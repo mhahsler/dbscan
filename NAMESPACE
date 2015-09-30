@@ -1,0 +1,19 @@
+useDynLib(dbscan)
+import(Rcpp)
+importFrom(graphics, plot)
+importFrom(stats, dist)
+
+export(
+  kNN,
+  kNNdistplot,
+  kNNdist,
+  frNN,
+  dbscan,
+  optics,
+  lof
+)
+
+S3method(print, optics)
+S3method(plot, optics)
+
+S3method(print, dbscan)

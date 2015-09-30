@@ -1,0 +1,10 @@
+proj$
+^\.Rproj\.user$
+^\.travis\.yml$
+^NEWS\.md$
+^cran-comments\.md$
+^appveyor\.yml$
+^revdep$
+^.*\.o$
+^.*\.Rproj$
+^LICENSE

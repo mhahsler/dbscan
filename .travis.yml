@@ -1,14 +1,9 @@
-# Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
+# Sample .travis.yml for R projects including codecov.io
 language: r
 sudo: required
 warnings_are_errors: true
 
-env:
-  global:
-    - CRAN: http://cran.rstudio.com
-
-r_packages:
-  - covr
-
+before_install:
+      - pip install codecov
 after_success:
-  - Rscript -e 'covr::codecov()'
+      - codecov

@@ -41,17 +41,15 @@ void update(
     N.first.pop_back();
     N.second.pop_back();
 
+    if(visited[o]) continue;
+
     double newreachdist = std::max(coredist[p], o_d);
 
-    if(visited[o]) {
-      // Update reachability distance for already processed points? No
-      //if(newreachdist < reachdist[o]) reachdist[o] = newreachdist;
-      continue;
-    }
-
     pos_seeds = std::find(seeds.begin(), seeds.end(), o);
-    if(pos_seeds == seeds.end()) seeds.push_back(o);
-    else if(newreachdist < reachdist[o]) reachdist[o] = newreachdist;
+    if(pos_seeds == seeds.end()) {
+      reachdist[o] = newreachdist;
+      seeds.push_back(o);
+    } else if(newreachdist < reachdist[o]) reachdist[o] = newreachdist;
   }
 }
 
@@ -87,7 +85,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   // OPTICS
   std::vector<bool> visited(nrow, false);
   std::vector<int> orderedPoints; orderedPoints.reserve(nrow);
-  std::vector<double> reachdist(nrow, INFINITY);
+  std::vector<double> reachdist(nrow, INFINITY); // we used Inf as undefined
   std::vector<double> coredist(nrow, INFINITY);
   nn N, N2;
   std::vector<int> seeds;
@@ -98,6 +96,8 @@ List optics_int(NumericMatrix data, double eps, int minPts,
 
     if (visited[p]) continue;
 
+    // ExpandClusterOrder
+    // Note:
     N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
 
     // find core distance
@@ -117,12 +117,14 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     seeds.clear();
 
     // update
-    update(N, p, seeds, eps2, minPts, visited, orderedPoints, reachdist, coredist);
+    update(N, p, seeds, eps2, minPts, visited, orderedPoints,
+      reachdist, coredist);
 
     while (!seeds.empty()) {
       // find smallest dist
       std::vector<int>::iterator q_it = seeds.begin();
-      for (std::vector<int>::iterator it = seeds.begin(); it!=seeds.end(); ++it) {
+      for (std::vector<int>::iterator it = seeds.begin();
+        it!=seeds.end(); ++it) {
         if (reachdist[*it] < reachdist[*q_it]) q_it = it;
       }
 
@@ -130,13 +132,16 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       seeds.erase(q_it);
 
       visited[q] = true;
+      // FIXME: set core dist?
+
       orderedPoints.push_back(q);
 
       N2 = regionQueryDist(q, dataPts, kdTree, eps2, approx);
 
       // contains q?
       if(N2.first.size() < (size_t) minPts-1) continue; // q has no core dist.
-      update(N2, q, seeds, eps2, minPts, visited, orderedPoints, reachdist, coredist);
+      update(N2, q, seeds, eps2, minPts, visited, orderedPoints,
+        reachdist, coredist);
     }
   }
 

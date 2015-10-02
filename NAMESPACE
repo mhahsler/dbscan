@@ -10,6 +10,7 @@ export(
   frNN,
   dbscan,
   optics,
+  optics_cut,
   lof
 )
 

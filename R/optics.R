@@ -17,8 +17,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree", bucketSize = 10,
-  splitRule = "suggest", approx = 0) {
+optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
+  bucketSize = 10, splitRule = "suggest", approx = 0) {
 
   ## make sure x is numeric
   x <- as.matrix(x)
@@ -36,34 +36,7 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree", bucketSize = 1
     as.integer(splitRule), as.double(approx))
 
   ### find clusters
-  if(!missing(eps_cl)) {
-    reachdist <- ret$reachdist[ret$order]
-    coredist <- ret$coredist[ret$order]
-    n <- length(ret$order)
-    cluster <- integer(n)
-    clusterid <- 0L
-    for(i in 1:n) {
-      if(reachdist[i] > eps_cl) {
-        if(coredist[i] <= eps_cl) {
-          clusterid <- clusterid + 1L
-          cluster[i] <- clusterid
-         }else{
-          cluster[i] <- 0L ### noise
-        }
-    #    cluster[i] <- 0L ### noise
-      }else{
-     #   if(i>1 && cluster[i-1]==0L) clusterid <- clusterid + 1L
-        cluster[i] <- clusterid
-      }
-    }
-
-    ret$eps_cl <- eps_cl
-
-    ### fix the order so cluster is in the same order as the rows in x
-    cluster[ret$order] <- cluster
-    ret$cluster <- cluster
-  }
-
+  if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
 
   ret$eps <- eps
   ret$minPts <- minPts
@@ -72,6 +45,35 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree", bucketSize = 1
   ret
 }
 
+
+### extract clusters
+optics_cut <- function(x, eps) {
+  reachdist <- x$reachdist[x$order]
+  coredist <- x$coredist[x$order]
+  n <- length(x$order)
+  cluster <- integer(n)
+
+  clusterid <- 0L         ### 0 is noise
+  for(i in 1:n) {
+    if(reachdist[i] > eps) {
+      if(coredist[i] <= eps) {
+        clusterid <- clusterid + 1L
+        cluster[i] <- clusterid
+      }else{
+        cluster[i] <- 0L  ### noise
+      }
+    }else{
+      cluster[i] <- clusterid
+    }
+  }
+
+  x$eps_cl <- eps
+  ### fix the order so cluster is in the same order as the rows in x
+  cluster[x$order] <- cluster
+  x$cluster <- cluster
+
+  x
+}
 
 print.optics <- function(x, ...) {
   cat("OPTICS clustering for ", length(x$order), " objects.", "\n", sep = "")
@@ -85,8 +87,8 @@ print.optics <- function(x, ...) {
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
   }
 
-plot.optics <- function(x, y=NULL, ...) {
-    if(!is.null(x$cluster)) {
+plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
+    if(!is.null(x$cluster) && cluster) {
       plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
         ylab = "Reachability dist.", xlab = "OPTICS order",
         main = "Reachability Plot")

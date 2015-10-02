@@ -1,5 +1,6 @@
 \name{optics}
 \alias{optics}
+\alias{optics_cut}
 \alias{OPTICS}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -14,11 +15,15 @@
   optics(x, eps, minPts = 5, eps_cl,
     search = "kdtree", bucketSize = 10,
     splitRule = "suggest", approx = 0)
+
+  optics_cut(x, eps)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix.}
-  \item{eps}{ size of the epsilon neighborhood (an upper limit can be used).}
+  \item{eps}{ size of the epsilon neighborhood (an upper limit can be used).
+    For \code{optics_cut} it specifies the height at which the
+    reachability plot is cut into clusters. }
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
@@ -26,7 +31,7 @@
     or "linear").}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
-      "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST" 
+      "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
       (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
   \item{approx}{ relative error bound for approximate nearest neighbor searching.}
 }
@@ -99,12 +104,16 @@ res$order
 ### plot produces a reachability plot
 plot(res)
 
-### run OPTICS with cluster identification (black is noise)
-res <- optics(x, eps = 1,  minPts = 10, eps_cl = .07)
+### identify clusters by cutting the reachability plot (black is noise)
+res <- optics_cut(res, eps = .07)
 res
 
 plot(res)
 plot(x, col = res$cluster+1)
+
+### re-cutting at a higher eps threshold
+res <- optics_cut(res, eps = .1)
+plot(res)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

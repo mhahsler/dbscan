@@ -1,4 +1,6 @@
 Version 0.9-5 (2015-xx-xx)
+  * OPTICS: fixed bug with first observation reported by Di Pang
+  * OPRICS: clusterings can now be extracted using optics_cut
 
 Version 0.9-4 (2015-09-17)
   * added tests (testthat).

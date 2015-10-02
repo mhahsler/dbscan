@@ -9,7 +9,7 @@
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 
-
+// Note: Region query includes self-matches!
 
 #include <Rcpp.h>
 #include "R_regionQuery.h"

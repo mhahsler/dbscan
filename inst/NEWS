@@ -1,8 +1,10 @@
+Version 0.9-5 (2015-xx-xx)
+
 Version 0.9-4 (2015-09-17)
   * added tests (testthat).
-  * input data is now checked if it can savely be coerced into a
+  * input data is now checked if it can safely be coerced into a
     numeric matrix (storage.mode double).
-  * fixed self matches in kNN (now returns the first NN correctly) and frNN.
+  * fixed self matches in kNN and frNN (now returns the first NN correctly).
 
 Version 0.9-3 (2015-9-2)
   * Added weights to DBSCAN.

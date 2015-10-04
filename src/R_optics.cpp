@@ -89,6 +89,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   std::vector<double> coredist(nrow, INFINITY);
   nn N, N2;
   std::vector<int> seeds;
+  std::vector<double> ds;
 
   for (int p=0; p<nrow; p++) {
     if (!(p % 100)) Rcpp::checkUserInterrupt();
@@ -97,12 +98,11 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     if (visited[p]) continue;
 
     // ExpandClusterOrder
-    // Note:
     N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
 
     // find core distance
     if(N.second.size() >= (size_t) minPts) {
-      std::vector<double> ds = N.second;
+      ds = N.second;
       std::sort(ds.begin(), ds.end()); // sort inceasing
       coredist[p] = ds[minPts-1];
     }
@@ -113,7 +113,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
 
     if (coredist[p] == INFINITY) continue; // core-dist is undefined
 
-    // updateable priority queue does not exist in C++ STL!
+    // updateable priority queue does not exist in C++ STL so we use a vector!
     seeds.clear();
 
     // update
@@ -121,22 +121,25 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       reachdist, coredist);
 
     while (!seeds.empty()) {
-      // find smallest dist
+      // get smallest dist (to emulate priority queue)
       std::vector<int>::iterator q_it = seeds.begin();
       for (std::vector<int>::iterator it = seeds.begin();
         it!=seeds.end(); ++it) {
         if (reachdist[*it] < reachdist[*q_it]) q_it = it;
       }
-
       int q = *q_it;
       seeds.erase(q_it);
 
+      N2 = regionQueryDist(q, dataPts, kdTree, eps2, approx);
+
       visited[q] = true;
-      // FIXME: set core dist?
+
+      // find core distance
+      ds = N2.second;
+      std::sort(ds.begin(), ds.end());
+      coredist[q] = ds[minPts-1];
 
       orderedPoints.push_back(q);
-
-      N2 = regionQueryDist(q, dataPts, kdTree, eps2, approx);
 
       // contains q?
       if(N2.first.size() < (size_t) minPts-1) continue; // q has no core dist.

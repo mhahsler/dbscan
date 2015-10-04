@@ -21,7 +21,7 @@
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix.}
-  \item{eps}{ size of the epsilon neighborhood (an upper limit can be used).
+  \item{eps}{ upper limit of the size of the epsilon neighborhood.
     For \code{optics_cut} it specifies the height at which the
     reachability plot is cut into clusters. }
   \item{minPts}{ number of minimum points in the eps region (for core points).

@@ -108,6 +108,7 @@ res
 
 plot(x, col=res$cluster + 1L)
 
+\dontrun{
 ## compare speed against fpc version (if microbenchmark is installed)
 if (requireNamespace("microbenchmark", quietly = TRUE)) {
   t_dbscan <- microbenchmark::microbenchmark(
@@ -125,6 +126,7 @@ if (requireNamespace("microbenchmark", quietly = TRUE)) {
 
   ## speedup of the kd-tree-based version compared to the fpc implementation
   median(t_fpc$time) / median(t_dbscan$time)
+}
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

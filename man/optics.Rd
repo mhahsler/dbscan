@@ -16,14 +16,12 @@
     search = "kdtree", bucketSize = 10,
     splitRule = "suggest", approx = 0)
 
-  optics_cut(x, eps)
+  optics_cut(x, eps_cl)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix.}
-  \item{eps}{ upper limit of the size of the epsilon neighborhood.
-    For \code{optics_cut} it specifies the height at which the
-    reachability plot is cut into clusters. }
+  \item{eps}{ upper limit of the size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
@@ -48,8 +46,12 @@ which shows each points reachability distance where the points are sorted
 by OPTICS. Valleys represent clusters (the deeper the valley, the more dense
   the cluster) and high points indicate points between clusters.
 
-If \code{epc_cl} is specified, then an algorithm to extract clusters
-(see Ankers et al, 1999) is used.
+If \code{eps_cl} is specified, then an algorithm to extract clusters
+(see Ankers et al, 1999) is used. That is, it internally calls \code{optics_cut}
+to extract the clustering.
+The resulting clustering is similar to what DBSCAN would
+produce. The only difference is that OPTICS is not able to assign some border
+points and reports them instead as noise.
 
 See \code{\link{kNN}} for more information on the other parameters related to
 kNN search.
@@ -62,8 +64,8 @@ kNN search.
     \item{reachdist }{ reachability distance for each point. }
     \item{coredist }{ core distance for each point. }
 
-  If \code{eps_cl} was specified the following additional components are
-    available:
+  If \code{eps_cl} was specified or \code{optics_cut} was called, then in
+  addition the following components are available:
     \item{eps_cl }{ reachability distance for each point. }
     \item{cluster }{ assigned cluster labels in the order of the rows in
       \code{x}. }
@@ -105,14 +107,14 @@ res$order
 plot(res)
 
 ### identify clusters by cutting the reachability plot (black is noise)
-res <- optics_cut(res, eps = .07)
+res <- optics_cut(res, eps_cl = .07)
 res
 
 plot(res)
 plot(x, col = res$cluster+1)
 
 ### re-cutting at a higher eps threshold
-res <- optics_cut(res, eps = .1)
+res <- optics_cut(res, eps_cl = .1)
 plot(res)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -29,7 +29,7 @@ expect_identical(res$minPts, minPts)
 ### from a clustering created by DBSCAN. Only some border objects may
 ### be missed"
 
-res <- optics_cut(res, eps = eps)
+res <- optics_cut(res, eps_cl = eps)
 #plot(res)
 
 db <- dbscan(x, minPts = minPts, eps = eps)

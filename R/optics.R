@@ -47,7 +47,7 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
 
 
 ### extract clusters
-optics_cut <- function(x, eps) {
+optics_cut <- function(x, eps_cl) {
   reachdist <- x$reachdist[x$order]
   coredist <- x$coredist[x$order]
   n <- length(x$order)
@@ -55,8 +55,8 @@ optics_cut <- function(x, eps) {
 
   clusterid <- 0L         ### 0 is noise
   for(i in 1:n) {
-    if(reachdist[i] > eps) {
-      if(coredist[i] <= eps) {
+    if(reachdist[i] > eps_cl) {
+      if(coredist[i] <= eps_cl) {
         clusterid <- clusterid + 1L
         cluster[i] <- clusterid
       }else{
@@ -67,7 +67,7 @@ optics_cut <- function(x, eps) {
     }
   }
 
-  x$eps_cl <- eps
+  x$eps_cl <- eps_cl
   ### fix the order so cluster is in the same order as the rows in x
   cluster[x$order] <- cluster
   x$cluster <- cluster

@@ -43,7 +43,7 @@ List kNN_int(NumericMatrix data, int k,
   NumericMatrix d(nrow, k);
   IntegerMatrix id(nrow, k);
 
-  // Note: the search also returns the point itself (a the first hit)!
+  // Note: the search also returns the point itself (as the first hit)!
   // So we have to look for k+1 points.
   ANNdistArray dists = new ANNdist[k+1];
   ANNidxArray nnIdx = new ANNidx[k+1];
@@ -60,9 +60,10 @@ List kNN_int(NumericMatrix data, int k,
     IntegerVector ids = IntegerVector(nnIdx, nnIdx+k+1);
     LogicalVector take = ids != i;
     ids = ids[take];
-
     id(i, _) = ids + 1;
-    d(i, _) = sqrt(NumericVector(dists, dists+k+1)[take]);
+
+    NumericVector ndists = NumericVector(dists, dists+k+1)[take];
+    d(i, _) = sqrt(ndists);
   }
 
   // cleanup

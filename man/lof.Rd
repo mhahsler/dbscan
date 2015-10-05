@@ -58,7 +58,6 @@ hist(lof, breaks=10)
 plot(x, pch = ".", main = "LOF (k=4)")
 points(x, cex = (lof-1)*3, pch = 1, col="red")
 text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 1)
-
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

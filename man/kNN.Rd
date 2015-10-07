@@ -20,7 +20,7 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   \item{sort}{ sort the neighbors by distance? }
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
-      "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST" 
+      "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
       (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
   \item{approx}{ use approximate nearest neighbors. All NN up to a distance of
     a factor of 1+\code{approx} eps may be used. Some actual NN may be
@@ -30,6 +30,8 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
 \details{
 This implementation uses the ANN library (see Mount and Arya, 2010) for
 nearest neighbor search. Linear nearest neighbor search can be used. To speed up nearest neighbor search the kd-tree is used.
+
+Note: self-matches are removed!
 
 \code{bucketSize} and \code{splitRule} influence how the kd-tree is built.
 \code{approx} uses the approximate nearest neighbor search implemented in ANN.

@@ -12,26 +12,37 @@ x <- cbind(
 )
 
 ### run OPTICS
-eps_optics <- 1
+eps <- 1
 #eps <- .06
-eps <- .1
+eps_cl <- .1
 minPts <- 10
-res <- optics(x, eps = eps_optics,  minPts = minPts)
+res <- optics(x, eps = eps,  minPts = minPts)
 
 expect_identical(length(res$order), nrow(x))
 expect_identical(length(res$reachdist), nrow(x))
 expect_identical(length(res$coredist), nrow(x))
-expect_identical(res$eps, eps_optics)
+expect_identical(res$eps, eps)
 expect_identical(res$minPts, minPts)
+
 
 ### compare result with DBSCAN
 ### "clustering created from a cluster-ordered is nearly indistinguishable
 ### from a clustering created by DBSCAN. Only some border objects may
 ### be missed"
 
-res <- optics_cut(res, eps_cl = eps)
+# extract DBSCAN clustering
+res <- optics_cut(res, eps_cl = eps_cl)
 #plot(res)
 
+# are there any clusters with only border points?
+frnn <- frNN(x, eps_cl)
+good <- sapply(frnn$id, FUN = function(x) (length(x)+1L)>=minPts)
+#plot(x, col = (res$cluster+1L))
+c_good <- res$cluster[good]
+c_notgood <- res$cluster[!good]
+expect_false(setdiff(c_notgood, c_good) != 0L)
+
+# compare with DBSCAN
 db <- dbscan(x, minPts = minPts, eps = eps)
 #plot(x, col = res$cluster+1L)
 #plot(x, col = db$cluster+1L)
@@ -41,3 +52,4 @@ pure <- sapply(split(db$cluster, res$cluster),
   FUN = function(x) length(unique(x)))
 
 expect_true(all(pure[names(pure) != "0"] == 1L))
+

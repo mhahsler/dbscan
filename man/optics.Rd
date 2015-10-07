@@ -107,15 +107,17 @@ res$order
 plot(res)
 
 ### identify clusters by cutting the reachability plot (black is noise)
-res <- optics_cut(res, eps_cl = .07)
+res <- optics_cut(res, eps_cl = .065)
 res
 
 plot(res)
-plot(x, col = res$cluster+1)
+plot(x, col = res$cluster+1L)
 
 ### re-cutting at a higher eps threshold
 res <- optics_cut(res, eps_cl = .1)
+res
 plot(res)
+plot(x, col = res$cluster+1L)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

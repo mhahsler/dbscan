@@ -35,11 +35,13 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
     as.integer(search), as.integer(bucketSize),
     as.integer(splitRule), as.double(approx))
 
+  ret$minPts <- minPts
+  ret$eps <- eps
+  ret$eps_cl <- NA
+
   ### find clusters
   if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
 
-  ret$eps <- eps
-  ret$minPts <- minPts
 
   class(ret) <- "optics"
   ret
@@ -77,7 +79,10 @@ optics_cut <- function(x, eps_cl) {
 
 print.optics <- function(x, ...) {
   cat("OPTICS clustering for ", length(x$order), " objects.", "\n", sep = "")
-  cat("Parameters: eps = ", x$eps, ", minPts = ", x$minPts, "\n", sep = "")
+  cat("Parameters: ", "minPts = ", x$minPts,
+    ", eps = ", x$eps,
+    ", eps_cl = ", x$eps_cl,
+    "\n", sep = "")
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])

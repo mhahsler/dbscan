@@ -142,7 +142,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       orderedPoints.push_back(q);
 
       // contains q?
-      if(N2.first.size() < (size_t) minPts-1) continue; // q has no core dist.
+      if(N2.first.size() < (size_t) minPts) continue; // q has no core dist.
       update(N2, q, seeds, eps2, minPts, visited, orderedPoints,
         reachdist, coredist);
     }

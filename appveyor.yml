@@ -29,13 +29,16 @@ artifacts:
 
   - path: '*.Rcheck\**\*.log'
     name: Logs
-    type: text
+    type: txt
 
   - path: '*.Rcheck\**\*.out'
     name: Logs
+    type: txt
 
   - path: '*.Rcheck\**\*.fail'
     name: Logs
+    type: txt
 
   - path: '*.Rcheck\**\*.Rout'
     name: Logs
+    type: txt

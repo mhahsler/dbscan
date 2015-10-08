@@ -23,22 +23,24 @@ on_failure:
 artifacts:
   - path: '\*_*.tar.gz'
     name: Linux package
+    type: application/gnutar
 
   - path: '\*_*.zip'
     name: Windows package
+    type: application/zip
 
   - path: '*.Rcheck\**\*.log'
     name: Logs
-    type: txt
+    type: text/plain
 
   - path: '*.Rcheck\**\*.out'
     name: Logs
-    type: txt
+    type: text/plain
 
   - path: '*.Rcheck\**\*.fail'
     name: Logs
-    type: txt
+    type: text/plain
 
   - path: '*.Rcheck\**\*.Rout'
     name: Logs
-    type: txt
+    type: text/plain

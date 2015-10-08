@@ -21,8 +21,15 @@ on_failure:
   - travis-tool.sh dump_logs
 
 artifacts:
+  - path: '\*_*.tar.gz'
+    name: Linux package
+
+  - path: '\*_*.zip'
+    name: Windows package
+
   - path: '*.Rcheck\**\*.log'
     name: Logs
+    type: text
 
   - path: '*.Rcheck\**\*.out'
     name: Logs
@@ -32,9 +39,3 @@ artifacts:
 
   - path: '*.Rcheck\**\*.Rout'
     name: Logs
-
-  - path: '\*_*.tar.gz'
-    name: Bits
-
-  - path: '\*_*.zip'
-    name: Bits

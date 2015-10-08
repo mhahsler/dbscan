@@ -76,9 +76,12 @@ Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTI
 
 \author{
     Michael Hahsler
+}
+
 \seealso{
 \code{\link[fpc]{dbscan}} in \pkg{fpc}.
 }
+
 \examples{
 set.seed(2)
 n <- 400

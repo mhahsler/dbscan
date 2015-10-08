@@ -1,7 +1,7 @@
 # Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
 language: r
 sudo: required
-warnings_are_errors: true
+warnings_are_errors: false
 
 env:
   global:

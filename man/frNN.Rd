@@ -47,10 +47,10 @@ A list with the following components:
 \references{
 David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Neighbor Searching, \url{https://www.cs.umd.edu/~mount/ANN/}.
 }
-%\author{
-%%  ~~who you are~~
-%}
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\author{
+    Michael Hahsler
+}
 
 \examples{
 data(iris)

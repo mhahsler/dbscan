@@ -33,9 +33,11 @@ Breunig, M., Kriegel, H., Ng, R., and Sander, J. (2000). LOF: identifying
    density-based local outliers. In \emph{ACM Int. Conf. on Management of Data,}
    pages 93-104.
 }
-%\author{
-%%  ~~who you are~~
-%}
+
+\author{
+    Michael Hahsler
+}
+
 \seealso{
 \code{\link{kNN}}.
 }

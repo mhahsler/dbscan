@@ -73,15 +73,9 @@ kNN search.
 \references{
 Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49--60.
 }
-%\author{
-  %%  ~~who you are~~
-    %}
-%\note{
-  %%  ~~further notes~~
-    %}
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
+\author{
+    Michael Hahsler
 \seealso{
 \code{\link[fpc]{dbscan}} in \pkg{fpc}.
 }

@@ -60,19 +60,16 @@ Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th
 Pacific-Asia Conference on Knowledge Discovery
 in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
 }
-%\author{
-  %%  ~~who you are~~
-    %}
-%\note{
-  %%  ~~further notes~~
-    %}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{kNNdistplot}},
 \code{\link[fpc]{dbscan}} in \pkg{fpc}.
 }
+
+\author{
+    Michael Hahsler
+}
+
 \examples{
 data(iris)
 iris <- as.matrix(iris[,1:4])

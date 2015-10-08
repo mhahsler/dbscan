@@ -27,15 +27,10 @@ See \code{\link{kNN}} for a discusion of the kd-tree related parameters.
 \code{kNNdist} returns a numeric vector with the distance to its k nearest
 neighbor.
 }
-%\references{
-%% ~put references to the literature/web site here ~
-%}
-%\author{
-%%  ~~who you are~~
-%}
-%\note{
-%%  ~~further notes~~
-%}
+
+\author{
+    Michael Hahsler
+}
 
 \seealso{
 \code{\link{kNN}}.

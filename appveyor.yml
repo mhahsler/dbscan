@@ -17,24 +17,16 @@ build_script:
 test_script:
   - travis-tool.sh run_tests
 
-on_failure:
-  - travis-tool.sh dump_logs
+after_test:
+  - 7z a logs.zip *.Rcheck
+
 
 artifacts:
+  - path: 'logs.zip'
+    name: Logs
+
   - path: '\*_*.tar.gz'
-    name: Linux package
+    name: Linux Package
 
   - path: '\*_*.zip'
-    name: Windows package
-
-  - path: '*.Rcheck\**\*.log'
-    name: Logs
-
-  - path: '*.Rcheck\**\*.out'
-    name: Logs
-
-  - path: '*.Rcheck\**\*.fail'
-    name: Logs
-
-  - path: '*.Rcheck\**\*.Rout'
-    name: Logs
+    name: Windows Package

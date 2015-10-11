@@ -22,7 +22,7 @@ implementations in WEKA, ELKI and Python's scikit-learn.
 * __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `intall_git()` (needs devtools) 
 
 ## Simple Example
-```
+```R
 install.packages("dbscan")
 library("dbscan")
 

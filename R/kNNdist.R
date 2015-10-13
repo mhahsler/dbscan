@@ -17,17 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-kNNdist <- function(x, k, ...){
-
-  ## make sure x is numeric
-  x <- as.matrix(x)
-  if(storage.mode(x) == "integer") storage.mode(x) <- "double"
-  if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
-
-  if(k >= nrow(x)) stop("Not enought neighbors in data set!")
-
-  dbscan::kNN(x, k, sort = TRUE, ...)$dist
-}
+kNNdist <- function(x, k, ...) dbscan::kNN(x, k, sort = TRUE, ...)$dist
 
 kNNdistplot <- function(x, k = 4, ...) {
   kNNdist <- sort(kNNdist(x, k ,...))

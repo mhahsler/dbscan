@@ -29,24 +29,20 @@ expect_identical(dim(nn$id), c(nrow(x), k))
 #points(x[nn$id[1,],], col="red", lwd=5)
 #points(x[nn$id[2,],], col="green", lwd=5)
 
-## compare with manually found NNs
-d <- as.matrix(dist(x)); diag(d) <- Inf
-ids <- t(apply(d, MARGIN = 1, order, decreasing = FALSE))[,1:k]
-dimnames(ids) <- list(rownames(x), 1:k)
-dists <- t(apply(d, MARGIN = 1, sort, decreasing = FALSE))[,1:k]
-dimnames(dists) <- list(rownames(x), 1:k)
+## compare with kNN found using distances
+nn_d <- kNN(dist(x), k)
 
 ## check visually
 #plot(x)
-#points(x[ids[1,],], col="red", lwd=5)
-#points(x[ids[2,],], col="green", lwd=5)
+#points(x[nn_d$id[1,],], col="red", lwd=5)
+#points(x[nn_d$id[2,],], col="green", lwd=5)
 
-#head(ids)
-#head(nn$id)
+### will aggree minus some tries
+expect_equal(nn, nn_d)
 
-expect_identical(nn$id, ids)
-expect_identical(nn$dist, dists)
-
+## calculate dist internally
+nn_d2 <- kNN(x, k, search = "dist")
+expect_equal(nn, nn_d2)
 
 ## without sorting
 nn2 <- dbscan::kNN(x, k=k, sort = FALSE)
@@ -79,18 +75,14 @@ k <- 5L
 nn <- dbscan::kNN(x, k=k, sort = TRUE)
 
 ## compare with manually found NNs
-d <- as.matrix(dist(x)); diag(d) <- Inf
-ids <- t(apply(d, MARGIN = 1, order, decreasing = FALSE))[,1:k]
-dimnames(ids) <- list(rownames(x), 1:k)
-dists <- t(apply(d, MARGIN = 1, sort, decreasing = FALSE))[,1:k]
-dimnames(dists) <- list(rownames(x), 1:k)
+nn_d <- dbscan::kNN(x, k=k, search = "dist")
 
-expect_identical(nn$dist, dists)
+expect_identical(nn$dist, nn_d$dist)
 ## This is expected to fail: expect_identical(nn$id, ids)
 
 ## only compare the ids which do not have unique distances
-ms <- nn$id == ids
-cos <- diff(dists)==0; cos[,1] <- FALSE
+ms <- nn$id == nn_d$id
+cos <- diff(nn_d$dist)==0; cos[,1] <- FALSE
 ms[cos] <- TRUE
 expect_false(any(rowSums(ms[,-k]) !=4))
 

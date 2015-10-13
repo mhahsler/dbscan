@@ -16,7 +16,7 @@ kNNdistplot(x, k = 4, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ the data set as a matrix. }
+  \item{x}{ the data set as a matrix or a dist object. }
   \item{k}{ number of nearest neighbors used (use minPoints). }
   \item{...}{further arguments are passed on to \code{kNN}.}
   }

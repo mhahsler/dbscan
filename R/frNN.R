@@ -20,16 +20,43 @@
 frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  if(is.na(search)) stop("Unknown NN search type!")
+
+  if(search == "DIST") {
+    if(.matrixlike(x)) x <- dist(x)
+    else stop("x needs to be a matrix to calculate distances")
+  }
+
+  ### get kNN from a dist object
+  if(is(x, "dist")) {
+    x <- as.matrix(x)
+    diag(x) <- Inf
+
+    id <- apply(x, MARGIN = 1, FUN = function(y) {
+          o <- order(y, decreasing = FALSE)
+          o[y[o] < eps]
+        }
+    )
+    names(id) <- rownames(x)
+
+    d <- lapply(1:nrow(x), FUN = function(i) {
+          unname(x[i,id[[i]]])
+        }
+    )
+    names(d) <- rownames(x)
+
+    return(list(dist = d, id = id, eps = eps))
+  }
+
   ## make sure x is numeric
+  if(!.matrixlike(x)) stop("x needs to be a matrix to calculate distances")
   x <- as.matrix(x)
   if(storage.mode(x) == "integer") storage.mode(x) <- "double"
   if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
-
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR"))
-  if(is.na(search)) stop("Unknown NN search type!")
 
   ret <- frNN_int(as.matrix(x), as.double(eps),
     as.integer(search), as.integer(bucketSize),

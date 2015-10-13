@@ -13,10 +13,10 @@ frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ a data matrix.}
+  \item{x}{ a data matrix or a dist object.}
   \item{eps}{ neighbors radius. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree"
-    or "linear").}
+    or "linear", "dist").}
   \item{sort}{ sort the neighbors by distance? }
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",

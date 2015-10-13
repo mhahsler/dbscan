@@ -81,8 +81,8 @@ List frNN_int(NumericMatrix data, double eps, int type, int bucketSize, int spli
 
   // prepare results
   List ret;
-  ret["id"] = id;
   ret["dist"] = dist;
+  ret["id"] = id;
   ret["eps"] = eps;
   return ret;
 }

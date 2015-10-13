@@ -34,35 +34,11 @@ expect_identical(sapply(nn$dist, length), sapply(nn$id, length))
 #points(x[1:2,, drop = FALSE], col="blue", pch="+", cex=2)
 
 ## compare with manually found NNs
-d <- as.matrix(dist(x)); diag(d) <- Inf
-ids <- apply(d, MARGIN = 1, FUN =
-    function(y) {
-      o <- order(y, decreasing = FALSE)
-      o[y[o] < eps]
-    }
-)
+nn_d <- dbscan::frNN(dist(x), eps = eps, sort = TRUE)
+expect_equal(nn, nn_d)
 
-dists <- lapply(1:nrow(d), FUN =
-    function(i) {
-      unname(d[i,ids[[i]]])
-    }
-)
-names(dists) <- rownames(x)
-
-## check visually
-#plot(x)
-#points(x[ids[[1]],], col="red", lwd=5)
-#points(x[ids[[2]],], col="green", lwd=5)
-#points(x[1:2,, drop = FALSE], col="blue", pch="+", cex=2)
-
-#head(ids)
-#head(nn$id)
-#head(dists, n=2)
-#head(nn$dist, n=2)
-
-expect_identical(nn$id, ids)
-expect_identical(nn$dist, dists)
-
+nn_d2 <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
+expect_equal(nn, nn_d2)
 
 ## without sorting
 nn2 <- dbscan::frNN(x, eps = eps, sort = FALSE)
@@ -94,20 +70,6 @@ eps <- .5
 nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
 
 ## compare with manually found NNs
-d <- as.matrix(dist(x)); diag(d) <- Inf
-ids <- apply(d, MARGIN = 1, FUN =
-    function(y) {
-      o <- order(y, decreasing = FALSE)
-      o[y[o] < eps]
-    }
-)
+nn_d <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
 
-dists <- lapply(1:nrow(d), FUN =
-    function(i) {
-      unname(d[i,ids[[i]]])
-    }
-)
-names(dists) <- rownames(x)
-
-expect_identical(nn$dist, dists)
-expect_identical(nn$id, ids)
+expect_identical(nn, nn_d)

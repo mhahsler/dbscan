@@ -13,26 +13,38 @@
  structure (from library ANN) for faster k-nearest neighbor search. 
  An R interface to __fast kNN and fixed-radius NN search__ is also provided.
 
-This implementation is typically faster than the native R implementaiton in package `fpc`, or the 
+This implementation is typically faster than the native R implementation in package `fpc`, or the 
 implementations in WEKA, ELKI and Python's scikit-learn.
 
 ## Installation
 
 * __Stable CRAN version:__ install from within R.
-* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `intall_git()` (needs devtools) 
+* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `intall_github("mhahsler/dbscan")` (requires devtools) 
 
 ## Simple Example
 ```R
-install.packages("dbscan")
 library("dbscan")
 
+## use the numeric variables in the iris dataset
 data("iris")
-iris <- as.matrix(iris[,1:4])
+x <- as.matrix(iris[, 1:4])
  
-## run DBSCAN
-res <- dbscan(iris, eps = .4, minPts = 4)
-res
+## DBSCAN
+db <- dbscan(x, eps = .4, minPts = 4)
+db
+## visualize results (noise is shown in black)
+pairs(x, col = db$cluster + 1L)
 
-## visualize results
-pairs(iris, col = res$cluster + 1L)
+## LOF (local outlier factor) 
+lof <- lof(x, k = 4)
+## larger bubbles in the visualization have a larger LOF
+pairs(x, cex = lof)
+
+## OPTICS
+opt <- optics(x, eps = 1, minPts = 4, eps_cl = .4)
+opt
+## create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
+plot(opt)
+## plot the extracted DBSCAN clustering
+pairs(x, col = opt$cluster + 1L)
 ```

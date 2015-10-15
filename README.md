@@ -37,24 +37,14 @@ pairs(x, col = db$cluster + 1L)
 
 ## LOF (local outlier factor) 
 lof <- lof(x, k = 4)
-<<<<<<< HEAD
 ## larger bubbles in the visualization have a larger LOF
-=======
-## Larger bubbles in the visualization have a larger LOF.
->>>>>>> fbd46996fcedc137124919c131ba2561cf3c1adf
 pairs(x, cex = lof)
 
 ## OPTICS
 opt <- optics(x, eps = 1, minPts = 4, eps_cl = .4)
 opt
-<<<<<<< HEAD
 ## create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 plot(opt)
 ## plot the extracted DBSCAN clustering
-=======
-## Create a reachability plot
-plot(opt)
-## since specified eps_cl we also extract a DBSCAN clustering from the order in OPTICS.
->>>>>>> fbd46996fcedc137124919c131ba2561cf3c1adf
 pairs(x, col = opt$cluster + 1L)
 ```

@@ -21,26 +21,45 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL,
   borderPoints = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
-  ## make sure x is numeric
-  x <- as.matrix(x)
-  if(storage.mode(x) == "integer") storage.mode(x) <- "double"
-  if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
-
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  if(is.na(search)) stop("Unknown NN search type!")
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR"))
-  if(is.na(search)) stop("Unknown NN search type!")
+
+  ### dist search
+  if(search == 3) {
+    if(!is(x, "dist"))
+      if(.matrixlike(x)) x <- dist(x)
+      else stop("x needs to be a matrix to calculate distances")
+  }
+
+  ## for dist we provide the R code with a frNN list and no x
+  frNN <- list()
+  if(is(x, "dist")) {
+    frNN <- frNN(x, eps)$id
+    ## add self match and use C numbering
+    frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
+
+    x <- matrix()
+    storage.mode(x) <- "double"
+
+  }else{
+    if(!.matrixlike(x)) stop("x needs to be a matrix")
+    ## make sure x is numeric
+    x <- as.matrix(x)
+    if(storage.mode(x) == "integer") storage.mode(x) <- "double"
+    if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
+  }
 
   ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
     as.double(weights), as.integer(borderPoints),
     as.integer(search), as.integer(bucketSize),
-    as.integer(splitRule), as.double(approx))
+    as.integer(splitRule), as.double(approx), frNN)
 
-  ret <- list(cluster = ret, eps = eps, minPts = minPts)
-  class(ret) <- "dbscan"
-  ret
+  structure(list(cluster = ret, eps = eps, minPts = minPts),
+    class = "dbscan")
 }
 
 

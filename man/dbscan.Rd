@@ -19,7 +19,7 @@
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix.}
+  \item{x}{a data matrix or a dist object.}
   \item{eps}{ size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
@@ -29,7 +29,7 @@
     \code{FALSE} then border points are considered noise
     (see DBSCAN* in Campello et al, 2013).}
   \item{search}{ nearest neighbor search strategy (one of "kdtree"
-    or "linear").}
+    or "linear", "dist").}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
     "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"

@@ -23,19 +23,21 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 
-  if(search == "DIST") {
-    if(.matrixlike(x)) x <- dist(x)
-    else stop("x needs to be a matrix to calculate distances")
+  ### dist search
+  if(search == 3) {
+    if(!is(x, "dist"))
+      if(.matrixlike(x)) x <- dist(x)
+      else stop("x needs to be a matrix to calculate distances")
   }
 
-  ### get kNN from a dist object
+  ### get kNN from a dist object in R
   if(is(x, "dist")) {
     x <- as.matrix(x)
     diag(x) <- Inf
 
     id <- apply(x, MARGIN = 1, FUN = function(y) {
           o <- order(y, decreasing = FALSE)
-          o[y[o] < eps]
+          o[y[o] <= eps]
         }
     )
     names(id) <- rownames(x)

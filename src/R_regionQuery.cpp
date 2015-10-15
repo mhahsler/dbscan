@@ -9,7 +9,7 @@
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 
-// Note: Region query includes self-matches!
+// Note: Region query returns self-matches!
 
 #include <Rcpp.h>
 #include "R_regionQuery.h"
@@ -29,7 +29,7 @@ nn regionQueryDist(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
 }
 
 std::vector<int> regionQuery(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
-  double eps2, double approx) {
+  double eps2, double approx = 0) {
 
   // find fixed radius nearest neighbors
   ANNpoint queryPt = dataPts[id];

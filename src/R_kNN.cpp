@@ -8,6 +8,7 @@
 // GNU General Public License (GPL) Version 3
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
+// Note: does not return self-matches!
 
 #include <Rcpp.h>
 #include "ANN/ANN.h"

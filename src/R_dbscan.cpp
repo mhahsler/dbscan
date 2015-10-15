@@ -15,44 +15,60 @@
 
 using namespace Rcpp;
 
+// call this with either
+// * data and epsilon and an empty frNN list
+// or
+// * empty data and a frNN id list (including selfmatches and using C numbering)
 
 // [[Rcpp::export]]
 IntegerVector dbscan_int(
     NumericMatrix data, double eps, int minPts, NumericVector weights,
-    int borderPoints, int type, int bucketSize, int splitRule, double approx) {
+    int borderPoints, int type, int bucketSize, int splitRule, double approx,
+    List frNN) {
 
   // kd-tree uses squared distances
   double eps2 = eps*eps;
+
   bool weighted = FALSE;
   double Nweight = 0.0;
+  ANNpointSet* kdTree = NULL;
+  ANNpointArray dataPts = NULL;
+  int nrow = NA_INTEGER;
+  int ncol= NA_INTEGER;
+
+  if(frNN.size()) {
+    // no kd-tree
+    nrow = frNN.size();
+  }else{
+
+    // copy data for kd-tree
+    nrow = data.nrow();
+    ncol = data.ncol();
+    dataPts = annAllocPts(nrow, ncol);
+    for (int i = 0; i < nrow; i++){
+      for (int j = 0; j < ncol; j++){
+        (dataPts[i])[j] = data(i, j);
+      }
+    }
+    //Rprintf("Points copied.\n");
+
+    // create kd-tree (1) or linear search structure (2)
+    if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
+      (ANNsplitRule) splitRule);
+    else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+    //Rprintf("kd-tree ready. starting DBSCAN.\n");
+  }
 
   if (weights.size() != 0) {
-    if (weights.size() != data.nrow())
+    if (weights.size() != nrow)
       stop("length of weights vector is incompatible with data.");
     weighted = TRUE;
   }
 
-  // copy data
-  int nrow = data.nrow();
-  int ncol = data.ncol();
-  ANNpointArray dataPts = annAllocPts(nrow, ncol);
-  for (int i = 0; i < nrow; i++){
-    for (int j = 0; j < ncol; j++){
-      (dataPts[i])[j] = data(i, j);
-    }
-  }
-  //Rprintf("Points copied.\n");
-
-  // create kd-tree (1) or linear search structure (2)
-  ANNpointSet* kdTree = NULL;
-  if (type==1)kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-    (ANNsplitRule) splitRule);
-  else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
-  //Rprintf("kd-tree ready. starting DBSCAN.\n");
-
   // DBSCAN
   std::vector<bool> visited(nrow, false);
   std::vector< std::vector<int> > clusters; // vector of vectors == list
+  std::vector<int>  N, N2;
 
   for (int i=0; i<nrow; i++) {
     //Rprintf("processing point %d\n", i+1);
@@ -60,8 +76,9 @@ IntegerVector dbscan_int(
 
     if (visited[i]) continue;
 
-
-    std::vector<int> N = regionQuery(i, dataPts, kdTree, eps2, approx);
+    //N = regionQuery(i, dataPts, kdTree, eps2, approx);
+    if(frNN.size())   N = frNN[i];
+    else              N = regionQuery(i, dataPts, kdTree, eps2, approx);
 
     // noise points stay unassigned for now
     //if (weighted) Nweight = sum(weights[IntegerVector(N.begin(), N.end())]) +
@@ -88,7 +105,9 @@ IntegerVector dbscan_int(
       if (visited[j]) continue; // point already processed
       visited[j] = true;
 
-      std::vector<int> N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
+      //N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
+      if(frNN.size())   N2 = frNN[j];
+      else              N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
 
       if (weighted) {
         // Nweight = sum(weights(NumericVector(N2.begin(), N2.end())) +
@@ -122,9 +141,11 @@ IntegerVector dbscan_int(
   }
 
   // cleanup
-  delete kdTree;
-  annDeallocPts(dataPts);
-  annClose();
+  if(kdTree != NULL) {
+    delete kdTree;
+    annDeallocPts(dataPts);
+    annClose();
+  }
 
   return wrap(id);
 }

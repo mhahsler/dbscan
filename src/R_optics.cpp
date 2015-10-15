@@ -19,7 +19,6 @@ void update(
     std::pair< std::vector<int>, std::vector<double> > &N,
     int p,
     std::vector<int> &seeds,
-    double eps2,
     int minPts,
     std::vector <bool> &visited,
     std::vector<int> &orderedPoints,
@@ -28,66 +27,77 @@ void update(
     ){
 
   std::vector<int>::iterator pos_seeds;
-
-  // find core distance
-  // Note: we hopefully cannot get here if ds is not at least minPts long!
-  std::vector<double> ds = N.second;
-  std::sort(ds.begin(), ds.end());
-  coredist[p] = ds[minPts-1];
+  double newreachdist;
+  int o;
+  double o_d;
 
   while(!N.first.empty()) {
-    int o = N.first.back();
-    double o_d = N.second.back();
+    o = N.first.back();
+    o_d = N.second.back();
     N.first.pop_back();
     N.second.pop_back();
 
     if(visited[o]) continue;
 
-    double newreachdist = std::max(coredist[p], o_d);
+    newreachdist = std::max(coredist[p], o_d);
 
-    pos_seeds = std::find(seeds.begin(), seeds.end(), o);
-    if(pos_seeds == seeds.end()) {
+    if(reachdist[o] == INFINITY) {
       reachdist[o] = newreachdist;
       seeds.push_back(o);
-    } else if(newreachdist < reachdist[o]) reachdist[o] = newreachdist;
+    } else {
+      // o was not visited and has a reachbility distance must be
+      // already in seeds!
+      if(newreachdist < reachdist[o]) reachdist[o] = newreachdist;
+    }
   }
 }
 
 
 // [[Rcpp::export]]
 List optics_int(NumericMatrix data, double eps, int minPts,
-  int type, int bucketSize, int splitRule, double approx) {
+  int type, int bucketSize, int splitRule, double approx, List frNN) {
 
   // kd-tree uses squared distances
   double eps2 = eps*eps;
 
-  // copy data
-  int nrow = data.nrow();
-  int ncol = data.ncol();
-  ANNpointArray dataPts = annAllocPts(nrow, ncol);
-  for(int i = 0; i < nrow; i++){
-    for(int j = 0; j < ncol; j++){
-      (dataPts[i])[j] = data(i, j);
-    }
-  }
-  //Rprintf("Points copied.\n");
-
-  // create kd-tree (1) or linear search structure (2)
   ANNpointSet* kdTree = NULL;
-  if (type==1){
-    kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule)  splitRule);
-  } else{
-    kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+  ANNpointArray dataPts = NULL;
+  int nrow = NA_INTEGER;
+  int ncol= NA_INTEGER;
+
+  if(frNN.size()) {
+    // no kd-tree
+    nrow = (as<List>(frNN["id"])).size();
+  }else{
+
+    // copy data for kd-tree
+    nrow = data.nrow();
+    ncol = data.ncol();
+    dataPts = annAllocPts(nrow, ncol);
+    for (int i = 0; i < nrow; i++){
+      for (int j = 0; j < ncol; j++){
+        (dataPts[i])[j] = data(i, j);
+      }
+    }
+    //Rprintf("Points copied.\n");
+
+    // create kd-tree (1) or linear search structure (2)
+    if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
+      (ANNsplitRule) splitRule);
+    else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+    //Rprintf("kd-tree ready. starting OPTICS.\n");
+
   }
-  //Rprintf("kd-tree ready. starting DBSCAN.\n");
+
 
   // OPTICS
   std::vector<bool> visited(nrow, false);
   std::vector<int> orderedPoints; orderedPoints.reserve(nrow);
+  // FIXME: fix predecessor
+  //std::vector<int> pre(nrow, NA_INTEGER);
   std::vector<double> reachdist(nrow, INFINITY); // we used Inf as undefined
   std::vector<double> coredist(nrow, INFINITY);
-  nn N, N2;
+  nn N;
   std::vector<int> seeds;
   std::vector<double> ds;
 
@@ -98,7 +108,13 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     if (visited[p]) continue;
 
     // ExpandClusterOrder
-    N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
+    //N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
+    if(frNN.size())   N = std::make_pair(
+      as<std::vector<int> >(as<List>(frNN["id"])[p]),
+      as<std::vector<double> >(as<List>(frNN["dist"])[p]));
+    else              N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
+
+    visited[p] = true;
 
     // find core distance
     if(N.second.size() >= (size_t) minPts) {
@@ -107,57 +123,72 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       coredist[p] = ds[minPts-1];
     }
 
-    // mark visited and output p
-    visited[p] = true;
     orderedPoints.push_back(p);
 
     if (coredist[p] == INFINITY) continue; // core-dist is undefined
 
     // updateable priority queue does not exist in C++ STL so we use a vector!
-    seeds.clear();
+    //seeds.clear();
 
     // update
-    update(N, p, seeds, eps2, minPts, visited, orderedPoints,
+    update(N, p, seeds, minPts, visited, orderedPoints,
       reachdist, coredist);
 
+    int q;
     while (!seeds.empty()) {
-      // get smallest dist (to emulate priority queue)
+      // get smallest dist (to emulate priority queue). All should have already
+      // a reachability distance <Inf from update().
       std::vector<int>::iterator q_it = seeds.begin();
       for (std::vector<int>::iterator it = seeds.begin();
         it!=seeds.end(); ++it) {
-        if (reachdist[*it] < reachdist[*q_it]) q_it = it;
+        // Note: The second part of the if statement ensures that ties are
+        // always broken consistenty (higher ID wins to produce the same
+        // results as the elki implementation)!
+        if (reachdist[*it] < reachdist[*q_it] ||
+          (reachdist[*it] == reachdist[*q_it] && *q_it < *it)) q_it = it;
       }
-      int q = *q_it;
+      q = *q_it;
       seeds.erase(q_it);
 
-      N2 = regionQueryDist(q, dataPts, kdTree, eps2, approx);
+      //N2 = regionQueryDist(q, dataPts, kdTree, eps2, approx);
+      if(frNN.size())   N = std::make_pair(
+        as<std::vector<int> >(as<List>(frNN["id"])[q]),
+        as<std::vector<double> >(as<List>(frNN["dist"])[q]));
+      else              N = regionQueryDist(q, dataPts, kdTree, eps2, approx);
 
       visited[q] = true;
 
-      // find core distance
-      ds = N2.second;
-      std::sort(ds.begin(), ds.end());
-      coredist[q] = ds[minPts-1];
+      // update core distance
+      if(N.second.size() >= (size_t) minPts) {
+        ds = N.second;
+        std::sort(ds.begin(), ds.end());
+        coredist[q] = ds[minPts-1];
+      }
 
       orderedPoints.push_back(q);
+      //pre[q] = p;
 
-      // contains q?
-      if(N2.first.size() < (size_t) minPts) continue; // q has no core dist.
-      update(N2, q, seeds, eps2, minPts, visited, orderedPoints,
+      if(N.first.size() < (size_t) minPts) continue; //  == q has no core dist.
+
+      // update seeds
+      update(N, q, seeds, minPts, visited, orderedPoints,
         reachdist, coredist);
     }
   }
 
   // cleanup
-  delete kdTree;
-  annDeallocPts(dataPts);
-  annClose();
+  if(kdTree != NULL) {
+    delete kdTree;
+    annDeallocPts(dataPts);
+    annClose();
+  }
 
   // prepare results (R index starts with 1)
   List ret;
   ret["order"] = IntegerVector(orderedPoints.begin(), orderedPoints.end())+1;
   ret["reachdist"] = sqrt(NumericVector(reachdist.begin(), reachdist.end()));
   ret["coredist"] = sqrt(NumericVector(coredist.begin(), coredist.end()));
+  //ret["predecessor"] = IntegerVector(pre.begin(), pre.end())+1;
   return ret;
 }
 

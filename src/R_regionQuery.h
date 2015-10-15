@@ -15,7 +15,9 @@
 #include "ANN/ANN.h"
 using namespace Rcpp;
 
+// pair of ids and dists
 typedef std::pair< std::vector<int>, std::vector<double> > nn ;
+
 
 nn regionQueryDist(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
   double eps2, double approx);

@@ -8,6 +8,7 @@
 // GNU General Public License (GPL) Version 3
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
+// Note: does not return self-matches unless selfmatches = TRUE
 
 #include <Rcpp.h>
 #include "ANN/ANN.h"
@@ -16,7 +17,8 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-List frNN_int(NumericMatrix data, double eps, int type, int bucketSize, int splitRule, double approx) {
+List frNN_int(NumericMatrix data, double eps, int type,
+  int bucketSize, int splitRule, double approx) {
 
   // kd-tree uses squared distances
   double eps2 = eps*eps;
@@ -60,18 +62,16 @@ List frNN_int(NumericMatrix data, double eps, int type, int bucketSize, int spli
     //std::transform(N.second.begin(), N.second.end(),
     //  N.second.begin(), static_cast<double (*)(double)>(std::sqrt));
 
-    // remove self matches
     IntegerVector ids = IntegerVector(N.first.begin(), N.first.end());
+    NumericVector dists = NumericVector(N.second.begin(), N.second.end());
+
+    // remove self matches
     LogicalVector take = ids != p;
     ids = ids[take];
-    NumericVector dists = NumericVector(N.second.begin(), N.second.end())[take];
+    dists = dists[take];
 
     id[p] = ids+1;
     dist[p] = sqrt(dists);
-
-
-
-
   }
 
   // cleanup

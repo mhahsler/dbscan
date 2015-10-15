@@ -31,9 +31,11 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   k <- as.integer(k)
   if(k < 1) stop("Illegal k: needs to be k>=1!")
 
-  if(search == "DIST") {
-    if(.matrixlike(x)) x <- dist(x)
-    else stop("x needs to be a matrix to calculate distances")
+  ### dist search
+  if(search == 3) {
+    if(!is(x, "dist"))
+      if(.matrixlike(x)) x <- dist(x)
+      else stop("x needs to be a matrix to calculate distances")
   }
 
   ### get kNN from a dist object

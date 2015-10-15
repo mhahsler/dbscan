@@ -20,20 +20,43 @@
 optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
   bucketSize = 10, splitRule = "suggest", approx = 0) {
 
-  ## make sure x is numeric
-  x <- as.matrix(x)
-  if(storage.mode(x) == "integer") storage.mode(x) <- "double"
-  if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
-
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR"))
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
+
+  ### dist search
+  if(search == 3) {
+    if(!is(x, "dist"))
+      if(.matrixlike(x)) x <- dist(x)
+      else stop("x needs to be a matrix to calculate distances")
+  }
+
+  ## for dist we provide the R code with a frNN list and no x
+  frNN <- list()
+  if(is(x, "dist")) {
+    frNN <- frNN(x, eps)
+    ## add self match and use C numbering
+    frNN$id <- lapply(1:length(frNN$id),
+      FUN = function(i) c(i-1L, frNN$id[[i]]-1L))
+    frNN$dist <- lapply(1:length(frNN$dist),
+      FUN = function(i) c(0, frNN$dist[[i]])^2)
+
+    x <- matrix()
+    storage.mode(x) <- "double"
+
+  }else{
+    if(!.matrixlike(x)) stop("x needs to be a matrix")
+    ## make sure x is numeric
+    x <- as.matrix(x)
+    if(storage.mode(x) == "integer") storage.mode(x) <- "double"
+    if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
+  }
 
   ret <- optics_int(as.matrix(x), as.double(eps), as.integer(minPts),
     as.integer(search), as.integer(bucketSize),
-    as.integer(splitRule), as.double(approx))
+    as.integer(splitRule), as.double(approx), frNN)
 
   ret$minPts <- minPts
   ret$eps <- eps
@@ -41,7 +64,6 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
 
   ### find clusters
   if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
-
 
   class(ret) <- "optics"
   ret

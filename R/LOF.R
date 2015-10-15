@@ -19,12 +19,12 @@
 
 lof <- function(x, k = 4, ...) {
 
-  ## make sure x is numeric
-  x <- as.matrix(x)
-  if(storage.mode(x) == "integer") storage.mode(x) <- "double"
-  if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
+  # get n
+  if(is(x, "dist")) n <- attr(x, "Size")
+  else n <- nrow(x)
 
-  n <- nrow(x)
+  if(is.null(n)) stop("x needs to be a matrix or a dist object!")
+
   if(k<1 || k>=n)
     stop("k has to be larger than 1 and smaller than the number of points")
 

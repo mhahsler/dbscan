@@ -3,16 +3,13 @@ library("testthat")
 
 context("OPTICS")
 
-set.seed(2)
-n <- 400
+load(system.file("test_data/test_data.rda", package = "dbscan"))
+load(system.file("test_data/elki_optics.rda", package = "dbscan"))
 
-x <- cbind(
-  x = runif(4, 0, 1) + rnorm(n, sd=0.1),
-  y = runif(4, 0, 1) + rnorm(n, sd=0.1)
-)
+x <- test_data
 
 ### run OPTICS
-eps <- 1
+eps <- .1
 #eps <- .06
 eps_cl <- .1
 minPts <- 10
@@ -24,6 +21,16 @@ expect_identical(length(res$coredist), nrow(x))
 expect_identical(res$eps, eps)
 expect_identical(res$minPts, minPts)
 
+### compare with distance based version!
+res_d <- optics(dist(x), eps = eps,  minPts = minPts)
+expect_equal(res, res_d)
+
+#plot(res)
+#plot(res_d)
+
+### compare with elki's result
+expect_equal(res$order, elki$ID)
+expect_equal(round(res$reachdist[res$order], 3), round(elki$reachability, 3))
 
 ### compare result with DBSCAN
 ### "clustering created from a cluster-ordered is nearly indistinguishable

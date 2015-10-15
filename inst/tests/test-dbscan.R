@@ -35,8 +35,13 @@ x <- cbind(
 	   )
 
 res <- dbscan::dbscan(x, eps = .2, minPts = 4)
-
 expect_identical(length(res$cluster), nrow(x))
+
+## compare with dist-based versions
+res_d <- dbscan::dbscan(dist(x), eps = .2, minPts = 4)
+expect_identical(res, res_d)
+res_d2 <- dbscan::dbscan(x, eps = .2, minPts = 4, search = "dist")
+expect_identical(res, res_d2)
 
 ## compare with dbscan from package fpc (only if installed)
 if (requireNamespace("fpc", quietly = TRUE)) {

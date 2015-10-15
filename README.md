@@ -23,16 +23,28 @@ implementations in WEKA, ELKI and Python's scikit-learn.
 
 ## Simple Example
 ```R
-install.packages("dbscan")
 library("dbscan")
 
+## use the numeric variables in the iris dataset
 data("iris")
-iris <- as.matrix(iris[,1:4])
+x <- as.matrix(iris[, 1:4])
  
-## run DBSCAN
-res <- dbscan(iris, eps = .4, minPts = 4)
-res
+## DBSCAN
+db <- dbscan(x, eps = .4, minPts = 4)
+db
+## visualize results (noise is shown in black)
+pairs(x, col = db$cluster + 1L)
 
-## visualize results
-pairs(iris, col = res$cluster + 1L)
+## LOF (local outlier factor) 
+lof <- lof(x, k = 4)
+## Larger bubbles in the visualization have a larger LOF.
+pairs(x, cex = lof)
+
+## OPTICS
+opt <- optics(x, eps = 1, minPts = 4, eps_cl = .4)
+opt
+## Create a reachability plot
+plot(opt)
+## since specified eps_cl we also extract a DBSCAN clustering from the order in OPTICS.
+pairs(x, col = opt$cluster + 1L)
 ```

@@ -37,7 +37,7 @@ IntegerVector dbscan_int(
   int ncol= NA_INTEGER;
 
   if(frNN.size()) {
-    // no kd-tree
+    // no kd-tree but use frNN list from distances
     nrow = frNN.size();
   }else{
 

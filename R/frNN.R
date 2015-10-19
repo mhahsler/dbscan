@@ -35,10 +35,12 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
     x <- as.matrix(x)
     diag(x) <- Inf
 
-    id <- apply(x, MARGIN = 1, FUN = function(y) {
+    id <- lapply(1:nrow(x), FUN = function(i) {
+          y <- x[i, ]
           o <- order(y, decreasing = FALSE)
           o[y[o] <= eps]
-        }
+
+      }
     )
     names(id) <- rownames(x)
 

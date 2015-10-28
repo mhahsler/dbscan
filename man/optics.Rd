@@ -37,7 +37,7 @@
 This implementation of OPTICS implements the original algorithm as described by
 Ankers et al (1999). OPTICS is similar to DBSCAN, however, for OPTICS
 \code{eps} is only an upper limit for the neighborhood size used to reduce
-computational complexity.
+computational complexity. Similar to DBSCAN, \code{minPts} is often set to be dimensionality of the data plus one.
 
 OPTICS linearly orders the data points such that points which are spatially closest become neighbors in the ordering. The closest analog to this ordering is dendrogram
 in single-link hierarchical clustering. The algorithm also calculates the
@@ -54,7 +54,7 @@ produce. The only difference is that OPTICS is not able to assign some border
 points and reports them instead as noise.
 
 See \code{\link{kNN}} for more information on the other parameters related to
-kNN search.
+nearest neighbor search.
 }
 \value{
   An object of class 'optics' with components:

@@ -50,7 +50,7 @@ A list with the following components:
 %% ...
 }
 \references{
-David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Neighbor Searching, \url{https://www.cs.umd.edu/~mount/ANN/}.
+David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Neighbor Searching, \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
 \code{\link{frNN}} for fixed radius nearest neighbors.

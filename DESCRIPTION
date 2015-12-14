@@ -9,6 +9,7 @@ Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
 Description: A fast reimplementation of several density-based algorithms of the DBSCAN family for spatial data. Includes the DBSCAN (density-based spatial clustering of applications with noise) and OPTICS (ordering points to identify the clustering structure) clustering algorithms and the LOF (local outlier factor) algorithm. The implementations uses the kd-tree data structure (from library ANN) for faster k-nearest neighbor search. An R interface to fast kNN and fixed-radius NN search is also provided.
 Imports: graphics, stats
 Suggests: fpc, microbenchmark, testthat
+BugReports: https://github.com/mhahsler/dbscan/issues
 License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and David Mount. All other code is copyright by Michael Hahsler.
 Imports: Rcpp

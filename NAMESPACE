@@ -1,7 +1,9 @@
-useDynLib(dbscan)
-import(Rcpp)
-importFrom(graphics, plot)
-importFrom(stats, dist)
+useDynLib("dbscan")
+import("Rcpp")
+importFrom("graphics", "plot")
+importFrom("stats", "dist")
+importFrom("methods", "is")
+
 
 export(
   kNN,

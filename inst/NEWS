@@ -1,4 +1,4 @@
-Version 0.9-6 (2015-xx-xx)
+Version 0.9-6 (2015-12-14)
   * OPTICS: fixed second bug reported by Di Pang
   * all methods now also accept dist objects and have a search method "dist"
     which precomputes distances.

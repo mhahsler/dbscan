@@ -77,7 +77,7 @@ IntegerVector dbscan_int(
     if (visited[i]) continue;
 
     //N = regionQuery(i, dataPts, kdTree, eps2, approx);
-    if(frNN.size())   N = frNN[i];
+    if(frNN.size())   N = Rcpp::as< std::vector<int> >(frNN[i]);
     else              N = regionQuery(i, dataPts, kdTree, eps2, approx);
 
     // noise points stay unassigned for now
@@ -106,7 +106,7 @@ IntegerVector dbscan_int(
       visited[j] = true;
 
       //N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
-      if(frNN.size())   N2 = frNN[j];
+      if(frNN.size())   N2 = Rcpp::as< std::vector<int> >(frNN[j]);
       else              N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
 
       if (weighted) {

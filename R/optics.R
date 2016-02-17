@@ -108,11 +108,14 @@ print.optics <- function(x, ...) {
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
-    cat("The clustering contains ", cl, " cluster(s).",
+    cat("The clustering contains ", cl, " cluster(s) and ",
+      sum(x$cluster==0L), " noise points.",
       "\n", sep = "")
+    print(table(x$cluster))
+    cat("\n")
   }
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
-  }
+}
 
 plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
     if(!is.null(x$cluster) && cluster) {

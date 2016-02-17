@@ -15,7 +15,7 @@
 \usage{
   dbscan(x, eps, minPts = 5, weights = NULL,
     borderPoints = TRUE, search = "kdtree", bucketSize = 10,
-    splitRule = "suggest", approx = 0)
+    splitRule = "suggest", approx = 0, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,6 +36,7 @@
     "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
     (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
   \item{approx}{ relative error bound for approximate nearest neighbor searching.}
+  \item{...}{ additional arguments are currently unused.}
 }
 \details{
 This implementation of DBSCAN implements the original algorithm as described by

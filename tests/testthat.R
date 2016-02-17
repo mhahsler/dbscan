@@ -1,2 +1,4 @@
 library("testthat")
-test_package("dbscan")
+
+library("dbscan")
+test_check("dbscan")

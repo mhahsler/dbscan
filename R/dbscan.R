@@ -19,7 +19,14 @@
 
 dbscan <- function(x, eps, minPts = 5, weights = NULL,
   borderPoints = TRUE, search = "kdtree", bucketSize = 10,
-  splitRule = "suggest", approx = 0) {
+  splitRule = "suggest", approx = 0, ...) {
+
+  ### check for MinPts for fpc compartibility
+  extra <- list(...)
+  if(!is.null(extra$M)) {
+    warning("converting argument MinPts (fpc) to minPts (dbscan)!")
+    minPts <- extra$M
+  }
 
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
@@ -68,8 +75,10 @@ print.dbscan <- function(x, ...) {
   cat("Parameters: eps = ", x$eps, ", minPts = ", x$minPts, "\n", sep = "")
   cl <- unique(x$cluster)
   cl <- length(cl[cl!=0L])
-  cat("The clustering contains ", cl, " cluster(s).",
+  cat("The clustering contains ", cl, " cluster(s) and ", sum(x$cluster==0L),
+    " noise points.",
       "\n", sep = "")
-  cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
+  print(table(x$cluster))
+  cat("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }
 

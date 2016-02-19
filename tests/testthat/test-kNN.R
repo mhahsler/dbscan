@@ -20,9 +20,9 @@ k <- 5L
 nn <- dbscan::kNN(x, k=k, sort = TRUE)
 
 ## check dimensions
-expect_identical(nn$k, k)
-expect_identical(dim(nn$dist), c(nrow(x), k))
-expect_identical(dim(nn$id), c(nrow(x), k))
+expect_equal(nn$k, k)
+expect_equal(dim(nn$dist), c(nrow(x), k))
+expect_equal(dim(nn$id), c(nrow(x), k))
 
 ## check visually
 #plot(x)
@@ -46,23 +46,23 @@ expect_equal(nn, nn_d2)
 
 ## without sorting
 nn2 <- dbscan::kNN(x, k=k, sort = FALSE)
-expect_identical(t(apply(nn$id, MARGIN = 1, sort)),
+expect_equal(t(apply(nn$id, MARGIN = 1, sort)),
   t(apply(nn2$id, MARGIN = 1, sort)))
 
 ## search options
 nn_linear <- dbscan::kNN(x, k=k, search = "linear")
-expect_identical(nn, nn_linear)
+expect_equal(nn, nn_linear)
 
 ## split options
 for(so in c("STD", "MIDPT", "FAIR", "SL_FAIR")) {
   nn3 <- dbscan::kNN(x, k=k, splitRule = so)
-  expect_identical(nn, nn3)
+  expect_equal(nn, nn3)
 }
 
 ## bucket size
 for(bs in c(5, 10, 15, 100)) {
   nn3 <- dbscan::kNN(x, k=k, bucketSize = bs)
-  expect_identical(nn, nn3)
+  expect_equal(nn, nn3)
 }
 
 ## the order is not stable with matching distances which means that the
@@ -77,8 +77,8 @@ nn <- dbscan::kNN(x, k=k, sort = TRUE)
 ## compare with manually found NNs
 nn_d <- dbscan::kNN(x, k=k, search = "dist")
 
-expect_identical(nn$dist, nn_d$dist)
-## This is expected to fail: expect_identical(nn$id, ids)
+expect_equal(nn$dist, nn_d$dist)
+## This is expected to fail: expect_equal(nn$id, ids)
 
 ## only compare the ids which do not have unique distances
 ms <- nn$id == nn_d$id

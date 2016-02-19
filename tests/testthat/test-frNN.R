@@ -21,11 +21,11 @@ eps <- .5
 nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
 
 ## check dimensions
-expect_identical(nn$eps, eps)
-expect_identical(length(nn$dist), nrow(x))
-expect_identical(length(nn$id), nrow(x))
+expect_equal(nn$eps, eps)
+expect_equal(length(nn$dist), nrow(x))
+expect_equal(length(nn$id), nrow(x))
 
-expect_identical(sapply(nn$dist, length), sapply(nn$id, length))
+expect_equal(sapply(nn$dist, length), sapply(nn$id, length))
 
 ## check visually
 #plot(x)
@@ -42,23 +42,23 @@ expect_equal(nn, nn_d2)
 
 ## without sorting
 nn2 <- dbscan::frNN(x, eps = eps, sort = FALSE)
-expect_identical(lapply(nn$id, sort),
+expect_equal(lapply(nn$id, sort),
   lapply(nn2$id, sort))
 
 ## search options
 nn_linear <- dbscan::frNN(x, eps=eps, search = "linear")
-expect_identical(nn, nn_linear)
+expect_equal(nn, nn_linear)
 
 ## split options
 for(so in c("STD", "MIDPT", "FAIR", "SL_FAIR")) {
   nn3 <- dbscan::frNN(x, eps=eps, splitRule = so)
-  expect_identical(nn, nn3)
+  expect_equal(nn, nn3)
 }
 
 ## bucket size
 for(bs in c(5, 10, 15, 100)) {
   nn3 <- dbscan::frNN(x, eps=eps, bucketSize = bs)
-  expect_identical(nn, nn3)
+  expect_equal(nn, nn3)
 }
 
 
@@ -72,4 +72,4 @@ nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
 ## compare with manually found NNs
 nn_d <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
 
-expect_identical(nn, nn_d)
+expect_equal(nn, nn_d)

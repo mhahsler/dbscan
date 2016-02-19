@@ -60,3 +60,19 @@ pure <- sapply(split(db$cluster, res$cluster),
 
 expect_true(all(pure[names(pure) != "0"] == 1L))
 
+## missing values, but distances are fine
+x_na <- x
+x_na[c(1,3,5), 1] <- NA
+expect_error(optics(x_na, eps = .2, minPts = 4), regexp = "NA")
+res_d1 <- optics(x_na, eps = .2, minPts = 4, search = "dist")
+res_d2 <- optics(dist(x_na), eps = .2, minPts = 4)
+expect_equal(res_d1, res_d2)
+
+## introduce NAs into dist
+x_na[c(1,3,5), 2] <- NA
+expect_error(optics(x_na, eps = .2, minPts = 4), regexp = "NA")
+expect_error(optics(x_na, eps = .2, minPts = 4, search = "dist"),
+  regexp = "NA")
+expect_error(optics(dist(x_na), eps = .2, minPts = 4), regexp = "NA")
+
+

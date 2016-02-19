@@ -28,11 +28,10 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     However, the algorithm will enjoy a significant speedup. }
 }
 \details{
-If \code{x} is a matrix then this implementation uses
-the ANN library (see Mount and Arya, 2010) for
-nearest neighbor search. Linear nearest neighbor search can be used. To speed up nearest neighbor search the kd-tree is used.
-
-Note: self-matches are removed!
+\code{search} controls if a kd-tree or linear search (both implemented in
+the ANN library; see Mount and Arya, 2010). Note, that these implementations cannot handle NAs. \code{search="dist"} precomputes Euclidean distances first using R.
+NAs are handled, but the resulting distance matrix cannot contain NAs. To use other distance measures, a precomputed distance matrix can be
+provided as \code{x} (\code{search} is ignored).
 
 \code{bucketSize} and \code{splitRule} influence how the kd-tree is built.
 \code{approx} uses the approximate nearest neighbor search implemented in ANN.
@@ -40,6 +39,8 @@ All nearest neighbors up to a distance of \code{eps}/(1+\code{approx})
 will be considered and all with a distance greater than \code{eps} will not
 be considered. The other points might be considered. Note that this results in
 some actual nearest neighbors being omitted leading to spurious clusters and noise points. However, the algorithm will enjoy a significant speedup. For more details see Mount and Arya (2010).
+
+\emph{Note:} self-matches are removed!
 }
 \value{
 %%  ~Describe the value returned

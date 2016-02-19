@@ -50,8 +50,7 @@ Setting parameters for DBSCAN:
 \code{minPts} is often set to be dimensionality of the data plus one.
 The knee in \code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
 
-See \code{\link{kNN}} for more information on the other parameters related to
-nearest neighbor search.
+See \code{\link{kNN}} for more information on the other parameters related to nearest neighbor search.
 }
 \value{
   A object of class 'dbscan' with the following components:

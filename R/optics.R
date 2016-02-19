@@ -54,6 +54,8 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
     if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
   }
 
+  if(length(frNN) == 0 && any(is.na(x))) stop("data/distances cannot contain NAs for optics (with kd-tree)!")
+
   ret <- optics_int(as.matrix(x), as.double(eps), as.integer(minPts),
     as.integer(search), as.integer(bucketSize),
     as.integer(splitRule), as.double(approx), frNN)

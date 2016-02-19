@@ -34,7 +34,6 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL,
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-
   ### dist search
   if(search == 3) {
     if(!is(x, "dist"))
@@ -59,6 +58,9 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL,
     if(storage.mode(x) == "integer") storage.mode(x) <- "double"
     if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
   }
+
+  if(length(frNN) == 0 && any(is.na(x)))
+    stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
 
   ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
     as.double(weights), as.integer(borderPoints),

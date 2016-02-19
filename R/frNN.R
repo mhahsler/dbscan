@@ -32,6 +32,9 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   ### get kNN from a dist object in R
   if(is(x, "dist")) {
+
+    if(any(is.na(x))) stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
+
     x <- as.matrix(x)
     diag(x) <- Inf
 
@@ -61,6 +64,8 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
+
+  if(any(is.na(x))) stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
   ret <- frNN_int(as.matrix(x), as.double(eps),
     as.integer(search), as.integer(bucketSize),

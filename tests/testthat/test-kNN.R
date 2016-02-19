@@ -86,3 +86,16 @@ cos <- diff(nn_d$dist)==0; cos[,1] <- FALSE
 ms[cos] <- TRUE
 expect_false(any(rowSums(ms[,-k]) !=4))
 
+## missing values, but distances are fine
+x_na <- x
+x_na[c(1,3,5), 1] <- NA
+expect_error(kNN(x_na, k = 3), regexp = "NA")
+res_d1 <- kNN(x_na, k = 3, search = "dist")
+res_d2 <- kNN(dist(x_na), k = 3)
+expect_equal(res_d1, res_d2)
+
+## introduce NAs into dist
+x_na[c(1,3,5),] <- NA
+expect_error(kNN(x_na, k = 3), regexp = "NA")
+expect_error(kNN(x_na, k = 3, search = "dist"), regexp = "NA")
+expect_error(kNN(dist(x_na), k = 3), regexp = "NA")

@@ -18,5 +18,7 @@ export(
 
 S3method(print, optics)
 S3method(plot, optics)
+S3method(predict, optics)
 
-S3method(print, dbscan)
+S3method(print, dbscan_fast)
+S3method(predict, dbscan_fast)

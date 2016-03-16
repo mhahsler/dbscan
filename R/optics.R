@@ -131,3 +131,16 @@ plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
         main = "Reachability Plot")
     }
 }
+
+predict.optics <- function (object, data, newdata = NULL, ...) {
+  if (is.null(newdata)) return(object$cluster)
+
+  nn <- frNN(rbind(data, newdata), eps = object$eps_cl,
+    sort = TRUE)$id[-(1:nrow(data))]
+  sapply(nn, function(x) {
+    x <- x[x<=nrow(data)]
+    x <- object$cluster[x][x>0][1]
+    x[is.na(x)] <- 0L
+    x
+  })
+}

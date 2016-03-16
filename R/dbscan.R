@@ -68,11 +68,11 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL,
     as.integer(splitRule), as.double(approx), frNN)
 
   structure(list(cluster = ret, eps = eps, minPts = minPts),
-    class = "dbscan")
+    class = c("dbscan_fast", "dbscan"))
 }
 
 
-print.dbscan <- function(x, ...) {
+print.dbscan_fast <- function(x, ...) {
   cat("DBSCAN clustering for ", length(x$cluster), " objects.", "\n", sep = "")
   cat("Parameters: eps = ", x$eps, ", minPts = ", x$minPts, "\n", sep = "")
   cl <- unique(x$cluster)
@@ -84,3 +84,15 @@ print.dbscan <- function(x, ...) {
   cat("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }
 
+predict.dbscan_fast <- function (object, data, newdata = NULL, ...) {
+  if (is.null(newdata)) return(object$cluster)
+
+  nn <- frNN(rbind(data, newdata), eps = object$eps,
+    sort = TRUE)$id[-(1:nrow(data))]
+  sapply(nn, function(x) {
+    x <- x[x<=nrow(data)]
+    x <- object$cluster[x][x>0][1]
+    x[is.na(x)] <- 0L
+    x
+    })
+}

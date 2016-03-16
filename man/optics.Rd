@@ -1,6 +1,7 @@
 \name{optics}
 \alias{optics}
 \alias{optics_cut}
+\alias{predict.optics}
 \alias{OPTICS}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -17,6 +18,9 @@
     splitRule = "suggest", approx = 0)
 
   optics_cut(x, eps_cl)
+
+  \method{predict}{optics}(object, data, newdata = NULL, ...)
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -33,6 +37,10 @@
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
       (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
   \item{approx}{ relative error bound for approximate nearest neighbor searching.}
+  \item{object}{ an OPTICS object that contains a clustering. }
+  \item{data}{ the data set used to create the OPTICS clustering object. }
+  \item{newdata}{ new data set for which cluster membership should be predicted. }
+  \item{...}{ additional arguments are currently unused.}
 }
 \details{
 This implementation of OPTICS implements the original algorithm as described by

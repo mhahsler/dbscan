@@ -1,6 +1,8 @@
 Version 0.9-6.1 (2016-xx-xx)
-  * dbscan now also accepts MinPts (with a capital M) to be
+  * DBSCAN now also accepts MinPts (with a capital M) to be
     compartible with the fpc version.
+  * DBSCAN objects are now also of class dbscan_fast to avoid clashes with fpc.
+  * DBSCAN and OPTICS have now a predict functions.
   * Added test for unhandled NAs.
 
 Version 0.9-6 (2015-12-14)

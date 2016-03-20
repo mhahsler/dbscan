@@ -1,6 +1,7 @@
 \name{optics}
 \alias{optics}
 \alias{optics_cut}
+\alias{predict.optics}
 \alias{OPTICS}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -17,28 +18,36 @@
     splitRule = "suggest", approx = 0)
 
   optics_cut(x, eps_cl)
+
+  \method{predict}{optics}(object, data, newdata = NULL, ...)
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix.}
+  \item{x}{a data matrix or a distance matrix.}
   \item{eps}{ upper limit of the size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
   \item{xi}{ Steepness threshold to identify clusters hierarchically.}    
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
-  \item{search}{ nearest neighbor search strategy (one of "kdtree"
-    or "linear").}
+  \item{search}{ nearest neighbor search strategy (one of "kdtree",
+    "linear" search, or precomputed "dist") Using precomputed distances
+    is better for high-dimensional, but smaller data sets.}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
       (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
   \item{approx}{ relative error bound for approximate nearest neighbor searching.}
+  \item{object}{ an OPTICS object that contains a clustering. }
+  \item{data}{ the data set used to create the OPTICS clustering object. }
+  \item{newdata}{ new data set for which cluster membership should be predicted. }
+  \item{...}{ additional arguments are currently unused.}
 }
 \details{
 This implementation of OPTICS implements the original algorithm as described by
 Ankers et al (1999). OPTICS is similar to DBSCAN, however, for OPTICS
 \code{eps} is only an upper limit for the neighborhood size used to reduce
-computational complexity.
+computational complexity. Similar to DBSCAN, \code{minPts} is often set to be dimensionality of the data plus one.
 
 OPTICS linearly orders the data points such that points which are spatially closest become neighbors in the ordering. The closest analog to this ordering is dendrogram
 in single-link hierarchical clustering. The algorithm also calculates the
@@ -63,20 +72,20 @@ parameter is that it identifies clusters by change in relative cluster density.
 (See http://stackoverflow.com/questions/20054541/elki-opticsxi-how-set-xi)
 
 See \code{\link{kNN}} for more information on the other parameters related to
-kNN search.
+nearest neighbor search.
 }
 \value{
   An object of class 'optics' with components:
     \item{eps }{ value of eps parameter. }
     \item{minPts }{ value of minPts parameter. }
-    \item{order }{ order for points. }
-    \item{reachdist }{ reachability distance for each point. }
-    \item{coredist }{ core distance for each point. }
+    \item{order }{ optics order for the data points in \code{x}. }
+    \item{reachdist }{ reachability distance for each data point in \code{x}. }
+    \item{coredist }{ core distance for each data point in \code{x}. }
 
   If \code{eps_cl} was specified or \code{optics_cut} was called, then in
-  addition the following components are available:
-    \item{eps_cl }{ reachability distance for each point. }
-    \item{cluster }{ assigned cluster labels in the order of the rows in
+      addition the following components are available:
+    \item{eps_cl }{ reachability distance for each point in \code{x}. }
+    \item{cluster }{ assigned cluster labels in the order of the data points in
       \code{x}. }
 }
 \references{
@@ -131,9 +140,13 @@ res
 
 plot(res)
 plot(x, col = res$cluster+1L)
+
+### using OPTICS on a precomputed distance matrix
+d <- dist(x)
+res <- optics(x, eps = 1, minPts = 10)
+plot(res)
+
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ model }
 \keyword{ clustering }
 

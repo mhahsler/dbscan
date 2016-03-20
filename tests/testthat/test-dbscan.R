@@ -50,3 +50,18 @@ if (requireNamespace("fpc", quietly = TRUE)) {
     expect_equivalent(res$cluster, res2$cluster)
 }
 
+## missing values, but distances are fine
+x_na <- x
+x_na[c(1,3,5), 1] <- NA
+expect_error(dbscan::dbscan(x_na, eps = .2, minPts = 4), regexp = "NA")
+res_d1 <- dbscan::dbscan(x_na, eps = .2, minPts = 4, search = "dist")
+res_d2 <- dbscan::dbscan(dist(x_na), eps = .2, minPts = 4)
+expect_equal(res_d1, res_d2)
+
+## introduce NAs into dist
+x_na[c(1,3,5), 2] <- NA
+expect_error(dbscan::dbscan(x_na, eps = .2, minPts = 4), regexp = "NA")
+expect_error(dbscan::dbscan(x_na, eps = .2, minPts = 4, search = "dist"),
+  regexp = "NA")
+expect_error(dbscan::dbscan(dist(x_na), eps = .2, minPts = 4), regexp = "NA")
+

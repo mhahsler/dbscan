@@ -1,7 +1,7 @@
 \name{dbscan}
 \alias{dbscan}
 \alias{DBSCAN}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{predict.dbscan_fast}
 \title{
   DBSCAN
 }
@@ -15,7 +15,9 @@
 \usage{
   dbscan(x, eps, minPts = 5, weights = NULL,
     borderPoints = TRUE, search = "kdtree", bucketSize = 10,
-    splitRule = "suggest", approx = 0)
+    splitRule = "suggest", approx = 0, ...)
+
+  \method{predict}{dbscan_fast}(object, data, newdata = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,9 +25,10 @@
   \item{eps}{ size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
-  \item{weights}{ numeric; weights for the data points to perform weighted
-    clustering. }
-  \item{borderPoints}{ logical; should border points be assigned. If
+  \item{weights}{ numeric; weights for the data points. Only needed to perform
+    weighted clustering. }
+  \item{borderPoints}{ logical; should border points be assigned. The default
+    is \code{TRUE} for regular DBSCAN. If
     \code{FALSE} then border points are considered noise
     (see DBSCAN* in Campello et al, 2013).}
   \item{search}{ nearest neighbor search strategy (one of "kdtree"
@@ -35,15 +38,32 @@
     "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
     (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
   \item{approx}{ relative error bound for approximate nearest neighbor searching.}
+  \item{object}{ a DBSCAN clustering object. }
+  \item{data}{ the data set used to create the DBSCAN clustering object. }
+  \item{newdata}{ new data set for which cluster membership should be predicted. }
+  \item{...}{ additional arguments are currently unused.}
 }
 \details{
+\emph{Note:} use \code{dbscan::dbscan} to call this
+implementation when you also use package \pkg{fpc}.
+
 This implementation of DBSCAN implements the original algorithm as described by
-Ester et al (1996). DBSCAN estimates the density around each data point by counting the number of points in a user-specified eps-neighborhood and applies a used-specified minPts thresholds to identify core, border and noise points. In a second step, core points are joined into a cluster if they are density-reachable (i.e., there is a chain of core points where one falls inside the eps-neighborhood of the next). Finally, border points are assigned to clusters.
+Ester et al (1996). DBSCAN estimates the density around each data point by counting the number of points in a user-specified eps-neighborhood and applies a used-specified minPts thresholds to identify core, border and noise points. In a second step, core points are joined into a cluster if they are density-reachable (i.e., there is a chain of core points where one falls inside the eps-neighborhood of the next). Finally, border points are assigned to clusters. The algorithm only needs
+parameters \code{eps} and \code{minPts}.
 
 Border points are arbitrarily assigned to clusters in the original algorithm.
 DBSCAN* (see Campello et al 2013) treats all border points as noise points. This is implemented with \code{borderPoints = FALSE}.
 
-\code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
+Setting parameters for DBSCAN:
+\code{minPts} is often set to be dimensionality of the data plus one.
+The knee in \code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
+
+See \code{\link{kNN}} for more information on the other parameters related to nearest neighbor search.
+
+\code{predict} can be used to predict cluster memberships for new data points.
+A point is considered a member of a cluster if it is within the eps
+neighborhood of a member of the cluster. Points which cannot be assigned to a
+cluster will be reported as members of the noise cluster 0.
 }
 \value{
   A object of class 'dbscan' with the following components:
@@ -100,10 +120,16 @@ x <- cbind(
   y = runif(10, 0, 10) + rnorm(n, sd = 0.2)
   )
 
+## Note: we use dbscan::dbscan to make sure that we do now run the
+## implementation in fpc.
 res <- dbscan::dbscan(x, eps = .2, minPts = 4)
 res
 
 plot(x, col=res$cluster + 1L)
+
+## predict cluster membership for new data points
+newdata <- x[1:5,] + rnorm(10, 0, .2)
+predict(res, x, newdata)
 
 \dontrun{
 ## compare speed against fpc version (if microbenchmark is installed)

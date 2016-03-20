@@ -19,14 +19,20 @@
 
 dbscan <- function(x, eps, minPts = 5, weights = NULL,
   borderPoints = TRUE, search = "kdtree", bucketSize = 10,
-  splitRule = "suggest", approx = 0) {
+  splitRule = "suggest", approx = 0, ...) {
+
+  ### check for MinPts for fpc compartibility
+  extra <- list(...)
+  if(!is.null(extra$M)) {
+    warning("converting argument MinPts (fpc) to minPts (dbscan)!")
+    minPts <- extra$M
+  }
 
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
-
 
   ### dist search
   if(search == 3) {
@@ -53,23 +59,40 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL,
     if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
   }
 
+  if(length(frNN) == 0 && any(is.na(x)))
+    stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
+
   ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
     as.double(weights), as.integer(borderPoints),
     as.integer(search), as.integer(bucketSize),
     as.integer(splitRule), as.double(approx), frNN)
 
   structure(list(cluster = ret, eps = eps, minPts = minPts),
-    class = "dbscan")
+    class = c("dbscan_fast", "dbscan"))
 }
 
 
-print.dbscan <- function(x, ...) {
+print.dbscan_fast <- function(x, ...) {
   cat("DBSCAN clustering for ", length(x$cluster), " objects.", "\n", sep = "")
   cat("Parameters: eps = ", x$eps, ", minPts = ", x$minPts, "\n", sep = "")
   cl <- unique(x$cluster)
   cl <- length(cl[cl!=0L])
-  cat("The clustering contains ", cl, " cluster(s).",
+  cat("The clustering contains ", cl, " cluster(s) and ", sum(x$cluster==0L),
+    " noise points.",
       "\n", sep = "")
-  cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
+  print(table(x$cluster))
+  cat("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }
 
+predict.dbscan_fast <- function (object, data, newdata = NULL, ...) {
+  if (is.null(newdata)) return(object$cluster)
+
+  nn <- frNN(rbind(data, newdata), eps = object$eps,
+    sort = TRUE)$id[-(1:nrow(data))]
+  sapply(nn, function(x) {
+    x <- x[x<=nrow(data)]
+    x <- object$cluster[x][x>0][1]
+    x[is.na(x)] <- 0L
+    x
+    })
+}

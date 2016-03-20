@@ -24,3 +24,18 @@ if(requireNamespace("DMwR", quietly = TRUE)) {
 
   expect_equal(lof, lof_DMwr)
 }
+
+## missing values, but distances are fine
+x_na <- x
+x_na[c(1,3,5), 1] <- NA
+expect_error(lof(x_na), regexp = "NA")
+res_d1 <- lof(x_na, search = "dist")
+res_d2 <- lof(dist(x_na))
+expect_equal(res_d1, res_d2)
+
+x_na[c(1,3,5), 2] <- NA
+expect_error(lof(x_na), regexp = "NA")
+expect_error(lof(x_na, search = "dist"),
+  regexp = "NA")
+expect_error(lof(dist(x_na)), regexp = "NA")
+

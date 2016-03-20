@@ -54,6 +54,8 @@ optics <- function(x, eps, minPts = 5, xi, eps_cl, search = "kdtree",
     if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
   }
 
+  if(length(frNN) == 0 && any(is.na(x))) stop("data/distances cannot contain NAs for optics (with kd-tree)!")
+
   ret <- optics_int(as.matrix(x), as.double(eps), as.integer(minPts),
     as.integer(search), as.integer(bucketSize),
     as.integer(splitRule), as.double(approx), frNN)
@@ -108,11 +110,14 @@ print.optics <- function(x, ...) {
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
-    cat("The clustering contains ", cl, " cluster(s).",
+    cat("The clustering contains ", cl, " cluster(s) and ",
+      sum(x$cluster==0L), " noise points.",
       "\n", sep = "")
+    print(table(x$cluster))
+    cat("\n")
   }
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
-  }
+}
 
 plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
     if(!is.null(x$cluster) && cluster) {
@@ -125,4 +130,17 @@ plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
         ylab = "Reachability dist.", xlab = "OPTICS order",
         main = "Reachability Plot")
     }
+}
+
+predict.optics <- function (object, data, newdata = NULL, ...) {
+  if (is.null(newdata)) return(object$cluster)
+
+  nn <- frNN(rbind(data, newdata), eps = object$eps_cl,
+    sort = TRUE)$id[-(1:nrow(data))]
+  sapply(nn, function(x) {
+    x <- x[x<=nrow(data)]
+    x <- object$cluster[x][x>0][1]
+    x[is.na(x)] <- 0L
+    x
+  })
 }

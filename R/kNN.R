@@ -40,6 +40,9 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   ### get kNN from a dist object
   if(is(x, "dist")) {
+
+    if(any(is.na(x))) stop("distances cannot be NAs for kNN!")
+
     x <- as.matrix(x)
     diag(x) <- NA
 
@@ -66,6 +69,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
+  if(any(is.na(x))) stop("data/distances cannot contain NAs for kNN (with kd-tree)!")
 
   ## returns NO self matches
   ret <- kNN_int(as.matrix(x), as.integer(k),

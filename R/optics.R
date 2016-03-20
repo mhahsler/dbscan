@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
+optics <- function(x, eps, minPts = 5, xi, eps_cl, search = "kdtree",
   bucketSize = 10, splitRule = "suggest", approx = 0) {
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
@@ -64,11 +64,11 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
 
   ### find clusters
   if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
-
+  if(!missing(xi)) ret <- opticsXi(ret, xi)
+    
   class(ret) <- "optics"
   ret
 }
-
 
 ### extract clusters
 optics_cut <- function(x, eps_cl) {

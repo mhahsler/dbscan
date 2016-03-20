@@ -24,6 +24,7 @@
   \item{eps}{ upper limit of the size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
+  \item{xi}{ Steepness threshold to identify clusters hierarchically.}    
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
   \item{search}{ nearest neighbor search strategy (one of "kdtree"
     or "linear").}
@@ -52,6 +53,14 @@ to extract the clustering.
 The resulting clustering is similar to what DBSCAN would
 produce. The only difference is that OPTICS is not able to assign some border
 points and reports them instead as noise.
+
+If \code{xi} is specified, then the algorithm specified in Figure 19
+(see Ankers et al, 1999) is used to extract clusters hiearchically. That is, it 
+internally calls \code{opticsXi} to extract the clustering.
+The resulting clustering is a hiearchical representation of what several DBSCANs would
+produce using varied parameters. It has been noted that one interpretation of the xi 
+parameter is that it identifies clusters by change in relative cluster density. 
+(See http://stackoverflow.com/questions/20054541/elki-opticsxi-how-set-xi)
 
 See \code{\link{kNN}} for more information on the other parameters related to
 kNN search.
@@ -113,6 +122,13 @@ plot(x, col = res$cluster+1L)
 ### re-cutting at a higher eps threshold
 res <- optics_cut(res, eps_cl = .1)
 res
+plot(res)
+plot(x, col = res$cluster+1L)
+
+### identify clusters using xi method hierarchically 
+res <- opticsXi(res, xi = 0.05)
+res
+
 plot(res)
 plot(x, col = res$cluster+1L)
 }

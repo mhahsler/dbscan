@@ -108,7 +108,7 @@ opticsXi <- function(optics_obj, xi = 0.001, minimum=F)
           simplify <- F
           while (cend > cstart) {
             tmp2 <- optics_obj$order[cend]
-            for (i in start:cend) {
+            for (i in cstart:cend) {
               if (tmp2 == optics_obj$order[i]) simplify <- T
             }
             if (simplify) break
@@ -129,8 +129,11 @@ opticsXi <- function(optics_obj, xi = 0.001, minimum=F)
 
   # Keep hiearchical cluster data
   optics_obj$xi <- xi
-  optics_obj$clusters_xi <- data.table::rbindlist(SetOfClusters)
-
+  optics_obj$clusters_xi <- do.call(rbind, SetOfClusters)
+  optics_obj$clusters_xi <- data.frame(start=unlist(optics_obj$clusters_xi[,1]), end=unlist(optics_obj$clusters_xi[,2]))
+  optics_obj$clusters_xi <- optics_obj$clusters_xi[order(optics_obj$clusters_xi$start, optics_obj$clusters_xi$end),]
+  row.names(optics_obj$clusters_xi) <- NULL
+  
   # Replace cluster attribute with XI results and return
   optics_obj <- extractXiClusters(optics_obj, minimum=minimum)
   optics_obj
@@ -160,23 +163,23 @@ valid <- function(index, optics_obj) {
 
 ### Extract xi clusters (minimum == T extracts clusters that do not contain other clusters)
 extractXiClusters <- function(optics_obj, minimum=F) {
-  
   if (length(optics_obj$clusters_xi) == 0) stop("No Xi clusters detected. The steepness (xi) parameter might be too high.")
   
   # Prepare cluster list based on minimum parameter
   clusters_xi <- optics_obj$clusters_xi
   if (!"cluster_id" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, cluster_id=1:nrow(clusters_xi))
-  if (!"cluster_size" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, clusters_xi[, list(cluster_size = (end - start))])
-  clusters_xi <- if (minimum) { clusters_xi[order(cluster_size)] } else { clusters_xi[order(-cluster_size)] }
+  if (!"cluster_size" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, list(cluster_size = (clusters_xi$end - clusters_xi$start)))
+  clusters_xi <- if (minimum) { clusters_xi[order(clusters_xi$cluster_size),] } else { clusters_xi[order(-clusters_xi$cluster_size),] }
   
   # Fill in the matrix 
   clusters <- rep(0, length(optics_obj$order))
   for(cid in clusters_xi$cluster_id) {
+    cluster <- clusters_xi[clusters_xi$cluster_id == cid,]
     if (minimum) {
-      if (clusters_xi[cluster_id == cid, all(clusters[start:end] == 0)]) { 
-        clusters[clusters_xi[cluster_id == cid, start:end]] <- cid
+      if (all(clusters[cluster$start:cluster$end] == 0)) { 
+        clusters[cluster$start:cluster$end] <- cid
       }
-    } else clusters[clusters_xi[cluster_id == cid, start:end]] <- cid
+    } else clusters[cluster$start:cluster$end] <- cid
   }
   
   # Fix the ordering

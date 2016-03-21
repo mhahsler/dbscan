@@ -13,12 +13,14 @@
   algorithm using a kd-tree.
 }
 \usage{
-  optics(x, eps, minPts = 5, eps_cl,
+  optics(x, eps, minPts = 5, xi, eps_cl,
     search = "kdtree", bucketSize = 10,
     splitRule = "suggest", approx = 0)
-
+  
+  opticsXi(x, xi)
+  
   optics_cut(x, eps_cl)
-
+  
   \method{predict}{optics}(object, data, newdata = NULL, ...)
 
 }

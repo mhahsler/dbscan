@@ -17,60 +17,60 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-opticsXi <- function(optics_obj, xi = 0.001, minimum=F)
+opticsXi <- function(object, xi = 0.001, minimum=F)
 {
-  if (!"optics" %in% class(optics_obj)) stop("opticsXi only accepts objects resulting from dbscan::optics!")
+  if (!"optics" %in% class(object)) stop("opticsXi only accepts objects resulting from dbscan::optics!")
+  if (xi > 1.0 || xi < 0.0) stop("The Xi parameter must be [0, 1]")
   
   # Initial variables  
-  optics_obj$ord_rd <- optics_obj$reachdist[optics_obj$order]
-  optics_obj$ixi <- (1 - xi)
+  object$ord_rd <- object$reachdist[object$order]
+  object$ixi <- (1 - xi)
   SetOfSteepDownAreas <- list()
   SetOfClusters <- list()
   index <- 1
   mib <- 0
   sdaset <- list()
-  nocorrect <- F
-  while (index <= length(optics_obj$order))
+  while (index <= length(object$order))
   {
-    mib <- max(mib, optics_obj$ord_rd[index]) 
-    if (!valid(index+1, optics_obj)) break
+    mib <- max(mib, object$ord_rd[index]) 
+    if (!valid(index+1, object)) break
     
     # Test if this is a steep down area 
-    if (steepDown(index, optics_obj))
+    if (steepDown(index, object))
     {
       # Update mib values with current mib and filter 
-      sdaset <- updateFilterSDASet(mib, sdaset, optics_obj$ixi)
-      startval <- optics_obj$ord_rd[index]
+      sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
+      startval <- object$ord_rd[index]
       mib <- 0
       startsteep <- index; endsteep <- index + 1
-      while(!is.na(optics_obj$order[index+1])) {
+      while(!is.na(object$order[index+1])) {
         index <- index + 1
-        if (steepDown(index, optics_obj)) { endsteep <- index + 1; next }
-        if (!steepDown(index, optics_obj, ixi=1.0) || index - endsteep > optics_obj$minPts) break
+        if (steepDown(index, object)) { endsteep <- index + 1; next }
+        if (!steepDown(index, object, ixi=1.0) || index - endsteep > object$minPts) break
       }
       sda <- list(s=startsteep, e=endsteep, maximum=startval, mib=0)
       # print(paste("New steep down area:", toString(sda)))
       sdaset <- append(sdaset, list(sda))
       next
     }
-    if (steepUp(index, optics_obj))
+    if (steepUp(index, object))
     {
-      sdaset <- updateFilterSDASet(mib, sdaset, optics_obj$ixi)
+      sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
       {
         startsteep <- index; endsteep <- index + 1
-        mib <- optics_obj$ord_rd[index]
-        esuccr <- if (!valid(index+1, optics_obj)) Inf else optics_obj$ord_rd[index+1]
+        mib <- object$ord_rd[index]
+        esuccr <- if (!valid(index+1, object)) Inf else object$ord_rd[index+1]
         if (esuccr != Inf) {
-          while(!is.na(optics_obj$order[index+1])) {
+          while(!is.na(object$order[index+1])) {
             index <- index + 1
-            if (steepUp(index, optics_obj)) { 
+            if (steepUp(index, object)) { 
               endsteep <- index + 1
-              mib <- optics_obj$ord_rd[index]
-              esuccr <- if (!valid(index+1, optics_obj)) Inf else optics_obj$ord_rd[index+1]
+              mib <- object$ord_rd[index]
+              esuccr <- if (!valid(index+1, object)) Inf else object$ord_rd[index+1]
               if (esuccr == Inf) { endsteep <- endsteep - 1; break }
               next 
             }
-            if (!steepUp(index, optics_obj, ixi=1.0) || index - endsteep > optics_obj$minPts) break
+            if (!steepUp(index, object, ixi=1.0) || index - endsteep > object$minPts) break
           }
         } else {
           endsteep <- endsteep - 1
@@ -82,61 +82,45 @@ opticsXi <- function(optics_obj, xi = 0.001, minimum=F)
       for (sda in rev(sdaset))
       {
         # Condition 3B 
-        if (mib * optics_obj$ixi < sda$mib) next 
+        if (mib * object$ixi < sda$mib) next 
         
         # Default values 
         cstart <- sda$s
         cend <- sua$e
-        
-        # Credit to ELKI 
-        if (!nocorrect) while(cend > cstart && optics_obj$ord_rd[cend] == Inf) { cend <- cend - 1 }
-        
+      
         # Condition 4
         {
           # Case b
-          if (sda$maximum * optics_obj$ixi >= sua$maximum) {
-            while(cstart < cend && optics_obj$ord_rd[cstart+1] > sua$maximum) cstart <- cstart + 1
+          if (sda$maximum * object$ixi >= sua$maximum) {
+            while(cstart < cend && object$ord_rd[cstart+1] > sua$maximum) cstart <- cstart + 1
           } 
           # Case c
-          else if (sua$maximum * optics_obj$ixi >= sda$maximum) {
-            while(cend > cstart && optics_obj$ord_rd[cend-1] > sda$maximum) cend <- cend - 1
-          }
-        }
-        
-        # Credit to ELKI 
-        if (!nocorrect) {
-          simplify <- F
-          while (cend > cstart) {
-            tmp2 <- optics_obj$order[cend]
-            for (i in cstart:cend) {
-              if (tmp2 == optics_obj$order[i]) simplify <- T
-            }
-            if (simplify) break
-            cend <- cend - 1
+          else if (sua$maximum * object$ixi >= sda$maximum) {
+            while(cend > cstart && object$ord_rd[cend-1] > sda$maximum) cend <- cend - 1
           }
         }
         
         # obey minpts 
-        if (cend - cstart + 1 < optics_obj$minPts) next
+        if (cend - cstart + 1 < object$minPts) next
         SetOfClusters <- append(SetOfClusters, list(list(start=cstart, end=cend)))
         next
       }
     } else { index <- index + 1 }
   }
   # Remove aliases  
-  optics_obj$ord_rd <- NULL
-  optics_obj$ixi <- NULL
+  object$ord_rd <- NULL
+  object$ixi <- NULL
 
   # Keep hiearchical cluster data
-  optics_obj$xi <- xi
-  optics_obj$clusters_xi <- do.call(rbind, SetOfClusters)
-  optics_obj$clusters_xi <- data.frame(start=unlist(optics_obj$clusters_xi[,1]), end=unlist(optics_obj$clusters_xi[,2]))
-  optics_obj$clusters_xi <- optics_obj$clusters_xi[order(optics_obj$clusters_xi$start, optics_obj$clusters_xi$end),]
-  row.names(optics_obj$clusters_xi) <- NULL
+  object$xi <- xi
+  object$clusters_xi <- do.call(rbind, SetOfClusters)
+  object$clusters_xi <- data.frame(start=unlist(object$clusters_xi[,1]), end=unlist(object$clusters_xi[,2]))
+  object$clusters_xi <- object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end),]
+  row.names(object$clusters_xi) <- NULL
   
   # Replace cluster attribute with XI results and return
-  optics_obj <- extractXiClusters(optics_obj, minimum=minimum)
-  optics_obj
+  object <- extractXiClusters(object, minimum=minimum)
+  object
 }
 
 # Removes obsolete steep areas 
@@ -145,34 +129,34 @@ updateFilterSDASet <- function(mib, sdaset, ixi) {
   lapply(sdaset, function(sda) { if (mib > sda$mib) sda$mib <- mib; sda })
 }
 
-steepUp <- function(i, optics_obj, ixi = optics_obj$ixi) {
-  if(optics_obj$ord_rd[i] >= Inf) return(F)
-  if(!valid(i+1, optics_obj)) return(T)
-  return(optics_obj$ord_rd[i] <= optics_obj$ord_rd[i+1] * ixi)
+steepUp <- function(i, object, ixi = object$ixi) {
+  if(object$ord_rd[i] >= Inf) return(F)
+  if(!valid(i+1, object)) return(T)
+  return(object$ord_rd[i] <= object$ord_rd[i+1] * ixi)
 }
 
-steepDown <- function(i, optics_obj, ixi = optics_obj$ixi) {
-  if(!valid(i+1, optics_obj)) return(F)
-  if(optics_obj$ord_rd[i+1] >= Inf) return(F)
-  return(optics_obj$ord_rd[i] * ixi >= optics_obj$ord_rd[i+1])
+steepDown <- function(i, object, ixi = object$ixi) {
+  if(!valid(i+1, object)) return(F)
+  if(object$ord_rd[i+1] >= Inf) return(F)
+  return(object$ord_rd[i] * ixi >= object$ord_rd[i+1])
 }
 
-valid <- function(index, optics_obj) {
-  return(!is.na(optics_obj$ord_rd[index]))
+valid <- function(index, object) {
+  return(!is.na(object$ord_rd[index]))
 }
 
 ### Extract xi clusters (minimum == T extracts clusters that do not contain other clusters)
-extractXiClusters <- function(optics_obj, minimum=F) {
-  if (length(optics_obj$clusters_xi) == 0) stop("No Xi clusters detected. The steepness (xi) parameter might be too high.")
+extractXiClusters <- function(object, minimum=F) {
+  if (length(object$clusters_xi) == 0) stop("No Xi clusters detected. The steepness (xi) parameter might be too high.")
   
   # Prepare cluster list based on minimum parameter
-  clusters_xi <- optics_obj$clusters_xi
+  clusters_xi <- object$clusters_xi
   if (!"cluster_id" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, cluster_id=1:nrow(clusters_xi))
   if (!"cluster_size" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, list(cluster_size = (clusters_xi$end - clusters_xi$start)))
   clusters_xi <- if (minimum) { clusters_xi[order(clusters_xi$cluster_size),] } else { clusters_xi[order(-clusters_xi$cluster_size),] }
   
   # Fill in the matrix 
-  clusters <- rep(0, length(optics_obj$order))
+  clusters <- rep(0, length(object$order))
   for(cid in clusters_xi$cluster_id) {
     cluster <- clusters_xi[clusters_xi$cluster_id == cid,]
     if (minimum) {
@@ -183,7 +167,7 @@ extractXiClusters <- function(optics_obj, minimum=F) {
   }
   
   # Fix the ordering
-  clusters[optics_obj$order] <- clusters
-  optics_obj$cluster <- clusters
-  optics_obj
+  clusters[object$order] <- clusters
+  object$cluster <- clusters
+  object
 }

@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-optics <- function(x, eps, minPts = 5, xi, eps_cl, search = "kdtree",
+optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
   bucketSize = 10, splitRule = "suggest", approx = 0) {
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
@@ -63,12 +63,12 @@ optics <- function(x, eps, minPts = 5, xi, eps_cl, search = "kdtree",
   ret$minPts <- minPts
   ret$eps <- eps
   ret$eps_cl <- NA
-
+  class(ret) <- "optics"
+  
   ### find clusters
   if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
   if(!missing(xi)) ret <- opticsXi(ret, xi)
     
-  class(ret) <- "optics"
   ret
 }
 
@@ -106,14 +106,21 @@ print.optics <- function(x, ...) {
   cat("Parameters: ", "minPts = ", x$minPts,
     ", eps = ", x$eps,
     ", eps_cl = ", x$eps_cl,
+    ", xi = ", x$xi, 
     "\n", sep = "")
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
-    cat("The clustering contains ", cl, " cluster(s) and ",
-      sum(x$cluster==0L), " noise points.",
-      "\n", sep = "")
-    print(table(x$cluster))
+    if(is.null(x$xi)) { 
+      cat("The clustering contains ", cl, " cluster(s) and ",
+          sum(x$cluster==0L), " noise points.",
+          "\n", sep = "")
+      print(table(x$cluster))
+    } else {
+      cat("The clustering contains ", nrow(x$clusters_xi), " cluster(s) and ",
+          sum(x$cluster==0L), " noise points.",
+          "\n", sep = "")
+    }
     cat("\n")
   }
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")

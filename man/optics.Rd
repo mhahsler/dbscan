@@ -1,6 +1,7 @@
 \name{optics}
 \alias{optics}
 \alias{optics_cut}
+\alias{opticsXi}
 \alias{predict.optics}
 \alias{OPTICS}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -13,13 +14,13 @@
   algorithm using a kd-tree.
 }
 \usage{
-  optics(x, eps, minPts = 5, xi, eps_cl,
+  optics(x, eps, minPts = 5, eps_cl, xi, 
     search = "kdtree", bucketSize = 10,
     splitRule = "suggest", approx = 0)
   
-  opticsXi(x, xi)
-  
   optics_cut(x, eps_cl)
+  
+  opticsXi(object, xi = 0.001, minimum = F)
   
   \method{predict}{optics}(object, data, newdata = NULL, ...)
 
@@ -30,8 +31,8 @@
   \item{eps}{ upper limit of the size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
-  \item{xi}{ Steepness threshold to identify clusters hierarchically.}    
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
+  \item{xi}{ Steepness threshold to identify clusters hierarchically.}    
   \item{search}{ nearest neighbor search strategy (one of "kdtree",
     "linear" search, or precomputed "dist") Using precomputed distances
     is better for high-dimensional, but smaller data sets.}
@@ -43,6 +44,8 @@
   \item{object}{ an OPTICS object that contains a clustering. }
   \item{data}{ the data set used to create the OPTICS clustering object. }
   \item{newdata}{ new data set for which cluster membership should be predicted. }
+  \item{minimum}{ boolean representing whether or not to extract the minimal 
+  clusters in the Xi clustering algorithm. }
   \item{...}{ additional arguments are currently unused.}
 }
 \details{
@@ -89,6 +92,13 @@ nearest neighbor search.
     \item{eps_cl }{ reachability distance for each point in \code{x}. }
     \item{cluster }{ assigned cluster labels in the order of the data points in
       \code{x}. }
+  
+  If \code{xi} was specified or \code{opticsXi} was called, then in
+      addition the following components are available:
+    \item{xi }{ Steepness threshold\code{x}. }
+    \item{cluster }{ assigned cluster labels in the order of the data points in
+      \code{x}.} 
+    \item{clusters_xi }{ data.frame containing the start and end of each cluster found in the OPTICS ordering. }    
 }
 \references{
 Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49--60.
@@ -142,6 +152,8 @@ res
 
 plot(res)
 plot(x, col = res$cluster+1L)
+
+
 
 ### using OPTICS on a precomputed distance matrix
 d <- dist(x)

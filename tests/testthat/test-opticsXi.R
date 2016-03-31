@@ -13,7 +13,7 @@ res <- dbscan::optics(x, eps = 1.0,  minPts = 5)
 res <- dbscan::opticsXi(res, xi=0.01, minimum=F)
 
 ### Check to make sure ELKI results match R 
-testthat::expect_equal(elki_optics_xi, res$clusters_xi)
+testthat::expect_equivalent(elki_optics_xi, res$clusters_xi)
 
 res2 <- dbscan::optics(x, eps = 1.0, minPts = 5, xi = 0.01)
-testthat::expect_equal(res, res2)
+testthat::expect_equivalent(res, res2)

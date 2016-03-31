@@ -20,7 +20,7 @@
 opticsXi <- function(object, xi = 0.001, minimum=F)
 {
   if (!"optics" %in% class(object)) stop("opticsXi only accepts objects resulting from dbscan::optics!")
-  if (xi > 1.0 || xi < 0.0) stop("The Xi parameter must be [0, 1]")
+  if (xi >= 1.0 || xi <= 0.0) stop("The Xi parameter must be (0, 1)")
   
   # Initial variables  
   object$ord_rd <- object$reachdist[object$order]
@@ -114,10 +114,15 @@ opticsXi <- function(object, xi = 0.001, minimum=F)
   # Keep hiearchical cluster data
   object$xi <- xi
   object$clusters_xi <- do.call(rbind, SetOfClusters)
-  object$clusters_xi <- data.frame(start=unlist(object$clusters_xi[,1]), end=unlist(object$clusters_xi[,2]))
-  object$clusters_xi <- object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end),]
-  row.names(object$clusters_xi) <- NULL
   
+  if (length(SetOfClusters) == 0) stop(paste("No clusters were found with threshold:", xi))
+  else { 
+    # Order cluster data 
+    object$clusters_xi <- data.frame(start=unlist(object$clusters_xi[,1]), end=unlist(object$clusters_xi[,2]))
+    object$clusters_xi <- object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end),]
+    row.names(object$clusters_xi) <- NULL
+  }
+
   # Replace cluster attribute with XI results and return
   object <- extractXiClusters(object, minimum=minimum)
   object
@@ -149,9 +154,11 @@ valid <- function(index, object) {
 extractXiClusters <- function(object, minimum=F) {
   if (length(object$clusters_xi) == 0) stop("No Xi clusters detected. The steepness (xi) parameter might be too high.")
   
-  # Prepare cluster list based on minimum parameter
+  # Add cluster_id to xi clusters 
+  if (!"cluster_id" %in% names(object$clusters_xi)) object$clusters_xi <- cbind(object$clusters_xi, cluster_id=1:nrow(object$clusters_xi))
+ 
+  # Copy the clusters and sort them based on minimum parameter value 
   clusters_xi <- object$clusters_xi
-  if (!"cluster_id" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, cluster_id=1:nrow(clusters_xi))
   if (!"cluster_size" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, list(cluster_size = (clusters_xi$end - clusters_xi$start)))
   clusters_xi <- if (minimum) { clusters_xi[order(clusters_xi$cluster_size),] } else { clusters_xi[order(-clusters_xi$cluster_size),] }
   

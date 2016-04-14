@@ -5,6 +5,7 @@ Title: Density Based Clustering of Applications with Noise (DBSCAN) and Related
     Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
                 email = "mhahsler@lyle.smu.edu"),
+	    person("Matthew", "Piekenbrock", role = c("ctb", "cph")),
 	    person("Sunil", "Arya", role = c("ctb", "cph")),
 	    person("David", "Mount", role = c("ctb", "cph")))
 Description: A fast reimplementation of several density-based algorithms of

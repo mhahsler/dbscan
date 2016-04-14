@@ -1,9 +1,10 @@
 # Changes in version 0.9-6.1 (2016-xx-xx)
 
+* OPTICSXi is now implemented (thanks to Matt Piekenbrock).
 * DBSCAN now also accepts MinPts (with a capital M) to be
     compartible with the fpc version.
 * DBSCAN objects are now also of class dbscan_fast to avoid clashes with fpc.
-* DBSCAN and OPTICS have now a predict functions.
+* DBSCAN and OPTICS have now predict functions.
 * Added test for unhandled NAs.
 
 # Changes in version 0.9-6 (2015-12-14)

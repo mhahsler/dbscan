@@ -126,7 +126,7 @@ x <- cbind(
 plot(x, col=rep(1:4, time = 100))
 
 ### run OPTICS
-res <- optics(x, eps = 1,  minPts = 10)
+res <- optics(x, eps = 10,  minPts = 10)
 res
 
 ### get order
@@ -155,8 +155,10 @@ res
 plot(res)
 plot(x, col = res$cluster+1L)
 
+# Xi cluster structure
+res$clusters_xi
 
-### using OPTICS on a precomputed distance matrix
+### use OPTICS on a precomputed distance matrix
 d <- dist(x)
 res <- optics(x, eps = 1, minPts = 10)
 plot(res)

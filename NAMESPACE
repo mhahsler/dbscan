@@ -1,9 +1,12 @@
 useDynLib("dbscan")
-import("Rcpp")
-importFrom("graphics", "plot")
-importFrom("stats", "dist")
-importFrom("methods", "is")
 
+import("Rcpp")
+
+importFrom("graphics", "plot", "par", "segments")
+
+importFrom("stats", "dist")
+
+importFrom("methods", "is")
 
 export(
   kNN,

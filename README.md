@@ -1,7 +1,7 @@
 # dbscan - Density Based Clustering of Applications with Noise (DBSCAN) and Related Algorithms - R package
 
-[![CRAN version](http://www.r-pkg.org/badges/version/dbscan)](http://cran.r-project.org/web/packages/dbscan/index.html)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/dbscan)](http://cran.r-project.org/web/packages/dbscan/index.html)
+[![CRAN version](http://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
 [![Travis-CI Build Status](https://travis-ci.org/mhahsler/dbscan.svg?branch=master)](https://travis-ci.org/mhahsler/dbscan)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
 

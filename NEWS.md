@@ -1,9 +1,9 @@
-# Changes in version 0.9-6.1 (2016-xx-xx)
+# Changes in version 0.9-7 (2016-04-14)
 
 * OPTICSXi is now implemented (thanks to Matt Piekenbrock).
 * DBSCAN now also accepts MinPts (with a capital M) to be
-    compartible with the fpc version.
-* DBSCAN objects are now also of class dbscan_fast to avoid clashes with fpc.
+    compatible with the fpc version.
+* DBSCAN objects are now also of class db scan_fast to avoid clashes with fpc.
 * DBSCAN and OPTICS have now predict functions.
 * Added test for unhandled NAs.
 * Fixed LOF for more than k duplicate points (reported by Samneet Singh).
@@ -36,7 +36,7 @@
 * Added frNN (fixed radius NN) interface.
 * Added LOF.
 * Added OPTICS.
-* All algorithms check now for interupt (CTRL-C/Esc).
+* All algorithms check now for interrupt (CTRL-C/Esc).
 * DBSCAN now returns a list instead of a numeric vector.
 
 # Changes in version 0.9-1 (2015-07-21)

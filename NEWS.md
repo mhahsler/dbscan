@@ -6,6 +6,7 @@
 * DBSCAN objects are now also of class dbscan_fast to avoid clashes with fpc.
 * DBSCAN and OPTICS have now predict functions.
 * Added test for unhandled NAs.
+* Fixed LOF for more than k duplicate points (reported by Samneet Singh).
 
 # Changes in version 0.9-6 (2015-12-14)
 

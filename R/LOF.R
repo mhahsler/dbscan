@@ -41,5 +41,9 @@ lof <- function(x, k = 4, ...) {
   lof <- numeric(n)
   for (i in 1:n) lof[i] <- sum(lrd[d$id[i,]])/k / lrd[i]
 
+  # with more than MinPts duplicates lrd can become infinity
+  # we define them not to be outliers
+  lof[is.nan(lof)] <- 1
+
   lof
 }

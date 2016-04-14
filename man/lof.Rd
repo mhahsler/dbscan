@@ -23,6 +23,10 @@ their neighbors are considered outliers.
 A LOF score of approximately 1 indicates that density around the point
 is comparable to its neighbors. Scores significantly larger than
 1 indicate outliers.
+
+Note: If there are more than \code{k} duplicate points in the data, then lof
+can become \code{NaN} caused by an infinite local density.
+In this case we set lof to 1. The paper by Breunig et al (2000) suggests a different method of removing all duplicate points first.
 }
 \value{
 A numeric vector of length \code{ncol(x)} containing LOF values for
@@ -64,3 +68,4 @@ text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 1)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{model}
+

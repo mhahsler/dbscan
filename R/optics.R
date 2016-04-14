@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
+optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
   bucketSize = 10, splitRule = "suggest", approx = 0) {
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
@@ -63,14 +63,14 @@ optics <- function(x, eps, minPts = 5, eps_cl, search = "kdtree",
   ret$minPts <- minPts
   ret$eps <- eps
   ret$eps_cl <- NA
-
+  class(ret) <- "optics"
+  
   ### find clusters
   if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
-
-  class(ret) <- "optics"
+  if(!missing(xi)) ret <- opticsXi(ret, xi)
+    
   ret
 }
-
 
 ### extract clusters
 optics_cut <- function(x, eps_cl) {
@@ -106,14 +106,21 @@ print.optics <- function(x, ...) {
   cat("Parameters: ", "minPts = ", x$minPts,
     ", eps = ", x$eps,
     ", eps_cl = ", x$eps_cl,
+    ", xi = ", x$xi, 
     "\n", sep = "")
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
-    cat("The clustering contains ", cl, " cluster(s) and ",
-      sum(x$cluster==0L), " noise points.",
-      "\n", sep = "")
-    print(table(x$cluster))
+    if(is.null(x$xi)) { 
+      cat("The clustering contains ", cl, " cluster(s) and ",
+          sum(x$cluster==0L), " noise points.",
+          "\n", sep = "")
+      print(table(x$cluster))
+    } else {
+      cat("The clustering contains ", nrow(x$clusters_xi), " cluster(s) and ",
+          sum(x$cluster==0L), " noise points.",
+          "\n", sep = "")
+    }
     cat("\n")
   }
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
@@ -121,14 +128,24 @@ print.optics <- function(x, ...) {
 
 plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
     if(!is.null(x$cluster) && cluster) {
-      plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
-        ylab = "Reachability dist.", xlab = "OPTICS order",
-        main = "Reachability Plot")
-      # abline(h=x$eps_cl, col="gray", lty=2)
+      if(is.null(x$clusters_xi)) { 
+        plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
+          ylab = "Reachability dist.", xlab = "OPTICS order",
+          main = "Reachability Plot", ...)
+      } else {
+        y_max <- max(x$reachdist[which(x$reachdist != Inf)])
+        hclusters <- x$clusters_xi[order(x$clusters_xi$end-x$clusters_xi$start),]
+        plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
+             ylab = "Reachability dist.", xlab = NA, xaxt = "n",
+             main = "Reachability Plot", yaxs="i", ylim=c(0,y_max), xaxt='n', ...)
+        y_increments <- ((y_max/(par("plt")[4]-par("plt")[3]))*(par("plt")[3]))/(2*nrow(hclusters))
+        i <- 1:nrow(hclusters)
+        segments(x0=hclusters$start[i], y0=-(y_increments*i), x1=hclusters$end[i], col=hclusters$cluster_id[i]+1L, lwd=1, xpd=T)
+      }
     }else{
       plot(x$reachdist[x$order], type="h",
         ylab = "Reachability dist.", xlab = "OPTICS order",
-        main = "Reachability Plot")
+        main = "Reachability Plot", ...)
     }
 }
 

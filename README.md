@@ -19,7 +19,7 @@ implementations in WEKA, ELKI and Python's scikit-learn.
 ## Installation
 
 * __Stable CRAN version:__ install from within R.
-* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `intall_github("mhahsler/dbscan")` (requires devtools) 
+* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `install_github("mhahsler/dbscan")` (requires devtools) 
 
 ## Examples
 ```R

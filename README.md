@@ -8,7 +8,7 @@
  This R package provides a fast C++ reimplementation of several density-based algorithms of the DBSCAN 
  family for spatial data. 
  Includes the __DBSCAN__ (density-based spatial clustering of applications with noise) and 
- __OPTICS__ (ordering points to identify the clustering structure) clustering algorithms and the 
+ __OPTICS/OPTICSXi__ (ordering points to identify the clustering structure) clustering algorithms and the 
  __LOF__ (local outlier factor) algorithm. The implementations uses the kd-tree data 
  structure (from library ANN) for faster k-nearest neighbor search. 
  An R interface to __fast kNN and fixed-radius NN search__ is also provided.
@@ -48,3 +48,11 @@ plot(opt)
 ## plot the extracted DBSCAN clustering
 pairs(x, col = opt$cluster + 1L)
 ```
+
+## Further Information
+
+* Development version of [dbscan on github](https://github.com/mhahsler/dbscan).
+* [dbscan reference manual](http://cran.r-project.org/web/packages/dbscan/dbscan.pdf)
+
+_Maintainer:_ [Michael Hahsler](http://michael.hahsler.net)
+

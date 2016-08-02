@@ -23,8 +23,8 @@ void update(
     std::vector <bool> &visited,
     std::vector<int> &orderedPoints,
     std::vector<double> &reachdist,
-    std::vector<double> &coredist
-    ){
+    std::vector<double> &coredist, 
+    std::vector<int> &pre){
 
   std::vector<int>::iterator pos_seeds;
   double newreachdist;
@@ -45,9 +45,12 @@ void update(
       reachdist[o] = newreachdist;
       seeds.push_back(o);
     } else {
-      // o was not visited and has a reachbility distance must be
+      // o was not visited and has a reachability distance must be
       // already in seeds!
-      if(newreachdist < reachdist[o]) reachdist[o] = newreachdist;
+      if(newreachdist < reachdist[o]) {
+        reachdist[o] = newreachdist;
+        pre[o] = p;
+      }
     }
   }
 }
@@ -93,8 +96,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   // OPTICS
   std::vector<bool> visited(nrow, false);
   std::vector<int> orderedPoints; orderedPoints.reserve(nrow);
-  // FIXME: fix predecessor
-  //std::vector<int> pre(nrow, NA_INTEGER);
+  std::vector<int> pre(nrow, NA_INTEGER);
   std::vector<double> reachdist(nrow, INFINITY); // we used Inf as undefined
   std::vector<double> coredist(nrow, INFINITY);
   nn N;
@@ -122,7 +124,8 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       std::sort(ds.begin(), ds.end()); // sort inceasing
       coredist[p] = ds[minPts-1];
     }
-
+    int tmp_p = NA_INTEGER; 
+    if (pre[p] == NA_INTEGER) { tmp_p = p; }
     orderedPoints.push_back(p);
 
     if (coredist[p] == INFINITY) continue; // core-dist is undefined
@@ -132,7 +135,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
 
     // update
     update(N, p, seeds, minPts, visited, orderedPoints,
-      reachdist, coredist);
+      reachdist, coredist, pre);
 
     int q;
     while (!seeds.empty()) {
@@ -162,17 +165,16 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       if(N.second.size() >= (size_t) minPts) {
         ds = N.second;
         std::sort(ds.begin(), ds.end());
-        coredist[q] = ds[minPts-1];
+        coredist[q] = ds[minPts - 1];
       }
-
+      if (pre[q] == NA_INTEGER) { pre[q] = tmp_p; }
       orderedPoints.push_back(q);
-      //pre[q] = p;
 
-      if(N.first.size() < (size_t) minPts) continue; //  == q has no core dist.
+      if(N.first.size() < (size_t) minPts) continue; //  == q has no core dist. 
 
       // update seeds
       update(N, q, seeds, minPts, visited, orderedPoints,
-        reachdist, coredist);
+        reachdist, coredist, pre);
     }
   }
 
@@ -185,10 +187,10 @@ List optics_int(NumericMatrix data, double eps, int minPts,
 
   // prepare results (R index starts with 1)
   List ret;
-  ret["order"] = IntegerVector(orderedPoints.begin(), orderedPoints.end())+1;
+  ret["order"] = IntegerVector(orderedPoints.begin(), orderedPoints.end()) + 1;
   ret["reachdist"] = sqrt(NumericVector(reachdist.begin(), reachdist.end()));
   ret["coredist"] = sqrt(NumericVector(coredist.begin(), coredist.end()));
-  //ret["predecessor"] = IntegerVector(pre.begin(), pre.end())+1;
+  ret["predecessor"] = IntegerVector(pre.begin(), pre.end()) + 1;
   return ret;
 }
 

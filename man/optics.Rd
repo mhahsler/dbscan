@@ -20,7 +20,7 @@
 
   optics_cut(x, eps_cl)
 
-  opticsXi(object, xi = 0.001, minimum = F)
+  opticsXi(object, xi = 0.001, minimum = F, nocorrect = F)
 
   \method{predict}{optics}(object, data, newdata = NULL, ...)
 
@@ -48,6 +48,8 @@
   \item{newdata}{ new data set for which cluster membership should be predicted. }
   \item{minimum}{ boolean representing whether or not to extract the minimal
     clusters in the Xi clustering algorithm. }
+  \item{nocorrect}{ boolean representing whether or not to prune the steep up area for
+  	points that have predecessors not in the cluster--found by the ELKI framework, see details below. }
   \item{...}{ additional arguments are currently unused.}
 }
 \details{
@@ -71,12 +73,12 @@ produce. The only difference is that OPTICS is not able to assign some border
 points and reports them instead as noise.
 
 If \code{xi} is specified, then the algorithm to extract clusters hiearchically
-specified in Ankers et al (1999) is used. That is, it
-internally calls \code{opticsXi} to extract the clustering.
-The resulting clustering is a hiearchical representation of what
-several DBSCANs would produce using varied parameters.
+specified in Ankers et al (1999), with an added set of fixes to the algorithm 
+originally contributed by the ELKI framework, is used. Internally, optics calls 
+\code{opticsXi} to extract the resulting hierarchical representation of what
+several DBSCANs would produce at varying density thresholds.
 It has been noted that one interpretation of the \code{xi}
-parameter is that it identifies clusters by change in relative cluster density.
+parameter is that it classifies clusters by change in relative cluster density.
 
 See \code{\link{kNN}} for more information on the other parameters related to
 nearest neighbor search.
@@ -148,7 +150,7 @@ res
 plot(res)
 plot(x, col = res$cluster+1L)
 
-### identify clusters using the hierarchically Xi method
+### identify clusters of varying density hierarchically using the Xi method
 res <- opticsXi(res, xi = 0.05)
 res
 

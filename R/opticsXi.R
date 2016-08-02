@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-opticsXi <- function(object, xi = 0.001, minimum=F)
+opticsXi <- function(object, xi = 0.001, minimum=F, nocorrect=F)
 {
   if (!"optics" %in% class(object)) stop("opticsXi only accepts objects resulting from dbscan::optics!")
   if (xi >= 1.0 || xi <= 0.0) stop("The Xi parameter must be (0, 1)")
@@ -87,7 +87,14 @@ opticsXi <- function(object, xi = 0.001, minimum=F)
         # Default values 
         cstart <- sda$s
         cend <- sua$e
-      
+        
+        # Credit to ELKI
+        if(!nocorrect) {
+          while(cend > cstart && object$ord_rd[cend] == Inf) {
+            cend <- cend - 1
+          }
+        }
+        
         # Condition 4
         {
           # Case b
@@ -100,6 +107,24 @@ opticsXi <- function(object, xi = 0.001, minimum=F)
           }
         }
         
+        # This NOT in the original article - credit to ELKI for finding this.
+        # Ensure that the predecessor is in the current cluster. This filter
+        # removes common artifacts from the Xi method
+        if(!nocorrect) {
+          while(cend > cstart) {
+            tmp2 <- object$predecessor[object$order[cend]]
+            if (!is.na(tmp2) && any(object$order[cstart:(cend-1)] == tmp2, na.rm = TRUE))
+               break
+            # Not found.
+            cend <- cend - 1
+          }
+        }
+        
+        # Ensure the last steep up point is not included if it's xi significant
+        if (steepUp(index-1, object)) {
+          cend <- cend - 1
+        }
+          
         # obey minpts 
         if (cend - cstart + 1 < object$minPts) next
         SetOfClusters <- append(SetOfClusters, list(list(start=cstart, end=cend)))
@@ -110,19 +135,23 @@ opticsXi <- function(object, xi = 0.001, minimum=F)
   # Remove aliases  
   object$ord_rd <- NULL
   object$ixi <- NULL
-
-  # Keep hiearchical cluster data
-  object$xi <- xi
-  object$clusters_xi <- do.call(rbind, SetOfClusters)
   
-  if (length(SetOfClusters) == 0) stop(paste("No clusters were found with threshold:", xi))
-  else { 
-    # Order cluster data 
+  # Keep xi parameter
+  object$xi <- xi
+  
+  # Zero-out clusters (only noise) if none found
+  if (length(SetOfClusters) == 0) {
+    warning(paste("No clusters were found with threshold:", xi))
+    object$clusters_xi <- NULL
+    object$cluster < rep(0, length(object$cluster))
+    return(invisible(object))
+  } else { # Cluster data exists; organize it by starting and ending index
+    object$clusters_xi <- do.call(rbind, SetOfClusters)
     object$clusters_xi <- data.frame(start=unlist(object$clusters_xi[,1]), end=unlist(object$clusters_xi[,2]))
     object$clusters_xi <- object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end),]
     row.names(object$clusters_xi) <- NULL
   }
-
+  
   # Replace cluster attribute with XI results and return
   object <- extractXiClusters(object, minimum=minimum)
   object
@@ -134,35 +163,38 @@ updateFilterSDASet <- function(mib, sdaset, ixi) {
   lapply(sdaset, function(sda) { if (mib > sda$mib) sda$mib <- mib; sda })
 }
 
+# Determines if the reachability distance at the current index 'i' is 
+# (xi) significantly lower than the next index
 steepUp <- function(i, object, ixi = object$ixi) {
   if(object$ord_rd[i] >= Inf) return(F)
   if(!valid(i+1, object)) return(T)
   return(object$ord_rd[i] <= object$ord_rd[i+1] * ixi)
 }
 
+# Determines if the reachability distance at the current index 'i' is 
+# (xi) significantly higher than the next index
 steepDown <- function(i, object, ixi = object$ixi) {
   if(!valid(i+1, object)) return(F)
   if(object$ord_rd[i+1] >= Inf) return(F)
   return(object$ord_rd[i] * ixi >= object$ord_rd[i+1])
 }
 
+# Determines if the reachability distance at the current index 'i' is a valid distance
 valid <- function(index, object) {
   return(!is.na(object$ord_rd[index]))
 }
 
 ### Extract xi clusters (minimum == T extracts clusters that do not contain other clusters)
 extractXiClusters <- function(object, minimum=F) {
-  if (length(object$clusters_xi) == 0) stop("No Xi clusters detected. The steepness (xi) parameter might be too high.")
-  
   # Add cluster_id to xi clusters 
   if (!"cluster_id" %in% names(object$clusters_xi)) object$clusters_xi <- cbind(object$clusters_xi, cluster_id=1:nrow(object$clusters_xi))
- 
+  
   # Copy the clusters and sort them based on minimum parameter value 
   clusters_xi <- object$clusters_xi
   if (!"cluster_size" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, list(cluster_size = (clusters_xi$end - clusters_xi$start)))
   clusters_xi <- if (minimum) { clusters_xi[order(clusters_xi$cluster_size),] } else { clusters_xi[order(-clusters_xi$cluster_size),] }
   
-  # Fill in the matrix 
+  # Fill in the [cluster] vector with cluster IDs
   clusters <- rep(0, length(object$order))
   for(cid in clusters_xi$cluster_id) {
     cluster <- clusters_xi[clusters_xi$cluster_id == cid,]
@@ -171,6 +203,11 @@ extractXiClusters <- function(object, minimum=F) {
         clusters[cluster$start:cluster$end] <- cid
       }
     } else clusters[cluster$start:cluster$end] <- cid
+  }
+  
+  # Correct the clusters_xi if minimum was specified 
+  if (minimum) { 
+    object$clusters_xi <- object$clusters_xi[unique(clusters)[-1],] 
   }
   
   # Fix the ordering

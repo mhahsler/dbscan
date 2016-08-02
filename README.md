@@ -47,4 +47,13 @@ opt
 plot(opt)
 ## plot the extracted DBSCAN clustering
 pairs(x, col = opt$cluster + 1L)
+## extract a hierarchical clustering using the Xi method (captures clusters of varying density)
+opt <- optics(x, eps = 1, minPts = 4, xi = .05)
+opt
+plot(opt)
 ```
+
+## License 
+The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from [ELKI](http://elki.dbs.ifi.lmu.de/) frameworks available Java source code (GNU AGPLv3), with explicit permission granted by the original author, [Erich Schubert](http://www.dbs.ifi.lmu.de/cms/Erich_Schubert).  
+
+

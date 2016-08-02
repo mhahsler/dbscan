@@ -20,7 +20,7 @@
 
   optics_cut(x, eps_cl)
 
-  opticsXi(object, xi = 0.001, minimum = F)
+  opticsXi(object, xi = 0.001, minimum = F, nocorrect = F)
 
   \method{predict}{optics}(object, data, newdata = NULL, ...)
 
@@ -48,6 +48,8 @@
   \item{newdata}{ new data set for which cluster membership should be predicted. }
   \item{minimum}{ boolean representing whether or not to extract the minimal
     clusters in the Xi clustering algorithm. }
+  \item{nocorrect}{ boolean representing whether or not to prune the steep up area for
+  	points that have predecessors not in the cluster--found by the ELKI framework, see details below. }
   \item{...}{ additional arguments are currently unused.}
 }
 \details{
@@ -148,7 +150,7 @@ res
 plot(res)
 plot(x, col = res$cluster+1L)
 
-### identify clusters using the hierarchically Xi method
+### identify clusters of varying density hierarchically using the Xi method
 res <- opticsXi(res, xi = 0.05)
 res
 

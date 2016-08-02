@@ -73,12 +73,12 @@ produce. The only difference is that OPTICS is not able to assign some border
 points and reports them instead as noise.
 
 If \code{xi} is specified, then the algorithm to extract clusters hiearchically
-specified in Ankers et al (1999) is used. That is, it
-internally calls \code{opticsXi} to extract the clustering.
-The resulting clustering is a hiearchical representation of what
-several DBSCANs would produce using varied parameters.
+specified in Ankers et al (1999), with an added set of fixes to the algorithm 
+originally contributed by the ELKI framework, is used. Internally, optics calls 
+\code{opticsXi} to extract the resulting hierarchical representation of what
+several DBSCANs would produce at varying density thresholds.
 It has been noted that one interpretation of the \code{xi}
-parameter is that it identifies clusters by change in relative cluster density.
+parameter is that it classifies clusters by change in relative cluster density.
 
 See \code{\link{kNN}} for more information on the other parameters related to
 nearest neighbor search.

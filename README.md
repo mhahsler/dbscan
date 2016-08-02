@@ -8,7 +8,7 @@
  This R package provides a fast C++ reimplementation of several density-based algorithms of the DBSCAN 
  family for spatial data. 
  Includes the __DBSCAN__ (density-based spatial clustering of applications with noise) and 
- __OPTICS__ (ordering points to identify the clustering structure) clustering algorithms and the 
+ __OPTICS/OPTICSXi__ (ordering points to identify the clustering structure) clustering algorithms and the 
  __LOF__ (local outlier factor) algorithm. The implementations uses the kd-tree data 
  structure (from library ANN) for faster k-nearest neighbor search. 
  An R interface to __fast kNN and fixed-radius NN search__ is also provided.
@@ -19,7 +19,7 @@ implementations in WEKA, ELKI and Python's scikit-learn.
 ## Installation
 
 * __Stable CRAN version:__ install from within R.
-* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `intall_github("mhahsler/dbscan")` (requires devtools) 
+* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `install_github("mhahsler/dbscan")` (requires devtools) 
 
 ## Examples
 ```R
@@ -55,5 +55,13 @@ plot(opt)
 
 ## License 
 The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from [ELKI](http://elki.dbs.ifi.lmu.de/) frameworks available Java source code (GNU AGPLv3), with explicit permission granted by the original author, [Erich Schubert](http://www.dbs.ifi.lmu.de/cms/Erich_Schubert).  
+
+
+## Further Information
+
+* Development version of [dbscan on github](https://github.com/mhahsler/dbscan).
+* [dbscan reference manual](http://cran.r-project.org/web/packages/dbscan/dbscan.pdf)
+
+_Maintainer:_ [Michael Hahsler](http://michael.hahsler.net)
 
 

@@ -55,7 +55,7 @@ Border points are arbitrarily assigned to clusters in the original algorithm.
 DBSCAN* (see Campello et al 2013) treats all border points as noise points. This is implemented with \code{borderPoints = FALSE}.
 
 Setting parameters for DBSCAN:
-\code{minPts} is often set to be dimensionality of the data plus one.
+\code{minPts} is often set to be dimensionality of the data plus one or higher.
 The knee in \code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
 
 See \code{\link{kNN}} for more information on the other parameters related to nearest neighbor search.
@@ -94,23 +94,15 @@ in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
 data(iris)
 iris <- as.matrix(iris[,1:4])
 
-res <- dbscan(iris, eps = .4, minPts = 4)
+## find suitable eps parameter using a k-NN plot for k = dim + 1
+## Look for the knee!
+kNNdistplot(iris, k = 5)
+abline(h=.4, col = "red", lty=2)
+
+res <- dbscan(iris, eps = .4, minPts = 5)
 res
 
 pairs(iris, col = res$cluster + 1L)
-
-## compare with dbscan from package fpc (only if installed)
-if (requireNamespace("fpc", quietly = TRUE)) {
-  res2 <- fpc::dbscan(iris, eps = .4, MinPts = 4)
-  pairs(iris, col = res2$cluster + 1L)
-
-  ## make sure both version produce the same results
-  all(res$cluster == res2$cluster)
-  }
-
-## find suitable eps parameter (look at knee)
-kNNdistplot(iris, k = 4)
-
 
 ## example data from fpc
 set.seed(665544)
@@ -120,26 +112,30 @@ x <- cbind(
   y = runif(10, 0, 10) + rnorm(n, sd = 0.2)
   )
 
-## Note: we use dbscan::dbscan to make sure that we do now run the
-## implementation in fpc.
-res <- dbscan::dbscan(x, eps = .2, minPts = 4)
+res <- dbscan(x, eps = .3, minPts = 3)
 res
 
-plot(x, col=res$cluster + 1L)
+## plot clusters and add noise (cluster 0) as crosses.
+plot(x, col=res$cluster)
+points(x[res$cluster==0,], pch = 3, col = "grey")
 
 ## predict cluster membership for new data points
+## (Note: 0 means it is predicted as noise)
 newdata <- x[1:5,] + rnorm(10, 0, .2)
 predict(res, x, newdata)
 
-\dontrun{
 ## compare speed against fpc version (if microbenchmark is installed)
-if (requireNamespace("microbenchmark", quietly = TRUE)) {
+## Note: we use dbscan::dbscan to make sure that we do now run the
+## implementation in fpc.
+\dontrun{
+if (requireNamespace("fpc", quietly = TRUE) &&
+    requireNamespace("microbenchmark", quietly = TRUE)) {
   t_dbscan <- microbenchmark::microbenchmark(
-    dbscan::dbscan(x, .2, 4), times = 10, unit = "ms")
+    dbscan::dbscan(x, .3, 3), times = 10, unit = "ms")
   t_dbscan_linear <- microbenchmark::microbenchmark(
-    dbscan::dbscan(x, .2, 4, search = "linear"), times = 10, unit = "ms")
+    dbscan::dbscan(x, .3, 3, search = "linear"), times = 10, unit = "ms")
   t_fpc <- microbenchmark::microbenchmark(
-    fpc::dbscan(x, .2, 4), times = 10, unit = "ms")
+    fpc::dbscan(x, .3, 3), times = 10, unit = "ms")
 
   rbind(t_fpc, t_dbscan_linear, t_dbscan)
 
@@ -149,8 +145,7 @@ if (requireNamespace("microbenchmark", quietly = TRUE)) {
 
   ## speedup of the kd-tree-based version compared to the fpc implementation
   median(t_fpc$time) / median(t_dbscan$time)
-}
-}
+}}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

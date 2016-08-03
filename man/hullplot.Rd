@@ -9,8 +9,8 @@
     convex hulls for clusters.
 }
 \usage{
-hullplot(x, cl, col = NULL, cex = 0.5, lwd_hull = 2,
-	 main = "Convex Cluster Hulls", ...)
+hullplot(x, cl, col = NULL, cex = 0.5, hull_lwd = 1, hull_lty = 1,
+	 main = "Convex Cluster Hulls", solid=FALSE, alpha = .2, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,8 +20,10 @@ hullplot(x, cl, col = NULL, cex = 0.5, lwd_hull = 2,
   \item{col}{ colors used for clusters. Defaults to the standard palette.
     The first color is used for noise/unassigned points (cluster id 0). }
   \item{cex}{ expansion factor for symbols. }
-  \item{lwd_hull}{ line width used for the convex hull.}
+  \item{hull_lwd, hull_lty}{ line width and line type used for the convex hull.}
   \item{main}{ main title.}
+  \item{solid, alpha}{ draw filled polygons instead of lines for the convex hulls.
+    alpha controls the alpha shading. }
   \item{...}{ additional arguments passed on to plot. }
 }
 %\details{
@@ -46,7 +48,11 @@ x <- cbind(
 cl <- rep(1:4, time = 100)
 
 ### original data with true clustering
+### (also with differnt symbols, just the hulls or polygons)
 hullplot(x, cl, main = "True clusters")
+hullplot(x, cl, main = "True clusters", pch = cl)
+hullplot(x, cl, main = "True clusters", pch = NA)
+hullplot(x, cl, main = "True clusters", solid = TRUE, hull_lwd = 0)
 
 
 ### run some clustering algorithms and plot the resutls

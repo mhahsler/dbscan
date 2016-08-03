@@ -136,8 +136,9 @@ opticsXi <- function(object, xi = 0.001, minimum=F, nocorrect=F)
   object$ord_rd <- NULL
   object$ixi <- NULL
   
-  # Keep xi parameter
+  # Keep xi parameter, and whether the minimal/local clustering is desired
   object$xi <- xi
+  object$min <- minimum
   
   # Zero-out clusters (only noise) if none found
   if (length(SetOfClusters) == 0) {

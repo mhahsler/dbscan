@@ -2,7 +2,8 @@ useDynLib("dbscan")
 
 import("Rcpp")
 
-importFrom("graphics", "plot", "par", "segments")
+importFrom("graphics", "plot", "par", "segments", "lines")
+importFrom("grDevices", "palette", "chull")
 
 importFrom("stats", "dist")
 
@@ -17,7 +18,8 @@ export(
   optics,
   optics_cut,
   opticsXi,
-  lof
+  lof,
+  hullplot
 )
 
 S3method(print, optics)

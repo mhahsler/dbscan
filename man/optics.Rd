@@ -73,8 +73,8 @@ produce. The only difference is that OPTICS is not able to assign some border
 points and reports them instead as noise.
 
 If \code{xi} is specified, then the algorithm to extract clusters hiearchically
-specified in Ankers et al (1999), with an added set of fixes to the algorithm 
-originally contributed by the ELKI framework, is used. Internally, optics calls 
+specified in Ankers et al (1999), with an added set of fixes to the algorithm
+originally contributed by the ELKI framework, is used. Internally, optics calls
 \code{opticsXi} to extract the resulting hierarchical representation of what
 several DBSCANs would produce at varying density thresholds.
 It has been noted that one interpretation of the \code{xi}
@@ -156,6 +156,8 @@ res
 
 plot(res)
 plot(x, col = res$cluster+1L)
+# better visualization of the nested structure using convex hulls
+hullplot(x, res)
 
 # Xi cluster structure
 res$clusters_xi

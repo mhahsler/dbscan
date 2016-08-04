@@ -69,7 +69,7 @@ km <- kmeans(x, centers = 4)
 hullplot(x, km, main = "k-means")
 
 hc <- cutree(hclust(dist(x)), k = 4)
-hullplot(x, hc, main = "Hierarchical")
+hullplot(x, hc, main = "Hierarchical Clustering")
 }
 \keyword{ plot }
 \keyword{ clustering }

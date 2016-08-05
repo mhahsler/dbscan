@@ -1,8 +1,9 @@
 # Changes in version 0.9-7.1 (2016-xx-xx)
 
 * OPTICS: added a predecessor correction step that is used by 
-    the ELKI implementation.  
+    the ELKI implementation (Matt Piekenbrock).  
 * Added hullplot to plot a scatter plot with added convex cluster hulls.
+* Fixed a memory problem in frNN (reported by Yilei He).
 
 # Changes in version 0.9-7 (2016-04-14)
 

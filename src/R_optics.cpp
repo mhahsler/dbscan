@@ -23,7 +23,7 @@ void update(
     std::vector <bool> &visited,
     std::vector<int> &orderedPoints,
     std::vector<double> &reachdist,
-    std::vector<double> &coredist, 
+    std::vector<double> &coredist,
     std::vector<int> &pre){
 
   std::vector<int>::iterator pos_seeds;
@@ -104,7 +104,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   std::vector<double> ds;
 
   for (int p=0; p<nrow; p++) {
-    if (!(p % 100)) Rcpp::checkUserInterrupt();
+    if (!(p % 10)) Rcpp::checkUserInterrupt();
     //Rprintf("processing point %d\n", p+1);
 
     if (visited[p]) continue;
@@ -124,7 +124,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       std::sort(ds.begin(), ds.end()); // sort inceasing
       coredist[p] = ds[minPts-1];
     }
-    int tmp_p = NA_INTEGER; 
+    int tmp_p = NA_INTEGER;
     if (pre[p] == NA_INTEGER) { tmp_p = p; }
     orderedPoints.push_back(p);
 
@@ -170,7 +170,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       if (pre[q] == NA_INTEGER) { pre[q] = tmp_p; }
       orderedPoints.push_back(q);
 
-      if(N.first.size() < (size_t) minPts) continue; //  == q has no core dist. 
+      if(N.first.size() < (size_t) minPts) continue; //  == q has no core dist.
 
       // update seeds
       update(N, q, seeds, minPts, visited, orderedPoints,

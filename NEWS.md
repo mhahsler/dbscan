@@ -1,4 +1,4 @@
-# Changes in version 0.9-7.1 (2016-xx-xx)
+# Changes in version 0.9-8 (2016-08-05)
 
 * OPTICS: added a predecessor correction step that is used by 
     the ELKI implementation (Matt Piekenbrock).  

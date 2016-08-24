@@ -19,12 +19,15 @@ export(
   optics_cut,
   opticsXi,
   lof,
-  hullplot
+  hullplot, 
+  as.reachability
 )
 
 S3method(print, optics)
 S3method(plot, optics)
 S3method(predict, optics)
+S3method(as.dendrogram, optics)
+S3method(as.reachability, dendrogram)
 
 S3method(print, dbscan_fast)
 S3method(predict, dbscan_fast)

@@ -59,10 +59,11 @@ hullplot(x, cl, main = "True clusters", solid = TRUE, hull_lwd = 0)
 db <- dbscan(x, eps = .07, minPts = 10)
 hullplot(x, db, main = "DBSCAN")
 
-op <- optics(x, eps = 10, minPts = 10, eps_cl = 0.07)
-hullplot(x, op, main = "OPTICS")
+op <- optics(x, eps = 10, minPts = 10)
+opDBSCAN <- extractDBSCAN(op, eps_cl = .07)
+hullplot(x, opDBSCAN, main = "OPTICS")
 
-opXi <- opticsXi(op, xi = 0.05)
+opXi <- extractXi(op, xi = 0.05)
 hullplot(x, opXi, main = "OPTICSXi")
 
 km <- kmeans(x, centers = 4)

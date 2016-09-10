@@ -17,14 +17,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
-  bucketSize = 10, splitRule = "suggest", approx = 0) {
+optics <- function(x, eps, minPts = 5, ...) {
 
+  ### extra contains settings for frNN
+  ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
+  extra <- list(...)
+  args <- c("search", "bucketSize", "splitRule", "approx")
+  m <- pmatch(names(extra), args)
+  if(any(is.na(m))) stop("Unknown parameter: ",
+    paste(names(extra)[is.na(m)], collapse = ", "))
+  names(extra) <- args[m]
+
+  search <- if(is.null(extra$search)) "kdtree" else extra$search
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  if(is.na(search)) stop("Unknown NN search type!")
+
+  bucketSize <- if(is.null(extra$bucketSize)) 10L else
+    as.integer(extra$bucketSize)
+
+  splitRule <- if(is.null(extra$splitRule)) "suggest" else extra$splitRule
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
-  if(is.na(search)) stop("Unknown NN search type!")
+  approx <- if(is.null(extra$approx)) 0L else as.integer(extra$approx)
 
   ### dist search
   if(search == 3) {
@@ -36,7 +51,7 @@ optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
   ## for dist we provide the R code with a frNN list and no x
   frNN <- list()
   if(is(x, "dist")) {
-    frNN <- frNN(x, eps)
+    frNN <- frNN(x, eps, ...)
     ## add self match and use C numbering
     frNN$id <- lapply(1:length(frNN$id),
       FUN = function(i) c(i-1L, frNN$id[[i]]-1L))
@@ -66,40 +81,7 @@ optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
   ret$xi <- NA
   class(ret) <- "optics"
 
-  ### find clusters
-  if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
-  if(!missing(xi)) ret <- opticsXi(ret, xi)
-
   ret
-}
-
-### extract clusters
-optics_cut <- function(x, eps_cl) {
-  reachdist <- x$reachdist[x$order]
-  coredist <- x$coredist[x$order]
-  n <- length(x$order)
-  cluster <- integer(n)
-
-  clusterid <- 0L         ### 0 is noise
-  for(i in 1:n) {
-    if(reachdist[i] > eps_cl) {
-      if(coredist[i] <= eps_cl) {
-        clusterid <- clusterid + 1L
-        cluster[i] <- clusterid
-      }else{
-        cluster[i] <- 0L  ### noise
-      }
-    }else{
-      cluster[i] <- clusterid
-    }
-  }
-
-  x$eps_cl <- eps_cl
-  ### fix the order so cluster is in the same order as the rows in x
-  cluster[x$order] <- cluster
-  x$cluster <- cluster
-
-  x
 }
 
 print.optics <- function(x, ...) {
@@ -161,11 +143,12 @@ plot.optics <- function(x, y=NULL, cluster = TRUE, ...) {
     }
 }
 
-predict.optics <- function (object, data, newdata = NULL, ...) {
+predict.optics <- function (object, newdata = NULL, data, ...) {
   if (is.null(newdata)) return(object$cluster)
+  if (is.null(object$cluster)) stop("no extracted clustering available in object! run extractDBSCAN or extractXi first.")
 
   nn <- frNN(rbind(data, newdata), eps = object$eps_cl,
-    sort = TRUE)$id[-(1:nrow(data))]
+    sort = TRUE, ...)$id[-(1:nrow(data))]
   sapply(nn, function(x) {
     x <- x[x<=nrow(data)]
     x <- object$cluster[x][x>0][1]

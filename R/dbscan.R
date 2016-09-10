@@ -17,24 +17,40 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-dbscan <- function(x, eps, minPts = 5, weights = NULL,
-  borderPoints = TRUE, search = "kdtree", bucketSize = 10,
-  splitRule = "suggest", approx = 0, ...) {
+dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
+  ...) {
 
-  ### check for MinPts for fpc compartibility
+  ### extra contains settings for frNN
+  ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
+  ### also check for MinPts for fpc compartibility (does not work for
+  ### search method dist)
   extra <- list(...)
-  if(!is.null(extra$M)) {
-    warning("converting argument MinPts (fpc) to minPts (dbscan)!")
-    minPts <- extra$M
-  }
+  args <- c("MinPts", "search", "bucketSize", "splitRule", "approx")
+  m <- pmatch(names(extra), args)
+  if(any(is.na(m))) stop("Unknown parameter: ",
+    paste(names(extra)[is.na(m)], collapse = ", "))
+  names(extra) <- args[m]
 
+  if(!is.null(extra$MinPts)) {
+    warning("converting argument MinPts (fpc) to minPts (dbscan)!")
+    minPts <- extra$MinPts
+  }
+  extra$MinPts <- NULL
+
+  search <- if(is.null(extra$search)) "kdtree" else extra$search
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 
+  bucketSize <- if(is.null(extra$bucketSize)) 10L else
+    as.integer(extra$bucketSize)
+
+  splitRule <- if(is.null(extra$splitRule)) "suggest" else extra$splitRule
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-  ### dist search
+  approx <- if(is.null(extra$approx)) 0L else as.integer(extra$approx)
+
+  ### do dist search
   if(search == 3) {
     if(!is(x, "dist"))
       if(.matrixlike(x)) x <- dist(x)
@@ -44,7 +60,7 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL,
   ## for dist we provide the R code with a frNN list and no x
   frNN <- list()
   if(is(x, "dist")) {
-    frNN <- frNN(x, eps)$id
+    frNN <- frNN(x, eps, ...)$id
     ## add self match and use C numbering
     frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
 
@@ -84,11 +100,11 @@ print.dbscan_fast <- function(x, ...) {
   cat("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }
 
-predict.dbscan_fast <- function (object, data, newdata = NULL, ...) {
+predict.dbscan_fast <- function (object, newdata = NULL, data, ...) {
   if (is.null(newdata)) return(object$cluster)
 
   nn <- frNN(rbind(data, newdata), eps = object$eps,
-    sort = TRUE)$id[-(1:nrow(data))]
+    sort = TRUE, ...)$id[-(1:nrow(data))]
   sapply(nn, function(x) {
     x <- x[x<=nrow(data)]
     x <- object$cluster[x][x>0][1]

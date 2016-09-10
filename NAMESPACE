@@ -16,8 +16,8 @@ export(
   frNN,
   dbscan,
   optics,
-  optics_cut,
-  opticsXi,
+  extractDBSCAN,
+  extractXi,
   lof,
   hullplot
 )

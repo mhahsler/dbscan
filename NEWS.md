@@ -4,6 +4,9 @@
     the ELKI implementation (Matt Piekenbrock).  
 * Added hullplot to plot a scatter plot with added convex cluster hulls.
 * Fixed a memory problem in frNN (reported by Yilei He).
+* Improved interface for dbscan and optics (... is not passed on to frNN).
+* Optics clustering extraction methods are now called extractDBSCAN and 
+  extractXi.
 
 # Changes in version 0.9-7 (2016-04-14)
 

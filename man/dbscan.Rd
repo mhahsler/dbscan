@@ -128,13 +128,16 @@ if (requireNamespace("fpc", quietly = TRUE) &&
     dbscan::dbscan(x, .3, 3), times = 10, unit = "ms")
   t_dbscan_linear <- microbenchmark::microbenchmark(
     dbscan::dbscan(x, .3, 3, search = "linear"), times = 10, unit = "ms")
+  t_dbscan_dist <- microbenchmark::microbenchmark(
+    dbscan::dbscan(x, .3, 3, search = "dist"), times = 10, unit = "ms")
   t_fpc <- microbenchmark::microbenchmark(
     fpc::dbscan(x, .3, 3), times = 10, unit = "ms")
 
-  rbind(t_fpc, t_dbscan_linear, t_dbscan)
+  r <- rbind(t_fpc, t_dbscan_dist, t_dbscan_linear, t_dbscan)
+  r
 
-  boxplot(rbind(t_fpc, t_dbscan_linear, t_dbscan),
-    names = c("fpc", "dbscan (linear)", "dbscan (kdtree)"),
+  boxplot(r,
+    names = c('fpc', 'dbscan (dist)', 'dbscan (linear)', 'dbscan (kdtree)'),
     main = "Runtime comparison in ms")
 
   ## speedup of the kd-tree-based version compared to the fpc implementation

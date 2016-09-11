@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-extractXi <- function(object, xi = 0.001, minimum=F, nocorrect=F)
+extractXi <- function(object, xi = 0.001, minimum = FALSE, nocorrect = FALSE)
 {
   if (!"optics" %in% class(object)) stop("extractXi only accepts objects resulting from dbscan::optics!")
   if (xi >= 1.0 || xi <= 0.0) stop("The Xi parameter must be (0, 1)")
@@ -166,16 +166,16 @@ updateFilterSDASet <- function(mib, sdaset, ixi) {
 # Determines if the reachability distance at the current index 'i' is
 # (xi) significantly lower than the next index
 steepUp <- function(i, object, ixi = object$ixi) {
-  if(object$ord_rd[i] >= Inf) return(F)
-  if(!valid(i+1, object)) return(T)
+  if(object$ord_rd[i] >= Inf) return(FALSE)
+  if(!valid(i+1, object)) return(TRUE)
   return(object$ord_rd[i] <= object$ord_rd[i+1] * ixi)
 }
 
 # Determines if the reachability distance at the current index 'i' is
 # (xi) significantly higher than the next index
 steepDown <- function(i, object, ixi = object$ixi) {
-  if(!valid(i+1, object)) return(F)
-  if(object$ord_rd[i+1] >= Inf) return(F)
+  if(!valid(i+1, object)) return(FALSE)
+  if(object$ord_rd[i+1] >= Inf) return(FALSE)
   return(object$ord_rd[i] * ixi >= object$ord_rd[i+1])
 }
 
@@ -185,7 +185,7 @@ valid <- function(index, object) {
 }
 
 ### Extract xi clusters (minimum == T extracts clusters that do not contain other clusters)
-extractXiClusters <- function(object, minimum=F) {
+extractXiClusters <- function(object, minimum = FALSE) {
   # Add cluster_id to xi clusters
   if (!"cluster_id" %in% names(object$clusters_xi)) object$clusters_xi <- cbind(object$clusters_xi, cluster_id=1:nrow(object$clusters_xi))
 

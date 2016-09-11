@@ -1,6 +1,6 @@
 hullplot <- function(x, cl, col = NULL,
-  cex = 0.5, hull_lwd = 1, hull_lty = 1, main = "Convex Cluster Hulls",
-    solid=FALSE, alpha = .2, ...) {
+  cex = 0.5, hull_lwd = 1, hull_lty = 1, solid = TRUE, alpha = .2,
+  main = "Convex Cluster Hulls", ...) {
 
   ### extract clustering (keep hierarchical OPTICSXi structure)
   if(is(cl, "optics") && !is.null(cl$clusters_xi)) clusters_xi <- cl
@@ -16,10 +16,14 @@ hullplot <- function(x, cl, col = NULL,
   plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
 
   col_poly <- adjustcolor(col, alpha.f = alpha)
+  border <- col
+
+  ## no border?
   if(is.null(hull_lwd) || is.na(hull_lwd) || hull_lwd == 0) {
     hull_lwd <- 1
     border <- NA
-  }else border <- NULL
+  }
+
 
   for(i in 1:max(cl)) {
 
@@ -33,6 +37,6 @@ hullplot <- function(x, cl, col = NULL,
       lines(d[ch,], col = col[i %% length(col) +1L], lwd=hull_lwd, lty=hull_lty)
     else
       polygon(d[ch,], col = col_poly[i %% length(col_poly) +1L],
-        lwd=hull_lwd, lty=hull_lty, border = border)
+        lwd=hull_lwd, lty=hull_lty, border = border[i %% length(col_poly) +1L])
   }
 }

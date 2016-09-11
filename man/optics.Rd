@@ -17,7 +17,7 @@
   optics(x, eps, minPts = 5, ...)
 
   extractDBSCAN(object, eps_cl)
-  extractXi(object, xi = 0.001, minimum = F, nocorrect = F)
+  extractXi(object, xi = 0.001, minimum = FALSE, nocorrect = FALSE)
 
   \method{predict}{optics}(object, newdata = NULL, data, ...)
 
@@ -58,7 +58,7 @@ which shows each points reachability distance where the points are sorted
 by OPTICS. Valleys represent clusters (the deeper the valley, the more dense
   the cluster) and high points indicate points between clusters.
 
-\code{extractDBSCAN} extracts a clustering from na OPTICS ordering that is
+\code{extractDBSCAN} extracts a clustering from an OPTICS ordering that is
 similar to what DBSCAN would produce with an eps set to
 \code{eps_cl} (see Ankers et al, 1999).
 The only difference to a DBSCAN clustering is that OPTICS is not able to
@@ -132,22 +132,20 @@ res <- extractDBSCAN(res, eps_cl = .065)
 res
 
 plot(res)  ## black is noise
-plot(x, col = res$cluster+1L)
+hullplot(x, res)
 
 ### re-cut at a higher eps threshold
 res <- extractDBSCAN(res, eps_cl = .1)
 res
 plot(res)
-plot(x, col = res$cluster+1L)
+hullplot(x, res)
 
 ### extract hierarchical clustering of varying density using the Xi method
 res <- extractXi(res, xi = 0.05)
 res
 
 plot(res)
-plot(x, col = res$cluster+1L)
-# better visualization of the nested structure using convex hulls
-hullplot(x, res) ## black is noise
+hullplot(x, res)
 
 # Xi cluster structure
 res$clusters_xi

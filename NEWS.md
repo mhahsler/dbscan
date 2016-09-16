@@ -1,8 +1,9 @@
 # Changes in version 0.9-8.1 (2016-xx-x)
 
-* Improved interface for dbscan and optics (... is not passed on to frNN).
-* Optics clustering extraction methods are now called extractDBSCAN and 
+* Improved interface for dbscan() and optics(): ... is not passed on to frNN.
+* OPTICS clustering extraction methods are now called extractDBSCAN and 
   extractXi.
+* hullplot uses now filled polygons as the default.
 
 # Changes in version 0.9-8 (2016-08-05)
 

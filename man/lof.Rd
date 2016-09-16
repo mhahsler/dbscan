@@ -54,16 +54,16 @@ x <- cbind(
   )
 
 ### calculate LOF score
-lof <- lof(x, k=4)
+lof <- lof(x, k=3)
 
 ### distribution of outlier factors
 summary(lof)
 hist(lof, breaks=10)
 
 ### point size is proportional to LOF
-plot(x, pch = ".", main = "LOF (k=4)")
+plot(x, pch = ".", main = "LOF (k=3)")
 points(x, cex = (lof-1)*3, pch = 1, col="red")
-text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 1)
+text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 3)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

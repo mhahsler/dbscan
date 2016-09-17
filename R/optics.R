@@ -17,14 +17,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
-  bucketSize = 10, splitRule = "suggest", approx = 0) {
+optics <- function(x, eps, minPts = 5, ...) {
 
+  ### extra contains settings for frNN
+  ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
+  extra <- list(...)
+  args <- c("search", "bucketSize", "splitRule", "approx")
+  m <- pmatch(names(extra), args)
+  if(any(is.na(m))) stop("Unknown parameter: ",
+    paste(names(extra)[is.na(m)], collapse = ", "))
+  names(extra) <- args[m]
+
+  search <- if(is.null(extra$search)) "kdtree" else extra$search
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  if(is.na(search)) stop("Unknown NN search type!")
+
+  bucketSize <- if(is.null(extra$bucketSize)) 10L else
+    as.integer(extra$bucketSize)
+
+  splitRule <- if(is.null(extra$splitRule)) "suggest" else extra$splitRule
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
-  if(is.na(search)) stop("Unknown NN search type!")
+  approx <- if(is.null(extra$approx)) 0L else as.integer(extra$approx)
 
   ### dist search
   if(search == 3) {
@@ -36,7 +51,7 @@ optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
   ## for dist we provide the R code with a frNN list and no x
   frNN <- list()
   if(is(x, "dist")) {
-    frNN <- frNN(x, eps)
+    frNN <- frNN(x, eps, ...)
     ## add self match and use C numbering
     frNN$id <- lapply(1:length(frNN$id),
       FUN = function(i) c(i-1L, frNN$id[[i]]-1L))
@@ -65,41 +80,8 @@ optics <- function(x, eps, minPts = 5, eps_cl, xi, search = "kdtree",
   ret$eps_cl <- NA
   ret$xi <- NA
   class(ret) <- "optics"
-  
-  ### find clusters
-  if(!missing(eps_cl)) ret <- optics_cut(ret, eps_cl)
-  if(!missing(xi)) ret <- opticsXi(ret, xi)
-    
+
   ret
-}
-
-### extract clusters
-optics_cut <- function(x, eps_cl) {
-  reachdist <- x$reachdist[x$order]
-  coredist <- x$coredist[x$order]
-  n <- length(x$order)
-  cluster <- integer(n)
-
-  clusterid <- 0L         ### 0 is noise
-  for(i in 1:n) {
-    if(reachdist[i] > eps_cl) {
-      if(coredist[i] <= eps_cl) {
-        clusterid <- clusterid + 1L
-        cluster[i] <- clusterid
-      }else{
-        cluster[i] <- 0L  ### noise
-      }
-    }else{
-      cluster[i] <- clusterid
-    }
-  }
-
-  x$eps_cl <- eps_cl
-  ### fix the order so cluster is in the same order as the rows in x
-  cluster[x$order] <- cluster
-  x$cluster <- cluster
-
-  x
 }
 
 print.optics <- function(x, ...) {
@@ -107,12 +89,12 @@ print.optics <- function(x, ...) {
   cat("Parameters: ", "minPts = ", x$minPts,
     ", eps = ", x$eps,
     ", eps_cl = ", x$eps_cl,
-    ", xi = ", x$xi, 
+    ", xi = ", x$xi,
     "\n", sep = "")
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
-    if(is.na(x$xi)) { 
+    if(is.na(x$xi)) {
       cat("The clustering contains ", cl, " cluster(s) and ",
           sum(x$cluster==0L), " noise points.",
           "\n", sep = "")
@@ -129,23 +111,30 @@ print.optics <- function(x, ...) {
 
 plot.optics <- function(x, y=NULL, cluster = TRUE, dendrogram = FALSE, prop = 0.75, ...) {
     if(!is.null(x$cluster) && cluster && !dendrogram) {
-      if(is.null(x$clusters_xi)) { 
+      if(is.null(x$clusters_xi)) {
         plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
-          ylab = "Reachability dist.", xlab = "OPTICS order",
-          main = "Reachability Plot", ...)
+             ylab = "Reachability dist.", xlab = "OPTICS order",
+             main = "Reachability Plot", ...)
       } else {
         y_max <- max(x$reachdist[which(x$reachdist != Inf)])
-        # Sort clusters by size 
+        # Sort clusters by size
         hclusters <- x$clusters_xi[order(x$clusters_xi$end-x$clusters_xi$start),]
-        colors <- palette() 
+        
+        def.par <- par(no.readonly = TRUE)
+        
+        # .1 means to leave 15% for the cluster lines
+        par(mar= c(2, 4, 4, 2) + 0.1, omd = c(0, 1, .15, 1))
+        y_increments <- (y_max/0.85*.15)/(nrow(hclusters)+1L)
+        
         plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
              ylab = "Reachability dist.", xlab = NA, xaxt = "n",
              main = "Reachability Plot", yaxs="i", ylim=c(0,y_max), xaxt='n', ...)
-        bottom_inches <- par("fin")[2] * par("plt")[3]
-        middle_inches <- par("fin")[2] * abs(par("plt")[4] - par("plt")[3])
-        y_increments <- ((bottom_inches/middle_inches)*y_max / nrow(hclusters) * prop)
+        
         i <- 1:nrow(hclusters)
-        segments(x0=hclusters$start[i], y0=-(y_increments*i), x1=hclusters$end[i], col=palette()[(i+1) %% 8 + 1], lwd=1, xpd=T)
+        segments(x0=hclusters$start[i], y0=-(y_increments*i),
+                 x1=hclusters$end[i], col=hclusters$cluster_id[i]+1L, lwd=2, xpd=NA)
+        par(def.par)
+        
       }
     } else if (dendrogram) {
       d_x <- as.dendrogram(x)
@@ -167,18 +156,19 @@ plot.optics <- function(x, y=NULL, cluster = TRUE, dendrogram = FALSE, prop = 0.
           plot(d_x)
         }
       } else { plot(d_x) }
-    } else {
+    }else{
       plot(x$reachdist[x$order], type="h",
         ylab = "Reachability dist.", xlab = "OPTICS order",
         main = "Reachability Plot", ...)
     }
 }
 
-predict.optics <- function (object, data, newdata = NULL, ...) {
+predict.optics <- function (object, newdata = NULL, data, ...) {
   if (is.null(newdata)) return(object$cluster)
+  if (is.null(object$cluster)) stop("no extracted clustering available in object! run extractDBSCAN or extractXi first.")
 
   nn <- frNN(rbind(data, newdata), eps = object$eps_cl,
-    sort = TRUE)$id[-(1:nrow(data))]
+    sort = TRUE, ...)$id[-(1:nrow(data))]
   sapply(nn, function(x) {
     x <- x[x<=nrow(data)]
     x <- object$cluster[x][x>0][1]
@@ -186,9 +176,6 @@ predict.optics <- function (object, data, newdata = NULL, ...) {
     x
   })
 }
-
-# Add new Generic for other class extensions support reachability plotting 
-as.reachability <- function(x, ...) UseMethod("as.reachability")
 
 as.dendrogram.optics <- function(x) {
   if(!"optics" %in% class(x)) stop("'as.dendrogram' from the dbscan package requires an OPTICS object.")
@@ -226,40 +213,9 @@ as.dendrogram.optics <- function(x) {
   }
   
   # Always shift down one; rev actually populates the midpoint calculation 
-  return(rev(rev(leaves[[1]])))
+  return(leaves[[1]])
 }
 
-as.reachability.dendrogram <- function(x) {
-  if (!inherits(x, "dendrogram")) stop("The as.reachability method requires a dendrogram object.")
-  DFS <- function(d, rp, pnode = 0, stack=c()) {
-    if(is.null(attr(d, "height"))) {
-      return(pnode)
-    } else {
-      stack <- c(attr(d, "height"), stack)
-      pnode <- DFS(d[[1]], rp, pnode, stack)
-      if (length(d) > 1) { 
-        for (sub_b in 2:length(d))  { pnode <- DFS(d[[sub_b]], rp, pnode, stack) }
-      }
-      # If at a leaf node, compare to previous node
-      if ((!is.null(attr(d, "leaf"))) && attr(d, "leaf")) { 
-        rp[[labels(d)]] <- stack # Record the ancestors reachability values 
-        if(is.null(rp[[as.character(pnode)]])) { # 1st point 
-          new_reach <- Inf
-        } else { # Smallest Common Ancestor 
-          new_reach <- min(intersect(rp[[as.character(pnode)]][-1], stack[-1])) # Exclude height 0
-        } 
-        rp[["reachdist"]] <- c(rp[["reachdist"]], new_reach) 
-        rp[["order"]] <- c(rp[["order"]], as.integer(labels(d)))
-        return(as.integer(labels(d)))
-      }
-      return(pnode)
-    }
-  }
-  # Keep track using environment to save progress by reference 
-  rp <- new.env(parent = emptyenv())
-  DFS(x, rp=rp)
-  return(list(reachdist=rp[["reachdist"]], order=rp[["order"]]))
-}
 
 # getColors <- function(x) { 
 #   if (!inherits(x, "optics")) { stop("'getColors' is only meant ot be used with OPTICS objects.") }

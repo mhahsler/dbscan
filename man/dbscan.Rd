@@ -13,11 +13,9 @@
   \pkg{fpc}.
 }
 \usage{
-  dbscan(x, eps, minPts = 5, weights = NULL,
-    borderPoints = TRUE, search = "kdtree", bucketSize = 10,
-    splitRule = "suggest", approx = 0, ...)
+dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 
-  \method{predict}{dbscan_fast}(object, data, newdata = NULL, ...)
+\method{predict}{dbscan_fast}(object, newdata = NULL, data, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -31,17 +29,12 @@
     is \code{TRUE} for regular DBSCAN. If
     \code{FALSE} then border points are considered noise
     (see DBSCAN* in Campello et al, 2013).}
-  \item{search}{ nearest neighbor search strategy (one of "kdtree"
-    or "linear", "dist").}
-  \item{bucketSize}{ max size of the kd-tree leafs. }
-  \item{splitRule}{ rule to split the kd-tree. One of "STD",
-    "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
-    (SL stands for sliding). "SUGGEST" uses ANNs best guess.}
-  \item{approx}{ relative error bound for approximate nearest neighbor searching.}
   \item{object}{ a DBSCAN clustering object. }
   \item{data}{ the data set used to create the DBSCAN clustering object. }
   \item{newdata}{ new data set for which cluster membership should be predicted. }
-  \item{...}{ additional arguments are currently unused.}
+  \item{...}{ additional arguments are passed on to fixed-radius
+  nearest neighbor search algorithm. See \code{\link{frNN}} for
+  details on how to control the search strategy.}
 }
 \details{
 \emph{Note:} use \code{dbscan::dbscan} to call this
@@ -58,7 +51,7 @@ Setting parameters for DBSCAN:
 \code{minPts} is often set to be dimensionality of the data plus one or higher.
 The knee in \code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
 
-See \code{\link{kNN}} for more information on the other parameters related to nearest neighbor search.
+See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
 
 \code{predict} can be used to predict cluster memberships for new data points.
 A point is considered a member of a cluster if it is within the eps
@@ -83,6 +76,7 @@ in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
 
 \seealso{
 \code{\link{kNNdistplot}},
+\code{\link{frNN}},
 \code{\link[fpc]{dbscan}} in \pkg{fpc}.
 }
 
@@ -134,13 +128,16 @@ if (requireNamespace("fpc", quietly = TRUE) &&
     dbscan::dbscan(x, .3, 3), times = 10, unit = "ms")
   t_dbscan_linear <- microbenchmark::microbenchmark(
     dbscan::dbscan(x, .3, 3, search = "linear"), times = 10, unit = "ms")
+  t_dbscan_dist <- microbenchmark::microbenchmark(
+    dbscan::dbscan(x, .3, 3, search = "dist"), times = 10, unit = "ms")
   t_fpc <- microbenchmark::microbenchmark(
     fpc::dbscan(x, .3, 3), times = 10, unit = "ms")
 
-  rbind(t_fpc, t_dbscan_linear, t_dbscan)
+  r <- rbind(t_fpc, t_dbscan_dist, t_dbscan_linear, t_dbscan)
+  r
 
-  boxplot(rbind(t_fpc, t_dbscan_linear, t_dbscan),
-    names = c("fpc", "dbscan (linear)", "dbscan (kdtree)"),
+  boxplot(r,
+    names = c('fpc', 'dbscan (dist)', 'dbscan (linear)', 'dbscan (kdtree)'),
     main = "Runtime comparison in ms")
 
   ## speedup of the kd-tree-based version compared to the fpc implementation

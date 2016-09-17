@@ -45,8 +45,10 @@ List frNN_int(NumericMatrix data, double eps, int type,
   //Rprintf("kd-tree ready. starting DBSCAN.\n");
 
   // frNN
-  std::vector< IntegerVector > id; id.resize(nrow);
-  std::vector< NumericVector > dist; dist.resize(nrow);
+  //std::vector< IntegerVector > id; id.resize(nrow);
+  //std::vector< NumericVector > dist; dist.resize(nrow);
+  List id(nrow);
+  List dist(nrow);
 
   for (int p=0; p<nrow; p++) {
     if (!(p % 100)) Rcpp::checkUserInterrupt();
@@ -70,6 +72,7 @@ List frNN_int(NumericMatrix data, double eps, int type,
     ids = ids[take];
     dists = dists[take];
 
+    //Rprintf("Found neighborhood size %d\n", ids.size());
     id[p] = ids+1;
     dist[p] = sqrt(dists);
   }

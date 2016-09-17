@@ -38,7 +38,7 @@ expect_equal(round(res$reachdist[res$order], 3), round(elki$reachability, 3))
 ### be missed"
 
 # extract DBSCAN clustering
-res <- optics_cut(res, eps_cl = eps_cl)
+res <- extractDBSCAN(res, eps_cl = eps_cl)
 #plot(res)
 
 # are there any clusters with only border points?

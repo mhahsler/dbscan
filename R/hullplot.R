@@ -16,18 +16,20 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-# If min == FALSE and the Xi method was used, the cluster vector only contains the 
-# assignments of each point to its largest containing cluster, and thus is doesn't contain enough 
-# information to be used for plotting. Need to use the information offered by the clusters_xi data.frame
-
+ 
 hullplot <- function(x, cl, col = NULL,
-  cex = 0.5, lwd_hull = 2, main = "Convex Cluster Hulls", ...) {
-  
-  opt <- cl
+  cex = 0.5, hull_lwd = 1, hull_lty = 1, solid = TRUE, alpha = .2,
+  main = "Convex Cluster Hulls", ...) {
+
+  ### extract clustering (keep hierarchical OPTICSXi structure)
+  if(is(cl, "optics") && !is.null(cl$clusters_xi)) clusters_xi <- cl
+  else clusters_xi <- NULL
+
   if(is.list(cl)) cl <- cl$cluster
   if(!is.numeric(cl)) stop("could not get cluster assignment vector from cl.")
-  if(is.null(col)) col <- palette() # why not rainbow(n=max(cl)+1L)?
+
+  #if(is.null(col)) col <- c("#000000FF", rainbow(n=max(cl)))
+  if(is.null(col)) col <- palette()
   if(max(cl)+1L > length(col)) warning("not enought colors. some colors will be reused.")
   
   # Plot hierarchical clustering
@@ -46,14 +48,31 @@ hullplot <- function(x, cl, col = NULL,
     # Double-check: If minimum was manually set to true at some point but was OPTICS-XI was originally 
     # run with minimum set to false (default), need to recompute the clustering array
     if (inherits(cl,what="optics") && cl$min == TRUE) { cl <- extractXiClusters(opt, TRUE)$cluster }
+  plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
 
-    plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
-    
-    for(i in 1:max(cl)) {
-      d <- x[cl==i,]
-      ch <- chull(d)
-      ch <- c(ch, ch[1])
-      lines(d[ch,], col = col[i %% length(col) +1L], lwd=lwd_hull)
-    }
+  col_poly <- adjustcolor(col, alpha.f = alpha)
+  border <- col
+
+  ## no border?
+  if(is.null(hull_lwd) || is.na(hull_lwd) || hull_lwd == 0) {
+    hull_lwd <- 1
+    border <- NA
+  }
+
+
+  for(i in 1:max(cl)) {
+
+    ### use all the points for OPTICSXi's hierarchical structure
+    if(is.null(clusters_xi)) d <- x[cl==i,]
+    else d <- x[clusters_xi$order[clusters_xi$clusters_xi$start[i] : clusters_xi$clusters_xi$end[i]],]
+
+    ch <- chull(d)
+    ch <- c(ch, ch[1])
+    if(!solid)
+      lines(d[ch,], col = col[i %% length(col) +1L], lwd=hull_lwd, lty=hull_lty)
+    else
+      polygon(d[ch,], col = col_poly[i %% length(col_poly) +1L],
+        lwd=hull_lwd, lty=hull_lty, border = border[i %% length(col_poly) +1L])
+  }
   }
 }

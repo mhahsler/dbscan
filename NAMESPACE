@@ -2,8 +2,8 @@ useDynLib("dbscan")
 
 import("Rcpp")
 
-importFrom("graphics", "plot", "par", "segments", "lines")
-importFrom("grDevices", "palette", "chull")
+importFrom("graphics", "plot", "par", "segments", "lines", "polygon")
+importFrom("grDevices", "palette", "chull", "adjustcolor")
 
 importFrom("stats", "dist")
 
@@ -16,8 +16,8 @@ export(
   frNN,
   dbscan,
   optics,
-  optics_cut,
-  opticsXi,
+  extractDBSCAN,
+  extractXi,
   lof,
   hullplot, 
   as.reachability

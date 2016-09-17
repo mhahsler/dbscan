@@ -36,8 +36,8 @@ Note: self-matches are not returned!
 \value{
 %%  ~Describe the value returned
 A list with the following components:
-  \item{dist }{a matrix with distances. }
-  \item{id }{a matrix with ids. }
+  \item{dist }{a list with distances. }
+  \item{id }{a list with ids. }
   \item{eps }{ eps used. }
 %% ...
 }

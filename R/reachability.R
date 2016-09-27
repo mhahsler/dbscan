@@ -21,79 +21,69 @@
 # Add new Generic for other class extensions support reachability plotting 
 as.reachability <- function(x, ...) UseMethod("as.reachability")
 
+# Simple print method for reachability objects
+print.reachability <- function(x) {
+  min_reach <- na.omit(x$reachdist)[which(na.omit(x$reachdist) != Inf)]
+  cat("Reachability collection for ", length(x$order), " objects.\n", 
+      "Avg minimum reachability distance: ", mean(min_reach), "\n", 
+      "Field Specializations: order, reachdist, cluster", sep="")
+}
+
 # Dendrogram --> Reachability conversion 
 as.dendrogram.reachability <- function(x) {
-  if(x$minPts > length(x$order)) { stop("'minPts' should be less or equal to the points in the dataset.") } 
-  if(length(which(x$reachdist == Inf)) > 1) stop(cat("The current eps value is not large enough to capture the complete hiearchical structure of the dataset.\nPlease use a large eps value (such as Inf)."))
-  
-  # Start with 0-height leaves 
-  leaves <- lapply(1:length(x$order), function(cid) {
-    structure(x$order[cid], members=1, height=0, label=as.character(x$order[cid]),
-              leaf=T, class="dendrogram")
-  })
-  
-  # Get sorted reachability distances and indices (ascending)
-  pl <- sort(x$reachdist)  
-  pl_order <- order(x$reachdist) 
-  
-  # For all the reachability distances excluding Inf 
-  for(i in which(pl != Inf)) {
-    # Get the index of the point with next smallest reach dist and its neighbor
-    p <- pl_order[i] 
-    q <- x$order[which(x$order == p) - 1]
-    
-    # Get the actual index fo the branch(es) containing the p and q 
-    hier_indices <- lapply(leaves, labels)
-    p_leaf <- which(unlist(lapply(hier_indices, function(b) p %in% b)))
-    q_leaf <- which(unlist(lapply(hier_indices, function(b) q %in% b)))
-    
-    # Create the new branch containing the leaves that were removed (midpoint filled in later)
-    children <- list(leaves[[q_leaf]], leaves[[p_leaf]])
-    cl_members <- as.integer(sum(sapply(children, function(b) attr(b, which="members"))))
-    N <- structure(children, members=cl_members, midpoint=NA, 
-                   height=pl[i], class="dendrogram")
-    
-    leaves <- append(leaves[-c(p_leaf, q_leaf)], list(N))
-  }
-  
-  # Always shift down one; plot(*, center=T) needed since midpoint calculation expensive
-  return(leaves[[1]])
+  if(length(which(x$reachdist == Inf)) > 1) stop(cat("Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain 
+                                                     enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value 
+                                                     (such as Inf) may be needed in the parameterization."))
+  dup_x <- x
+  c_order <- order(dup_x$reachdist) - 1
+  dup_x$order <- dup_x$order - 1
+  reach_to_dendrogram(dup_x, sort(dup_x$reachdist), c_order)
 }
 
 # Converting from dendrogram --> reachability plot 
 as.reachability.dendrogram <- function(x) {
   if (!inherits(x, "dendrogram")) stop("The as.reachability method requires a dendrogram object.")
-  DFS <- function(d, rp, pnode = 0, stack=c()) {
-    if(is.null(attr(d, "height"))) {
-      return(pnode)
-    } else {
-      stack <- c(attr(d, "height"), stack)
-      pnode <- DFS(d[[1]], rp, pnode, stack)
-      if (length(d) > 1) { 
-        for (sub_b in 2:length(d))  { pnode <- DFS(d[[sub_b]], rp, pnode, stack) }
-      }
-      # If at a leaf node, compare to previous node
-      if ((!is.null(attr(d, "leaf"))) && attr(d, "leaf")) { 
-        rp[[labels(d)]] <- stack # Record the ancestors reachability values 
-        if(is.null(rp[[as.character(pnode)]])) { # 1st point 
-          new_reach <- Inf
-        } else { # Smallest Common Ancestor 
-          new_reach <- min(intersect(rp[[as.character(pnode)]][-1], stack[-1])) # Exclude height 0
-        } 
-        rp[["reachdist"]] <- c(rp[["reachdist"]], new_reach) 
-        rp[["order"]] <- c(rp[["order"]], as.integer(labels(d)))
-        return(as.integer(labels(d)))
-      }
-      return(pnode)
-    }
-  }
-  # Keep track using environment to save progress by reference 
-  rp <- new.env(parent = emptyenv())
-  DFS(x, rp=rp)
-  return(structure(list(reachdist=rp[["reachdist"]], order=rp[["order"]])), class="reachability")
+  fix_x <- dendrapply(x, function(leaf) { 
+    new_leaf <- as.list(leaf); attributes(new_leaf) <- attributes(leaf); new_leaf 
+  })
+  res <- dendrogram_to_reach(fix_x)
+  return(res); 
 }
 
 # Plotting method for reachability objects.
-plot.reachability <- function(x){
-  
+plot.reachability <- function(x, order_labels = FALSE, ...) {
+  if (is.null(x$cluster) || is.na(x$cluster)) {
+    plot(x$reachdist[x$order], type="h", xlab="Order", 
+         ylab = "Reachability dist.", main = "Reachability Plot", ...)
+    lines(x = c(1, 1), y = c(0, max(x$reachdist[x$reachdist != Inf])), lty=2)
+    if (order_labels) { text(x = 1:length(x$order), y = x$reachdist[x$order], labels = x$order, pos=3) }
+  } else {
+    if (is(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$cluster))) {
+      y_max <- max(x$reachdist[which(x$reachdist != Inf)])
+      # Sort clusters by size
+      hclusters <- x$cluster[order(x$cluster$end - x$cluster$start),]
+      def.par <- par(no.readonly = TRUE)
+      
+      # .1 means to leave 15% for the cluster lines
+      par(mar= c(2, 4, 4, 2) + 0.1, omd = c(0, 1, .15, 1))
+      y_increments <- (y_max/0.85*.15)/(nrow(hclusters)+1L)
+      
+      top_level <- extractClusterLabels(x$cluster, x$order)
+      plot(x$reachdist[x$order], type="h", col=top_level[x$order]+1L,
+           ylab = "Reachability dist.", xlab = NA, xaxt = "n",
+           main = "Reachability Plot", yaxs="i", ylim=c(0,y_max), xaxt='n', ...)
+      if (order_labels) { text(x = 1:length(x$order), y = x$reachdist[x$order], labels = x$order, pos=3) }
+      
+      i <- 1:nrow(hclusters)
+      segments(x0=hclusters$start[i], y0=-(y_increments*i),
+               x1=hclusters$end[i], col=hclusters$cluster_id[i]+1L, lwd=2, xpd=NA)
+      ## Restore previous settings
+      par(def.par)
+    } else if (is.numeric(x$cluster)) { # 'flat' clustering given 
+      plot(x$reachdist[x$order], type="h", col=x$cluster[x$order]+1L,
+           ylab = "Reachability dist.", xlab = "Order",
+           main = "Reachability Plot", ...)
+      if (order_labels) { text(x = 1:length(x$order), y = x$reachdist[x$order], labels = x$order, pos=3) }
+    }
+  }
 }

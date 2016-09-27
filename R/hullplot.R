@@ -17,37 +17,32 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  
-hullplot <- function(x, cl, col = NULL,
+hullplot <- function(x, cl, predecessor = FALSE, col = NULL,
   cex = 0.5, hull_lwd = 1, hull_lty = 1, solid = TRUE, alpha = .2,
   main = "Convex Cluster Hulls", ...) {
 
-  ### extract clustering (keep hierarchical OPTICSXi structure)
-  if(is(cl, "optics") && !is.null(cl$clusters_xi)) clusters_xi <- cl
+  ### extract clustering (keep hierarchical xICSXi structure)
+  if(is(cl, "xics") && !is.null(cl$clusters_xi)) clusters_xi <- cl
   else clusters_xi <- NULL
 
   if(is.list(cl)) cl <- cl$cluster
-  if(!is.numeric(cl)) stop("could not get cluster assignment vector from cl.")
+  if(!is.numeric(cl)) stop("Could not get cluster assignment vector from cl.")
 
   #if(is.null(col)) col <- c("#000000FF", rainbow(n=max(cl)))
   if(is.null(col)) col <- palette()
-  if(max(cl)+1L > length(col)) warning("not enought colors. some colors will be reused.")
+  if(max(cl)+1L > length(col)) warning("Not enough colors. Some colors will be reused.")
   
   # Plot hierarchical clustering
-  if (inherits(opt,what="optics") && opt$min == FALSE) { # Short circuiting should allow element access
+  if (inherits(x,what="xics")) {
     plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
-    if (!is.null(opt$clusters_xi) && nrow(opt$clusters_xi) > 0) {
-      for(i in 1:nrow(opt$clusters_xi)) {
-        rng <- opt$clusters_xi[i,1:2]
-        d <- x[opt$order[rng$start : rng$end],]
-        ch <- chull(d)
-        ch <- c(ch, ch[1])
-        lines(d[ch,], col = col[i %% length(col) +1L], lwd=lwd_hull)
+    if (!is.null(x$clusters_xi) && nrow(x$clusters_xi) > 0) {
+      clusters_xi <- x$clusters_xi[order(-(clusters_xi$end-clusters_xi$start)),] # Order by size (descending)
+      for(i in 1:nrow(clusters_xi)) {
+        d <- x[x$order[clusters_xi$start[i]:clusters_xi$end[i]],]
+        lines(d[chull(d),], col = col[i %% length(col) +1L], lwd=lwd_hull)
       }
     }
   } else { # Simple 'flat' clustering 
-    # Double-check: If minimum was manually set to true at some point but was OPTICS-XI was originally 
-    # run with minimum set to false (default), need to recompute the clustering array
-    if (inherits(cl,what="optics") && cl$min == TRUE) { cl <- extractXiClusters(opt, TRUE)$cluster }
   plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
 
   col_poly <- adjustcolor(col, alpha.f = alpha)
@@ -62,7 +57,7 @@ hullplot <- function(x, cl, col = NULL,
 
   for(i in 1:max(cl)) {
 
-    ### use all the points for OPTICSXi's hierarchical structure
+    ### use all the points for xICSXi's hierarchical structure
     if(is.null(clusters_xi)) d <- x[cl==i,]
     else d <- x[clusters_xi$order[clusters_xi$clusters_xi$start[i] : clusters_xi$clusters_xi$end[i]],]
 
@@ -75,4 +70,13 @@ hullplot <- function(x, cl, col = NULL,
         lwd=hull_lwd, lty=hull_lty, border = border[i %% length(col_poly) +1L])
   }
   }
+  # Predecessor Spanning Tree 
+  if (predecessor) {
+    for(i in 2:length(cl$order)) { 
+      from <- x[cl$predecessor[cl$order][i],]
+      to <- x[cl$order[i],] 
+      segments(x0=from[[1]], y0=from[[2]], x1=to[[1]], y1=to[[2]])
+    }
+  }  
+  
 }

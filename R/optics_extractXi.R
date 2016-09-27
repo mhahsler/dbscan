@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = FALSE)
+extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = TRUE)
 {
   if (!"optics" %in% class(x)) stop("extractXi only accepts xs resulting from dbscan::optics!")
   if (xi >= 1.0 || xi <= 0.0) stop("The Xi parameter must be (0, 1)")
@@ -135,18 +135,10 @@ extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = FALSE)
   # Remove aliases
   x$ord_rd <- NULL
   x$ixi <- NULL
-<<<<<<< HEAD:R/opticsXi.R
   
-  # Keep xi parameter, and whether the minimal/local clustering is desired
-  x$xi <- xi
-  x$min <- minimum
-  
-=======
-
   # Keep xi parameter
   x$xi <- xi
-
->>>>>>> upstream/master:R/optics_extractXi.R
+  
   # Zero-out clusters (only noise) if none found
   if (length(SetOfClusters) == 0) {
     warning(paste("No clusters were found with threshold:", xi))
@@ -160,8 +152,14 @@ extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = FALSE)
     row.names(x$clusters_xi) <- NULL
   }
 
-  # Replace cluster attribute with XI results and return
-  x <- extractXiClusters(x, minimum=minimum)
+  # Populate cluster vector with top-level cluster labels 
+  x$cluster <- extractClusterLabels(x, minimum=minimum)
+  
+  # Remove non-local clusters if minimum was specified
+  if (minimum) { x$clusters_xi <- x$clusters_xi[unique(x$cluster)[-1],] }
+  
+  class(x$cluster) <- append(class(x$cluster), "xics")
+  class(x$clusters_xi) <- append(class(x$clusters_xi), "xics")
   x
 }
 
@@ -193,19 +191,19 @@ valid <- function(index, x) {
 }
 
 ### Extract xi clusters (minimum == T extracts clusters that do not contain other clusters)
-extractXiClusters <- function(x, minimum = FALSE) {
-  # Add cluster_id to xi clusters
-  if (!"cluster_id" %in% names(x$clusters_xi)) x$clusters_xi <- cbind(x$clusters_xi, cluster_id=1:nrow(x$clusters_xi))
+extractClusterLabels <- function(cl, order, minimum = FALSE) {
+  ## Add cluster_id to xi clusters
+  if (!"cluster_id" %in% names(cl)) cl <- cbind(cl, cluster_id=1:nrow(cl))
+  if (!all(c("start", "end") %in% names(cl))) stop("extractClusterLabels expects start and end references")
+  
+  ## Sort cl based on minimum parameter / cluster size
+  if (!"cluster_size" %in% names(cl)) cl <- cbind(cl, list(cluster_size = (cl$end - cl$start)))
+  cl <- if (minimum) { cl[order(cl$cluster_size),] } else { cl[order(-cl$cluster_size),] }
 
-  # Copy the clusters and sort them based on minimum parameter value
-  clusters_xi <- x$clusters_xi
-  if (!"cluster_size" %in% names(clusters_xi)) clusters_xi <- cbind(clusters_xi, list(cluster_size = (clusters_xi$end - clusters_xi$start)))
-  clusters_xi <- if (minimum) { clusters_xi[order(clusters_xi$cluster_size),] } else { clusters_xi[order(-clusters_xi$cluster_size),] }
-
-  # Fill in the [cluster] vector with cluster IDs
-  clusters <- rep(0, length(x$order))
-  for(cid in clusters_xi$cluster_id) {
-    cluster <- clusters_xi[clusters_xi$cluster_id == cid,]
+  ## Fill in the [cluster] vector with cluster IDs
+  clusters <- rep(0, length(order))
+  for(cid in cl$cluster_id) {
+    cluster <- cl[cl$cluster_id == cid,]
     if (minimum) {
       if (all(clusters[cluster$start:cluster$end] == 0)) {
         clusters[cluster$start:cluster$end] <- cid
@@ -213,13 +211,7 @@ extractXiClusters <- function(x, minimum = FALSE) {
     } else clusters[cluster$start:cluster$end] <- cid
   }
 
-  # Correct the clusters_xi if minimum was specified
-  if (minimum) {
-    x$clusters_xi <- x$clusters_xi[unique(clusters)[-1],]
-  }
-
   # Fix the ordering
-  clusters[x$order] <- clusters
-  x$cluster <- clusters
-  x
+  clusters[order] <- clusters
+  return(clusters)
 }

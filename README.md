@@ -41,14 +41,20 @@ lof <- lof(x, k = 4)
 pairs(x, cex = lof)
 
 ## OPTICS
-opt <- optics(x, eps = 1, minPts = 4, eps_cl = .4)
+opt <- optics(x, eps = 1, minPts = 4)
 opt
+
+## extract DBSCAN-like clustering 
+opt <- extractDBSCAN(opt, eps_cl = .4)
+
 ## create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 plot(opt)
+
 ## plot the extracted DBSCAN clustering
 pairs(x, col = opt$cluster + 1L)
+
 ## extract a hierarchical clustering using the Xi method (captures clusters of varying density)
-opt <- optics(x, eps = 1, minPts = 4, xi = .05)
+opt <- extractXi(opt, xi = .05)
 opt
 plot(opt)
 ```

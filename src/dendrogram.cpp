@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include "union_find.h"
+#include <string>
 using namespace Rcpp;
 
 int which_int(IntegerVector x, int target) {
@@ -22,7 +23,7 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
   for (int i = 0; i < n_nodes; ++i) {
     List leaf = List();
     leaf.push_back(i+1); 
-    leaf.attr("label") = std::to_string(i+1);
+    leaf.attr("label") = Rcpp::wrap(std::to_string(i + 1));
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;
     leaf.attr("leaf") = true;
@@ -73,10 +74,11 @@ int DFS(List d, List& rp, int pnode, NumericVector stack) {
     NumericVector reachdist = rp["reachdist"];
     IntegerVector order = rp["order"];
     reachdist.push_back(new_reach);
-    order.push_back(stoi(leaf_label));
+    int res = std::stoi(leaf_label);
+    order.push_back(res);
     rp["order"] = order;
     rp["reachdist"] = reachdist;
-    return(stoi(leaf_label));
+    return(res);
   } else {
     double cheight = d.attr("height"); 
     stack.push_back(cheight); 

@@ -15,7 +15,7 @@ namespace patch
     return stm.str() ;
   }
 }
-// Ditto with atoi! 
+// Ditto with atoi!
 int fast_atoi( const char * str )
 {
   int val = 0;
@@ -26,13 +26,12 @@ int fast_atoi( const char * str )
 }
 
 int which_int(IntegerVector x, int target) {
-  size_t size = x.size();
-  for (unsigned int i = 0; i < size; ++i) {
+  int size = (int) x.size();
+  for (int i = 0; i < size; ++i) {
     if (x(i) == target) return(i);
   }
   return(-1);
 }
-
 
 
 // [[Rcpp::export]]
@@ -46,7 +45,7 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
   std::vector<List> dendrogram(n_nodes);
   for (int i = 0; i < n_nodes; ++i) {
     List leaf = List();
-    leaf.push_back(i+1); 
+    leaf.push_back(i+1);
     std::string label = patch::to_string(i + 1);
     leaf.attr("label") = label;
     leaf.attr("members") = 1;
@@ -58,10 +57,10 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
   // Get the index of the point with next smallest reach dist and its neighbor
   int insert = 0, prev_insert = 0, tmp = 0;
   for (int i = 0; i < (n_nodes-1); ++i) {
-    int p = pl_order(i); 
+    int p = pl_order(i);
     int q = order(which_int(order, p) - 1); // left neighbor in ordering
     if (q == -1) { stop("Left neighbor not found"); }
-
+  
     // Get the actual index of the branch(es) containing the p and q
     int p_i = uf.Find(p), q_i = uf.Find(q);
     List p_branch = dendrogram.at(p_i), q_branch = dendrogram.at(q_i);
@@ -70,15 +69,16 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
     branch.attr("members") = p_members + q_members;
     branch.attr("height") = pl(i);
     branch.attr("class") = "dendrogram";
-    // if (i < 5 ) Rcpp::Rcout << "p_i: " << p_i << ", q_i: " << q_i << std::endl;
 
     // Merge the two, retrieving the new index and deleting the old
     uf.Union(p_i, q_i);
     tmp = uf.Find(q_i); // q because q_branch is first in the new branch
-    if (tmp != insert) { prev_insert = insert; } 
+    // Need the else statement to stop the unused variable warning apparently
+    if (tmp != insert) { prev_insert = insert; } else { prev_insert = prev_insert; }
     insert = tmp;
     dendrogram.at(insert) = branch;
-    dendrogram.at(insert == p_i ? q_i : p_i) = NULL;
+    int remove = insert == p_i ? q_i : p_i;
+    dendrogram.at(remove) = R_NilValue;
   }
   Rcpp::List result = dendrogram.at(insert);
   return(result);
@@ -105,28 +105,28 @@ int DFS(List d, List& rp, int pnode, NumericVector stack) {
     rp["reachdist"] = reachdist;
     return(res);
   } else {
-    double cheight = d.attr("height"); 
-    stack.push_back(cheight); 
-    List left = d[0]; 
-    // Recursively go left, recording the reachability distances on the stack 
-    pnode = DFS(left, rp, pnode, stack); 
+    double cheight = d.attr("height");
+    stack.push_back(cheight);
+    List left = d[0];
+    // Recursively go left, recording the reachability distances on the stack
+    pnode = DFS(left, rp, pnode, stack);
     if (d.length() > 1) {
       for (int sub_branch = 1; sub_branch < d.length(); ++sub_branch)  {
         pnode = DFS(d[sub_branch], rp, pnode, stack); // pnode;
       }
     }
-    return(pnode); 
+    return(pnode);
   }
 }
 
 // [[Rcpp::export]]
 List dendrogram_to_reach(const Rcpp::List x) {
-  Rcpp::List rp = List::create(_["order"] = IntegerVector::create(), 
+  Rcpp::List rp = List::create(_["order"] = IntegerVector::create(),
                                _["reachdist"] = NumericVector::create());
-  NumericVector stack = NumericVector::create(); 
-  DFS(x, rp, 0, stack); 
-  List res = List::create(_["reachdist"] = rp["reachdist"], _["order"] = rp["order"]); 
-  res.attr("class") = "reachability"; 
+  NumericVector stack = NumericVector::create();
+  DFS(x, rp, 0, stack);
+  List res = List::create(_["reachdist"] = rp["reachdist"], _["order"] = rp["order"]);
+  res.attr("class") = "reachability";
   return(res); 
 }
 

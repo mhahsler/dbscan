@@ -13,19 +13,19 @@
 
 #include "union_find.h"
 
-UnionFind::UnionFind(const size_t size) : parent(size), rank(size)
+UnionFind::UnionFind(const int size) : parent(size), rank(size)
 {
-  for (size_t i = 0; i < size; ++i)
+  for (int i = 0; i < size; ++i)
   { parent[i] = i, rank[i] = 0; }
 }
   
 // Destructor not needed w/o dynamic allocation
 UnionFind::~UnionFind() { }
   
-void UnionFind::Union(const size_t x, const size_t y)
+void UnionFind::Union(const int x, const int y)
 {
-  const size_t xRoot = Find(x);
-  const size_t yRoot = Find(y);
+  const int xRoot = Find(x);
+  const int yRoot = Find(y);
   if (xRoot == yRoot)
    return; 
   else if (rank[xRoot] > rank[yRoot])
@@ -39,7 +39,7 @@ void UnionFind::Union(const size_t x, const size_t y)
   }
 }
 
-const size_t UnionFind::Find(const size_t x)
+const int UnionFind::Find(const int x)
 {
   if (parent[x] == x)
     return x; 

@@ -20,9 +20,9 @@ class UnionFind
   Rcpp::IntegerVector rank;
   
   public:
-  UnionFind(const size_t size);
+  UnionFind(const int size);
   ~UnionFind();
-  void Union(const size_t x, const size_t y); 
-  const size_t Find(const size_t x); 
+  void Union(const int x, const int y); 
+  const int Find(const int x); 
   
 }; // class UnionFind

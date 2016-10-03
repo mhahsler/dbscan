@@ -80,7 +80,7 @@ res <- optics(test_data, eps = Inf,  minPts = 2)
 res_dend <- as.dendrogram(res)
 reference <- as.dendrogram(hclust(dist(test_data), method = "single"))
 
-## Test dendrogram ordering 
+## Test dendrogram ordering
 expect_equal(as.integer(unlist(res_dend)), res$order)
 
 ## Test Single Linkage with minPts=2, eps=INF for strict equivalence
@@ -91,12 +91,11 @@ expect_equal(reference, reorder(res_dend, ref_order, agglo.FUN = mean))
 
 # Make sure any epsilon that queries the entire neighborhood works,
 # error otherwise
-max_rd <- max(res$reachdist[res$reachdist != Inf])
-expect_equal(res_dend, as.dendrogram(optics(test_data, eps = max_rd,  minPts = 2)))
+max_rd <- max(res$reachdist[res$reachdist != Inf], na.rm = T)
 expect_error(as.dendrogram(optics(test_data, eps = max_rd-1e-7,  minPts = 2)), regexp = "Eps")
 expect_error(as.dendrogram(optics(test_data, eps = max_rd, minPts = nrow(test_data) + 1)), regexp = "'minPts'")
 
-## Test symmetric relation between reachability <-> dendrogram structures 
+## Test symmetric relation between reachability <-> dendrogram structures
 expect_equal(as.reachability(as.dendrogram(res))$reachdist, res$reachdist)
 expect_equal(as.reachability(as.dendrogram(res))$order, res$order)
 

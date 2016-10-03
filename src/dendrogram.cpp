@@ -27,7 +27,7 @@ int fast_atoi( const char * str )
 
 int which_int(IntegerVector x, int target) {
   size_t size = x.size();
-  for (int i = 0; i < size; ++i) {
+  for (unsigned int i = 0; i < size; ++i) {
     if (x(i) == target) return(i);
   }
   return(-1);
@@ -48,7 +48,7 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
     List leaf = List();
     leaf.push_back(i+1); 
     std::string label = patch::to_string(i + 1);
-    leaf.attr("label") = Rcpp::wrap(label);
+    leaf.attr("label") = label;
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;
     leaf.attr("leaf") = true;
@@ -75,7 +75,7 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
     // Merge the two, retrieving the new index and deleting the old
     uf.Union(p_i, q_i);
     tmp = uf.Find(q_i); // q because q_branch is first in the new branch
-    if (tmp != insert) prev_insert = insert;
+    if (tmp != insert) { prev_insert = insert; } 
     insert = tmp;
     dendrogram.at(insert) = branch;
     dendrogram.at(insert == p_i ? q_i : p_i) = NULL;

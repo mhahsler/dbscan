@@ -1,7 +1,29 @@
 #include <Rcpp.h>
-#include "union_find.h"
+#include <sstream>
 #include <string>
+
+#include "union_find.h"
 using namespace Rcpp;
+
+// std::to_string is apparently a c++11 only thing that crashes appveyor, so using ostringstream it is!
+namespace patch
+{
+  template < typename T > std::string to_string( const T& n )
+  {
+    std::ostringstream stm ;
+    stm << n ;
+    return stm.str() ;
+  }
+}
+// Ditto with atoi! 
+int fast_atoi( const char * str )
+{
+  int val = 0;
+  while( *str ) {
+    val = val*10 + (*str++ - '0');
+  }
+  return val;
+}
 
 int which_int(IntegerVector x, int target) {
   size_t size = x.size();
@@ -10,6 +32,8 @@ int which_int(IntegerVector x, int target) {
   }
   return(-1);
 }
+
+
 
 // [[Rcpp::export]]
 List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, NumericVector pl_order) {
@@ -23,7 +47,8 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
   for (int i = 0; i < n_nodes; ++i) {
     List leaf = List();
     leaf.push_back(i+1); 
-    leaf.attr("label") = Rcpp::wrap(std::to_string(i + 1));
+    std::string label = patch::to_string(i + 1);
+    leaf.attr("label") = Rcpp::wrap(label);
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;
     leaf.attr("leaf") = true;
@@ -63,7 +88,7 @@ int DFS(List d, List& rp, int pnode, NumericVector stack) {
   if (d.hasAttribute("leaf")) { // If at a leaf node, compare to previous node
     std::string leaf_label = as<std::string>( d.attr("label") );
     rp[leaf_label] = stack; // Record the ancestors reachability values
-    std::string pnode_label = std::to_string(pnode);
+    std::string pnode_label = patch::to_string(pnode);
     double new_reach = 0.0f;
     if(!rp.containsElementNamed(pnode_label.c_str())) { // 1st time seeing this point
       new_reach = INFINITY;
@@ -74,7 +99,7 @@ int DFS(List d, List& rp, int pnode, NumericVector stack) {
     NumericVector reachdist = rp["reachdist"];
     IntegerVector order = rp["order"];
     reachdist.push_back(new_reach);
-    int res = std::stoi(leaf_label);
+    int res = fast_atoi(leaf_label.c_str());
     order.push_back(res);
     rp["order"] = order;
     rp["reachdist"] = reachdist;

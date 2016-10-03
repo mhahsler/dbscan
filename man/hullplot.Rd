@@ -43,8 +43,7 @@ n <- 400
 
 x <- cbind(
   x = runif(4, 0, 1) + rnorm(n, sd=0.1),
-  y = runif(4, 0, 1) + rnorm(n, sd=0.1),
-  z = runif(4, 0, 1) + rnorm(n, sd=0.1)
+  y = runif(4, 0, 1) + rnorm(n, sd=0.1)
   )
 cl <- rep(1:4, time = 100)
 
@@ -56,17 +55,6 @@ hullplot(x, cl, main = "True clusters", pch = cl)
 hullplot(x, cl, main = "True clusters", pch = NA)
 ### a version suitable for b/w printing)
 hullplot(x, cl, main = "True clusters", solid = FALSE, col = "black", pch = cl)
-
-### only show some points (first 10) inside the hulls with text
-### (look at package wordcloud for better word layout)
-hullplot(x, cl, main = "True clusters", pch = NA)
-points(x[1:10,])
-text(x[1:10,], labels = paste("Obs.", 1:10), pos = 3)
-
-### look at dimensions x and z
-hullplot(x[, c("x", "z")], cl, main = "True clusters")
-### use a PCA projection
-hullplot(prcomp(x)$x, cl, main = "True clusters")
 
 
 ### run some clustering algorithms and plot the resutls
@@ -89,28 +77,6 @@ hullplot(x, km, main = "k-means")
 
 hc <- cutree(hclust(dist(x)), k = 4)
 hullplot(x, hc, main = "Hierarchical Clustering")
-
-set.seed(2)
-n <- 10 * 4
-
-x <- cbind(
-  x = runif(4, 0, 1) + rnorm(n, sd=0.1),
-  y = runif(4, 0, 1) + rnorm(n, sd=0.1),
-  z = runif(4, 0, 1) + rnorm(n, sd=0.1)
-  )
-cl <- rep(1:4, time = 10)
-
-### original data with true clustering
-hullplot(x, cl, main = "True clusters")
-text(x, labels = 1:40)
-
-hullplot(x[,2:3], cl, main = "True clusters")
-
-hullplot(prcomp(x)$x, cl, main = "True clusters")
-
-
-
-
 }
 \keyword{ plot }
 \keyword{ clustering }

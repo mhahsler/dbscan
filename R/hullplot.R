@@ -17,13 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  
-hullplot <- function(x, cl, predecessor = FALSE, col = NULL,
+hullplot <- function(x, cl, col = NULL,
   cex = 0.5, hull_lwd = 1, hull_lty = 1, solid = TRUE, alpha = .2,
   main = "Convex Cluster Hulls", ...) {
 
   ### extract clustering (keep hierarchical xICSXi structure)
-  if(is(cl, "xics") && !is.null(cl$clusters_xi)) clusters_xi <- cl
-  else clusters_xi <- NULL
+  if(is(cl, "xics") || "clusters_xi" %in% names(cl)) {
+    clusters_xi <- cl$clusters_xi
+    cl_order <- cl$order
+  } else clusters_xi <- NULL
 
   if(is.list(cl)) cl <- cl$cluster
   if(!is.numeric(cl)) stop("Could not get cluster assignment vector from cl.")
@@ -32,19 +34,7 @@ hullplot <- function(x, cl, predecessor = FALSE, col = NULL,
   if(is.null(col)) col <- palette()
   if(max(cl)+1L > length(col)) warning("Not enough colors. Some colors will be reused.")
   
-  # Plot hierarchical clustering
-  if (inherits(x,what="xics")) {
-    plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
-    if (!is.null(x$clusters_xi) && nrow(x$clusters_xi) > 0) {
-      clusters_xi <- x$clusters_xi[order(-(clusters_xi$end-clusters_xi$start)),] # Order by size (descending)
-      for(i in 1:nrow(clusters_xi)) {
-        d <- x[x$order[clusters_xi$start[i]:clusters_xi$end[i]],]
-        lines(d[chull(d),], col = col[i %% length(col) +1L], lwd=lwd_hull)
-      }
-    }
-  } else { # Simple 'flat' clustering 
   plot(x[,1:2], col = col[cl %% length(col) +1L], cex = cex, main = main, ...)
-
   col_poly <- adjustcolor(col, alpha.f = alpha)
   border <- col
 
@@ -54,29 +44,22 @@ hullplot <- function(x, cl, predecessor = FALSE, col = NULL,
     border <- NA
   }
 
+  if(is(cl, "xics") || "clusters_xi" %in% names(cl)) {
+    ## This is necessary for larger datasets: Ensure largest is plotted first
+    clusters_xi <- clusters_xi[order(-(clusters_xi$end-clusters_xi$start)),] # Order by size (descending)
+    ci_order <- clusters_xi$cluster_id
+  } else { ci_order <- 1:max(cl) }
 
-  for(i in 1:max(cl)) {
+  for(i in 1:length(ci_order)) {
 
     ### use all the points for xICSXi's hierarchical structure
-    if(is.null(clusters_xi)) d <- x[cl==i,]
-    else d <- x[clusters_xi$order[clusters_xi$clusters_xi$start[i] : clusters_xi$clusters_xi$end[i]],]
+    if(is.null(clusters_xi)) { d <- x[cl==i,] 
+    } else { d <- x[cl_order[clusters_xi$start[i] : clusters_xi$end[i]],] }
 
     ch <- chull(d)
     ch <- c(ch, ch[1])
-    if(!solid)
-      lines(d[ch,], col = col[i %% length(col) +1L], lwd=hull_lwd, lty=hull_lty)
-    else
-      polygon(d[ch,], col = col_poly[i %% length(col_poly) +1L],
-        lwd=hull_lwd, lty=hull_lty, border = border[i %% length(col_poly) +1L])
+    if(!solid) { lines(d[ch,], col = col[ci_order[i] %% length(col) +1L], lwd=hull_lwd, lty=hull_lty) 
+    } else { polygon(d[ch,], col = col_poly[ci_order[i] %% length(col_poly) +1L],
+                     lwd=hull_lwd, lty=hull_lty, border = border[ci_order[i] %% length(col_poly) +1L]) }
   }
-  }
-  # Predecessor Spanning Tree 
-  if (predecessor) {
-    for(i in 2:length(cl$order)) { 
-      from <- x[cl$predecessor[cl$order][i],]
-      to <- x[cl$order[i],] 
-      segments(x0=from[[1]], y0=from[[2]], x1=to[[1]], y1=to[[2]])
-    }
-  }  
-  
 }

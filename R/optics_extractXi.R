@@ -17,60 +17,60 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = TRUE)
+extractXi <- function(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 {
-  if (!"optics" %in% class(x)) stop("extractXi only accepts xs resulting from dbscan::optics!")
+  if (!"optics" %in% class(object)) stop("extractXi only accepts xs resulting from dbscan::optics!")
   if (xi >= 1.0 || xi <= 0.0) stop("The Xi parameter must be (0, 1)")
 
   # Initial variables
-  x$ord_rd <- x$reachdist[x$order]
-  x$ixi <- (1 - xi)
+  object$ord_rd <- object$reachdist[object$order]
+  object$ixi <- (1 - xi)
   SetOfSteepDownAreas <- list()
   SetOfClusters <- list()
   index <- 1
   mib <- 0
   sdaset <- list()
-  while (index <= length(x$order))
+  while (index <= length(object$order))
   {
-    mib <- max(mib, x$ord_rd[index])
-    if (!valid(index+1, x)) break
+    mib <- max(mib, object$ord_rd[index])
+    if (!valid(index+1, object)) break
 
     # Test if this is a steep down area
-    if (steepDown(index, x))
+    if (steepDown(index, object))
     {
       # Update mib values with current mib and filter
-      sdaset <- updateFilterSDASet(mib, sdaset, x$ixi)
-      startval <- x$ord_rd[index]
+      sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
+      startval <- object$ord_rd[index]
       mib <- 0
       startsteep <- index; endsteep <- index + 1
-      while(!is.na(x$order[index+1])) {
+      while(!is.na(object$order[index+1])) {
         index <- index + 1
-        if (steepDown(index, x)) { endsteep <- index + 1; next }
-        if (!steepDown(index, x, ixi=1.0) || index - endsteep > x$minPts) break
+        if (steepDown(index, object)) { endsteep <- index + 1; next }
+        if (!steepDown(index, object, ixi=1.0) || index - endsteep > object$minPts) break
       }
       sda <- list(s=startsteep, e=endsteep, maximum=startval, mib=0)
       # print(paste("New steep down area:", toString(sda)))
       sdaset <- append(sdaset, list(sda))
       next
     }
-    if (steepUp(index, x))
+    if (steepUp(index, object))
     {
-      sdaset <- updateFilterSDASet(mib, sdaset, x$ixi)
+      sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
       {
         startsteep <- index; endsteep <- index + 1
-        mib <- x$ord_rd[index]
-        esuccr <- if (!valid(index+1, x)) Inf else x$ord_rd[index+1]
+        mib <- object$ord_rd[index]
+        esuccr <- if (!valid(index+1, object)) Inf else object$ord_rd[index+1]
         if (esuccr != Inf) {
-          while(!is.na(x$order[index+1])) {
+          while(!is.na(object$order[index+1])) {
             index <- index + 1
-            if (steepUp(index, x)) {
+            if (steepUp(index, object)) {
               endsteep <- index + 1
-              mib <- x$ord_rd[index]
-              esuccr <- if (!valid(index+1, x)) Inf else x$ord_rd[index+1]
+              mib <- object$ord_rd[index]
+              esuccr <- if (!valid(index+1, object)) Inf else object$ord_rd[index+1]
               if (esuccr == Inf) { endsteep <- endsteep - 1; break }
               next
             }
-            if (!steepUp(index, x, ixi=1.0) || index - endsteep > x$minPts) break
+            if (!steepUp(index, object, ixi=1.0) || index - endsteep > object$minPts) break
           }
         } else {
           endsteep <- endsteep - 1
@@ -82,15 +82,15 @@ extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = TRUE)
       for (sda in rev(sdaset))
       {
         # Condition 3B
-        if (mib * x$ixi < sda$mib) next
+        if (mib * object$ixi < sda$mib) next
 
         # Default values
         cstart <- sda$s
         cend <- sua$e
 
         # Credit to ELKI
-        if(!correctPredecessors) {
-          while(cend > cstart && x$ord_rd[cend] == Inf) {
+        if(correctPredecessors) {
+          while(cend > cstart && object$ord_rd[cend] == Inf) {
             cend <- cend - 1
           }
         }
@@ -98,22 +98,22 @@ extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = TRUE)
         # Condition 4
         {
           # Case b
-          if (sda$maximum * x$ixi >= sua$maximum) {
-            while(cstart < cend && x$ord_rd[cstart+1] > sua$maximum) cstart <- cstart + 1
+          if (sda$maximum * object$ixi >= sua$maximum) {
+            while(cstart < cend && object$ord_rd[cstart+1] > sua$maximum) cstart <- cstart + 1
           }
           # Case c
-          else if (sua$maximum * x$ixi >= sda$maximum) {
-            while(cend > cstart && x$ord_rd[cend-1] > sda$maximum) cend <- cend - 1
+          else if (sua$maximum * object$ixi >= sda$maximum) {
+            while(cend > cstart && object$ord_rd[cend-1] > sda$maximum) cend <- cend - 1
           }
         }
 
         # This NOT in the original article - credit to ELKI for finding this.
         # Ensure that the predecessor is in the current cluster. This filter
         # removes common artifacts from the Xi method
-        if(!correctPredecessors) {
+        if(correctPredecessors) {
           while(cend > cstart) {
-            tmp2 <- x$predecessor[x$order[cend]]
-            if (!is.na(tmp2) && any(x$order[cstart:(cend-1)] == tmp2, na.rm = TRUE))
+            tmp2 <- object$predecessor[object$order[cend]]
+            if (!is.na(tmp2) && any(object$order[cstart:(cend-1)] == tmp2, na.rm = TRUE))
                break
             # Not found.
             cend <- cend - 1
@@ -121,46 +121,50 @@ extractXi <- function(x, xi, minimum = FALSE, correctPredecessors = TRUE)
         }
 
         # Ensure the last steep up point is not included if it's xi significant
-        if (steepUp(index-1, x)) {
+        if (steepUp(index-1, object)) {
           cend <- cend - 1
         }
 
         # obey minpts
-        if (cend - cstart + 1 < x$minPts) next
+        if (cend - cstart + 1 < object$minPts) next
         SetOfClusters <- append(SetOfClusters, list(list(start=cstart, end=cend)))
         next
       }
     } else { index <- index + 1 }
   }
   # Remove aliases
-  x$ord_rd <- NULL
-  x$ixi <- NULL
+  object$ord_rd <- NULL
+  object$ixi <- NULL
   
-  # Keep xi parameter
-  x$xi <- xi
+  # Keep xi parameter, disable any previous flat clustering parameter 
+  object$xi <- xi
+  object$eps_cl <- NA
   
   # Zero-out clusters (only noise) if none found
   if (length(SetOfClusters) == 0) {
     warning(paste("No clusters were found with threshold:", xi))
-    x$clusters_xi <- NULL
-    x$cluster < rep(0, length(x$cluster))
-    return(invisible(x))
-  } else { # Cluster data exists; organize it by starting and ending index
-    x$clusters_xi <- do.call(rbind, SetOfClusters)
-    x$clusters_xi <- data.frame(start=unlist(x$clusters_xi[,1]), end=unlist(x$clusters_xi[,2]))
-    x$clusters_xi <- x$clusters_xi[order(x$clusters_xi$start, x$clusters_xi$end),]
-    row.names(x$clusters_xi) <- NULL
+    object$clusters_xi <- NULL
+    object$cluster < rep(0, length(object$cluster))
+    return(invisible(object))
+  } else { # Cluster data exists; organize it by starting and ending index, give arbitrary id
+    object$clusters_xi <- do.call(rbind, SetOfClusters)
+    object$clusters_xi <- data.frame(start=unlist(object$clusters_xi[,1]), end=unlist(object$clusters_xi[,2]))
+    object$clusters_xi <- object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end),]
+    object$clusters_xi <- cbind(object$clusters_xi, list(cluster_id=1:nrow(object$clusters_xi)))
+    row.names(object$clusters_xi) <- NULL
   }
 
-  # Populate cluster vector with top-level cluster labels 
-  x$cluster <- extractClusterLabels(x, minimum=minimum)
+  ## Populate cluster vector with either: 
+  ## 1. 'top-level' cluster labels to aid in plotting 
+  ## 2. 'local' or non-overlapping cluster labels if minimum == TRUE
+  object$cluster <- extractClusterLabels(object$clusters_xi, object$order, minimum=minimum)
   
   # Remove non-local clusters if minimum was specified
-  if (minimum) { x$clusters_xi <- x$clusters_xi[unique(x$cluster)[-1],] }
+  if (minimum) { object$clusters_xi <- object$clusters_xi[sort(unique(object$cluster))[-1],] }
   
-  class(x$cluster) <- append(class(x$cluster), "xics")
-  class(x$clusters_xi) <- append(class(x$clusters_xi), "xics")
-  x
+  class(object$cluster) <- unique(append(class(object$cluster), "xics"))
+  class(object$clusters_xi) <- unique(append(class(object$clusters_xi), "xics"))
+  object
 }
 
 # Removes obsolete steep areas
@@ -171,30 +175,30 @@ updateFilterSDASet <- function(mib, sdaset, ixi) {
 
 # Determines if the reachability distance at the current index 'i' is
 # (xi) significantly lower than the next index
-steepUp <- function(i, x, ixi = x$ixi) {
-  if(x$ord_rd[i] >= Inf) return(FALSE)
-  if(!valid(i+1, x)) return(TRUE)
-  return(x$ord_rd[i] <= x$ord_rd[i+1] * ixi)
+steepUp <- function(i, object, ixi = object$ixi) {
+  if(object$ord_rd[i] >= Inf) return(FALSE)
+  if(!valid(i+1, object)) return(TRUE)
+  return(object$ord_rd[i] <= object$ord_rd[i+1] * ixi)
 }
 
 # Determines if the reachability distance at the current index 'i' is
 # (xi) significantly higher than the next index
-steepDown <- function(i, x, ixi = x$ixi) {
-  if(!valid(i+1, x)) return(FALSE)
-  if(x$ord_rd[i+1] >= Inf) return(FALSE)
-  return(x$ord_rd[i] * ixi >= x$ord_rd[i+1])
+steepDown <- function(i, object, ixi = object$ixi) {
+  if(!valid(i+1, object)) return(FALSE)
+  if(object$ord_rd[i+1] >= Inf) return(FALSE)
+  return(object$ord_rd[i] * ixi >= object$ord_rd[i+1])
 }
 
 # Determines if the reachability distance at the current index 'i' is a valid distance
-valid <- function(index, x) {
-  return(!is.na(x$ord_rd[index]))
+valid <- function(index, object) {
+  return(!is.na(object$ord_rd[index]))
 }
 
-### Extract xi clusters (minimum == T extracts clusters that do not contain other clusters)
+### Extract clusters (minimum == T extracts clusters that do not contain other clusters) from a given ordering of points
 extractClusterLabels <- function(cl, order, minimum = FALSE) {
-  ## Add cluster_id to xi clusters
-  if (!"cluster_id" %in% names(cl)) cl <- cbind(cl, cluster_id=1:nrow(cl))
+  ## Add cluster_id to clusters
   if (!all(c("start", "end") %in% names(cl))) stop("extractClusterLabels expects start and end references")
+  if (!"cluster_id" %in% names(cl)) cl <- cbind(cl, cluster_id=1:nrow(cl))
   
   ## Sort cl based on minimum parameter / cluster size
   if (!"cluster_size" %in% names(cl)) cl <- cbind(cl, list(cluster_size = (cl$end - cl$start)))

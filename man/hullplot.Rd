@@ -69,7 +69,7 @@ opXi <- extractXi(op, xi = 0.05)
 hullplot(x, opXi, main = "OPTICSXi")
 
 # Extract minimal 'flat' clusters only 
-opXi <- opticsXi(op, xi = 0.05, minimum = TRUE)
+opXi <- extractXi(op, xi = 0.05, minimum = TRUE)
 hullplot(x, opXi, main = "OPTICSXi")
 
 km <- kmeans(x, centers = 4)

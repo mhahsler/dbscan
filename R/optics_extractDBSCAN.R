@@ -41,6 +41,7 @@ extractDBSCAN <- function(object, eps_cl) {
   }
 
   object$eps_cl <- eps_cl
+  object$xi <- NA
   ### fix the order so cluster is in the same order as the rows in x
   cluster[object$order] <- cluster
   object$cluster <- cluster

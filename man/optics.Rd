@@ -17,7 +17,7 @@
   optics(x, eps, minPts = 5, ...)
 
   extractDBSCAN(object, eps_cl)
-  extractXi(object, xi = 0.001, minimum = FALSE, nocorrect = FALSE)
+  extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 
   \method{predict}{optics}(object, newdata = NULL, data, ...)
 
@@ -36,9 +36,9 @@
   \item{object}{ an object of class optics. For predict it needs to contain not just an ordering, but also an extracted clustering. }
   \item{data}{ the data set used to create the OPTICS clustering object. }
   \item{newdata}{ new data set for which cluster membership should be predicted. }
-  \item{minimum}{ boolean representing whether or not to extract the minimal
+  \item{minimum}{ boolean representing whether or not to extract the minimal (non-overlapping)
     clusters in the Xi clustering algorithm. }
-  \item{nocorrect}{ boolean representing whether or not to prune the steep up area for
+  \item{correctPredecessors}{ boolean Correct a common artifacting by pruning the steep up area for
   	points that have predecessors not in the cluster--found by the ELKI framework, see details below. }
   \item{...}{ additional arguments are passed on to fixed-radius
     nearest neighbor search algorithm. See \code{\link{frNN}} for
@@ -46,7 +46,7 @@
 }
 \details{
 This implementation of OPTICS implements the original algorithm as described by
-Ankers et al (1999). OPTICS is an ordering algorithm using similar concepts
+Ankerst et al (1999). OPTICS is an ordering algorithm using similar concepts
 to DBSCAN. However, for OPTICS
 \code{eps} is only an upper limit for the neighborhood size used to reduce
 computational complexity. Similar to DBSCAN, \code{minPts} is often set to be dimensionality of the data plus one.
@@ -60,12 +60,12 @@ by OPTICS. Valleys represent clusters (the deeper the valley, the more dense
 
 \code{extractDBSCAN} extracts a clustering from an OPTICS ordering that is
 similar to what DBSCAN would produce with an eps set to
-\code{eps_cl} (see Ankers et al, 1999).
+\code{eps_cl} (see Ankerst et al, 1999).
 The only difference to a DBSCAN clustering is that OPTICS is not able to
 assign some border points and reports them instead as noise.
 
 \code{extractXi} extract clusters hiearchically
-specified in Ankers et al (1999) based on the steepness of the reachability plot.
+specified in Ankerst et al (1999) based on the steepness of the reachability plot.
 One interpretation of the \code{xi}
 parameter is that it classifies clusters by change in relative cluster density.
 The used algorithm was originally contributed by the ELKI framework,

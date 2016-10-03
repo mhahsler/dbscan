@@ -20,7 +20,8 @@ List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, Numeri
   // Create leaves
   std::vector<List> dendrogram(n_nodes);
   for (int i = 0; i < n_nodes; ++i) {
-    List leaf = List(i+1);
+    List leaf = List();
+    leaf.push_back(i+1); 
     leaf.attr("label") = std::to_string(i+1);
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;

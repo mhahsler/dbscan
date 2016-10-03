@@ -109,24 +109,27 @@ print.optics <- function(x, ...) {
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }
 
-plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"), ...) {
+plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"), predecessor = FALSE, ...) {
   if(missing(type) || type == "reachability") {
     # OPTICS cluster extraction methods
-    if (is(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$cluster))) {
-      y_max <- max(x$reachdist[which(x$reachdist != Inf)])
+    if (is(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
+     
       # Sort clusters by size
-      hclusters <- x$cluster[order(x$cluster$end - x$cluster$start),]
-      def.par <- par(no.readonly = TRUE)
+      hclusters <- x$clusters_xi[order(x$clusters_xi$end - x$clusters_xi$start),]
       
       # .1 means to leave 15% for the cluster lines
+      def.par <- par(no.readonly = TRUE)
       par(mar= c(2, 4, 4, 2) + 0.1, omd = c(0, 1, .15, 1))
+      
+      # Need to know how to spread out lines 
+      y_max <- max(x$reachdist[which(x$reachdist != Inf)])
       y_increments <- (y_max/0.85*.15)/(nrow(hclusters)+1L)
       
-      top_level <- extractClusterLabels(x$cluster, x$order)
-      plot(as.reachability(x),  col=top_level[x$order]+1L, 
+      # Get top level cluster labels
+      # top_level <- extractClusterLabels(x$clusters_xi, x$order)
+      plot(as.reachability(x),  col=x$cluster[x$order]+1L, 
            xlab = NA, xaxt='n', 
            yaxs="i", ylim=c(0,y_max), ...)
-      if (order_labels) { text(x = 1:length(x$order), y = x$reachdist[x$order], labels = x$order, pos=3) }
       
       # Lines beneath plotting region indicating Xi clusters 
       i <- 1:nrow(hclusters)
@@ -136,8 +139,8 @@ plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"),
       par(def.par)
     } else if (is.numeric(x$cluster) && !is.null(x$eps_cl)) { # Works for integers too 
       ## extractDBSCAN clustering 
-      plot(as.reachability(x), ...)
-      lines(x = c(0, length(x$cluster)), y = c(x$eps_cl, x$eps_cl), col="orange", lty=2)
+      plot(as.reachability(x), col=x$cluster[x$order]+1L, ...)
+      lines(x = c(0, length(x$cluster)), y = c(x$eps_cl, x$eps_cl), col="black", lty=2)
     } else {
       # Regular reachability plot
       plot(as.reachability(x), ...)
@@ -146,13 +149,13 @@ plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"),
       d_x <- as.dendrogram(x)
       if (!is.null(x$cluster) && cluster) {
         if(requireNamespace("dendextend", quietly = TRUE)) { 
-          ## Use dendextend plotting abilities 
+          ## Use dendextend plotting abilities if possible 
           if (!is.na(x$eps_cl)) { # Plotting according to epsilon threshold
             d_x <- dendextend::set(d_x, "labels_col", value = c(x$cluster + 1)[x$order])
-          } else if (is(x, "xics") || all(c("start", "end", "cluster_id") %in% names(x$cluster))) { 
+          } else if (is(x, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) { 
             ## Plotting according to Xi method
             hier_asc <- x$clusters_xi[order(-(x$clusters_xi$end - x$clusters_xi$start)),]
-            minimal <- sort(unique(extractXiClusters(x, T)$cluster))[-1]
+            minimal <- sort(unique(extractClusterLabels(x$clusters_xi, x$order, minimum = TRUE)))[-1]
             for(cl in 1:nrow(hier_asc)) {
               cl_indices <- unlist(hier_asc[cl,])
               cl_labels <- x$order[cl_indices[1]:cl_indices[2]]
@@ -162,8 +165,8 @@ plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"),
             }
           }
         }
-        plot(d_x, center = TRUE, ...) 
       }
+      plot(d_x, center = TRUE, ...) 
     } else { stop("Unknown plot type") }
 }
 
@@ -182,19 +185,15 @@ predict.optics <- function (object, newdata = NULL, data, ...) {
 }
 
 # Simple conversion between OPTICS objects and reachability objects 
-as.reachability.optics <- function(x) {
-  if (!is.null(x$clusters_xi)){
-    clustering <- x$clusters_xi
-  } else if (!is.null(x$cluster)) { clustering <- x$cluster 
-  } else { clustering <- NA }
-  structure(list(reachdist=x$reachdist, order=x$order, cluster=clustering), class="reachability")
+as.reachability.optics <- function(object, ...) {
+  structure(list(reachdist=object$reachdist, order=object$order), class="reachability")
 }
 
 # Conversion between OPTICS objects and dendrograms 
-as.dendrogram.optics <- function(x) {
-  if(x$minPts > length(x$order)) { stop("'minPts' should be less or equal to the points in the dataset.") } 
-  if(length(which(x$reachdist == Inf)) > 1) stop(cat("The current eps value is not large enough to capture the complete hiearchical structure of the dataset.\nPlease use a large eps value (such as Inf)."))
-  as.dendrogram(as.reachability(x))
+as.dendrogram.optics <- function(object, ...) {
+  if(object$minPts > length(object$order)) { stop("'minPts' should be less or equal to the points in the dataset.") } 
+  if(length(which(object$reachdist == Inf)) > 1) stop("Eps value is not large enough to capture the complete hiearchical structure of the dataset. Please use a large eps value (such as Inf).")
+  as.dendrogram(as.reachability(object))
   # # Start with 0-height leaves 
   # leaves <- lapply(1:length(x$order), function(cid) {
   #   structure(x$order[cid], members=1, height=0, label=as.character(x$order[cid]),

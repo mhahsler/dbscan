@@ -6,15 +6,14 @@
 using namespace Rcpp;
 
 // reach_to_dendrogram
-List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, NumericVector pl_order);
-RcppExport SEXP dbscan_reach_to_dendrogram(SEXP reachabilitySEXP, SEXP plSEXP, SEXP pl_orderSEXP) {
+List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_order);
+RcppExport SEXP dbscan_reach_to_dendrogram(SEXP reachabilitySEXP, SEXP pl_orderSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::List >::type reachability(reachabilitySEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type pl(plSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type pl_order(pl_orderSEXP);
-    rcpp_result_gen = Rcpp::wrap(reach_to_dendrogram(reachability, pl, pl_order));
+    Rcpp::traits::input_parameter< const NumericVector >::type pl_order(pl_orderSEXP);
+    rcpp_result_gen = Rcpp::wrap(reach_to_dendrogram(reachability, pl_order));
     return rcpp_result_gen;
 END_RCPP
 }

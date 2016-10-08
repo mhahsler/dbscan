@@ -35,53 +35,62 @@ int which_int(IntegerVector x, int target) {
 
 
 // [[Rcpp::export]]
-List reach_to_dendrogram(const Rcpp::List reachability, NumericVector pl, NumericVector pl_order) {
-  Rcpp::NumericVector reachdist = reachability["reachdist"];
-  Rcpp::IntegerVector order = reachability["order"];
+List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_order) {
+  
+  // Set up sorted reachability distance 
+  NumericVector pl = Rcpp::clone(as<NumericVector>(reachability["reachdist"])).sort();
+  
+  // Get 0-based order 
+  IntegerVector order = Rcpp::clone(as<IntegerVector>(reachability["order"])) - 1; 
+  
+  /// Initialize disjoint-set structure 
   int n_nodes = order.size();
   UnionFind uf((size_t) n_nodes);
 
   // Create leaves
-  std::vector<List> dendrogram(n_nodes);
+  List dendrogram(n_nodes);
   for (int i = 0; i < n_nodes; ++i) {
-    List leaf = List();
+    IntegerVector leaf = IntegerVector();
     leaf.push_back(i+1);
-    std::string label = patch::to_string(i + 1);
-    leaf.attr("label") = label;
+    leaf.attr("label") = patch::to_string(i + 1);
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;
     leaf.attr("leaf") = true;
     dendrogram.at(i) = leaf;
   }
-
-  // Get the index of the point with next smallest reach dist and its neighbor
-  int insert = 0, prev_insert = 0, tmp = 0;
-  for (int i = 0; i < (n_nodes-1); ++i) {
-    int p = pl_order(i);
-    int q = order(which_int(order, p) - 1); // left neighbor in ordering
-    if (q == -1) { stop("Left neighbor not found"); }
   
+  // Precompute the q order
+  IntegerVector q_order(n_nodes); 
+  for (int i = 0; i < n_nodes - 1; ++i) {
+    q_order.at(i) = order(which_int(order, pl_order(i)) - 1); 
+  }
+  
+  // Get the index of the point with next smallest reach dist and its neighbor
+  IntegerVector members(n_nodes, 1);
+  int insert = 0, p = 0, q = 0, p_i = 0, q_i = 0;
+  for (int i = 0; i < (n_nodes-1); ++i) {
+    p = pl_order(i);
+    q = q_order(i);  // left neighbor in ordering
+    if (q == -1) { stop("Left neighbor not found"); }
+
     // Get the actual index of the branch(es) containing the p and q
-    int p_i = uf.Find(p), q_i = uf.Find(q);
-    List p_branch = dendrogram.at(p_i), q_branch = dendrogram.at(q_i);
-    int p_members = p_branch.attr("members"), q_members = q_branch.attr("members");
-    List branch = List::create(q_branch, p_branch);
-    branch.attr("members") = p_members + q_members;
+    p_i = uf.Find(p), q_i = uf.Find(q);
+    List branch = List::create(dendrogram.at(q_i), dendrogram.at(p_i));
+    
+    // generic proxy blocks attr access for mixed types, so keep track of members manually!
+    branch.attr("members") = members.at(p_i) + members.at(q_i); 
     branch.attr("height") = pl(i);
     branch.attr("class") = "dendrogram";
 
-    // Merge the two, retrieving the new index and deleting the old
+    // Merge the two, retrieving the new index
     uf.Union(p_i, q_i);
-    tmp = uf.Find(q_i); // q because q_branch is first in the new branch
-    // Need the else statement to stop the unused variable warning apparently
-    if (tmp != insert) { prev_insert = insert; } else { prev_insert = prev_insert; }
-    insert = tmp;
+    insert = uf.Find(q_i); // q because q_branch is first in the new branch
+    
+    // Update members reference and insert the branch 
+    members.at(insert) = branch.attr("members");
     dendrogram.at(insert) = branch;
-    int remove = insert == p_i ? q_i : p_i;
-    dendrogram.at(remove) = R_NilValue;
   }
-  Rcpp::List result = dendrogram.at(insert);
-  return(result);
+  return(dendrogram.at(insert));
 }
 
 int DFS(List d, List& rp, int pnode, NumericVector stack) {

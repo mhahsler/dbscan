@@ -46,11 +46,12 @@ as.dendrogram.reachability <- function(object, ...) {
   if(length(which(object$reachdist == Inf)) > 1) stop("Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain 
                                                      enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value 
                                                      (such as Inf) may be needed in the parameterization.")
-  dup_x <- object
-  c_order <- order(dup_x$reachdist) - 1
-  dup_x$order <- dup_x$order - 1
-  res <- reach_to_dendrogram(dup_x, sort(dup_x$reachdist), c_order)
-  res <- dendrapply(res, function(leaf) { new_leaf <- leaf[[1]]; attributes(new_leaf) <- attributes(leaf); new_leaf })
+  #dup_x <- object
+  c_order <- order(object$reachdist) - 1
+  # dup_x$order <- dup_x$order - 1
+  #q_order <- sapply(c_order, function(i) which(dup_x$order == i))
+  res <- reach_to_dendrogram(object, c_order)
+  # res <- dendrapply(res, function(leaf) { new_leaf <- leaf[[1]]; attributes(new_leaf) <- attributes(leaf); new_leaf })
   res
 }
 

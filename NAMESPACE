@@ -38,3 +38,6 @@ S3method(as.dendrogram, reachability)
 
 S3method(print, dbscan_fast)
 S3method(predict, dbscan_fast)
+
+S3method(print, kNN)
+S3method(print, frNN)

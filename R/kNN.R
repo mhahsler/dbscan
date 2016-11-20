@@ -89,5 +89,12 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   dimnames(ret$dist) <- list(rownames(x), 1:k)
   dimnames(ret$id) <- list(rownames(x), 1:k)
 
+  class(ret) <- "kNN"
   ret
+}
+
+print.kNN <- function(x, ...) {
+  cat("k-nearest neighbors for ", nrow(x$id), " objects (k=", x$k,").",
+    "\n", sep = "")
+  cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }

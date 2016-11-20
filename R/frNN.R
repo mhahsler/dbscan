@@ -83,5 +83,14 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   ret$eps <- eps
 
+  class(ret) <- "frNN"
+
   ret
+}
+
+
+print.frNN <- function(x, ...) {
+  cat("fixed radius nearest neighbors for ", length(x$id),
+    " objects (eps=", x$eps,").", "\n", sep = "")
+  cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }

@@ -2,7 +2,9 @@
 \alias{reachability}
 \alias{dendrogram}
 \alias{as.reachability}
-\alias{as.dendrogram}
+\alias{as.reachability.optics}
+\alias{as.reachability.dendrogram}
+\alias{as.dendrogram.reachability}
 \alias{plot.reachability}
 \alias{print.reachability}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -15,16 +17,17 @@
 \usage{
 as.reachability(object, ...)
 
-## S3 Method for class 'optics'
-as.reachability(object, ...)
+\method{as.reachability}{optics}(object, ...)
 
-## S3 Method for class 'dendrogram'
-as.reachability(object, ...)
+\method{as.reachability}{dendrogram}(object, ...)
+
+\method{as.dendrogram}{reachability}(object, ...)
 
 \method{print}{reachability}(x, ...)
 
 \method{plot}{reachability}(x, order_labels = FALSE,
-xlab = "Order", ylab = "Reachability dist.", main = "Reachability Plot", ...)
+  xlab = "Order", ylab = "Reachability dist.",
+  main = "Reachability Plot", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -70,7 +73,11 @@ Sander, J., X. Qin, Z. Lu, N. Niu, and A. Kovarsky (2003). Automatic extraction 
     Matthew Piekenbrock
 }
 \seealso{
-\code{\link[stats]{dendrogram}}, \code{\link{optics}}, \code{\link{extractDBSCAN}}, \code{\link{extractXi}}, \code{\link{hclust}}.
+  \code{\link[stats]{dendrogram}},
+  \code{\link{optics}},
+  \code{\link{extractDBSCAN}},
+  \code{\link{extractXi}},
+  \code{\link{hclust}}.
 }
 
 \examples{
@@ -89,38 +96,26 @@ text(x = x, labels = 1:nrow(x), pos=3)
 res <- optics(x, eps = 10,  minPts = 2)
 res
 
-### get order
-res$order
-
 ### plot produces a reachability plot
 plot(res)
 
 ### Extract reachability components from OPTICS
-res <- as.reachability(res)
+reach <- as.reachability(res)
+reach
 
-### plot still produces a reachability plot; points
-### can be viewed by looking at the labels
-plot(res, order_labels = TRUE)
+### plot still produces a reachability plot; points ids
+### (rows in the original data) can be displayed with order_labels = TRUE
+plot(reach, order_labels = TRUE)
 
 ### Reachability objects can be directly converted to dendrograms
-plot(as.dendrogram(res))
+dend <- as.dendrogram(reach)
+dend
+plot(dend)
 
-### The relation between dendrogram and reachability plot is symmetric
-all.equal(as.reachability(as.dendrogram(res)), res)
+### A dendrogram can be converted back into a reachability object
+plot(as.reachability(dend))
 
-### Per the original 2003 paper by Ankerst,
-### a single linkage tree == OPTICS reachability plot with minPts = 2, eps = Inf
-res <- optics(x, minPts = 2, eps = Inf)
-reach_dend <- as.dendrogram(res)
-s_linkage_tree <- as.dendrogram(hclust(dist(x), method = "single"))
 
-## First need to reorder
-s_linkage_order <- order.dendrogram(s_linkage_tree)
-s_linkage_tree <- reorder(s_linkage_tree, s_linkage_order, agglo.FUN = mean)
-
-## Then check for equality
-all.equal(s_linkage_tree, reorder(reach_dend, s_linkage_order, agglo.FUN = mean),
-  check.attributes = FALSE, check.names = FALSE)
 }
 \keyword{ model }
 \keyword{ clustering }

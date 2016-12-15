@@ -108,7 +108,8 @@ Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTI
 }
 
 \seealso{
-\code{\link{frNN}}.
+\code{\link{frNN}},
+\code{\link{as.reachability}}.
 }
 
 \examples{

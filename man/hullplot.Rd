@@ -14,11 +14,12 @@ hullplot(x, cl, col = NULL, cex = 0.5, hull_lwd = 1, hull_lty = 1,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix (only the first two columns are used to produce
-      the scatter plot).}
+  \item{x}{a data matrix. If more than 2 columns are provided, then the data
+    is plotted using the first two principal components.}
   \item{cl}{a clustering. Either a numeric cluster assignment vector or a clustering object (a list with an element named \code{cluster}).}
   \item{col}{ colors used for clusters. Defaults to the standard palette.
-    The first color is used for noise/unassigned points (cluster id 0). }
+    The first color (default is black) is used for noise/unassigned points
+    (cluster id 0). }
   \item{cex}{ expansion factor for symbols. }
   \item{hull_lwd, hull_lty}{ line width and line type used for the convex hull.}
   \item{main}{ main title.}
@@ -68,7 +69,7 @@ hullplot(x, opDBSCAN, main = "OPTICS")
 opXi <- extractXi(op, xi = 0.05)
 hullplot(x, opXi, main = "OPTICSXi")
 
-# Extract minimal 'flat' clusters only 
+# Extract minimal 'flat' clusters only
 opXi <- extractXi(op, xi = 0.05, minimum = TRUE)
 hullplot(x, opXi, main = "OPTICSXi")
 

@@ -44,7 +44,7 @@ some actual nearest neighbors being omitted leading to spurious clusters and noi
 }
 \value{
 %%  ~Describe the value returned
-A list with the following components:
+An object of class kNN containing a list with the following components:
   \item{dist }{a matrix with distances. }
   \item{id }{a matrix with ids. }
   \item{k }{number of k used. }

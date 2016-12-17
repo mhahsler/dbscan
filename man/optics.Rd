@@ -14,13 +14,12 @@
   algorithm using a kd-tree.
 }
 \usage{
-  optics(x, eps, minPts = 5, ...)
+optics(x, eps, minPts = 5, ...)
 
-  extractDBSCAN(object, eps_cl)
-  extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
+extractDBSCAN(object, eps_cl)
+extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 
-  \method{predict}{optics}(object, newdata = NULL, data, ...)
-
+\method{predict}{optics}(object, newdata = NULL, data, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,8 +27,9 @@
   \item{eps}{ upper limit of the size of the epsilon neighborhood. Limiting the
     neighborhood size improves performance and has no or very little impact on
     the ordering as long as it is not set too low.}
-  \item{minPts}{ number of minimum points in the eps region (for core points).
-    Default is 5 points.}
+  \item{minPts}{ the parameter is used to identify dense neighborhoods
+    and the reachability distance is calculated as the distance to the
+    minPts nearest neighbor. Default is 5 points.}
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
   \item{xi}{ Steepness threshold to identify clusters hierarchically using
     the Xi method.}
@@ -49,7 +49,12 @@ This implementation of OPTICS implements the original algorithm as described by
 Ankerst et al (1999). OPTICS is an ordering algorithm using similar concepts
 to DBSCAN. However, for OPTICS
 \code{eps} is only an upper limit for the neighborhood size used to reduce
-computational complexity. Similar to DBSCAN, \code{minPts} is often set to be dimensionality of the data plus one.
+computational complexity. Note that \code{minPts} in OPTICS has a different
+effect then in DBSCAN.
+It is used to define dense neighborhoods, but since \code{eps} is typically
+set rather high, this does not effect the ordering much. However,
+it is also used to calculate the reachability distance
+and larger values will make the reachability distance plot smoother.
 
 OPTICS linearly orders the data points such that points which are spatially closest become neighbors in the ordering. The closest analog to this ordering is dendrogram
 in single-link hierarchical clustering. The algorithm also calculates the
@@ -103,7 +108,8 @@ Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTI
 }
 
 \seealso{
-\code{\link{frNN}}.
+\code{\link{frNN}},
+\code{\link{as.reachability}}.
 }
 
 \examples{

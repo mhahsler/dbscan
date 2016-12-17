@@ -73,3 +73,4 @@ nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
 nn_d <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
 
 expect_equal(nn, nn_d)
+

@@ -5,7 +5,8 @@ import("Rcpp")
 importFrom("graphics", "plot", "par", "segments", "lines", "polygon", "text")
 importFrom("grDevices", "palette", "chull", "adjustcolor")
 
-importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram")
+importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
+  "is.leaf", "prcomp")
 
 importFrom("methods", "is")
 
@@ -19,7 +20,7 @@ export(
   extractDBSCAN,
   extractXi,
   lof,
-  hullplot, 
+  hullplot,
   as.reachability
 )
 
@@ -37,3 +38,6 @@ S3method(as.dendrogram, reachability)
 
 S3method(print, dbscan_fast)
 S3method(predict, dbscan_fast)
+
+S3method(print, kNN)
+S3method(print, frNN)

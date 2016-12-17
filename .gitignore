@@ -6,6 +6,8 @@
 .Rhistory
 .Rapp.history
 .RData
+*.Rcheck
+
 
 # Example code in package build process
 *-Ex.R
@@ -19,4 +21,6 @@ vignettes/*.html
 vignettes/*.pdf
 .Rproj.user
 
+# Personal work directories 
 Work
+ignore

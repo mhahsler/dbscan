@@ -17,34 +17,34 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-# Add new Generic for other class extensions support reachability plotting 
+# Add new Generic for other class extensions support reachability plotting
 as.reachability <- function(object, ...) UseMethod("as.reachability")
 
 # Simple print method for reachability objects
 print.reachability <- function(x, ...) {
   avg_reach <- mean(x$reachdist[which(x$reachdist != Inf)], na.rm = T)
-  cat("Reachability collection for ", length(x$order), " objects.\n", 
-      "Avg minimum reachability distance: ", avg_reach, "\n", 
+  cat("Reachability collection for ", length(x$order), " objects.\n",
+      "Avg minimum reachability distance: ", avg_reach, "\n",
       "Available Fields: order, reachdist", sep="")
 }
 
-# Converting from dendrogram --> reachability plot 
+# Converting from dendrogram --> reachability plot
 as.reachability.dendrogram <- function(object, ...) {
   if (!inherits(object, "dendrogram")) stop("The as.reachability method requires a dendrogram object.")
-  # Rcpp doesn't seem to import attributes well for vectors 
-  fix_x <- dendrapply(object, function(leaf) { 
-    new_leaf <- as.list(leaf); attributes(new_leaf) <- attributes(leaf); new_leaf 
+  # Rcpp doesn't seem to import attributes well for vectors
+  fix_x <- dendrapply(object, function(leaf) {
+    new_leaf <- as.list(leaf); attributes(new_leaf) <- attributes(leaf); new_leaf
   })
   res <- dendrogram_to_reach(fix_x)
-  # Refix the ordering 
+  # Refix the ordering
   res$reachdist <- res$reachdist[order(res$order)]
   return(res)
 }
 
-# Dendrogram --> Reachability conversion 
+# Dendrogram --> Reachability conversion
 as.dendrogram.reachability <- function(object, ...) {
-  if(length(which(object$reachdist == Inf)) > 1) stop("Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain 
-                                                     enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value 
+  if(length(which(object$reachdist == Inf)) > 1) stop("Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain
+                                                     enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value
                                                      (such as Inf) may be needed in the parameterization.")
   #dup_x <- object
   c_order <- order(object$reachdist) - 1
@@ -56,7 +56,7 @@ as.dendrogram.reachability <- function(object, ...) {
 }
 
 # Plotting method for reachability objects.
-plot.reachability <- function(x, order_labels = FALSE, xlab="Order", 
+plot.reachability <- function(x, order_labels = FALSE, xlab="Order",
                               ylab = "Reachability dist.", main = "Reachability Plot", ...) {
   if (is.null(x$order) || is.null(x$reachdist)) stop("reachability objects need 'reachdist' and 'order' fields")
   plot(x$reachdist[x$order], xlab = xlab, ylab = ylab, main = main, type="h", ...)

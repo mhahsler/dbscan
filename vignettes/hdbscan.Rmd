@@ -1,0 +1,139 @@
+---
+title: "HDBSCAN* with the dbscan package"
+author: "Michael Hahsler, Matt Piekenbrock"
+output:
+  html_notebook: default
+  pdf_document: default
+header-includes: \usepackage{animate}
+---
+The testing data sets
+```{r}
+library("dbscan")
+data("x_test1")
+plot(x_test1, pch=20, xlab="X axis", ylab="Y Axis")
+```
+
+HDBSCAN by default returns a flat clustering of the most salient clusters 
+
+```{r}
+  cl <- dbscan::hdbscan(x_test1, minPts = 5)
+  cl
+```
+The 'flat' results 
+```{r}
+ plot(x_test1, col=cl$cluster+1, pch=20)
+```
+
+## Robust Single Linkage 
+The Robust Single Linkage (RSL) tree is stored as a dendrogram in the 'rsl_tree' member. Note that direct hclust conversion is not currently possible due to the lack of support for $n$-ary trees by the stats package in R, which prevents oft-used methods like cutting the tree from being immediately available. However, the 'dendextend' package offers some additional functionality though.
+
+```{r}
+plot(cl$rsl_tree)
+```
+## Validation 1: DBSCAN* vs RSL tree cutting
+```{r}
+cuts <- unname(dendextend::cutree(cl$hcl, h=0.25))
+cuts[which(!cuts %in% which(table(cuts) > 1))] <- 0 # minPts doesn't matter? 
+cut_cl <- match(cuts, unique(cuts)) - 1 # 'Normalize' so cluster ID increments
+table(cut_cl)
+```
+```{r}
+dbscan_cl <- dbscan::dbscan(x_test1, eps=0.25, minPts = 5, borderPoints = F)
+table(dbscan_cl$cluster)
+```
+```{r}
+  all.equal(dbscan_cl$cluster, cut_cl)
+```
+## Validation 2: DBSCAN* vs RSL tree cutting at all MST distance values 
+```{r}
+check <- rep(F, nrow(cl$mst))
+for (eps_i in 1:nrow(cl$mst)) {
+  eps <- cl$mst[eps_i, 3]
+  
+  ## Cutting the robust single linkage tree 
+  cut_tree <- function(eps){
+    cuts <- unname(dendextend::cutree(cl$hcl, h=eps))
+    cuts[which(diag(cl$mrd) > eps)] <- 0 # Use core distance to distinguish noise; minPts doesn't matter? 
+    cut_cl <- match(cuts, sort(unique(cuts))) - 1 # 'Normalize' so cluster ID increments; sort ensures noise is 0
+    cut_cl
+  }
+  
+  ## RSL cut 
+  cut_cl <- cut_tree(eps)
+  
+  ## DBSCAN
+  dbscan_cl <- dbscan::dbscan(x_test1, eps=eps, minPts = 5, borderPoints = F)
+  
+  ## Use run length encoding as an ID-independent way to check ordering
+  res <- all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths)
+  
+  ## Simple Check 
+  # check[eps_i] <- (res == "TRUE")
+  
+  ## More Robust Check -- robust to floating point errors caused by rounding when the tree is cut
+  if (res == "TRUE"){
+    check[eps_i] <- T
+  } else {
+    # Adjusting for numerical precision errors
+    cut_cl <- cut_tree(eps-1e-15)
+    res <- all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths)
+    check[eps_i] <- (res == "TRUE")
+  }
+}
+print(all(check == T))
+```
+
+## Condensed Tree
+```{r}
+ plot(cl)
+```
+You can change up colors
+```{r}
+ plot(cl, gradient = c("yellow", "orange", "red", "blue"))
+```
+
+You can scale the widths for individual devices appropriately 
+```{r}
+plot(cl, gradient = c("purple", "blue", "green", "yellow"), scale=25)
+```
+And outline the ones that were used in the flat solution 
+```{r}
+plot(cl, gradient = c("purple", "blue", "green", "yellow"), show_flat = T)
+```
+
+
+## Cluster Stability Scores
+Note the stability scores correspond to the labels on the condensed tree, but the cluster assignments in the cluster member element does not correspond to the labels in the condensed tree. Also note that these scores represent the stability scores after the traversal up the tree. 
+```{r}
+print(cl$cluster_scores)
+```
+
+The individual point membership 'probabilities' are in the probabilities member element
+```{r}
+  print(cl$membership_prob)
+```
+```{r}
+  plot(x_test1, col=cl$cluster+1, pch=21)
+  colors <- sapply(1:length(cl$cluster), function(i) adjustcolor(palette()[(cl$cluster+1)[i]], alpha.f = cl$membership_prob[i]))
+  points(x_test1, col=colors, pch=20)
+```
+
+## Hierarchical representations
+The hierarchy of cluster membership changes and the distance values that happened at, for what its worth, as shown in Table 1 of [1], can be generated via the as.matrix S3 method.
+```{r}
+  hdbscan_hier <- as.matrix(cl)
+  head(hdbscan_hier)[, seq(1, ncol(hdbscan_hier), by=10)]
+```
+
+## A Bigger Example
+Another data set ()
+```{r}
+  # data("x_test2")
+  # cl2 <- hdbscan(x_test2, minPts = 15)
+```
+
+
+
+## Validating HDBSCAN
+A much more comprehensive evaluation of the clustering coming soon...  
+

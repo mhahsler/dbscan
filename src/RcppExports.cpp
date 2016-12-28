@@ -28,6 +28,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mst_to_dendrogram
+List mst_to_dendrogram(const NumericMatrix mst);
+RcppExport SEXP dbscan_mst_to_dendrogram(SEXP mstSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix >::type mst(mstSEXP);
+    rcpp_result_gen = Rcpp::wrap(mst_to_dendrogram(mst));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mrd
+NumericMatrix mrd(NumericMatrix dm, NumericVector cd);
+RcppExport SEXP dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
+    rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dbscan_int
 IntegerVector dbscan_int(NumericMatrix data, double eps, int minPts, NumericVector weights, int borderPoints, int type, int bucketSize, int splitRule, double approx, List frNN);
 RcppExport SEXP dbscan_dbscan_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP weightsSEXP, SEXP borderPointsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {

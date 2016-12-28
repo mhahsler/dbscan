@@ -9,6 +9,14 @@ dendrogram_to_reach <- function(x) {
     .Call('dbscan_dendrogram_to_reach', PACKAGE = 'dbscan', x)
 }
 
+mst_to_dendrogram <- function(mst) {
+    .Call('dbscan_mst_to_dendrogram', PACKAGE = 'dbscan', mst)
+}
+
+mrd <- function(dm, cd) {
+    .Call('dbscan_mrd', PACKAGE = 'dbscan', dm, cd)
+}
+
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
     .Call('dbscan_dbscan_int', PACKAGE = 'dbscan', data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
 }

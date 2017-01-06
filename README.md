@@ -14,53 +14,88 @@
  An R interface to __fast kNN and fixed-radius NN search__ is also provided.
 
 This implementation is typically faster than the native R implementation in package `fpc`, or the 
-implementations in WEKA, ELKI and Python's scikit-learn.
+implementations in [WEKA](http://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](http://scikit-learn.org/).
+
 
 ## Installation
 
-* __Stable CRAN version:__ install from within R.
-* __Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install via `install_github("mhahsler/dbscan")` (requires devtools) 
+__Stable CRAN version:__ install from within R with
+```R
+install.packages("dbscan")
+```
+__Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install from GitHub (needs devtools).
+```R 
+install_git("mhahsler/dbscan")
+```
 
-## Examples
+## Usage
+
+Load the package and use the numeric variables in the iris dataset
 ```R
 library("dbscan")
 
-## use the numeric variables in the iris dataset
 data("iris")
 x <- as.matrix(iris[, 1:4])
- 
-## DBSCAN
+```
+
+Run DBSCAN
+```R
 db <- dbscan(x, eps = .4, minPts = 4)
 db
-## visualize results (noise is shown in black)
+```
+
+```
+DBSCAN clustering for 150 objects.
+Parameters: eps = 0.4, minPts = 4
+The clustering contains 4 cluster(s) and 25 noise points.
+
+ 0  1  2  3  4 
+25 47 38 36  4 
+
+Available fields: cluster, eps, minPts
+```
+
+Visualize results (noise is shown in black)
+```R
 pairs(x, col = db$cluster + 1L)
+```
 
-## LOF (local outlier factor) 
+
+Calculate LOF (local outlier factor) 
+and visualize (larger bubbles in the visualization have a larger LOF)
+```R
 lof <- lof(x, k = 4)
-## larger bubbles in the visualization have a larger LOF
 pairs(x, cex = lof)
+```
 
-## OPTICS
+Run OPTICS
+```R
 opt <- optics(x, eps = 1, minPts = 4)
 opt
+```
 
-## extract DBSCAN-like clustering 
+```
+OPTICS clustering for 150 objects.
+Parameters: minPts = 4, eps = 1, eps_cl = NA, xi = NA
+Available fields: order, reachdist, coredist, predecessor, minPts, eps, eps_cl, xi
+```
+
+Extract DBSCAN-like clustering from OPTICS 
+and create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
+```R
 opt <- extractDBSCAN(opt, eps_cl = .4)
-
-## create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 plot(opt)
+```
 
-## plot the extracted DBSCAN clustering
-pairs(x, col = opt$cluster + 1L)
-
-## extract a hierarchical clustering using the Xi method (captures clusters of varying density)
+Extract a hierarchical clustering using the Xi method (captures clusters of varying density)
+```R
 opt <- extractXi(opt, xi = .05)
 opt
 plot(opt)
 ```
 
 ## License 
-The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from [ELKI](http://elki.dbs.ifi.lmu.de/) frameworks available Java source code (GNU AGPLv3), with explicit permission granted by the original author, [Erich Schubert](http://www.dbs.ifi.lmu.de/cms/Erich_Schubert).  
+The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the [ELKI](http://elki.dbs.ifi.lmu.de/) framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, [Erich Schubert](http://www.dbs.ifi.lmu.de/cms/Erich_Schubert).  
 
 
 ## Further Information

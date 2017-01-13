@@ -4,6 +4,10 @@
 * OPTICS clustering extraction methods are now called extractDBSCAN and 
   extractXi.
 * hullplot uses now filled polygons as the default.
+* hullplot now used PCA if the data has more than 2 dimensions.
+* kNN and frNN are now objects with a print function.
+* dbscan now also accepts a frNN object as input.
+
 
 # Changes in version 0.9-8 (2016-08-05)
 

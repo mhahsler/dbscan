@@ -19,7 +19,9 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix or a dist object.}
+  \item{x}{a data matrix or a dist object. Alternatively, a frNN object
+    with fixed-radius nearest neighbors can also be specified. In this case
+    eps can be missing and will taken form the frNN object.}
   \item{eps}{ size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}
@@ -52,6 +54,11 @@ Setting parameters for DBSCAN:
 The knee in \code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
 
 See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
+
+A precomputed frNN object can be supplied as \code{x}. In this case
+\code{eps} does not need to be specified. This option us useful
+for large data sets, where a sparse distance matrix is available.
+See \code{\link{frNN}} how to create frNN objects.
 
 \code{predict} can be used to predict cluster memberships for new data points.
 A point is considered a member of a cluster if it is within the eps
@@ -98,6 +105,10 @@ res
 
 pairs(iris, col = res$cluster + 1L)
 
+## use precomputed frNN
+fr <- frNN(iris, eps = .4)
+dbscan(fr, minPts = 5)
+
 ## example data from fpc
 set.seed(665544)
 n <- 100
@@ -112,6 +123,8 @@ res
 ## plot clusters and add noise (cluster 0) as crosses.
 plot(x, col=res$cluster)
 points(x[res$cluster==0,], pch = 3, col = "grey")
+
+hullplot(x, res)
 
 ## predict cluster membership for new data points
 ## (Note: 0 means it is predicted as noise)

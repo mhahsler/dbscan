@@ -25,6 +25,10 @@ if (requireNamespace("fpc", quietly = TRUE)) {
     expect_equivalent(res$cluster, res2$cluster)
 }
 
+## compare with precomputed frNN
+fr <- frNN(iris, eps = .4)
+res9 <- dbscan(fr, minPts = 4)
+expect_equivalent(res, res9)
 
 ## compare on example data from fpc
 set.seed(665544)

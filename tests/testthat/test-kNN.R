@@ -99,3 +99,4 @@ x_na[c(1,3,5),] <- NA
 expect_error(kNN(x_na, k = 3), regexp = "NA")
 expect_error(kNN(x_na, k = 3, search = "dist"), regexp = "NA")
 expect_error(kNN(dist(x_na), k = 3), regexp = "NA")
+

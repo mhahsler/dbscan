@@ -32,12 +32,18 @@ For details on the parameters see \code{\link{kNN}}.
 
 Note: self-matches are not returned!
 %%  ~~ If necessary, more details than the description above ~~
+
+To create a frNN object from scratch, you need to supply at least the
+elements \code{id} with a list of integer vectors with
+the nearest neighbor ids
+for each point and \code{eps} (see below).
 }
 \value{
 %%  ~Describe the value returned
-A list with the following components:
-  \item{dist }{a list with distances. }
-  \item{id }{a list with ids. }
+An object of class frNN containing a list with the following components:
+  \item{id }{a list of integer vectors. Each vector contains the ids
+  of the fixed radius nearest neighbors. }
+  \item{dist }{a list with distances (same stucture as \code{ids}). }
   \item{eps }{ eps used. }
 %% ...
 }
@@ -69,6 +75,12 @@ nn$id[[i]]
 nn$dist[[i]]
 
 plot(iris[,-5], col = ifelse(1:nrow(iris) \%in\% nn$id[[i]], "red", "black"))
+
+## manually create a frNN object for dbscan (dbscan only needs ids and eps)
+nn <- list(ids = list(c(2,3), c(1,3), c(1,2), c(3,5), c(4,5)), eps = 1)
+class(nn) <- "frNN"
+nn
+dbscan(nn, minPts = 2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

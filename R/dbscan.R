@@ -20,6 +20,8 @@
 dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
   ...) {
 
+  if(is(x, "frNN") && missing(eps)) eps <- x$eps
+
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
   ### also check for MinPts for fpc compartibility (does not work for
@@ -61,11 +63,14 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
   frNN <- list()
   if(is(x, "dist")) {
     frNN <- frNN(x, eps, ...)$id
-    ## add self match and use C numbering
-    frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
-
-    x <- matrix()
-    storage.mode(x) <- "double"
+    x <- matrix(0.0, nrow=0, ncol=0)
+  }else if(is(x, "frNN")) {
+    if(x$eps != eps) {
+      eps <- x$eps
+      warning("Using the eps of ", eps, " provided in the fixed-radius NN object.")
+    }
+    frNN <- x$id
+    x <- matrix(0.0, nrow=0, ncol=0)
 
   }else{
     if(!.matrixlike(x)) stop("x needs to be a matrix")
@@ -77,6 +82,10 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
 
   if(length(frNN) == 0 && any(is.na(x)))
     stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
+
+  ## add self match and use C numbering if frNN is used
+  if(length(frNN) > 0)
+    frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
 
   ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
     as.double(weights), as.integer(borderPoints),

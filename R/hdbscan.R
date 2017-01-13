@@ -34,6 +34,7 @@ hdbscan <- function(x, minPts = 5) {
   ## NOTE: hclust conversion apparently doesn't support n-ary trees, so for now we use our own! 
   mst_spantree <- vegan::spantree(mrd)
   mst <- cbind(from=mst_spantree$kid, to=2:nrow(mrd), dist=mst_spantree$dist)
+  mst <- mst[order(-mst[,3]),]
   
   ## Workaround 
   hcl <- as.hclust(mst_spantree)
@@ -83,6 +84,10 @@ hdbscan <- function(x, minPts = 5) {
   prob <- rep(0, length(cluster))
   for (cid in ls(cluster_assignments)){
     cl <- store[[".cluster_info"]][[cid]]
+    ## Below is what Python is doing 
+    # pr <- 1 - ((max(1/cl$eps) - 1/cl$eps) / max(1/cl$eps))
+    
+    ## But this seems to make more sense to me
     pr <- (1/cl$eps - 1/cl$eps_birth)/(max(1/cl$eps) - 1/cl$eps_birth)
     prob[cl$contains] <- pr
   }
@@ -123,7 +128,7 @@ plot.hdbscan <- function(x, scale=20, gradient=c("yellow", "red"), show_flat = F
   runtime <- attr(x, "runtime")
   yBottom <- ceiling(max(sapply(runtime[[".cluster_info"]], function(cl) cl$height))) + 1
   
-  plot(dend, ylim=c(yBottom, 0), edge.root = F, main="HDBSCAN*", ylab="λ value")
+  plot(dend, ylim=c(yBottom, 0), edge.root = F, main="HDBSCAN*", ylab="Lambda value")
   coords <- dendextend::get_nodes_xy(dend)
   
   ## Variables to help setup plotting
@@ -338,24 +343,347 @@ as.matrix.hdbscan <- function(x, ...) {
   })
 }
 
-## Super experimental in-development starter code for constructing the flat clustering much faster
-hdbscan_fast <- function(x, ...){
-  mst <- cl$mst[order(-cl$mst[, 3]),]
-  cuts <- cutree(cl$hcl, h = mst[,3])
-  core_dist <- diag(cl$mrd)
-  res <- sapply(1:nrow(mst), function(i) {
-    noise <- which(core_dist > mst[i,3])
-    if (length(noise) > 0){
-      cuts[noise, i] <- 0
-      return(match(cuts[, i], sort(unique(cuts[, i]))) - 1)
+
+rise <- function(cl){
+  nclusters <- which(mapply(function(x, y) x < 0 && y < 0, cl$merge[,1], cl$merge[,2]))
+  # res <- matrix(0, nrow=nrow(cl$merge) +1, ncol=nrow(cl$merge))
+  cc <- 1
+  cc_indices <- new.env(parent = emptyenv()) # or rather 
+  cc_other <- rep(0, nrow(cl$merge) + 1)
+  for (i in 1:nrow(cl$merge)){
+    m <- cl$merge[i,]
+    if (all(m < 0)){
+      cc_other[(-m)] <- cc
+      #cc_indices[[as.character(cc)]] <- append(cc_indices[as.character(cc)], -m)
+      cc <- cc + 1
+    } else if (any(m < 0)){
+      j <- -(m[which(m < 0)])
+      #cc_indices[[as.character(cc)]] <- append(cc_indices[as.character(cc)], -m)
+      prev_step <- cl$merge[m[which(m > 0)],]
+      true_cc <- cc_other[prev_step[which(prev_step < 0)]]
+      cc_other[j] <- true_cc
+    } else {
+      
     }
-    return(match(cuts[, i], sort(unique(cuts[, i]))))
-  })
-  # mapply(function(j, i) {
-  #   if (setdiff(res[, j])
-  # })
-  #cuts[which(core_dist > eps)] <- 0 # Use core distance to distinguish noise; minPts doesn't matter? 
-  #cut_cl <- match(cuts, sort(unique(cuts))) - 1 # 'Normalize' so cluster ID increments; sort ensures noise is 0
-}
+  }
+}  
+
+
+#   
+#   ## New list idea: instead of using table, use armadillo vectors + subtraction to determine 
+#   ## online when the update specific point differences 
+#   
+#   # added_noise <- mapply(function(i, j){
+#   #   ifelse(is.na(table(res[, j])["0"]), -Inf, table(res[, j])["0"]) > ifelse(is.na(table(res[, i])["0"]), 0, table(res[, i])["0"])
+#   # }, 1:(ncol(res)-1), 2:ncol(res))
+#   # 
+#   # ## Get the epsilon indices that produced 'true' cluster splits
+#   # true_splits <- which(mapply(function(i, j) {
+#   #   length(table(res[res[, i] != 0, i])) < length(table(res[res[, j] != 0, j]))
+#   # }, 1:(ncol(res)-1), 2:ncol(res))) + 1
+#   # length_changes <- sapply(apply(res, 2, table), length)
+#   # true_splits <- true_splits[true_splits < max(which(length_changes == max(length_changes)))]
+#   # 
+#   # for (n in 2:nrow(mst)){
+#   #   assignments <- res[, n][cl$hcl$order]
+#   #   cids <- unique(assignments)
+#   #   
+#   #   if (n %in% true_splits) { ## true split
+#   #     sapply(as.character(cids), function(cid) {
+#   #       store[[cid]]$contains <- cl$hcl$order[res[, n][cl$hcl$order] == as.numeric(cid)]
+#   #       store[[cid]]$eps <- eps_values[n]
+#   #     })
+#   #   } else if (added_noise[n]){ ## cluster is shrinking
+#   #     sapply(as.character(cids), function(cid) {
+#   #       index <- match(cl$hcl$order[res[, n][cl$hcl$order] == as.numeric(cid)], store[[cid]]$contains)
+#   #       store[[cid]]$eps <- eps_values[n]
+#   #     })
+#   #   } else { ## Either a non-true-split multi-branch or all noise
+#   #     
+#   #   }
+#   # }
+#   # 
+#   # for (i in 0:(nrow(mst)-1)){
+#   #   j <- i + 1
+#   #   new_clusters <- setdiff(res[, j], res[, i])
+#   #   j_freq <- table(res[, j])
+#   #   i_freq <- table(res[, i])
+#   #   ## If the next tree cut down generated a new non-zero symbol, it was a true split
+#   #   if (length(j_freq[names(j_freq) %in% "0"]) > length(i_freq[names(i_freq) %in% "0"])){
+#   #     
+#   #   } ## Else if noise points are falling off the cluster
+#   #   else if (added_noise[i]) {
+#   #     update_points <- which(res[, j] != res[, i])
+#   #     sapply(update_points, function(cid_i){
+#   #       cid <- as.character(res[cid_i, i])
+#   #       store[[cid]]
+#   #     })
+#   #   } ## Else if only noise left
+#   #   else {
+#   #     
+#   #   }
+#   #   
+#   #   ## Take advantage of the fact that it is known when the last true split happened
+#   #   if (length(j_freq) < length(i_freq)){
+#   #     only_noise_left <- T
+#   #   }
+#   #   
+# #     ## Create entry in hash table
+# #     # sapply(as.character(new_clusters), function(cid) assign(cid, list(), envir = store))
+# #     
+# #     ## Get the cluster ID that was replaced
+# #     split_off_index <- res[, i][which((res[, j] - res[, i]) != 0)][1] #na.omit(unique(res[, i][which(res[, j] == new_clusters)]))
+# #     
+# #     ## Get
+# #     new_branch <- j_freq[names(j_freq) %in% c(new_clusters, split_off_index)]
+# #     if (all(new_branch > minPts)){
+# #       if (j != 1){
+# #         new_cids <- c(cid_count+1, cid_count+2)
+# #         cid_count <- cid_count + 2
+# #         to_replace <- res[, j] %in% c(new_clusters, split_off_index)
+# #         res2[to_replace, j] <- (new_cids)[match(res[to_replace, j], sort(unique(res[to_replace, j])))]
+# #         sapply(as.character(new_cids), function(cid) {
+# #           store[[cid]]$contains <- unique(c(store[[cid]]$contains, which(res[, j] == as.numeric(cid))))
+# #           store[[cid]]$eps <- rep(eps_values[j], length(store[[cid]]$contains))
+# #         })
+# #       } else {
+# #         store[["1"]]$contains <- cl$hcl$order
+# #         store[["1"]]$eps <- rep(eps_values[j], length(store[["1"]]$contains))
+# #       }
+# #     } else if (all(new_branch <= minPts)) {
+# #       ## else just update noise
+# #       store[[cid]]$eps[which(res[, j] != res[, i])] <- eps_values[j]
+# #     } else {
+# #       cid <- as.character(split_off_index)
+# #       #store[[cid]]$contains <- unique(c(store[[cid]]$contains, which(res[, j] == as.numeric(cid))))
+# #       store[[cid]]$eps[which(res[, j] != res[, i])] <- eps_values[j]
+# #     }
+# #   }
+# # }
+#   
+#   
+#   map_vals <- function(x, from, to){
+#     
+#   }
+#   
+#   
+#   # mst <- cl$mst[order(-cl$mst[, 3]),]
+#   # # Add microscopically small number for consistency between tree cuts and DBSCAN*
+#   # cuts <- cutree(cl$hcl, h = mst[,3]+.Machine$double.eps) 
+#   # core_dist <- diag(cl$mrd)
+#   # 
+#   # # res <- apply(cuts, 2, function(column){ column[core_dist > as.numeric()] <- 0; column })
+#   # 
+#   # apply(cuts, 2, function(branch) match(branch[hcl$order], unique(branch[hcl$order])))
+#   # 
+#   # 
+#   # ## Fast cutree-based approach with a conditional using core distance 
+#   # n <- nrow(mst)+1
+#   # i_merge <- as.vector(hcl$merge)
+#   # m_nr <- rep(0, n)
+#   # j <- 0
+#   # sing <- rep(T, n)
+#   # 
+#   # res <- matrix(0, nrow=nrow(mst)+1, ncol=nrow(mst))
+#   # i <- 1
+#   # for (dist in mst[1:20, 3]){
+#   #   k <- n + 1L - apply(outer(c(hcl$height, Inf), dist, ">"), 2, which.max)
+#   #   res[, i] <- my_cuttree(hcl$merge, k)
+#   #   i <- i + 1
+#   # }
+# 
+#   
+#   # 
+#   # # Magical k 
+#   # k <- n + 1L - apply(outer(c(hcl$height, Inf), 0.25, ">"), 2, which.max)
+#   # which <- k
+#   # for (k in 1:n){
+#   #   # m1 <- i_merge[k]
+#   #   # m2 <- i_merge[n-1+k-1]
+#   #   m <- hcl$merge[k,]
+#   #   if (all(m < 0)){
+#   #     m_nr[-m] <- k
+#   #     sing[-m] <- F
+#   #   } else if (any(m < 0)){
+#   #     j <- ifelse(m[1] < 0, -m[1], m[2])
+#   #     m_nr[m_nr == m[1]] <- k
+#   #     m_nr[k] <- k
+#   #     sing[j] <- F
+#   #   } else {
+#   #     m_nr[m_nr %in% m] <- k
+#   #   }
+#   # }
+#   # 
+#   # found_j <- F
+#   # z <- rep(0, n)
+#   # i_ans <- rep(0, n)
+#   # 
+#   # for (j in 1:length(which)){
+#   #   if(which == n - k){
+#   #     if (!found_j){
+#   #       found_j <- T
+#   #       nclust <- 0
+#   #       mm <- j * n
+#   #       m1 <- mm
+#   #       for (l in 1:n){
+#   #         if (sing[l]){
+#   #           i_ans[m1] = nclust
+#   #           nclust <- nclust + 1
+#   #         }else {
+#   #           if (z[m_nr[l]] == 0){
+#   #             z[m_nr[l]] <- nclust 
+#   #             nclust <- nclust + 1
+#   #             i_ans[m1] <- z[m_nr[l]]
+#   #           }
+#   #         }
+#   #         m1 <- m1 + 1
+#   #       }
+#   #     }
+#   #   } else {
+#   #     m1 <- j*n
+#   #     m2 <- mm
+#   #     for(l in 1:n){
+#   #       i_ans[m1] = i_ans[m2]
+#   #       m1 <- m1 + 1 
+#   #       m2 <- m2 + 1
+#   #     }
+#   #   }
+#   #   for(j in 1:length(which)){
+#   #     if(which[j] == n){
+#   #       m1 <- j*n
+#   #       for(l in 1:n){
+#   #         i_ans[m1] <- l
+#   #         m1 <- m1 + 1
+#   #       }
+#   #     }
+#   #   }
+#   #   
+#   # }
+#   # 
+#   
+# 
+#   
+#   
+#   
+#   
+#   # res <- sapply(1:nrow(mst), function(i) {
+#   #   #cuts[core_dist > mst[i,3], i] <- 0
+#   #   #cuts[,i]
+#   # noise <- which(core_dist > mst[i,3])
+#   # if (length(noise) > 0){
+#   #   cuts[noise, i] <- 0
+#   #   corder <- unique(cuts[, i][cl$hcl$order])
+#   #   corder <- corder[corder != 0]
+#   #   return(match(cuts[, i], c(0, unique(corder))) - 1)
+#   # }
+#   # #return(cuts[,i])
+#   # return(match(cuts[, i], unique(cuts[, i][cl$hcl$order])))
+#   # })
+#   
+#   # for (i in 1:ncol(cuts)){
+#   #   labels <- cuts[, i]
+#   #   noise <- which(core_dist > mst[i, 3])
+#   #   if (length(noise) > 0) 
+#   #     labels[core_dist > mst[i, 3]] <- 0 
+#   #   }
+#   # }
+#   # 
+#   # res2 <- res
+#   # minPts <- 5
+#   # store <- new.env(parent = emptyenv())
+#   # eps_values <- mst[, 3]
+#   # cid_count <- 1
+#   # only_noise_left <- F
+#   # 
+#   # added_noise <- mapply(function(i, j){
+#   #   ifelse(is.na(table(res[, j])["0"]), -Inf, table(res[, j])["0"]) > ifelse(is.na(table(res[, i])["0"]), 0, table(res[, i])["0"])
+#   # }, 1:(ncol(res)-1), 2:ncol(res))
+#   # 
+#   # ## Get the epsilon indices that produced 'true' cluster splits
+#   # true_splits <- which(mapply(function(i, j) {
+#   #   length(table(res[res[, i] != 0, i])) < length(table(res[res[, j] != 0, j]))
+#   #   }, 1:(ncol(res)-1), 2:ncol(res))) + 1
+#   # length_changes <- sapply(apply(res, 2, table), length)
+#   # true_splits <- true_splits[true_splits < max(which(length_changes == max(length_changes)))]
+#   # 
+#   # for (n in 2:nrow(mst)){
+#   #   assignments <- res[, n][cl$hcl$order]
+#   #   cids <- unique(assignments)
+#   # 
+#   #   if (n %in% true_splits) { ## true split
+#   #   sapply(as.character(cids), function(cid) {
+#   #     store[[cid]]$contains <- cl$hcl$order[res[, n][cl$hcl$order] == as.numeric(cid)]
+#   #     store[[cid]]$eps <- eps_values[n]
+#   #   })
+#   #   } else if (added_noise[n]){ ## cluster is shrinking
+#   #     sapply(as.character(cids), function(cid) {
+#   #       index <- match(cl$hcl$order[res[, n][cl$hcl$order] == as.numeric(cid)], store[[cid]]$contains)
+#   #       store[[cid]]$eps <- eps_values[n]
+#   #     })
+#   #   } else { ## Either a non-true-split multi-branch or all noise
+#   # 
+#   #   }
+#   # }
+#   # 
+#   # for (i in 0:(nrow(mst)-1)){
+#   #   j <- i + 1
+#   #   new_clusters <- setdiff(res[, j], res[, i])
+#   #   j_freq <- table(res[, j])
+#   #   i_freq <- table(res[, i])
+#   #   ## If the next tree cut down generated a new non-zero symbol, it was a true split
+#   #   if (length(j_freq[names(j_freq) %in% "0"]) > length(i_freq[names(i_freq) %in% "0"])){
+#   # 
+#   #   } ## Else if noise points are falling off the cluster
+#   #   else if (added_noise[i]) {
+#   #     update_points <- which(res[, j] != res[, i])
+#   #     sapply(update_points, function(cid_i){
+#   #       cid <- as.character(res[cid_i, i])
+#   #       store[[cid]]
+#   #     })
+#   #   } ## Else if only noise left
+#   #   else {
+#   # 
+#   #   }
+#   # 
+#   #   ## Take advantage of the fact that it is known when the last true split happened
+#   #   if (length(j_freq) < length(i_freq)){
+#   #     only_noise_left <- T
+#   #   }
+#   # 
+#   #     ## Create entry in hash table
+#   #     # sapply(as.character(new_clusters), function(cid) assign(cid, list(), envir = store))
+#   # 
+#   #     ## Get the cluster ID that was replaced
+#   #     split_off_index <- res[, i][which((res[, j] - res[, i]) != 0)][1] #na.omit(unique(res[, i][which(res[, j] == new_clusters)]))
+#   # 
+#   # ## Get
+#   # new_branch <- j_freq[names(j_freq) %in% c(new_clusters, split_off_index)]
+#   # if (all(new_branch > minPts)){
+#   #   if (j != 1){
+#   #     new_cids <- c(cid_count+1, cid_count+2)
+#   #     cid_count <- cid_count + 2
+#   #     to_replace <- res[, j] %in% c(new_clusters, split_off_index)
+#   #     res2[to_replace, j] <- (new_cids)[match(res[to_replace, j], sort(unique(res[to_replace, j])))]
+#   #     sapply(as.character(new_cids), function(cid) {
+#   #       store[[cid]]$contains <- unique(c(store[[cid]]$contains, which(res[, j] == as.numeric(cid))))
+#   #       store[[cid]]$eps <- rep(eps_values[j], length(store[[cid]]$contains))
+#   #     })
+#   #   } else {
+#   #     store[["1"]]$contains <- cl$hcl$order
+#   #     store[["1"]]$eps <- rep(eps_values[j], length(store[["1"]]$contains))
+#   #   }
+#   # } else if (all(new_branch <= minPts)) {
+#   #   ## else just update noise
+#   #   store[[cid]]$eps[which(res[, j] != res[, i])] <- eps_values[j]
+#   # } else {
+#   #   cid <- as.character(split_off_index)
+#   #   #store[[cid]]$contains <- unique(c(store[[cid]]$contains, which(res[, j] == as.numeric(cid))))
+#   #   store[[cid]]$eps[which(res[, j] != res[, i])] <- eps_values[j]
+#   # }
+#   #   }
+#   # }
+#   #cuts[which(core_dist > eps)] <- 0 # Use core distance to distinguish noise; minPts doesn't matter? 
+#   #cut_cl <- match(cuts, sort(unique(cuts))) - 1 # 'Normalize' so cluster ID increments; sort ensures noise is 0
+# }
 
 

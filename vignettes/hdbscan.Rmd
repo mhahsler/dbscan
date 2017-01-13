@@ -30,6 +30,7 @@ The Robust Single Linkage (RSL) tree is stored as a dendrogram in the 'rsl_tree'
 ```{r}
 plot(cl$rsl_tree)
 ```
+
 ## Validation 1: DBSCAN* vs RSL tree cutting
 ```{r}
 cuts <- unname(dendextend::cutree(cl$hcl, h=0.25))
@@ -44,6 +45,7 @@ table(dbscan_cl$cluster)
 ```{r}
   all.equal(dbscan_cl$cluster, cut_cl)
 ```
+
 ## Validation 2: DBSCAN* vs RSL tree cutting at all MST distance values 
 ```{r}
 check <- rep(F, nrow(cl$mst))
@@ -59,26 +61,26 @@ for (eps_i in 1:nrow(cl$mst)) {
   }
   
   ## RSL cut 
-  cut_cl <- cut_tree(eps)
+  cut_cl <- cut_tree(eps+.Machine$double.eps)
   
   ## DBSCAN
-  dbscan_cl <- dbscan::dbscan(x_test1, eps=eps, minPts = 5, borderPoints = F)
+  dbscan_cl <- dbscan::dbscan(x_test1, eps=eps+.Machine$double.eps, minPts = 5, borderPoints = F)
   
   ## Use run length encoding as an ID-independent way to check ordering
   res <- all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths)
   
   ## Simple Check 
-  # check[eps_i] <- (res == "TRUE")
+  check[eps_i] <- (res == "TRUE")
   
   ## More Robust Check -- robust to floating point errors caused by rounding when the tree is cut
-  if (res == "TRUE"){
-    check[eps_i] <- T
-  } else {
-    # Adjusting for numerical precision errors
-    cut_cl <- cut_tree(eps-1e-15)
-    res <- all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths)
-    check[eps_i] <- (res == "TRUE")
-  }
+  # if (res == "TRUE"){
+  #   check[eps_i] <- T
+  # } else {
+  #   # Adjusting for numerical precision errors
+  #   cut_cl <- cut_tree(eps+1e-4)
+  #   res <- all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths)
+  #   check[eps_i] <- (res == "TRUE")
+  # }
 }
 print(all(check == T))
 ```
@@ -87,23 +89,24 @@ print(all(check == T))
 ```{r}
  plot(cl)
 ```
+
 You can change up colors
 ```{r}
  plot(cl, gradient = c("yellow", "orange", "red", "blue"))
 ```
 
-You can scale the widths for individual devices appropriately 
+You can also scale the widths for individual devices appropriately 
 ```{r}
 plot(cl, gradient = c("purple", "blue", "green", "yellow"), scale=25)
 ```
+
 And outline the ones that were used in the flat solution 
 ```{r}
 plot(cl, gradient = c("purple", "blue", "green", "yellow"), show_flat = T)
 ```
 
-
 ## Cluster Stability Scores
-Note the stability scores correspond to the labels on the condensed tree, but the cluster assignments in the cluster member element does not correspond to the labels in the condensed tree. Also note that these scores represent the stability scores after the traversal up the tree. 
+Note the stability scores correspond to the labels on the condensed tree, but the cluster assignments in the cluster member element does not correspond to the labels in the condensed tree. Also note that these scores represent the stability scores _before_ the traversal up the tree that updates the scores based on the children. 
 ```{r}
 print(cl$cluster_scores)
 ```
@@ -112,6 +115,8 @@ The individual point membership 'probabilities' are in the probabilities member 
 ```{r}
   print(cl$membership_prob)
 ```
+
+These can be used to show the 'degree of cluster membership' through, for example, plotting points with transparencies that correspond to their membership degrees.   
 ```{r}
   plot(x_test1, col=cl$cluster+1, pch=21)
   colors <- sapply(1:length(cl$cluster), function(i) adjustcolor(palette()[(cl$cluster+1)[i]], alpha.f = cl$membership_prob[i]))
@@ -124,15 +129,6 @@ The hierarchy of cluster membership changes and the distance values that happene
   hdbscan_hier <- as.matrix(cl)
   head(hdbscan_hier)[, seq(1, ncol(hdbscan_hier), by=10)]
 ```
-
-## A Bigger Example
-Another data set ()
-```{r}
-  # data("x_test2")
-  # cl2 <- hdbscan(x_test2, minPts = 15)
-```
-
-
 
 ## Validating HDBSCAN
 A much more comprehensive evaluation of the clustering coming soon...  

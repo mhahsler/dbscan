@@ -5,6 +5,78 @@
 
 using namespace Rcpp;
 
+// combine
+NumericVector combine(const NumericVector& t1, const NumericVector& t2);
+RcppExport SEXP dbscan_combine(SEXP t1SEXP, SEXP t2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type t1(t1SEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type t2(t2SEXP);
+    rcpp_result_gen = Rcpp::wrap(combine(t1, t2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// buildDendrogram
+List buildDendrogram(List hcl, int minPts);
+RcppExport SEXP dbscan_buildDendrogram(SEXP hclSEXP, SEXP minPtsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
+    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
+    rcpp_result_gen = Rcpp::wrap(buildDendrogram(hcl, minPts));
+    return rcpp_result_gen;
+END_RCPP
+}
+// n_members
+List n_members(List hcl, int minPts);
+RcppExport SEXP dbscan_n_members(SEXP hclSEXP, SEXP minPtsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
+    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
+    rcpp_result_gen = Rcpp::wrap(n_members(hcl, minPts));
+    return rcpp_result_gen;
+END_RCPP
+}
+// all_children
+IntegerVector all_children(List hier, int key, IntegerVector sub_tree);
+RcppExport SEXP dbscan_all_children(SEXP hierSEXP, SEXP keySEXP, SEXP sub_treeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hier(hierSEXP);
+    Rcpp::traits::input_parameter< int >::type key(keySEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type sub_tree(sub_treeSEXP);
+    rcpp_result_gen = Rcpp::wrap(all_children(hier, key, sub_tree));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cutree_t
+IntegerMatrix cutree_t(IntegerMatrix merge_, IntegerVector which_);
+RcppExport SEXP dbscan_cutree_t(SEXP merge_SEXP, SEXP which_SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type merge_(merge_SEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type which_(which_SEXP);
+    rcpp_result_gen = Rcpp::wrap(cutree_t(merge_, which_));
+    return rcpp_result_gen;
+END_RCPP
+}
+// processHierarchy
+IntegerMatrix processHierarchy(IntegerMatrix cuts);
+RcppExport SEXP dbscan_processHierarchy(SEXP cutsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type cuts(cutsSEXP);
+    rcpp_result_gen = Rcpp::wrap(processHierarchy(cuts));
+    return rcpp_result_gen;
+END_RCPP
+}
 // reach_to_dendrogram
 List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_order);
 RcppExport SEXP dbscan_reach_to_dendrogram(SEXP reachabilitySEXP, SEXP pl_orderSEXP) {
@@ -48,6 +120,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
     rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
+    return rcpp_result_gen;
+END_RCPP
+}
+// timesTwo
+List timesTwo(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP dbscan_timesTwo(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
+    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
+    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
+    rcpp_result_gen = Rcpp::wrap(timesTwo(data, k, type, bucketSize, splitRule, approx));
     return rcpp_result_gen;
 END_RCPP
 }

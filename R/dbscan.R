@@ -106,7 +106,8 @@ print.dbscan_fast <- function(x, ...) {
     " noise points.",
       "\n", sep = "")
   print(table(x$cluster))
-  cat("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
+  message <- paste("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep="")
+  cat(paste0(strwrap(message, width = 75, collapse = "\n                  ")))
 }
 
 predict.dbscan_fast <- function (object, newdata = NULL, data, ...) {

@@ -5,24 +5,20 @@ combine <- function(t1, t2) {
     .Call('dbscan_combine', PACKAGE = 'dbscan', t1, t2)
 }
 
-buildDendrogram <- function(hcl, minPts = 5L) {
-    .Call('dbscan_buildDendrogram', PACKAGE = 'dbscan', hcl, minPts)
+buildDendrogram <- function(hcl) {
+    .Call('dbscan_buildDendrogram', PACKAGE = 'dbscan', hcl)
 }
 
-n_members <- function(hcl, minPts = 5L) {
-    .Call('dbscan_n_members', PACKAGE = 'dbscan', hcl, minPts)
+all_children <- function(hier, key) {
+    .Call('dbscan_all_children', PACKAGE = 'dbscan', hier, key)
 }
 
-all_children <- function(hier, key, sub_tree) {
-    .Call('dbscan_all_children', PACKAGE = 'dbscan', hier, key, sub_tree)
+computeSalientScores <- function(info, cid, sc) {
+    .Call('dbscan_computeSalientScores', PACKAGE = 'dbscan', info, cid, sc)
 }
 
-cutree_t <- function(merge_, which_) {
-    .Call('dbscan_cutree_t', PACKAGE = 'dbscan', merge_, which_)
-}
-
-processHierarchy <- function(cuts) {
-    .Call('dbscan_processHierarchy', PACKAGE = 'dbscan', cuts)
+hdbscan_fast <- function(hcl, minPts = 5L) {
+    .Call('dbscan_hdbscan_fast', PACKAGE = 'dbscan', hcl, minPts)
 }
 
 reach_to_dendrogram <- function(reachability, pl_order) {
@@ -39,10 +35,6 @@ mst_to_dendrogram <- function(mst) {
 
 mrd <- function(dm, cd) {
     .Call('dbscan_mrd', PACKAGE = 'dbscan', dm, cd)
-}
-
-timesTwo <- function(data, k, type, bucketSize, splitRule, approx) {
-    .Call('dbscan_timesTwo', PACKAGE = 'dbscan', data, k, type, bucketSize, splitRule, approx)
 }
 
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {

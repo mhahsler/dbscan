@@ -53,9 +53,9 @@ for (eps_i in 1:nrow(cl$mst)) {
   eps <- cl$mst[eps_i, 3]
   
   ## Cutting the robust single linkage tree 
-  cut_tree <- function(eps){
-    cuts <- unname(dendextend::cutree(cl$hcl, h=eps))
-    cuts[which(diag(cl$mrd) > eps)] <- 0 # Use core distance to distinguish noise; minPts doesn't matter? 
+  cut_tree <- function(hcl, eps){
+    cuts <- unname(cutree(hcl, h=eps))
+    cuts[which(diag(mrd) > eps)] <- 0 # Use core distance to distinguish noise; minPts doesn't matter? 
     cut_cl <- match(cuts, sort(unique(cuts))) - 1 # 'Normalize' so cluster ID increments; sort ensures noise is 0
     cut_cl
   }

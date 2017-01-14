@@ -45,5 +45,4 @@ S3method(print, frNN)
 
 S3method(print, hdbscan)
 S3method(plot, hdbscan)
-S3method(as.matrix, hdbscan)
 

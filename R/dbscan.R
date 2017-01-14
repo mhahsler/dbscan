@@ -107,7 +107,7 @@ print.dbscan_fast <- function(x, ...) {
       "\n", sep = "")
   print(table(x$cluster))
   message <- paste("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep="")
-  cat(paste0(strwrap(message, width = 75, collapse = "\n                  ")))
+  cat(paste0(strwrap(message, width = 75), collapse = "\n                  "))
 }
 
 predict.dbscan_fast <- function (object, newdata = NULL, data, ...) {

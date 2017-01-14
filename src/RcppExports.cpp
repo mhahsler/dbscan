@@ -18,62 +18,50 @@ BEGIN_RCPP
 END_RCPP
 }
 // buildDendrogram
-List buildDendrogram(List hcl, int minPts);
-RcppExport SEXP dbscan_buildDendrogram(SEXP hclSEXP, SEXP minPtsSEXP) {
+List buildDendrogram(List hcl);
+RcppExport SEXP dbscan_buildDendrogram(SEXP hclSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
-    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
-    rcpp_result_gen = Rcpp::wrap(buildDendrogram(hcl, minPts));
-    return rcpp_result_gen;
-END_RCPP
-}
-// n_members
-List n_members(List hcl, int minPts);
-RcppExport SEXP dbscan_n_members(SEXP hclSEXP, SEXP minPtsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
-    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
-    rcpp_result_gen = Rcpp::wrap(n_members(hcl, minPts));
+    rcpp_result_gen = Rcpp::wrap(buildDendrogram(hcl));
     return rcpp_result_gen;
 END_RCPP
 }
 // all_children
-IntegerVector all_children(List hier, int key, IntegerVector sub_tree);
-RcppExport SEXP dbscan_all_children(SEXP hierSEXP, SEXP keySEXP, SEXP sub_treeSEXP) {
+IntegerVector all_children(List hier, int key);
+RcppExport SEXP dbscan_all_children(SEXP hierSEXP, SEXP keySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type hier(hierSEXP);
     Rcpp::traits::input_parameter< int >::type key(keySEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type sub_tree(sub_treeSEXP);
-    rcpp_result_gen = Rcpp::wrap(all_children(hier, key, sub_tree));
+    rcpp_result_gen = Rcpp::wrap(all_children(hier, key));
     return rcpp_result_gen;
 END_RCPP
 }
-// cutree_t
-IntegerMatrix cutree_t(IntegerMatrix merge_, IntegerVector which_);
-RcppExport SEXP dbscan_cutree_t(SEXP merge_SEXP, SEXP which_SEXP) {
+// computeSalientScores
+double computeSalientScores(const List info, std::string cid, std::list<int>& sc);
+RcppExport SEXP dbscan_computeSalientScores(SEXP infoSEXP, SEXP cidSEXP, SEXP scSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type merge_(merge_SEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type which_(which_SEXP);
-    rcpp_result_gen = Rcpp::wrap(cutree_t(merge_, which_));
+    Rcpp::traits::input_parameter< const List >::type info(infoSEXP);
+    Rcpp::traits::input_parameter< std::string >::type cid(cidSEXP);
+    Rcpp::traits::input_parameter< std::list<int>& >::type sc(scSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeSalientScores(info, cid, sc));
     return rcpp_result_gen;
 END_RCPP
 }
-// processHierarchy
-IntegerMatrix processHierarchy(IntegerMatrix cuts);
-RcppExport SEXP dbscan_processHierarchy(SEXP cutsSEXP) {
+// hdbscan_fast
+List hdbscan_fast(List hcl, int minPts);
+RcppExport SEXP dbscan_hdbscan_fast(SEXP hclSEXP, SEXP minPtsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type cuts(cutsSEXP);
-    rcpp_result_gen = Rcpp::wrap(processHierarchy(cuts));
+    Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
+    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
+    rcpp_result_gen = Rcpp::wrap(hdbscan_fast(hcl, minPts));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -120,22 +108,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
     rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
-    return rcpp_result_gen;
-END_RCPP
-}
-// timesTwo
-List timesTwo(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
-RcppExport SEXP dbscan_timesTwo(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
-    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
-    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
-    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
-    rcpp_result_gen = Rcpp::wrap(timesTwo(data, k, type, bucketSize, splitRule, approx));
     return rcpp_result_gen;
 END_RCPP
 }

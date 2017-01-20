@@ -84,30 +84,36 @@ optics <- function(x, eps, minPts = 5, ...) {
   ret
 }
 
+
+
 print.optics <- function(x, ...) {
-  cat("OPTICS clustering for ", length(x$order), " objects.", "\n", sep = "")
-  cat("Parameters: ", "minPts = ", x$minPts,
-    ", eps = ", x$eps,
-    ", eps_cl = ", x$eps_cl,
-    ", xi = ", x$xi,
-    "\n", sep = "")
+  writeLines(c(
+    paste0("OPTICS ordering/clustering for ", length(x$order), " objects."),
+    paste0("Parameters: ",
+      "minPts = ", x$minPts,
+      ", eps = ", x$eps,
+      ", eps_cl = ", x$eps_cl,
+      ", xi = ", x$xi)
+  ))
+
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
+
     if(is.na(x$xi)) {
-      cat("The clustering contains ", cl, " cluster(s) and ",
-          sum(x$cluster==0L), " noise points.",
-          "\n", sep = "")
+      writeLines(paste0("The clustering contains ", cl, " cluster(s) and ",
+          sum(x$cluster==0L), " noise points."))
+
       print(table(x$cluster))
     } else {
-      cat("The clustering contains ", nrow(x$clusters_xi), " cluster(s) and ",
-          sum(x$cluster==0L), " noise points.",
-          "\n", sep = "")
+      writeLines(paste0("The clustering contains ", nrow(x$clusters_xi),
+        " cluster(s) and ", sum(x$cluster==0L), " noise points."))
     }
     cat("\n")
   }
-  message <- paste("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
-  cat(paste0(strwrap(message, width = 75), collapse = "\n                  "))
+
+  writeLines(strwrap(paste0("Available fields: ",
+    paste(names(x), collapse = ", ")), exdent = 18))
 }
 
 plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"), predecessor = FALSE, ...) {

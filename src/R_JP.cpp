@@ -17,7 +17,14 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
 
   // create label vector
   std::vector<int> label(n);
-  std::iota(std::begin(label), std::end(label), 1); // Fill with 1, 2, ..., n.
+  //iota is C++11 only
+  //std::iota(std::begin(label), std::end(label), 1); // Fill with 1, 2, ..., n.
+  int value = 1;
+  std::vector<int>::iterator first = label.begin(), last = label.end();
+  while(first != last) {
+    *first++ = value;
+    ++value;
+  }
 
   // create sorted sets so we can use set operations
   std::vector< std::set<int> > nn_set(nn.nrow());

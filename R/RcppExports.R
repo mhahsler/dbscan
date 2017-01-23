@@ -17,6 +17,10 @@ frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
     .Call('dbscan_frNN_int', PACKAGE = 'dbscan', data, eps, type, bucketSize, splitRule, approx)
 }
 
+JP_int <- function(nn, kt) {
+    .Call('dbscan_JP_int', PACKAGE = 'dbscan', nn, kt)
+}
+
 kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
     .Call('dbscan_kNN_int', PACKAGE = 'dbscan', data, k, type, bucketSize, splitRule, approx)
 }

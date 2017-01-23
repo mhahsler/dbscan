@@ -77,6 +77,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     as.integer(splitRule), as.double(approx))
 
   ### sort entries (by dist and id)?
+  ### FIXME: This is expensive! We should do this in C++
   if(sort && k>1) {
     o <- sapply(1:nrow(ret$dist), FUN =
         function(i) order(ret$dist[i,], ret$id[i,], decreasing=FALSE))

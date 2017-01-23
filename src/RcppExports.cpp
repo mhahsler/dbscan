@@ -64,6 +64,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// JP_int
+IntegerVector JP_int(IntegerMatrix nn, unsigned int kt);
+RcppExport SEXP dbscan_JP_int(SEXP nnSEXP, SEXP ktSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type nn(nnSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type kt(ktSEXP);
+    rcpp_result_gen = Rcpp::wrap(JP_int(nn, kt));
+    return rcpp_result_gen;
+END_RCPP
+}
 // kNN_int
 List kNN_int(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
 RcppExport SEXP dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {

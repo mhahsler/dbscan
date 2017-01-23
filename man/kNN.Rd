@@ -17,7 +17,8 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   \item{k}{ number of neighbors to find. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
-  \item{sort}{ sort the neighbors by distance? }
+  \item{sort}{ sort the neighbors by distance? Note that this is expensive and
+      \code{sort = FALSE} is much faster. }
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
@@ -72,6 +73,16 @@ i <- 10
 nn$id[i,]
 plot(iris[,-5], col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
 
+# show the k nearest neighbors as a graph.
+plotNNgraph <- function(x, nn, main = "kNN graph", ...) {
+plot(x, main = main, ...)
+  for(i in 1:nrow(nn$id)) {
+    for(j in 1:length(nn$id[i,]))
+      lines(x = c(x[i,1], x[nn$id[i,j],1]), y = c(x[i,2], x[nn$id[i,j],2]), ...)
+  }
+}
+
+plotNNgraph(iris[, c(1,2)], nn)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

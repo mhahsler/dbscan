@@ -19,8 +19,17 @@
 
 
 jpclust <- function(x, k, kt, ...) {
+
   # Step 1
-  nn <- kNN(x, k, sort = FALSE, ...)$id
+  if(is(x, "kNN")) {
+    if(missing(k)) k <- nn$k
+    nn <- x$id[,1:k]
+  } else {
+    nn <- kNN(x, k, sort = FALSE, ...)$id
+  }
+
+  if(length(kt) != 1 || kt < 1 || kt > k)
+    stop("kt needs to be a threshold in range [1, k].")
 
   # Step 2
   cl <- JP_int(nn, kt = as.integer(kt))

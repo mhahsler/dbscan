@@ -15,16 +15,16 @@ using namespace Rcpp;
 IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
   int n = nn.nrow();
 
+  // since the actual points (neighbor 0) are not in the list
+  kt--;
+
   // create label vector
   std::vector<int> label(n);
   //iota is C++11 only
   //std::iota(std::begin(label), std::end(label), 1); // Fill with 1, 2, ..., n.
   int value = 1;
   std::vector<int>::iterator first = label.begin(), last = label.end();
-  while(first != last) {
-    *first++ = value;
-    ++value;
-  }
+  while(first != last) *first++ = value++;
 
   // create sorted sets so we can use set operations
   std::vector< std::set<int> > nn_set(nn.nrow());
@@ -37,20 +37,30 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
   }
 
   std::vector<int> z;
-  int newlabel, oldlabel;
+  std::set<int>::iterator it;
+  int i, j, newlabel, oldlabel;
 
-  for(int i = 0; i < n; ++i) {
-    for(int j = 0; j < n; ++j) {
+  for(i = 0; i < n; ++i) {
+    // check all neighbors of i
+    for (it = nn_set[i].begin(); it != nn_set[i].end(); ++it) {
+      j = *it-1;
+
+      // edge was already checked
+      if(j<i) continue;
+
+      // already in the same cluster
       if(label[i] == label[j]) continue;
 
+      // check if points are in each others snn list (is is already in j)
       if(nn_set[j].find(i+1) != nn_set[j].end()) {
 
+        // calculate link strength as the number of shared points
         z.clear();
         std::set_intersection(nn_set[i].begin(), nn_set[i].end(),
           nn_set[j].begin(), nn_set[j].end(),
           std::back_inserter(z));
 
-        // this could be done faster with set unions
+        // this could be done faster with set union
         if(z.size() >= kt) {
           // update labels
           if(label[i] > label[j]) {

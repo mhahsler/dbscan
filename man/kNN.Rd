@@ -65,7 +65,7 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Nei
 \examples{
 data(iris)
 # finding kNN directly in data (using a kd-tree)
-nn <- kNN(iris[,-5], k=10)
+nn <- kNN(iris[,-5], k=5)
 nn
 
 # explore neighborhood of point 10
@@ -75,7 +75,7 @@ plot(iris[,-5], col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
 
 # show the k nearest neighbors as a graph.
 plotNNgraph <- function(x, nn, main = "kNN graph", ...) {
-plot(x, main = main, ...)
+  plot(x, main = main, ...)
   for(i in 1:nrow(nn$id)) {
     for(j in 1:length(nn$id[i,]))
       lines(x = c(x[i,1], x[nn$id[i,j],1]), y = c(x[i,2], x[nn$id[i,j],2]), ...)

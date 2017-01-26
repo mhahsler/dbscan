@@ -21,7 +21,7 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 \arguments{
   \item{x}{a data matrix or a dist object. Alternatively, a frNN object
     with fixed-radius nearest neighbors can also be specified. In this case
-    eps can be missing and will taken form the frNN object.}
+    eps can be missing and will be taken form the frNN object.}
   \item{eps}{ size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
       Default is 5 points.}

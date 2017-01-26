@@ -50,14 +50,14 @@ R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Base
 
 \examples{
 data(iris)
-iris <- as.matrix(iris[,1:4])
+iris <- as.matrix(iris[,1:4]) ### only use numeric attributes
 
 # use a shared neighborhood of 10 points and require 6 shared neighbors
 cl <- jpclust(iris, k = 10, kt = 6)
 pairs(iris, col = cl)
 
-# use a precomputed kNN object
-nn <- kNN(itis, k = 15)
+# use a precomputed kNN object instead of the original data.
+nn <- kNN(iris, k = 15)
 nn
 
 cl <- jpclust(nn, k = 10, kt = 6)

@@ -107,7 +107,7 @@ print.optics <- function(x, ...) {
     cat("\n")
   }
   message <- paste("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
-  cat(paste0(strwrap(message, width = 75, collapse = "\n                  ")))
+  cat(paste0(strwrap(message, width = 75), collapse = "\n                  "))
 }
 
 plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"), predecessor = FALSE, ...) {

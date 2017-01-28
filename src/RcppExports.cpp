@@ -29,38 +29,62 @@ BEGIN_RCPP
 END_RCPP
 }
 // all_children
-IntegerVector all_children(List hier, int key);
-RcppExport SEXP dbscan_all_children(SEXP hierSEXP, SEXP keySEXP) {
+IntegerVector all_children(List hier, int key, bool leaves_only);
+RcppExport SEXP dbscan_all_children(SEXP hierSEXP, SEXP keySEXP, SEXP leaves_onlySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type hier(hierSEXP);
     Rcpp::traits::input_parameter< int >::type key(keySEXP);
-    rcpp_result_gen = Rcpp::wrap(all_children(hier, key));
+    Rcpp::traits::input_parameter< bool >::type leaves_only(leaves_onlySEXP);
+    rcpp_result_gen = Rcpp::wrap(all_children(hier, key, leaves_only));
+    return rcpp_result_gen;
+END_RCPP
+}
+// node_xy
+NumericMatrix node_xy(List hier);
+RcppExport SEXP dbscan_node_xy(SEXP hierSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hier(hierSEXP);
+    rcpp_result_gen = Rcpp::wrap(node_xy(hier));
+    return rcpp_result_gen;
+END_RCPP
+}
+// buildCondensedTree
+List buildCondensedTree(List hdbscan);
+RcppExport SEXP dbscan_buildCondensedTree(SEXP hdbscanSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hdbscan(hdbscanSEXP);
+    rcpp_result_gen = Rcpp::wrap(buildCondensedTree(hdbscan));
     return rcpp_result_gen;
 END_RCPP
 }
 // computeSalientScores
-double computeSalientScores(const List info, std::string cid, std::list<int>& sc);
-RcppExport SEXP dbscan_computeSalientScores(SEXP infoSEXP, SEXP cidSEXP, SEXP scSEXP) {
+double computeSalientScores(const List hdbscan, std::string cid, std::list<int>& sc, List cl_hierarchy);
+RcppExport SEXP dbscan_computeSalientScores(SEXP hdbscanSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const List >::type info(infoSEXP);
+    Rcpp::traits::input_parameter< const List >::type hdbscan(hdbscanSEXP);
     Rcpp::traits::input_parameter< std::string >::type cid(cidSEXP);
     Rcpp::traits::input_parameter< std::list<int>& >::type sc(scSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeSalientScores(info, cid, sc));
+    Rcpp::traits::input_parameter< List >::type cl_hierarchy(cl_hierarchySEXP);
+    rcpp_result_gen = Rcpp::wrap(computeSalientScores(hdbscan, cid, sc, cl_hierarchy));
     return rcpp_result_gen;
 END_RCPP
 }
 // hdbscan_fast
-List hdbscan_fast(List hcl, int minPts);
+List hdbscan_fast(const List hcl, const int minPts);
 RcppExport SEXP dbscan_hdbscan_fast(SEXP hclSEXP, SEXP minPtsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
-    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
+    Rcpp::traits::input_parameter< const List >::type hcl(hclSEXP);
+    Rcpp::traits::input_parameter< const int >::type minPts(minPtsSEXP);
     rcpp_result_gen = Rcpp::wrap(hdbscan_fast(hcl, minPts));
     return rcpp_result_gen;
 END_RCPP
@@ -100,14 +124,74 @@ BEGIN_RCPP
 END_RCPP
 }
 // mrd
-NumericMatrix mrd(NumericMatrix dm, NumericVector cd);
+NumericVector mrd(NumericVector dm, NumericVector cd);
 RcppExport SEXP dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type dm(dmSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
+    rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mrd_m
+NumericMatrix mrd_m(NumericMatrix dm, NumericVector cd);
+RcppExport SEXP dbscan_mrd_m(SEXP dmSEXP, SEXP cdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
-    rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
+    rcpp_result_gen = Rcpp::wrap(mrd_m(dm, cd));
+    return rcpp_result_gen;
+END_RCPP
+}
+// coreFromDist
+NumericVector coreFromDist(const NumericVector dist, const int n, const int minPts);
+RcppExport SEXP dbscan_coreFromDist(SEXP distSEXP, SEXP nSEXP, SEXP minPtsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type dist(distSEXP);
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const int >::type minPts(minPtsSEXP);
+    rcpp_result_gen = Rcpp::wrap(coreFromDist(dist, n, minPts));
+    return rcpp_result_gen;
+END_RCPP
+}
+// prims
+NumericMatrix prims(const NumericVector x_dist, const int n);
+RcppExport SEXP dbscan_prims(SEXP x_distSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type x_dist(x_distSEXP);
+    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(prims(x_dist, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// order_
+IntegerVector order_(NumericVector x);
+RcppExport SEXP dbscan_order_(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(order_(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// hclustMergeOrder
+List hclustMergeOrder(NumericMatrix mst, IntegerVector o);
+RcppExport SEXP dbscan_hclustMergeOrder(SEXP mstSEXP, SEXP oSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type mst(mstSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type o(oSEXP);
+    rcpp_result_gen = Rcpp::wrap(hclustMergeOrder(mst, o));
     return rcpp_result_gen;
 END_RCPP
 }

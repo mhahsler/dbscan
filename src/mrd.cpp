@@ -1,8 +1,22 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// Computes the mutual reachability distance from the the distance vector 'dm' and the core distance 
 // [[Rcpp::export]]
-NumericMatrix mrd(NumericMatrix dm, NumericVector cd) {
+NumericVector mrd(NumericVector dm, NumericVector cd) {
+  NumericVector res = NumericVector(dm.length());
+  int n = cd.length();
+  for (int i = 0, c = 0; i < n; ++i) {
+    for (int j = i+1; j < n; ++j) {
+      res(c++) = std::max(dm(c), std::max(cd(i), cd(j)));
+    }
+  }
+  return res;
+}
+
+// Full Matrix version
+// [[Rcpp::export]]
+NumericMatrix mrd_m(NumericMatrix dm, NumericVector cd) {
   int nrow = dm.nrow(), ncol = dm.ncol();
   NumericMatrix out(nrow, ncol);
 

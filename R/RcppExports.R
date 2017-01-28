@@ -9,15 +9,23 @@ buildDendrogram <- function(hcl) {
     .Call('dbscan_buildDendrogram', PACKAGE = 'dbscan', hcl)
 }
 
-all_children <- function(hier, key) {
-    .Call('dbscan_all_children', PACKAGE = 'dbscan', hier, key)
+all_children <- function(hier, key, leaves_only = FALSE) {
+    .Call('dbscan_all_children', PACKAGE = 'dbscan', hier, key, leaves_only)
 }
 
-computeSalientScores <- function(info, cid, sc) {
-    .Call('dbscan_computeSalientScores', PACKAGE = 'dbscan', info, cid, sc)
+node_xy <- function(hier) {
+    .Call('dbscan_node_xy', PACKAGE = 'dbscan', hier)
 }
 
-hdbscan_fast <- function(hcl, minPts = 5L) {
+buildCondensedTree <- function(hdbscan) {
+    .Call('dbscan_buildCondensedTree', PACKAGE = 'dbscan', hdbscan)
+}
+
+computeSalientScores <- function(hdbscan, cid, sc, cl_hierarchy) {
+    .Call('dbscan_computeSalientScores', PACKAGE = 'dbscan', hdbscan, cid, sc, cl_hierarchy)
+}
+
+hdbscan_fast <- function(hcl, minPts) {
     .Call('dbscan_hdbscan_fast', PACKAGE = 'dbscan', hcl, minPts)
 }
 
@@ -35,6 +43,26 @@ mst_to_dendrogram <- function(mst) {
 
 mrd <- function(dm, cd) {
     .Call('dbscan_mrd', PACKAGE = 'dbscan', dm, cd)
+}
+
+mrd_m <- function(dm, cd) {
+    .Call('dbscan_mrd_m', PACKAGE = 'dbscan', dm, cd)
+}
+
+coreFromDist <- function(dist, n, minPts) {
+    .Call('dbscan_coreFromDist', PACKAGE = 'dbscan', dist, n, minPts)
+}
+
+prims <- function(x_dist, n) {
+    .Call('dbscan_prims', PACKAGE = 'dbscan', x_dist, n)
+}
+
+order_ <- function(x) {
+    .Call('dbscan_order_', PACKAGE = 'dbscan', x)
+}
+
+hclustMergeOrder <- function(mst, o) {
+    .Call('dbscan_hclustMergeOrder', PACKAGE = 'dbscan', mst, o)
 }
 
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {

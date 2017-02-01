@@ -19,29 +19,35 @@ By default, HDBSCAN returns a flat clustering of the most salient or 'stable' cl
   cl <- dbscan::hdbscan(moons, minPts = 5)
   cl
   
-  # minPts <- 5
-  # x <- moons
-  # ## Calculate Core distance using kNN
-  # euc_dist <- dist(x, method = "euclidean")
-  # core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
-  # n <- nrow(x)
-  # 
-  # ## Mutual Reachability matrix
-  # mrd <- dbscan:::mrd(euc_dist, core_dist)
-  # 
-  # ## Get MST, convert to RSL representation
-  # mst <- dbscan:::prims(mrd, n)
-  # hcl <- dbscan:::hclustMergeOrder(mst, order(mst[, 3]))
-  # 
-  # ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
-  # res <- dbscan:::hdbscan_fast(hcl, minPts)
-  # dend <- dbscan:::buildCondensedTree(res)
-  # dendextend::get_nodes_xy(dend)
-  # 
-  # dbscan:::node_xy(attr(res, "cl_hierarchy"))
-  # 
-  # t1 <- dbscan:::buildDendrogram(cl$hcl)
-  # t2 <- stats:::as.dendrogram(cl$hcl)
+  all_info <- attr(cl, ".info")
+  cl_hier <- attr(all_info, "cl_hierarchy")
+  dbscan:::node_xy(cl_hier)
+  
+  dend <- dbscan:::buildCondensedTree(all_info)
+  dendextend::get_nodes_xy(dend)
+  minPts <- 5
+  x <- moons
+  ## Calculate Core distance using kNN
+  euc_dist <- dist(x, method = "euclidean")
+  core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
+  n <- nrow(x)
+
+  ## Mutual Reachability matrix
+  mrd <- dbscan:::mrd(euc_dist, core_dist)
+
+  ## Get MST, convert to RSL representation
+  mst <- dbscan:::prims(mrd, n)
+  hcl <- dbscan:::hclustMergeOrder(mst, order(mst[, 3]))
+
+  ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
+  res <- dbscan:::hdbscan_fast(hcl, minPts)
+  dend <- dbscan:::buildCondensedTree(res)
+  dendextend::get_nodes_xy(dend)
+
+  dbscan:::node_xy(attr(res, "cl_hierarchy"))
+
+  t1 <- dbscan:::buildDendrogram(cl$hcl)
+  t2 <- stats:::as.dendrogram(cl$hcl)
 ```
 The 'flat' results are stored in the 'cluster' member. Noise points are given a value of 0. 
 ```{r}
@@ -79,7 +85,7 @@ for (eps_i in 1:nrow(cl$mst)) {
   ## Cutting the robust single linkage tree 
   cut_tree <- function(hcl, eps){
     cuts <- unname(cutree(hcl, h=eps))
-    cuts[which(diag(mrd) > eps)] <- 0 # Use core distance to distinguish noise; minPts doesn't matter? 
+    cuts[which(diag(mrd) > eps)] <- 0 # Use core distance to distinguish noise
     cut_cl <- match(cuts, sort(unique(cuts))) - 1 # 'Normalize' so cluster ID increments; sort ensures noise is 0
     cut_cl
   }
@@ -95,16 +101,6 @@ for (eps_i in 1:nrow(cl$mst)) {
   
   ## Simple Check 
   check[eps_i] <- (res == "TRUE")
-  
-  ## More Robust Check -- robust to floating point errors caused by rounding when the tree is cut
-  # if (res == "TRUE"){
-  #   check[eps_i] <- T
-  # } else {
-  #   # Adjusting for numerical precision errors
-  #   cut_cl <- cut_tree(eps+1e-4)
-  #   res <- all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths)
-  #   check[eps_i] <- (res == "TRUE")
-  # }
 }
 print(all(check == T))
 ```
@@ -142,9 +138,9 @@ The individual point membership 'probabilities' are in the probabilities member 
 
 These can be used to show the 'degree of cluster membership' through, for example, plotting points with transparencies that correspond to their membership degrees.   
 ```{r}
-  plot(x_test1, col=cl$cluster+1, pch=21)
+  plot(moons, col=cl$cluster+1, pch=21)
   colors <- sapply(1:length(cl$cluster), function(i) adjustcolor(palette()[(cl$cluster+1)[i]], alpha.f = cl$membership_prob[i]))
-  points(x_test1, col=colors, pch=20)
+  points(moons, col=colors, pch=20)
 ```
 
 ## Hierarchical representations
@@ -155,7 +151,31 @@ The hierarchy of cluster membership changes and the distance values that happene
 ```
 
 ## Validating HDBSCAN
-A much more comprehensive evaluation of the clustering coming soon...  
+
+HDBSCAN is equivalent to running DBSCAN* at $n$-1 values of epsilon such that each epsilon produces a distinct clustering result. There are infinitely many possible values of eps at which that happens. One easy way of getting a set of values is to extract the minimal possible values such that any values below such values produces a different clustering. These values, luckily, can be computed via a minimum spanning tree algorithm. First, the mutual reachability graph needs to be computed as it is mutual reachability distance that the MST is be computed over. 
+```{r}
+  minPts <- 5
+  moon_dist <- dist(moons, method = "euclidean")
+  core_dist <- kNNdist(moons, k = minPts - 1)[, minPts - 1]
+  mrg <- dbscan:::mrd(moon_dist, cd = core_dist)
+```
+
+Then, the MST can be computed using any number of algorithms. The dbscan package uses an efficient version of Prim's algorithm. 
+```{r}
+  mst <- dbscan:::prims(mrg, nrow(moons))
+```
+
+```{r}
+  eps_vals <- sort(mst[, 3], decreasing = T) + .Machine$double.eps ## For consistency 
+  dbscan_res <- list()  
+  for (i in 1:length(eps_vals)){
+    dbscan_res[[i]] <- dbscan::dbscan(moons, eps = eps_vals[i], minPts = minPts, borderPoints = F)
+  }
+  
+```
+
+
+
 
 ## How HDBSCAN Works 
 Per the name, HDBSCAN is an algorithm that computes a hierarchy of (DBSCAN) clusters. (more explanation coming soon)
@@ -186,9 +206,15 @@ dbscan::hdbscan(iris)
 ```
 
 ```{r}
-data("x_test2")
-cl2 <- dbscan::hdbscan(x_test2, minPts = 15)
+data("blobs")
+cl2 <- dbscan::hdbscan(blobs, minPts = 15, gen_condensed_tree = T)
 ```
+
+
+```{r}
+plot(cl2$condensed_tree)
+```
+
 
 ```{r}
 plot(x_test2, col=cl2$cluster+1, pch=20)
@@ -282,4 +308,16 @@ Finally, the primary method at which all the information needed by HDBSCAN is th
 
 
 
+```{r}
+
+
+cl2 <- dbscan::hdbscan(blobs, minPts = 15, gen_condensed_tree = T)
+
+plot(blobs[attr(cl2, "hdbscan")$`5`$contains,], pch=20, cex=0.5)
+points(blobs[attr(cl2, "hdbscan")$`11`$contains,], pch=20, cex=0.5, col="red")
+symbols(x = blobs[attr(cl2, "hdbscan")$`11`$contains,], circles = attr(cl2, "hdbscan")$`11`$eps, add=T, inches = F)
+
+
+dbscan::dbscan(blobs[attr(cl2, "hdbscan")$`5`$contains,], borderPoints = T, minPts = 15, eps = eps_test[1] + .Machine$double.eps)
+```
 

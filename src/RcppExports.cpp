@@ -42,13 +42,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // node_xy
-NumericMatrix node_xy(List hier);
-RcppExport SEXP dbscan_node_xy(SEXP hierSEXP) {
+NumericMatrix node_xy(List hdbscan, List cl_hierarchy, int cid);
+RcppExport SEXP dbscan_node_xy(SEXP hdbscanSEXP, SEXP cl_hierarchySEXP, SEXP cidSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type hier(hierSEXP);
-    rcpp_result_gen = Rcpp::wrap(node_xy(hier));
+    Rcpp::traits::input_parameter< List >::type hdbscan(hdbscanSEXP);
+    Rcpp::traits::input_parameter< List >::type cl_hierarchy(cl_hierarchySEXP);
+    Rcpp::traits::input_parameter< int >::type cid(cidSEXP);
+    rcpp_result_gen = Rcpp::wrap(node_xy(hdbscan, cl_hierarchy, cid));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-hdbscan <- function(x, minPts = 5, xdist=NA, gen_rsl_tree = F) {
+hdbscan <- function(x, minPts = 5, xdist=NA, gen_rsl_tree = F, gen_condensed_tree=F) {
   ## Calculate Core distance using kNN
   if (missing(xdist) && (is(x, "data.table") || is(x, "data.frame") || is(x, "matrix"))) {
     euc_dist <- dist(x, method = "euclidean")
@@ -35,8 +35,8 @@ hdbscan <- function(x, minPts = 5, xdist=NA, gen_rsl_tree = F) {
   mrd <- mrd(euc_dist, core_dist)
 
   ## Get MST, convert to RSL representation
-  mst <- dbscan:::prims(mrd, n)
-  hc <- dbscan:::hclustMergeOrder(mst, order(mst[, 3]))
+  mst <- prims(mrd, n)
+  hc <- hclustMergeOrder(mst, order(mst[, 3]))
 
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
   res <- hdbscan_fast(hc, minPts)
@@ -61,25 +61,18 @@ hdbscan <- function(x, minPts = 5, xdist=NA, gen_rsl_tree = F) {
   ## NOTE: These scores represent the stability scores before the hierarchy traversal
   cluster_scores <- sapply(sl, function(cid) res[[as.character(cid)]]$score)
 
-  ## Return just a vector of cluster assignments by default, else return everything
-  if (gen_rsl_tree){
-    out <- structure(list(cluster=cluster, minPts=minPts,
-                          cluster_scores=cluster_scores, # Stability Scores
-                          membership_prob=prob, # Individual point membership probabilities
-                          outlier_scores=attr(res, "glosh"), # Outlier Scores
-                          mst=mst, # Minimum Spanning Tree (for debugging)
-                          hc=hc, # Hclust object of MST (for debugging / maybe useful to user?)
-                          rsl_tree=dbscan:::buildDendrogram(hcl)
-    ), class="hdbscan") # runtime contains all the information used to build HDBSCAN
-  } else {
-    out <- structure(list(cluster=cluster, minPts=minPts,
-                          cluster_scores=cluster_scores, # Stability Scores
-                          membership_prob=prob, # Individual point membership probabilities
-                          outlier_scores=attr(res, "glosh"), # Outlier Scores
-                          mst=mst, # Minimum Spanning Tree (for debugging)
-                          hc=hc # Hclust object of MST (for debugging)
-    ), class="hdbscan") # runtime contains all the information used to build HDBSCAN
-  }
+  ## Return everything HDBSCAN does
+  out <- structure(list(cluster=cluster, minPts=minPts,
+                        cluster_scores=cluster_scores, # (Cluster-wide cumulative) Stability Scores
+                        membership_prob=prob, # Individual point membership probabilities
+                        outlier_scores=attr(res, "glosh"), # Outlier Scores
+                        mst=mst, # Minimum Spanning Tree (for debugging)
+                        hc=hc # Hclust object of MST (can be cut for quick assignments)
+  ), class="hdbscan", hdbscan=res) # hdbscan attributes contains actual HDBSCAN hierarchy 
+  
+  ## The trees don't need to be explicitly computed, but they may be useful if the user wants them
+  if (gen_rsl_tree){ out$rsl_tree = buildDendrogram(hcl) }
+  if (gen_condensed_tree) { out$condensed_tree = buildCondensedTree(res) }
   return(out)
 }
 
@@ -95,52 +88,83 @@ print.hdbscan <- function(x, ...) {
   
   print(table(x$cluster))
   cat("\n")
-  
   writeLines(strwrap(paste0("Available fields: ", paste(names(x), collapse = ", ")), exdent = 18))
 }
 
-plot.hdbscan <- function(x, scale=20, gradient=c("yellow", "red"), show_flat = F, ...){
-  dend <- stats:::midcache.dendrogram(x$condensed_tree)
-  runtime <- attr(x, "runtime")
-  yBottom <- ceiling(max(sapply(runtime[[".cluster_info"]], function(cl) cl$height))) + 1
+plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...){
+  
+  ## Main information needed 
+  hd_info <- attr(x, "hdbscan")
+  dend <- if (is.null(x$condensed_tree)) buildCondensedTree(hd_info) else x$condensed_tree
+  coords <- node_xy(hd_info, cl_hierarchy = attr(hd_info, "cl_hierarchy"))
 
-  dbscan:::all_children(attr(res, "cl_hierarchy"), 0, F)
-  plot(dend, ylim=c(yBottom, 0), edge.root = F, main="HDBSCAN*", ylab="Lambda value")
-  coords <- dendextend::get_nodes_xy(dend)
-
-  ## Variables to help setup plotting
-  nclusters <- length(runtime[[".cid"]])
-  col_breaks <- seq(0, length(cl$cluster)+nclusters, by=nclusters)
+  ## Variables to help setup the scaling of the plotting
+  nclusters <- length(hd_info)
+  npoints <- length(x$cluster)
+  nleaves <- length(all_children(attr(hd_info, "cl_hierarchy"), key = 0, leaves_only = T))
+  scale <- ifelse(scale == "suggest", nclusters, as.numeric(scale))
+  
+  ## Color variables
+  col_breaks <- seq(0, length(x$cluster)+nclusters, by=nclusters)
   gcolors <- colorRampPalette(gradient)(length(col_breaks))
-  normalize <- function(x) (nclusters)*(x - 1) / (length(cl$cluster) - 1)
 
   ## Depth-first search to recursively plot rectangles
-  eps_dfs <- function(dend, index, parent_height, scale){
+  eps_dfs <- function(dend, index, parent_height, scale = 20){
     coord <- coords[index,]
-    widths <- sapply(sort(attr(dend, "eps"), decreasing = T), function(eps) length(which(attr(dend, "eps") <= eps)))
+    cl_key <- as.character(attr(dend, "label"))
+    
+    ## widths == number of points in the cluster at each eps it was alive
+    widths <- sapply(sort(hd_info[[cl_key]]$eps, decreasing = T), function(eps) length(which(hd_info[[cl_key]]$eps <= eps)))
+    if (length(widths) > 0){
+      widths <- unlist(c(widths + hd_info[[cl_key]]$n_children, rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)))
+    } else {
+      widths <- as.vector(rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children))
+    }
+    
+    ## Normalize and scale widths to length of x-axis
+    normalize <- function(x) (nleaves)*(x - 1) / (npoints - 1)
     xleft <- coord[[1]] - normalize(widths)/scale
     xright <- coord[[1]] + normalize(widths)/scale
-    ytop <- rep(parent_height, length(widths))
-    ybottom <- sort(1/attr(dend, "eps"), decreasing = F)
+    
+    ## Top is always parent height, bottom is when the points died
+    ## Minor adjustment if at the root equivalent to plot.dendrogram(edge.root=T)
+    if (cl_key == "0"){
+      ytop <- rep(hd_info[[cl_key]]$eps_birth + 0.0625*hd_info[[cl_key]]$eps_birth, length(widths))
+      ybottom <- rep(hd_info[[cl_key]]$eps_death, length(widths))
+    } else {
+      ytop <- rep(parent_height, length(widths))
+      ybottom <- c(sort(hd_info[[cl_key]]$eps, decreasing = T), rep(hd_info[[cl_key]]$eps_death, hd_info[[cl_key]]$n_children))
+    }
+    
+    ## Draw the rectangles 
+    rect_color <- gcolors[.bincode(length(widths), breaks = col_breaks)]
     rect(xleft = xleft, xright = xright, ybottom = ybottom, ytop = ytop,
-         col = gcolors[.bincode(length(attr(dend, "contains")), breaks = col_breaks)],
-         border=NA, lwd=0)
+         col = rect_color, border=NA, lwd=0)
+
+    ## Highlight the most 'stable' clusters returned by the default flat cluster extraction
     if (show_flat){
-      salient_cl <- names(attr(x, "runtime")[[".cluster"]])
-      if (attr(dend, "label") %in% salient_cl){
-        max_width <- max(normalize(widths)/scale)
-        rect(xleft = min(xleft) - max_width, xright = max(xright) + max_width,
-             ybottom = max(ybottom) + max_width, ytop = min(ytop) - max_width,
+      salient_cl <- attr(hd_info, "salient_clusters")
+      if (as.integer(attr(dend, "label")) %in% salient_cl){
+        x_adjust <- (max(xright) - min(xleft)) * 0.10 # 10% left/right border
+        y_adjust <- (max(ytop) - min(ybottom)) * 0.025 # 2.5% above/below border
+        rect(xleft = min(xleft) - x_adjust, xright = max(xright) + x_adjust,
+             ybottom = min(ybottom) - y_adjust, ytop = max(ytop) + y_adjust,
              border = "red", lwd=1)
       }
     }
+    
+    ## Recurse in depth-first-manner 
     if (is.leaf(dend)){
-      return(dend)
+      return(index)
     } else {
-      for (i in 1:length(dend)){
-        eps_dfs(dend[[i]], as.integer(attr(dend[[i]], "label"))+1, parent_height = coords[index, 2], scale=scale)
-      }
+      left <- eps_dfs(dend[[1]], index = index+1, parent_height = attr(dend, "height"), scale = scale)
+      right <- eps_dfs(dend[[2]], index = left+1, parent_height = attr(dend, "height"), scale = scale)
+      return(right)
     }
   }
+  
+  ## Run the recursive plotting
+  plot(dend, edge.root = T, main="HDBSCAN*", ylab="eps value")
   eps_dfs(dend, index = 1, parent_height = 0, scale = scale)
+  return(invisible(x))
 }

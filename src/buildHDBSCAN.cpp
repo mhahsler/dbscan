@@ -82,7 +82,6 @@ List buildDendrogram(List hcl) {
     labels = as<StringVector>(hcl["labels"]); 
   }
   
-
   int n = merge.nrow() + 1, k; 
   List new_br, z = List(n);
   for (k = 0; k < n-1; k++){ 
@@ -196,153 +195,137 @@ IntegerVector all_children(List hier, int key, bool leaves_only = false){
 }
 
 // [[Rcpp::export]]
-NumericMatrix node_xy(List hier){
-  IntegerVector children = all_children(hier, 0);
-  NumericMatrix res = NumericMatrix(children.length(), 2);
-
-  Rcout << "here" << std::endl; 
-  // Do iterative 'recursive' type function to extract all the IDs of sub trees
-  std::queue<int> to_do = std::queue<int>();
-  to_do.push(0);
-  int leaf_counter = 0, row_index = 0;
-  while (to_do.size() != 0){
-    int parent = to_do.front();
-    if (!hier.containsElementNamed(patch::to_string(parent).c_str())){
-      leaf_counter++;
-      row_index++;
-      if (row_index < children.length()){
-        res(row_index, _) = NumericVector::create(leaf_counter, (double) to_do.front());
-      }
-      to_do.pop();
-    } else {
-      IntegerVector local_ch = hier[patch::to_string(parent).c_str()];
-      if (row_index < children.length())
-        res(row_index, _) = NumericVector::create(leaf_counter, (double) to_do.front());
-      to_do.pop();
-      for (int n_children = 0; n_children < local_ch.length(); ++n_children){
-        int child_id = local_ch.at(n_children);
-        if (!hier.containsElementNamed(patch::to_string(child_id).c_str())) { // is leaf
-          leaf_counter++;
-        }
-        row_index++;
-        to_do.push(child_id);
-      }
-    }
-    if (row_index < children.length()){
-      Rcout << "todo: " << to_do.front() <<  std::endl;
-      //res(row_index, _) = NumericVector::create(leaf_counter, (double) to_do.front());
+NumericMatrix node_xy(List hdbscan, List cl_hierarchy, int cid = 0){
+  
+  // Initialize
+  if (cid == 0){
+    hdbscan["node_xy"] = NumericMatrix(all_children(cl_hierarchy, 0).size()+1, 2);
+    hdbscan["leaf_counter"] = 0; 
+    hdbscan["row_counter"] = 0; 
+  }
+  
+  // Retrieve/set variables 
+  std::string cid_str = patch::to_string(cid);
+  NumericMatrix node_xy_ = hdbscan["node_xy"]; 
+  List cl = hdbscan[cid_str]; 
+  
+  // Increment row index every time
+  int row_index = (int) hdbscan["row_counter"];
+  hdbscan["row_counter"] = row_index+1;
+  
+  // base case
+  if (!cl_hierarchy.containsElementNamed(cid_str.c_str())){
+    int leaf_index = (int) hdbscan["leaf_counter"];
+    node_xy_(row_index, _) = NumericVector::create((double) ++leaf_index, (double) cl["eps_death"]);
+    hdbscan["leaf_counter"] = leaf_index; 
+    NumericMatrix res = NumericMatrix(1, 1);
+    res[0] = row_index; 
+    return(res);
+  } else {
+    IntegerVector children = cl_hierarchy[cid_str]; 
+    int l_row = (int) node_xy(hdbscan, cl_hierarchy, children.at(0))[0]; // left 
+    int r_row = (int) node_xy(hdbscan, cl_hierarchy, children.at(1))[0]; // right 
+    double lvalue = (double) (node_xy_(l_row, 0) + node_xy_(r_row, 0)) / 2; 
+    node_xy_(row_index, _) = NumericVector::create(lvalue, (double) cl["eps_death"]);
+    
+    if (cid != 0){
+      NumericMatrix res = NumericMatrix(1, 1);
+      res[0] = row_index; 
+      return(res);
     }
   }
-  return(res);
+  
+  // Cleanup 
+  if (cid == 0){
+    hdbscan["leaf_counter"] = R_NilValue;
+    hdbscan["row_counter"] = R_NilValue;
+  }
+  return (node_xy_);
 }
 
-
-
 // [[Rcpp::export]]
-List buildCondensedTree(List hdbscan){
-  //List clusters = hdbscan.attr("cluster");
+List buildCondensedTree(List hdbscan) {
+  
+  // Hierarchical information
   List cl_hierarchy = hdbscan.attr("cl_hierarchy");
   IntegerVector all_childs = all_children(cl_hierarchy, 0);
-  NumericMatrix node_xy = NumericMatrix(all_childs.length()+1, 2); 
-  //IntegerVector cl_tracker = info["cl_tracker"];
-  //int root_node = info[".root_node"];
 
-  IntegerVector children = cl_hierarchy["0"];
+  // To keep track of members and midpoints 
+  std::unordered_map<std::string, int> members = std::unordered_map<std::string, int>(); 
+  std::unordered_map<std::string, float> mids = std::unordered_map<std::string, float>(); 
+
+  // To keep track of where we are 
+  std::stack<int> cid_stack = std::stack<int>(); 
+  cid_stack.push(0);
   
-  List dendrogram = List(hdbscan.length());
-  // to_do.push(root_node);
-
-  List members = List(), midpoints = List();
-  std::vector<std::string> cl_labels = (hdbscan.names());
-  for (int i = 0, cid = 0; i < cl_labels.size(); ++i) {
-    if (!cl_hierarchy.containsElementNamed(cl_labels.at(i).c_str())){
-      IntegerVector leaf = IntegerVector::create(++cid); //clusters[patch::to_string(parent)]
-      List cl = hdbscan[cl_labels.at(i).c_str()]; 
-      leaf.attr("label") = cl_labels.at(i);
+  // Iteratively build the hierarchy 
+  List dendrogram = List();
+  
+  // Premake children
+  for (IntegerVector::iterator it = all_childs.begin(); it != all_childs.end(); ++it){
+    std::string cid_label = patch::to_string(*it);
+    List cl = hdbscan[cid_label];
+    if (!cl_hierarchy.containsElementNamed(cid_label.c_str())){
+      // Create leaf
+      IntegerVector leaf = IntegerVector::create(*it);
+      leaf.attr("label") = cid_label;
       leaf.attr("members") = 1;
       leaf.attr("height") = cl["eps_death"];
       leaf.attr("midpoint") = 0;
       leaf.attr("leaf") = true;
-      leaf.attr(".info") = cl; 
-      dendrogram[cl_labels.at(i)] = leaf;
-      members[cl_labels.at(i)] = 1;
-      midpoints[cl_labels.at(i)] = 0;
+      dendrogram[cid_label] = leaf;
+      members[cid_label] = 1;
+      mids[cid_label] = 0;
     }
   }
-
-  // Build the hierarchy top-down 
-  std::stack<int> to_do = std::stack<int>(); //(size_t) hdbscan.length()
-  to_do.push(0);
-  int row_index = 0, leaf_index = 0;
-
-  while (to_do.size() != 0) {
-    int parent = to_do.top();
-    //Rcout << "Processing: " << parent << std::endl; 
-    // if (!cl_hierarchy.containsElementNamed(patch::to_string(parent).c_str())){
-    //   to_do.pop();
-    //   Rcout << "here" << std::endl; 
-    // } else {
-      children = cl_hierarchy[patch::to_string(parent).c_str()];
-      List child_branches = List(children.length());
-      bool process = true;
-      for (int c_i = 0, n_members = 0; c_i < children.length(); ++c_i){
-        int child_id = children.at(c_i);
-        //Rcout << "Pushing: " << child_id << " to slot " << c_i << std::endl; 
-        if (dendrogram.containsElementNamed(patch::to_string(child_id).c_str())) {
-          Rcout << "Pushing singleton: " << child_id << " i: " << leaf_index << std::endl; 
-          child_branches.at(c_i) = dendrogram[patch::to_string(child_id)];
-          leaf_index++;
-        } else {
-          process = false;
-          Rcout << "Pushing non-singleton: " << child_id << " at ri: " << row_index << std::endl;
-          to_do.push(child_id);
-          row_index++; 
-        }
-      }
-      if (process){
-        to_do.pop();
-        List parent_cl = hdbscan[patch::to_string(parent)];
-        node_xy(row_index--, _) = NumericVector::create(row_index, parent_cl["eps_birth"]);
-        //Rcout << "RI: " << row_index << std::endl; 
-        
-        std::string l_str = patch::to_string(children.at(0));
-        std::string r_str = patch::to_string(children.at(1));
-        List l_branch = dendrogram[l_str], r_branch = dendrogram[r_str];
-
-        // Unfortunately this is necessary
-        int l_members = members[l_str], r_members = members[r_str];
-        float l_mid = midpoints[l_str], r_mid = midpoints[r_str];
-
-        // Make the new branch
-        child_branches.attr("label") = patch::to_string(parent);
-        child_branches.attr("members") = l_members + r_members;
-
-        bool isL = (bool) !cl_hierarchy.containsElementNamed(l_str.c_str()); // is left a leaf
-        if (!isL && cl_hierarchy.containsElementNamed(r_str.c_str())){ // is non-singleton merge
-          child_branches.attr("midpoint") = (l_members + l_mid + r_mid) / 2;
-        } else { // contains a leaf
-          //Rcout << "HERE";
-          int sub_members = isL ? r_members : l_members;
-          float mid_pt = isL ? r_mid : l_mid;
-          child_branches.attr("midpoint") = ((isL ? 1 : sub_members) + mid_pt) / 2;
-        }
-        child_branches.attr("height") = (float) parent_cl["eps_birth"];
-        child_branches.attr(".info") = parent_cl;
-        child_branches.attr("class") = "dendrogram";
-
-        // Need to store this for later
-        dendrogram[patch::to_string(parent)] = child_branches;
-        midpoints[patch::to_string(parent)] = (float) child_branches.attr("midpoint");
-        members[patch::to_string(parent)] = (float) child_branches.attr("members");
-
-        // Don't need these anymore
-        dendrogram[l_str] = R_NilValue, dendrogram[r_str] = R_NilValue;
-      }
+  
+  // Building the dendrogram bottom-up
+  while(!cid_stack.empty()) {
+    int cid = cid_stack.top();
+    std::string cid_label = patch::to_string(cid);
+    List cl = hdbscan[cid_label];
+    
+    // Recursive calls
+    IntegerVector local_children = cl_hierarchy[cid_label];
+  
+    // Members and midpoint extraction
+    std::string l_str = patch::to_string(local_children.at(0)), r_str = patch::to_string(local_children.at(1)); 
+    // Rcout << "Comparing: " << l_str << ", " << r_str << std::endl; 
+    if (!dendrogram.containsElementNamed(l_str.c_str())){ cid_stack.push(local_children.at(0)); continue; }
+    if (!dendrogram.containsElementNamed(r_str.c_str())){ cid_stack.push(local_children.at(1)); continue; }
+    
+    // Continue building up the hierarchy 
+    List left = dendrogram[l_str], right = dendrogram[r_str];
+    
+    int l_members = members[l_str], r_members = members[r_str];
+    float l_mid = mids[l_str], r_mid = mids[r_str];
+  
+    // Make the new branch
+    List new_branch = List::create(dendrogram[l_str], dendrogram[r_str]); 
+    new_branch.attr("label") = cid_label;
+    new_branch.attr("members") = l_members + r_members;
+    new_branch.attr("height") = (float) cl["eps_death"];
+    new_branch.attr("class") = "dendrogram";
+    
+    // Midpoint calculation
+    bool isL = (bool) !cl_hierarchy.containsElementNamed(l_str.c_str()); // is left a leaf
+    if (!isL && cl_hierarchy.containsElementNamed(r_str.c_str())){ // is non-singleton merge
+      new_branch.attr("midpoint") = (l_members + l_mid + r_mid) / 2;
+    } else { // contains a leaf
+      int sub_members = isL ? r_members : l_members;
+      float mid_pt = isL ? r_mid : l_mid;
+      new_branch.attr("midpoint") = ((isL ? 1 : sub_members) + mid_pt) / 2;
     }
-  // }
-  List root = dendrogram["0"]; 
-  root.attr("node_xy") = node_xy;
-  return(root);
+  
+    // Save info for later 
+    members[cid_label] = l_members + r_members; 
+    mids[cid_label] = (float) new_branch.attr("midpoint"); 
+    dendrogram[cid_label] = new_branch;
+    
+    // Done with this node
+    cid_stack.pop();
+  }
+  return(dendrogram["0"]);
 }
 
 // Compute stability scores for cluster objects in the hierarchy
@@ -413,6 +396,7 @@ List hdbscan_fast(const List hcl, const int minPts){
   std::unordered_map<std::string, int> n_children = std::unordered_map<std::string, int>(); 
   std::unordered_map<std::string, double> eps_death = std::unordered_map<std::string, double>(); 
   std::unordered_map<std::string, double> eps_birth = std::unordered_map<std::string, double>(); 
+  std::unordered_map<std::string, bool> processed = std::unordered_map<std::string, bool>(); 
   
   // First pass: Agglomerate up the hierarchy, recording member sizes
   for (k = 0; k < n-1; ++k){
@@ -432,7 +416,7 @@ List hdbscan_fast(const List hcl, const int minPts){
   
   // Initialize root 
   contains["0"] = pt_order; 
-  eps["0"] = NumericVector(n, eps_dist.at(eps_dist.length()-1));   
+  eps["0"] = NumericVector();   // n, eps_dist.at(eps_dist.length()-1)
   eps_birth["0"] = eps_dist.at(eps_dist.length()-1); 
   
   int global_cid = 0; 
@@ -447,11 +431,13 @@ List hdbscan_fast(const List hcl, const int minPts){
     // Trivial case: merge of singletons, create a temporary *assumed* cluster to be resolved on merger
     if (all(m < 0).is_true()){
       contains[cl_cid].push_back(-lm), contains[cl_cid].push_back(-rm);
-      eps[cl_cid].push_back(eps_dist.at(k)), eps[cl_cid].push_back(eps_dist.at(k)); 
-      eps_death[cl_cid] = std::min((double) eps_dist.at(k), (double) eps_death[cl_cid]); 
+      double noise_eps = processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k); 
+      eps[cl_cid].push_back(noise_eps), eps[cl_cid].push_back(noise_eps); 
+      eps_death[cl_cid] = processed[cl_cid] ? eps_death[cl_cid] : std::min((double) eps_dist.at(k), (double) eps_death[cl_cid]); 
     } else if (any(m < 0).is_true()) {
       // Record new point info and mark the non-singleton with the cluster id
-      contains[cl_cid].push_back(-(lm < 0 ? lm : rm)), eps[cl_cid].push_back(eps_dist.at(k));
+      contains[cl_cid].push_back(-(lm < 0 ? lm : rm));
+      eps[cl_cid].push_back(processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k));
       cl_tracker.at((lm < 0 ? rm : lm) - 1) = cid;
     } else {
       int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
@@ -460,6 +446,7 @@ List hdbscan_fast(const List hcl, const int minPts){
       if (merge_size1 >= minPts && merge_size2 >= minPts){
         // Record death of current cluster
         eps_death[cl_cid] = eps_dist.at(k);
+        processed[cl_cid] = true; 
         
         // Mark the lower merge steps as new clusters 
         cl_hierarchy[cl_cid] = IntegerVector::create(global_cid+1, global_cid+2);
@@ -467,10 +454,12 @@ List hdbscan_fast(const List hcl, const int minPts){
         cl_tracker.at(lm - 1) = ++global_cid, cl_tracker.at(rm - 1) = ++global_cid; 
         
         // Record the distance the new clusters appeared and initialize containers
-        contains[l_index] = IntegerVector(), contains[r_index] = IntegerVector(); ; 
+        contains[l_index] = IntegerVector(), contains[r_index] = IntegerVector();
         eps[l_index] = NumericVector(), eps[r_index] = NumericVector(); 
-        eps_birth[l_index] = eps_dist.at(lm - 1),  eps_birth[r_index] = eps_dist.at(rm - 1);
-        eps_death[l_index] = eps_dist.at(lm - 1),  eps_death[r_index] = eps_dist.at(lm - 1); 
+        // eps_birth[l_index] = eps_dist.at(lm - 1), eps_birth[r_index] = eps_dist.at(rm - 1);
+        eps_birth[l_index] = eps_dist.at(k), eps_birth[r_index] = eps_dist.at(k);
+        eps_death[l_index] = eps_dist.at(lm - 1), eps_death[r_index] = eps_dist.at(rm - 1); 
+        processed[l_index] = false, processed[r_index] = false; 
         n_children[cl_cid] = merge_size1 + merge_size2; 
       } else {
         // Inherit cluster identity 
@@ -528,8 +517,8 @@ List hdbscan_fast(const List hcl, const int minPts){
     }
   }
   res.attr("cl_hierarchy") = cl_hierarchy;  // Stores parent/child structure 
-  res.attr("cluster") = cluster; 
-  res.attr("glosh") = outlier_scores; 
+  res.attr("cluster") = cluster; // Flat assignments 
+  res.attr("glosh") = outlier_scores; // glosh outlier scores 
   return(res);
 }
 

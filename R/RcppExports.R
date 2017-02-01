@@ -13,8 +13,8 @@ all_children <- function(hier, key, leaves_only = FALSE) {
     .Call('dbscan_all_children', PACKAGE = 'dbscan', hier, key, leaves_only)
 }
 
-node_xy <- function(hier) {
-    .Call('dbscan_node_xy', PACKAGE = 'dbscan', hier)
+node_xy <- function(hdbscan, cl_hierarchy, cid = 0L) {
+    .Call('dbscan_node_xy', PACKAGE = 'dbscan', hdbscan, cl_hierarchy, cid)
 }
 
 buildCondensedTree <- function(hdbscan) {

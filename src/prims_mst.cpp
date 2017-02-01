@@ -31,6 +31,11 @@ public:
   }
 };
 
+// coreFromDist indexes through the a dist vector to retrieve the core distance; 
+// this might be useful in some situations. For example, you can get the core distance 
+// from only a dist object, without needing the original data. In experimentation, the 
+// kNNdist ended up being faster than this. 
+
 // [[Rcpp::export]]
 NumericVector coreFromDist(const NumericVector dist, const int n, const int minPts){
   NumericVector core_dist = NumericVector(n); 
@@ -47,7 +52,6 @@ NumericVector coreFromDist(const NumericVector dist, const int n, const int minP
   return(core_dist);  
 }
 
-#define UNSEEN 1e8
 // [[Rcpp::export]]
 NumericMatrix prims(const NumericVector x_dist, const int n) {
   
@@ -70,12 +74,12 @@ NumericMatrix prims(const NumericVector x_dist, const int n) {
       if (i == c_node) continue; 
       if (v_selected[i] < 0) {
         int index = i > c_node ? INDEX_TF(n, c_node, i) : INDEX_TF(n, i, c_node); // bigger index always on the right
-        priority = x_dist[index];
+        priority = x_dist[index]; // get distance 
         if (priority < fringe[i].weight) {
           fringe[i].weight = priority; 
           fringe[i].to = c_node; // i indexes the 'from' node
         }
-        if (fringe[i].weight < min) {
+        if (fringe[i].weight < min) { // an edge 'on the fringe' might be less than any of the current nodes weights
           min = fringe[i].weight; 
           min_id = i;
         }

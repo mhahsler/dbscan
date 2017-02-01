@@ -1,6 +1,5 @@
 \name{reachability}
 \alias{reachability}
-\alias{dendrogram}
 \alias{as.reachability}
 \alias{as.reachability.optics}
 \alias{as.reachability.dendrogram}
@@ -47,7 +46,7 @@ The original ordering algorithm OPTICS as described by Ankerst et al (1999) intr
 visualization. This representation was shown to essentially convey the same information as the more
 traditional dendrogram structure by Sanders et al (2003).
 
-Different hierarchical representations, such as dendrograms or reachability plots, may be preferable depending on the context. In smaller datasets, cluster memberships may be more easily identifeable through a dendrogram representation, particularly is the user is already familiar with tree-like representations. For larger datasets however, a reachability plot may be prefered for visualizing macro-level density relationships.
+Different hierarchical representations, such as dendrograms or reachability plots, may be preferable depending on the context. In smaller datasets, cluster memberships may be more easily identifiable through a dendrogram representation, particularly is the user is already familiar with tree-like representations. For larger datasets however, a reachability plot may be prefered for visualizing macro-level density relationships.
 
 The central idea behind a reachability plot is that the ordering in which points are plotted identifies
 underlying hierarchical density representation. OPTICS linearly orders the data points such that points which are spatially closest become neighbors in the ordering. Valleys represent clusters, which can be represented hierarchically. Although the ordering is crucial to the structure of the reachability plot, its important to note that OPTICS, like DBSCAN, is not entirely deterministic and, just like the dendrogram, isomorphisms may exist

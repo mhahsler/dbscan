@@ -102,7 +102,7 @@ The dbscan package is licensed under the [GNU General Public License (GPL) Versi
 
 * Development version of [dbscan on github](https://github.com/mhahsler/dbscan).
 * List of changes from [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)
-* [dbscan reference manual](http://cran.r-project.org/web/packages/dbscan/dbscan.pdf)
+* [dbscan reference manual](https://cran.r-project.org/package=dbscan/dbscan.pdf)
 
 _Maintainer:_ [Michael Hahsler](http://michael.hahsler.net)
 

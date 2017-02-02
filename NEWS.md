@@ -1,4 +1,4 @@
-# dbscan 0.9-8.1 (2016-xx-x)
+# dbscan 1.0-0 (2017-02-02)
 
 ## New Features
 
@@ -14,9 +14,14 @@
 
 # dbscan 0.9-8 (2016-08-05)
 
+## New Features
+
+* Added hullplot to plot a scatter plot with added convex cluster hulls.
 * OPTICS: added a predecessor correction step that is used by 
     the ELKI implementation (Matt Piekenbrock).  
-* Added hullplot to plot a scatter plot with added convex cluster hulls.
+
+## Bugfixes
+
 * Fixed a memory problem in frNN (reported by Yilei He).
 
 # dbscan 0.9-7 (2016-04-14)

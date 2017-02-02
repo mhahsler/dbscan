@@ -2,8 +2,9 @@
 
 ## New Features
 
+* The package has now a vignette.
 * Jarvis-Patrick clustering is now available as jpclust().
-* Improved interface for dbscan() and optics(): ... is not passed on to frNN.
+* Improved interface for dbscan() and optics(): ... is now passed on to frNN.
 * OPTICS clustering extraction methods are now called extractDBSCAN and 
   extractXi.
 * hullplot uses now filled polygons as the default.

@@ -61,8 +61,6 @@ nn <- kNN(iris, k = 15)
 nn
 
 cl <- jpclust(nn, k = 10, kt = 6)
-
-
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

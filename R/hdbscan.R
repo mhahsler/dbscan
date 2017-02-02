@@ -17,10 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-hdbscan <- function(x, minPts = 5, xdist=NA, gen_rsl_tree = F, gen_condensed_tree=F) {
+hdbscan <- function(x, minPts, xdist=NULL, gen_rsl_tree = FALSE, gen_condensed_tree=FALSE) {
   ## Calculate Core distance using kNN
   if (missing(xdist) && (is(x, "data.table") || is(x, "data.frame") || is(x, "matrix"))) {
-    euc_dist <- dist(x, method = "euclidean")
+    euc_dist <- dist(as.matrix(x), method = "euclidean")
     core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
     n <- nrow(x)
   } else if (!missing(xdist) && is(xdist, "dist")) {
@@ -56,22 +56,22 @@ hdbscan <- function(x, minPts = 5, xdist=NA, gen_rsl_tree = F, gen_condensed_tre
   if (any(cl == 0)) {
     cluster <- match(cl, c(0, sl))-1
   } else { cluster <- match(cl, sl) }
-
+  
   ## Final stability scores
   ## NOTE: These scores represent the stability scores before the hierarchy traversal
-  cluster_scores <- sapply(sl, function(cid) res[[as.character(cid)]]$score)
+  cluster_scores <- sapply(unique(cl)[unique(cl) != 0], function(sl_cid) res[[as.character(sl_cid)]]$score)
+  names(cluster_scores) <- unique(cluster)[unique(cluster) != 0]
 
   ## Return everything HDBSCAN does
-  out <- structure(list(cluster=cluster, minPts=minPts,
+  out <- structure(list(cluster=cluster, minPts=minPts, 
                         cluster_scores=cluster_scores, # (Cluster-wide cumulative) Stability Scores
                         membership_prob=prob, # Individual point membership probabilities
                         outlier_scores=attr(res, "glosh"), # Outlier Scores
-                        mst=mst, # Minimum Spanning Tree (for debugging)
                         hc=hc # Hclust object of MST (can be cut for quick assignments)
   ), class="hdbscan", hdbscan=res) # hdbscan attributes contains actual HDBSCAN hierarchy 
   
   ## The trees don't need to be explicitly computed, but they may be useful if the user wants them
-  if (gen_rsl_tree){ out$rsl_tree = buildDendrogram(hcl) }
+  if (gen_rsl_tree){ out$rsl_tree = buildDendrogram(hc) }
   if (gen_condensed_tree) { out$condensed_tree = buildCondensedTree(res) }
   return(out)
 }
@@ -91,22 +91,22 @@ print.hdbscan <- function(x, ...) {
   writeLines(strwrap(paste0("Available fields: ", paste(names(x), collapse = ", ")), exdent = 18))
 }
 
-plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...){
+plot.hdbscan <- function(object, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...){
   
   ## Main information needed 
-  hd_info <- attr(x, "hdbscan")
-  dend <- if (is.null(x$condensed_tree)) buildCondensedTree(hd_info) else x$condensed_tree
+  hd_info <- attr(object, "hdbscan")
+  dend <- if (is.null(object$condensed_tree)) buildCondensedTree(hd_info) else object$condensed_tree
   coords <- node_xy(hd_info, cl_hierarchy = attr(hd_info, "cl_hierarchy"))
 
   ## Variables to help setup the scaling of the plotting
   nclusters <- length(hd_info)
-  npoints <- length(x$cluster)
+  npoints <- length(object$cluster)
   nleaves <- length(all_children(attr(hd_info, "cl_hierarchy"), key = 0, leaves_only = T))
   scale <- ifelse(scale == "suggest", nclusters, as.numeric(scale))
   
   ## Color variables
-  col_breaks <- seq(0, length(x$cluster)+nclusters, by=nclusters)
-  gcolors <- colorRampPalette(gradient)(length(col_breaks))
+  col_breaks <- seq(0, length(object$cluster)+nclusters, by=nclusters)
+  gcolors <- grDevices::colorRampPalette(gradient)(length(col_breaks))
 
   ## Depth-first search to recursively plot rectangles
   eps_dfs <- function(dend, index, parent_height, scale = 20){
@@ -138,7 +138,7 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
     
     ## Draw the rectangles 
     rect_color <- gcolors[.bincode(length(widths), breaks = col_breaks)]
-    rect(xleft = xleft, xright = xright, ybottom = ybottom, ytop = ytop,
+    graphics::rect(xleft = xleft, xright = xright, ybottom = ybottom, ytop = ytop,
          col = rect_color, border=NA, lwd=0)
 
     ## Highlight the most 'stable' clusters returned by the default flat cluster extraction
@@ -147,7 +147,7 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
       if (as.integer(attr(dend, "label")) %in% salient_cl){
         x_adjust <- (max(xright) - min(xleft)) * 0.10 # 10% left/right border
         y_adjust <- (max(ytop) - min(ybottom)) * 0.025 # 2.5% above/below border
-        rect(xleft = min(xleft) - x_adjust, xright = max(xright) + x_adjust,
+        graphics::rect(xleft = min(xleft) - x_adjust, xright = max(xright) + x_adjust,
              ybottom = min(ybottom) - y_adjust, ytop = max(ytop) + y_adjust,
              border = "red", lwd=1)
       }
@@ -164,7 +164,7 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
   }
   
   ## Run the recursive plotting
-  plot(dend, edge.root = T, main="HDBSCAN*", ylab="eps value")
+  plot(dend, edge.root = TRUE, main="HDBSCAN*", ylab="eps value")
   eps_dfs(dend, index = 1, parent_height = 0, scale = scale)
-  return(invisible(x))
+  return(invisible(object))
 }

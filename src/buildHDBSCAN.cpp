@@ -92,23 +92,22 @@ List buildDendrogram(List hcl) {
     if (all(m < 0).is_true()){
       // Left 
       IntegerVector left = IntegerVector::create(-lm);
+      left.attr("members") = (int) 1;
+      left.attr("height") = (double) 0.f;
       left.attr("label") = labels.at(-(lm + 1));
-      left.attr("members") = 1;
-      left.attr("height") = 0;
       left.attr("leaf") = true;
 
       // Right 
       IntegerVector right = IntegerVector::create(-rm);
+      right.attr("members") = (int) 1;
+      right.attr("height") = (double) 0.f;     
       right.attr("label") = labels.at(-(rm + 1));
-      right.attr("members") = 1;
-      right.attr("height") = 0;      
       right.attr("leaf") = true;
 
       // Merge 
       new_br = List::create(left, right);
-      new_br.attr("midpoint") = 0.5;
       new_br.attr("members") = 2;
-      //new_br.attr("class") = "dendrogram";
+      new_br.attr("midpoint") = 0.5;
     } 
     // Second case: 1 is a singleton, the other is a branch
     else if (any(m < 0).is_true()){
@@ -117,9 +116,9 @@ List buildDendrogram(List hcl) {
       // Create the leaf from the negative entry
       IntegerVector leaf = IntegerVector::create(isL ? -lm : -rm);
       leaf.attr("members") = 1;
-      leaf.attr("leaf") = true;
       leaf.attr("height") = 0;
       leaf.attr("label") = labels.at(isL ? -(lm + 1) : -(rm + 1));
+      leaf.attr("leaf") = true;
 
       // Merge the leaf with the other existing branch
       int branch_key = isL ? rm - 1 : lm - 1;
@@ -132,7 +131,6 @@ List buildDendrogram(List hcl) {
       double mid_pt = sub_branch.attr("midpoint");
       new_br.attr("members") = int(sub_members) + 1;
       new_br.attr("midpoint") = (int(isL ? 1 : sub_members) + mid_pt) / 2;
-      //new_br.attr("class") = "dendrogram";
     } else {
       // Create the new branch
       List l_branch = z.at(lm - 1), r_branch = z.at(rm - 1);
@@ -145,7 +143,6 @@ List buildDendrogram(List hcl) {
       // Set up new branch attributes
       new_br.attr("members") = left_members + right_members;
       new_br.attr("midpoint") = (left_members + l_mid + r_mid) / 2;
-      new_br.attr("class") = "dendrogram";
 
       // Deallocate unneeded memory along the way
       z.at(lm - 1) = R_NilValue;
@@ -415,7 +412,7 @@ List hdbscan_fast(const List hcl, const int minPts){
   }  
   
   // Initialize root 
-  contains["0"] = pt_order; 
+  contains["0"] = NumericVector(); 
   eps["0"] = NumericVector();   // n, eps_dist.at(eps_dist.length()-1)
   eps_birth["0"] = eps_dist.at(eps_dist.length()-1); 
   
@@ -482,11 +479,19 @@ List hdbscan_fast(const List hcl, const int minPts){
       _["n_children"] = n_children[key->first]            
     );
     
-    // Compute GLOSH outlier scores over leaves  
-    if (!cl_hierarchy.containsElementNamed((key->first).c_str())) {
-      double lambda_max = 1/(eps_birth[key->first]);
-      NumericVector glosh = NumericVector(key->second.length(), 1) - (lambda_max/eps[key->first]);
-      outlier_scores[key->second - 1] = glosh;
+    // Compute GLOSH outlier scores 
+    if (eps[key->first].size() > 0){
+      double eps_max = std::numeric_limits<double>::infinity();
+      IntegerVector leaf_membership = all_children(cl_hierarchy, atoi(key->first.c_str()), true); 
+      if (leaf_membership.length() == 0){
+        eps_max = eps_death[key->first];
+      } else {
+        for (IntegerVector::iterator it = leaf_membership.begin(); it != leaf_membership.end(); ++it){
+          eps_max = std::min(eps_max, eps_death[patch::to_string(*it)]);
+        }
+      }
+      NumericVector glosh = NumericVector(key->second.length(), 1) - (eps_max/eps[key->first]);
+      outlier_scores[key->second - 1] = glosh; 
     }
   }
   

@@ -6,9 +6,10 @@ using namespace Rcpp;
 NumericVector mrd(NumericVector dm, NumericVector cd) {
   NumericVector res = NumericVector(dm.length());
   int n = cd.length();
-  for (int i = 0, c = 0; i < n; ++i) {
+  for (int i = 0, c_ = 0; i < n; ++i) {
     for (int j = i+1; j < n; ++j) {
-      res(c++) = std::max(dm(c), std::max(cd(i), cd(j)));
+      res[c_] = std::max(dm[c_], std::max(cd[i], cd[j]));
+      c_++;
     }
   }
   return res;

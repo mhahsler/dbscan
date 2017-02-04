@@ -3,6 +3,7 @@
 ## New Features
 
 * Added NN superclass for kNN and frNN with plot and with adjacencylist().
+* Added shared nearest neighbor clustering as sNNclust().
 
 # dbscan 1.0-0 (2017-02-02)
 

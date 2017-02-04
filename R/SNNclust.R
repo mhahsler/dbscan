@@ -35,8 +35,7 @@ sNNclust <- function(x, k, minstr, minlinks, ...) {
   d <- k - SNN_sim_int(nn)
 
   # convert into a frNN object
-  remove <- d > eps
-  nn_list <- lapply(seq(nrow(nn)), FUN = function(i) unname(nn[i, !remove[i,]]))
+  nn_list <- lapply(seq(nrow(nn)), FUN = function(i) unname(nn[i, d[i,] <= eps]))
   snn <- structure(list(id = nn_list, eps = eps),
     class = c("NN", "frNN"))
 

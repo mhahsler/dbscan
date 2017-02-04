@@ -20,6 +20,7 @@ export(
   optics,
   extractDBSCAN,
   extractXi,
+  sNNclust,
   jpclust,
   lof,
   hullplot,

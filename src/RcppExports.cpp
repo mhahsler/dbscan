@@ -76,6 +76,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SNN_sim_int
+IntegerMatrix SNN_sim_int(IntegerMatrix nn);
+RcppExport SEXP dbscan_SNN_sim_int(SEXP nnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type nn(nnSEXP);
+    rcpp_result_gen = Rcpp::wrap(SNN_sim_int(nn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // kNN_int
 List kNN_int(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
 RcppExport SEXP dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {

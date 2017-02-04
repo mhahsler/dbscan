@@ -5,9 +5,9 @@
 % Package includes
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\usepackage{esvect} % vv
-\usepackage{algorithm} % algorithm tools
-\usepackage[noend]{algpseudocode} % algorithmic (pseudocode) tools
+%\usepackage{esvect} % vv
+%\usepackage{algorithm} % algorithm tools
+%\usepackage[noend]{algpseudocode} % algorithmic (pseudocode) tools
 \usepackage{mathtools} % coloneqq
 \usepackage{amsthm}
 \usepackage[dvipsnames]{xcolor} % for adding color to code

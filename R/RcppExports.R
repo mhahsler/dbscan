@@ -21,6 +21,10 @@ JP_int <- function(nn, kt) {
     .Call('dbscan_JP_int', PACKAGE = 'dbscan', nn, kt)
 }
 
+SNN_sim_int <- function(nn) {
+    .Call('dbscan_SNN_sim_int', PACKAGE = 'dbscan', nn)
+}
+
 kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
     .Call('dbscan_kNN_int', PACKAGE = 'dbscan', data, k, type, bucketSize, splitRule, approx)
 }

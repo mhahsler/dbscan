@@ -53,7 +53,8 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
     )
     names(d) <- rownames(x)
 
-    return(structure(list(dist = d, id = id, eps = eps), class = "frNN"))
+    return(structure(list(dist = d, id = id, eps = eps, sort = TRUE),
+      class = "frNN"))
   }
 
   ## make sure x is numeric
@@ -82,6 +83,7 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   names(ret$id) <- rownames(x)
 
   ret$eps <- eps
+  ret$sort <- sort
 
   class(ret) <- "frNN"
 

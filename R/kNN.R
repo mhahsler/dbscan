@@ -54,7 +54,8 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     d <- t(sapply(1:nrow(id), FUN = function(i) x[i, id[i,]]))
     dimnames(d) <- list(rownames(x), 1:k)
 
-    return(structure(list(dist = d, id = id, k = k, sort = TRUE), class = "kNN"))
+    return(structure(list(dist = d, id = id, k = k, sort = TRUE),
+      class = c("NN", "kNN")))
   }
 
   ## make sure x is numeric
@@ -91,7 +92,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   dimnames(ret$id) <- list(rownames(x), 1:k)
   ret$sort <- sort
 
-  class(ret) <- "kNN"
+  class(ret) <- c("NN", "kNN")
   ret
 }
 

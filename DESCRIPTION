@@ -25,7 +25,8 @@ Suggests:
     fpc,
     microbenchmark,
     testthat, 
-    dendextend
+    dendextend,
+    igraph
 BugReports: https://github.com/mhahsler/dbscan/issues
 License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and

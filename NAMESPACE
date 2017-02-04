@@ -11,6 +11,7 @@ importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
 importFrom("methods", "is")
 
 export(
+  adjacencylist,
   kNN,
   kNNdistplot,
   kNNdist,
@@ -42,3 +43,6 @@ S3method(predict, dbscan_fast)
 
 S3method(print, kNN)
 S3method(print, frNN)
+S3method(adjacencylist, kNN)
+S3method(adjacencylist, frNN)
+S3method(plot, NN)

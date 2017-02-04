@@ -1,5 +1,8 @@
 # dbscan 1.0-0.1 (2017-xx-xx)
 
+## New Features
+
+* Added NN superclass for kNN and frNN with plot and with adjacencylist().
 
 # dbscan 1.0-0 (2017-02-02)
 

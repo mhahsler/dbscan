@@ -55,7 +55,7 @@ An object of class kNN containing a list with the following components:
 David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Neighbor Searching, \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
-\code{\link{frNN}} for fixed radius nearest neighbors.
+\code{\link{NN}} and \code{\link{frNN}} for fixed radius nearest neighbors.
 }
 
 \author{
@@ -64,25 +64,19 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Nei
 
 \examples{
 data(iris)
+x <- iris[, -5]
+
 # finding kNN directly in data (using a kd-tree)
-nn <- kNN(iris[,-5], k=5)
+nn <- kNN(x, k=5)
 nn
 
 # explore neighborhood of point 10
 i <- 10
 nn$id[i,]
-plot(iris[,-5], col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
+plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
 
-# show the k nearest neighbors as a graph.
-plotNNgraph <- function(x, nn, main = "kNN graph", ...) {
-  plot(x, main = main, ...)
-  for(i in 1:nrow(nn$id)) {
-    for(j in 1:length(nn$id[i,]))
-      lines(x = c(x[i,1], x[nn$id[i,j],1]), y = c(x[i,2], x[nn$id[i,j],2]), ...)
-  }
-}
-
-plotNNgraph(iris[, c(1,2)], nn)
+# Visualize the nearest neighbors
+plot(nn, x)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

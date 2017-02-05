@@ -1,6 +1,7 @@
 \name{frNN}
 \alias{frNN}
 \alias{frnn}
+\alias{sort.frNN}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Find the Fixed Radius Nearest Neighbors}
 \description{
@@ -17,7 +18,7 @@ frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   \item{eps}{ neighbors radius. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree"
     or "linear", "dist").}
-  \item{sort}{ sort the neighbors by distance? }
+  \item{sort}{ sort the neighbors by distance? This is expensive and can be done later using \code{sort()}. }
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"

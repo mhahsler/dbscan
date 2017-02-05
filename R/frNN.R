@@ -90,6 +90,21 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   ret
 }
 
+sort.frNN <- function(x, decreasing = FALSE, ...) {
+  if(!is.null(x$sort) && x$sort) return(x)
+  if(is.null(x$dist)) stop("Unable to sort. Distances are missing.")
+
+  o <- lapply(1:length(x$dist), FUN =
+      function(i) order(x$dist[[i]], x$id[[i]], decreasing=FALSE))
+  x$dist <- lapply(1:length(o), FUN = function(p) x$dist[[p]][o[[p]]])
+  x$id <- lapply(1:length(o), FUN = function(p) x$id[[p]][o[[p]]])
+
+  x$sort <- TRUE
+
+  x
+}
+
+
 
 print.frNN <- function(x, ...) {
   cat("fixed radius nearest neighbors for ", length(x$id),

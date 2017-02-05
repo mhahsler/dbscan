@@ -1,6 +1,7 @@
 \name{kNN}
 \alias{kNN}
 \alias{knn}
+\alias{sort.kNN}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Find the k Nearest Neighbors}
 \description{
@@ -18,7 +19,8 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
   \item{sort}{ sort the neighbors by distance? Note that this is expensive and
-      \code{sort = FALSE} is much faster. }
+      \code{sort = FALSE} is much faster. kNN objects can be sorted using
+      \code{sort()}.}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"

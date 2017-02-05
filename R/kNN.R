@@ -96,6 +96,25 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   ret
 }
 
+sort.kNN <- function(x, decreasing = FALSE, ...) {
+  if(!is.null(x$sort) && x$sort) return(x)
+  if(is.null(x$dist)) stop("Unable to sort. Distances are missing.")
+  if(ncol(x$id)<2) {
+    x$sort <- TRUE
+    return(x)
+  }
+
+  o <- sapply(1:nrow(x$dist), FUN =
+      function(i) order(x$dist[i,], x$id[i,], decreasing=decreasing))
+  for(i in 1:ncol(o)) {
+    x$dist[i,] <- x$dist[i,][o[,i]]
+    x$id[i,] <- x$id[i,][o[,i]]
+  }
+  x$sort <- TRUE
+
+  x
+}
+
 print.kNN <- function(x, ...) {
   cat("k-nearest neighbors for ", nrow(x$id), " objects (k=", x$k,").",
     "\n", sep = "")

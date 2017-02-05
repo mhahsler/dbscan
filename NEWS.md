@@ -4,6 +4,7 @@
 
 * Added NN superclass for kNN and frNN with plot and with adjacencylist().
 * Added shared nearest neighbor clustering as sNNclust().
+* Unsorted kNN and frNN can now be sorted using sort().
 
 # dbscan 1.0-0 (2017-02-02)
 

@@ -25,8 +25,7 @@ sNNclust <- function(x, k, minstr, minlinks, ...) {
   if(is(x, "kNN")) {
     if(k > ncol(x$id))
       stop("Provided kNN object contains less than ", k, "neighbors!")
-    if(k != ncol(x$id) && !x$sort)
-      stop("Provided kNN object needs to be sorted! Use kNN() with sort = TRUE")
+    if(k != ncol(x$id) && !x$sort) x <- sort(x)
 
     nn <- x$id[,1:k]
   } else nn <- kNN(x, k, ..., sort = FALSE)$id

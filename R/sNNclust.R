@@ -21,20 +21,14 @@ sNNclust <- function(x, k, minstr, minlinks, ...) {
   eps <- k - minstr
   minPts <- minlinks
 
-  # find kNN
-  if(is(x, "kNN")) {
-    if(k > ncol(x$id))
-      stop("Provided kNN object contains less than ", k, "neighbors!")
-    if(k != ncol(x$id) && !x$sort) x <- sort(x)
-
-    nn <- x$id[,1:k]
-  } else nn <- kNN(x, k, ..., sort = FALSE)$id
+  nn <- sNN(x, k=k, ...)
 
   # calculate JP clustering similarity and convert to distance
-  d <- k - SNN_sim_int(nn)
+  d <- k - nn$shared
 
   # convert into a frNN object
-  nn_list <- lapply(seq(nrow(nn)), FUN = function(i) unname(nn[i, d[i,] <= eps]))
+  nn_list <- lapply(seq(nrow(nn$id)),
+    FUN = function(i) unname(nn$id[i, d[i,] <= eps]))
   snn <- structure(list(id = nn_list, eps = eps),
     class = c("NN", "frNN"))
 

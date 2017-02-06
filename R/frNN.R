@@ -20,6 +20,19 @@
 frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
+  if(is(x, "frNN")) {
+    if(x$eps < eps) stop("frNN in x has not a sufficient eps radius.")
+
+    for(i in 1:length(x$dist)) {
+      take <- x$dist[[i]] <= eps
+      x$dist[[i]] <- x$dist[[i]][take]
+      x$id[[i]] <- x$id[[i]][take]
+    }
+    x$eps <- eps
+
+    return(x)
+  }
+
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 

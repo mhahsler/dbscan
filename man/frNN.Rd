@@ -14,7 +14,7 @@ frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ a data matrix or a dist object.}
+  \item{x}{ a data matrix, a dist object or a frNN object.}
   \item{eps}{ neighbors radius. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree"
     or "linear", "dist").}
@@ -75,12 +75,14 @@ hist(sapply(adjacencylist(nn), length),
 i <- 10
 nn$id[[i]]
 nn$dist[[i]]
+plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[[i]], "red", "black"))
 
 # get an adjacency list
 head(adjacencylist(nn))
 
-plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[[i]], "red", "black"))
+# plot the fixed radius neighbors (and then reduced to a radius of .3)
 plot(nn, x)
+plot(frNN(nn, .3), x)
 
 
 ## manually create a frNN object for dbscan (dbscan only needs ids and eps)

@@ -25,6 +25,16 @@
 kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
+  if(is(x, "kNN")) {
+    if(x$k < k) stop("kNN in x has not enough nearest neighbors.")
+    if(!x$sort) x <- sort(x)
+    x$id <- x$id[,1:k]
+    if(!is.null(x$dist)) x$dist <- x$dist[,1:k]
+    if(!is.null(x$shared)) x$dist <- x$shared[,1:k]
+    x$k <- k
+    return(x)
+  }
+
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 

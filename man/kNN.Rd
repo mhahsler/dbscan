@@ -14,7 +14,7 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ a data matrix or a dist object. }
+  \item{x}{ a data matrix, a dist object or a kNN object. }
   \item{k}{ number of neighbors to find. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
@@ -77,8 +77,11 @@ i <- 10
 nn$id[i,]
 plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
 
-# Visualize the nearest neighbors
+# Visualize the 5 nearest neighbors
 plot(nn, x)
+
+# Visualize a reduced 2-NN graph
+plot(kNN(nn, k = 2), x)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

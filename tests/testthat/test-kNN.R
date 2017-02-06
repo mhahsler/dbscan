@@ -100,3 +100,13 @@ expect_error(kNN(x_na, k = 3), regexp = "NA")
 expect_error(kNN(x_na, k = 3, search = "dist"), regexp = "NA")
 expect_error(kNN(dist(x_na), k = 3), regexp = "NA")
 
+## sort and kNN to reduce k
+nn10 <- kNN(x, k = 10, sort = FALSE)
+expect_equal(nn10$sort, FALSE)
+expect_error(kNN(nn10, k = 11))
+nn5 <- kNN(nn10, k = 5)
+expect_equal(nn5$sort, TRUE)
+expect_equal(ncol(nn5$id), 5L)
+expect_equal(ncol(nn5$dist), 5L)
+
+

@@ -74,3 +74,15 @@ nn_d <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
 
 expect_equal(nn, nn_d)
 
+## sort and frNN to reduce eps
+nn5 <- frNN(x, eps = .5, sort = FALSE)
+expect_equal(nn5$sort, FALSE)
+
+nn5s <- sort(nn5)
+expect_equal(nn5s$sort, TRUE)
+expect_equal(all(sapply(nn5s$dist, FUN = function(x) all(x == sort(x)))), TRUE)
+
+expect_error(frNN(nn5, eps = 1))
+nn2 <- frNN(nn5, eps = .2)
+expect_equal(all(sapply(nn2$dist, FUN = function(x) all(x <=.2))), TRUE)
+

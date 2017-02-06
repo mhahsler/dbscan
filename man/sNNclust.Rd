@@ -41,14 +41,13 @@ Levent Ertoz, Michael Steinbach, Vipin Kumar, A New Shared Nearest Neighbor Clus
 }
 
 \examples{
-data(iris)
-iris <- as.matrix(iris[,1:4]) ### only use numeric attributes
+data("Chameleon")
 
-# Out of 20 NN 10 have to be shared (minstr) to create a link in the sNN graph.
-# A point needs a least 5 strong links to be a representative (not noise).
+# Out of 20 NN 5 have to be shared (minstr) to create a link in the sNN graph.
+# A point needs a least 15 strong links to be a representative (not noise).
 # Noise points have cluster id 0 and are shown in black.
-cl <- sNNclust(iris, k = 20, minstr = 10, minlinks = 5)
-pairs(iris, col = cl + 1L)
+cl <- sNNclust(chameleon_ds4, k = 20, minstr = 5, minlinks = 15)
+plot(chameleon_ds4, col = cl + 1L, cex = .5)
 }
 \keyword{ model }
 \keyword{ clustering }

@@ -49,18 +49,18 @@ R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Base
 }
 
 \examples{
-data(iris)
-iris <- as.matrix(iris[,1:4]) ### only use numeric attributes
+data("Chameleon")
 
-# use a shared neighborhood of 10 points and require 6 shared neighbors
-cl <- jpclust(iris, k = 10, kt = 6)
-pairs(iris, col = cl)
+# use a shared neighborhood of 20 points and require 12 shared neighbors
+cl <- jpclust(chameleon_ds4, k = 20, kt = 12)
+plot(chameleon_ds4, col = cl, cex = .5)
+# Note how the sine wave points chain clusters together.
 
 # use a precomputed kNN object instead of the original data.
-nn <- kNN(iris, k = 15)
+nn <- kNN(chameleon_ds4, k = 30)
 nn
 
-cl <- jpclust(nn, k = 10, kt = 6)
+cl <- jpclust(nn, k = 20, kt = 12)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

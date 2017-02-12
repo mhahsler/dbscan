@@ -17,26 +17,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-# number of shared nearest neighbors including the point itself.
-sNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
+
+pointdensity <- function(x, eps, type = "frequency",
+  search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0){
 
-  if(is(x, "kNN")) {
-    nn <- x
-    if(missing(k)) k <- nn$k
-    if(ncol(nn$id) < k) stop("kNN object does not contain enough neighbors!")
-    if(ncol(nn$id) < k) {
-      if(!nn$sort) nn <- sort(nn)
-      nn$id <- nn$id[,1:k]
-      nn$dist <- nn$dist[,1:k]
-    }
-  } else nn <- kNN(x, k, sort = FALSE, search = search, bucketSize = bucketSize,
-    splitRule = splitRule, approx = approx)
+  ### ANN uses squared distance
+  eps2 <- eps*eps
 
-  nn$shared <- SNN_sim_int(nn$id)
-  class(nn) <- c("NN", "kNN", "sNN")
+  type <- match.arg(type, choices = c("frequency", "density"))
 
-  if(sort) nn <- sort(nn)
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  if(is.na(search)) stop("Unknown NN search type!")
 
-  nn
+  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
+  if(is.na(splitRule)) stop("Unknown splitRule!")
+
+  d <- dbscan_density_int(as.matrix(x), as.double(eps2),
+  as.integer(search), as.integer(bucketSize),
+  as.integer(splitRule), as.double(approx))
+
+  if(type == "density") d <- d / (2*eps*nrow(x))
+
+  d
 }
+
+

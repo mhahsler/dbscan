@@ -15,9 +15,6 @@ using namespace Rcpp;
 IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
   int n = nn.nrow();
 
-  // since the actual points (neighbor 0) are not in the list
-  kt--;
-
   // create label vector
   std::vector<int> label(n);
   //iota is C++11 only
@@ -61,7 +58,8 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
           std::back_inserter(z));
 
         // this could be done faster with set union
-        if(z.size() >= kt) {
+        // +1 since i is in j
+        if(z.size()+1 >= kt) {
           // update labels
           if(label[i] > label[j]) {
             newlabel = label[j]; oldlabel = label[i];
@@ -108,7 +106,7 @@ IntegerMatrix SNN_sim_int(IntegerMatrix nn) {
       // edge was already checked
       //if(j<i) continue;
 
-      // check if points are in each others snn list (is is already in j)
+      // check if points are in each others snn list (i is already in j)
       if(nn_set[j].find(i+1) != nn_set[j].end()) {
 
         // calculate link strength as the number of shared points
@@ -117,8 +115,8 @@ IntegerMatrix SNN_sim_int(IntegerMatrix nn) {
           nn_set[j].begin(), nn_set[j].end(),
           std::back_inserter(z));
 
-        // this could be done faster with set union
-        snn(i, j_ind) = z.size();
+        // +1 for i being in j
+        snn(i, j_ind) = z.size()+1;
       }
     }
   }

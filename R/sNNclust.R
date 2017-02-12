@@ -17,22 +17,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-sNNclust <- function(x, k, minstr, minlinks, ...) {
-  eps <- k - minstr
-  minPts <- minlinks
-
+sNNclust <- function(x, k, eps, minPts, borderPoints = TRUE, ...) {
   nn <- sNN(x, k=k, ...)
 
-  # calculate JP clustering similarity and convert to distance
-  d <- k - nn$shared
-
-  # convert into a frNN object
+  # convert into a frNN object which already enforces eps
   nn_list <- lapply(seq(nrow(nn$id)),
-    FUN = function(i) unname(nn$id[i, d[i,] <= eps]))
+    FUN = function(i) unname(nn$id[i, nn$shared[i,] >= eps]))
   snn <- structure(list(id = nn_list, eps = eps),
     class = c("NN", "frNN"))
 
   # run dbscan
-  cl <- dbscan(snn, minPts = minPts, borderPoints = FALSE)
+  cl <- dbscan(snn, minPts = minPts, borderPoints = borderPoints)
   cl$cluster
 }

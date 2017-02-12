@@ -28,10 +28,13 @@ sNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     omitted leading to spurious clusters and noise points.
     However, the algorithm will enjoy a significant speedup. }
 }
-%\details{
-%}
+\details{
+The number of shared nearest neighbors is the intersection of the
+kNN neighborhood of two points. Note: that each point is considered to be part
+of its own kNN neighborhood. The range for the shared nearest neighbors is
+[0,k].
+}
 \value{
-%%  ~Describe the value returned
 An object of class sNN containing a list with the following components:
   \item{id }{a matrix with ids. }
   \item{dist }{a matrix with the distances. }
@@ -55,6 +58,9 @@ x <- iris[, -5]
 k <- 5
 nn <- sNN(x, k = k)
 nn
+
+# shared nearest neighbor distribution
+table(as.vector(nn$shared))
 
 # explore neighborhood of point 10
 i <- 10

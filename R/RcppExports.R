@@ -13,6 +13,10 @@ dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSiz
     .Call('dbscan_dbscan_int', PACKAGE = 'dbscan', data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
 }
 
+dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
+    .Call('dbscan_dbscan_density_int', PACKAGE = 'dbscan', data, eps, type, bucketSize, splitRule, approx)
+}
+
 frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
     .Call('dbscan_frNN_int', PACKAGE = 'dbscan', data, eps, type, bucketSize, splitRule, approx)
 }

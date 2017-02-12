@@ -5,9 +5,11 @@
 * Added NN superclass for kNN and frNN with plot and with adjacencylist().
 * Added shared nearest neighbor clustering as sNNclust() and sNN to calculate
   the number of shared nearest neighbors.
+* Added pointdensity function.
 * Unsorted kNN and frNN can now be sorted using sort().
 * kNN and frNN now also accept kNN and frNN objects, respectively. This can 
   be used to create a new kNN (frNN) with a reduced k or eps.
+* Added Chameleon datasets.
 
 # dbscan 1.0-0 (2017-02-02)
 

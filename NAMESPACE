@@ -24,6 +24,7 @@ export(
   sNNclust,
   jpclust,
   lof,
+  pointdensity,
   hullplot,
   as.reachability
 )

@@ -65,29 +65,72 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// computeSalientScores
-double computeSalientScores(const List hdbscan, std::string cid, std::list<int>& sc, List cl_hierarchy);
-RcppExport SEXP dbscan_computeSalientScores(SEXP hdbscanSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP) {
+// computeVirtualNode
+double computeVirtualNode(IntegerVector noise, List constraints);
+RcppExport SEXP dbscan_computeVirtualNode(SEXP noiseSEXP, SEXP constraintsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const List >::type hdbscan(hdbscanSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type noise(noiseSEXP);
+    Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeVirtualNode(noise, constraints));
+    return rcpp_result_gen;
+END_RCPP
+}
+// computeSalientScores
+NumericVector computeSalientScores(List hdbscan, std::string cid, std::list<int>& sc, List cl_hierarchy, bool prune_unstable_leaves, bool useVirtual, const int n_constraints, List constraints);
+RcppExport SEXP dbscan_computeSalientScores(SEXP hdbscanSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP, SEXP prune_unstable_leavesSEXP, SEXP useVirtualSEXP, SEXP n_constraintsSEXP, SEXP constraintsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hdbscan(hdbscanSEXP);
     Rcpp::traits::input_parameter< std::string >::type cid(cidSEXP);
     Rcpp::traits::input_parameter< std::list<int>& >::type sc(scSEXP);
     Rcpp::traits::input_parameter< List >::type cl_hierarchy(cl_hierarchySEXP);
-    rcpp_result_gen = Rcpp::wrap(computeSalientScores(hdbscan, cid, sc, cl_hierarchy));
+    Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
+    Rcpp::traits::input_parameter< bool >::type useVirtual(useVirtualSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_constraints(n_constraintsSEXP);
+    Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeSalientScores(hdbscan, cid, sc, cl_hierarchy, prune_unstable_leaves, useVirtual, n_constraints, constraints));
     return rcpp_result_gen;
 END_RCPP
 }
 // hdbscan_fast
-List hdbscan_fast(const List hcl, const int minPts);
-RcppExport SEXP dbscan_hdbscan_fast(SEXP hclSEXP, SEXP minPtsSEXP) {
+List hdbscan_fast(const List hcl, const int minPts, bool compute_glosh, bool prune_unstable_leaves);
+RcppExport SEXP dbscan_hdbscan_fast(SEXP hclSEXP, SEXP minPtsSEXP, SEXP compute_gloshSEXP, SEXP prune_unstable_leavesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const List >::type hcl(hclSEXP);
     Rcpp::traits::input_parameter< const int >::type minPts(minPtsSEXP);
-    rcpp_result_gen = Rcpp::wrap(hdbscan_fast(hcl, minPts));
+    Rcpp::traits::input_parameter< bool >::type compute_glosh(compute_gloshSEXP);
+    Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
+    rcpp_result_gen = Rcpp::wrap(hdbscan_fast(hcl, minPts, compute_glosh, prune_unstable_leaves));
+    return rcpp_result_gen;
+END_RCPP
+}
+// distToAdjacency
+List distToAdjacency(IntegerVector constraints, const int N);
+RcppExport SEXP dbscan_distToAdjacency(SEXP constraintsSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type constraints(constraintsSEXP);
+    Rcpp::traits::input_parameter< const int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(distToAdjacency(constraints, N));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractSemiSupervised
+List extractSemiSupervised(List hdbscan, List constraints, bool prune_unstable_leaves);
+RcppExport SEXP dbscan_extractSemiSupervised(SEXP hdbscanSEXP, SEXP constraintsSEXP, SEXP prune_unstable_leavesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hdbscan(hdbscanSEXP);
+    Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
+    Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractSemiSupervised(hdbscan, constraints, prune_unstable_leaves));
     return rcpp_result_gen;
 END_RCPP
 }

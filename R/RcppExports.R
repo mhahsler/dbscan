@@ -21,12 +21,24 @@ buildCondensedTree <- function(hdbscan) {
     .Call('dbscan_buildCondensedTree', PACKAGE = 'dbscan', hdbscan)
 }
 
-computeSalientScores <- function(hdbscan, cid, sc, cl_hierarchy) {
-    .Call('dbscan_computeSalientScores', PACKAGE = 'dbscan', hdbscan, cid, sc, cl_hierarchy)
+computeVirtualNode <- function(noise, constraints) {
+    .Call('dbscan_computeVirtualNode', PACKAGE = 'dbscan', noise, constraints)
 }
 
-hdbscan_fast <- function(hcl, minPts) {
-    .Call('dbscan_hdbscan_fast', PACKAGE = 'dbscan', hcl, minPts)
+computeSalientScores <- function(hdbscan, cid, sc, cl_hierarchy, prune_unstable_leaves = FALSE, useVirtual = FALSE, n_constraints = 0L, constraints = NULL) {
+    .Call('dbscan_computeSalientScores', PACKAGE = 'dbscan', hdbscan, cid, sc, cl_hierarchy, prune_unstable_leaves, useVirtual, n_constraints, constraints)
+}
+
+hdbscan_fast <- function(hcl, minPts, compute_glosh = TRUE, prune_unstable_leaves = FALSE) {
+    .Call('dbscan_hdbscan_fast', PACKAGE = 'dbscan', hcl, minPts, compute_glosh, prune_unstable_leaves)
+}
+
+distToAdjacency <- function(constraints, N) {
+    .Call('dbscan_distToAdjacency', PACKAGE = 'dbscan', constraints, N)
+}
+
+extractSemiSupervised <- function(hdbscan, constraints, prune_unstable_leaves = FALSE) {
+    .Call('dbscan_extractSemiSupervised', PACKAGE = 'dbscan', hdbscan, constraints, prune_unstable_leaves)
 }
 
 reach_to_dendrogram <- function(reachability, pl_order) {

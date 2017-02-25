@@ -20,6 +20,7 @@ export(
   extractDBSCAN,
   extractXi,
   hdbscan,
+  extractSS, 
   lof,
   hullplot,
   as.reachability

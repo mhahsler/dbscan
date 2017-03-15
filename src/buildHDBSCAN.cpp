@@ -452,7 +452,8 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
             eps_max = std::min(eps_max, eps_death[patch::to_string(*it)]);
           }
         }
-        NumericVector glosh = NumericVector(key->second.length(), 1) - (eps_max/eps[key->first]);
+        NumericVector eps_max_vec = NumericVector(eps_max, eps.size())/Rcpp::as<NumericVector>(eps[key->first]);
+        NumericVector glosh = NumericVector((double) key->second.length(), 1) - eps_max_vec;
         outlier_scores[key->second - 1] = glosh; 
       }
     }

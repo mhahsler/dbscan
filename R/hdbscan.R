@@ -18,8 +18,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
+  ## Type Checking 
+  if (is(x, "data.table") || is(x, "data.frame") || is(x, "matrix")){
+    x <- as.matrix(x)
+    if (!storage.mode(x) %in% c("integer", "double")){
+      stop("hdbscan expects numerical data")
+    }
+  } else { stop("hdbscan expects a matrix-conformable object for x") }
+  
   ## Calculate Core distance using kNN
-  if (missing(xdist) && (is(x, "data.table") || is(x, "data.frame") || is(x, "matrix"))) {
+  if (missing(xdist)) {
     euc_dist <- dist(as.matrix(x), method = "euclidean")
     core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
     n <- nrow(x)
@@ -28,7 +36,7 @@ hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplif
     core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
     n <- nrow(x)
   } else {
-    stop("hdbscan expects a matrix-conformable object for x")
+    stop("xdist must be a dist object")
   }
 
   ## Mutual Reachability matrix
@@ -37,9 +45,11 @@ hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplif
   ## Get MST, convert to RSL representation
   mst <- prims(mrd, n)
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
+  hc$call <- match.call()
 
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
-  res <- hdbscan_fast(hc, minPts, compute_glosh = TRUE)
+  res <- computeStability(hc, minPts, compute_glosh = TRUE)
+  res <- extractUnsupervised(res)
   cl <- attr(res, "cluster")
   sl <- attr(res, "salient_clusters")
   
@@ -58,9 +68,9 @@ hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplif
   } else { cluster <- match(cl, sl) }
   cl_map <- structure(sl, names=unique(cluster[hc$order][cluster[hc$order] != 0]))
   
-  ## Final stability scores
+  ## Stability scores
   ## NOTE: These scores represent the stability scores -before- the hierarchy traversal
-  cluster_scores <- sapply(sl, function(sl_cid) res[[as.character(sl_cid)]]$score)
+  cluster_scores <- sapply(sl, function(sl_cid) res[[as.character(sl_cid)]]$stability)
   names(cluster_scores) <- names(cl_map)
 
   ## Return everything HDBSCAN does
@@ -74,7 +84,7 @@ hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplif
   
   ## The trees don't need to be explicitly computed, but they may be useful if the user wants them
   if (gen_hdbscan_tree){ out$hdbscan_tree = buildDendrogram(hc) }
-  if (gen_simplified_tree) { out$simplified_tree = buildCondensedTree(res) }
+  if (gen_simplified_tree) { out$simplified_tree = simplifiedTree(res) }
   return(out)
 }
 
@@ -93,23 +103,23 @@ print.hdbscan <- function(x, ...) {
   writeLines(strwrap(paste0("Available fields: ", paste(names(x), collapse = ", ")), exdent = 18))
 }
 
-plot.hdbscan <- function(object, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...){
+plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...){
   ## Logic checks
   if(!(scale == "suggest" || scale > 0.0)) stop("scale parameter must be greater than 0.")
   
   ## Main information needed 
-  hd_info <- attr(object, "hdbscan")
-  dend <- if (is.null(object$simplified_tree)) buildCondensedTree(hd_info) else object$simplified_tree
+  hd_info <- attr(x, "hdbscan")
+  dend <- if (is.null(x$simplified_tree)) simplifiedTree(hd_info) else x$simplified_tree
   coords <- node_xy(hd_info, cl_hierarchy = attr(hd_info, "cl_hierarchy"))
 
   ## Variables to help setup the scaling of the plotting
   nclusters <- length(hd_info)
-  npoints <- length(object$cluster)
+  npoints <- length(x$cluster)
   nleaves <- length(all_children(attr(hd_info, "cl_hierarchy"), key = 0, leaves_only = T))
   scale <- ifelse(scale == "suggest", nclusters, nclusters/as.numeric(scale))
   
   ## Color variables
-  col_breaks <- seq(0, length(object$cluster)+nclusters, by=nclusters)
+  col_breaks <- seq(0, length(x$cluster)+nclusters, by=nclusters)
   gcolors <- grDevices::colorRampPalette(gradient)(length(col_breaks))
 
   ## Depth-first search to recursively plot rectangles
@@ -170,33 +180,9 @@ plot.hdbscan <- function(object, scale="suggest", gradient=c("yellow", "red"), s
   }
   
   ## Run the recursive plotting
-  plot(dend, edge.root = TRUE, main="HDBSCAN*", ylab="eps value", leaflab="none")
+  plot(dend, edge.root = TRUE, main="HDBSCAN*", ylab="eps value", leaflab="none", ...)
   eps_dfs(dend, index = 1, parent_height = 0, scale = scale)
-  return(invisible(object))
-}
-
-extractSS <- function(x, constraints){
-  if (!is(x, 'hdbscan')) stop("extractSS expects an hdbscan object")
-  hd_info <- attr(x, 'hdbscan')
-  n <- length(x$cluster)
-  
-  ## If given as adjacency-list form
-  if (is.list(constraints) && max(as.integer(names(constraints))) < n) { 
-    x <- extractSemiSupervised(hd_info, constraints)
-  } else if (is.vector(constraints) && length(constraints) == n*(n-1)/2){
-    ## Adjacency given, retrieve adjacency list form
-    constraints_list <- distToAdjacency(constraints, n) ## NOTE: Fix to make base 1
-    x <- extractSemiSupervised(hd_info, constraints_list)
-  } else if (is.matrix(constraints) && all(dim(constraints) == c(n, n))){
-    ## Full-Adjacency given, give warning and retrieve adjacency list form
-    warning("Full nxn matrix given; extractSS does not support asymmetric relational constraints. Using lower triangular.")
-    cvec <- constraints[lower.tri(constraints)]
-    constraints_list <- distToAdjacency(cvec, n)
-    x <- extractSemiSupervised(hd_info, constraints_list)
-  } else {
-    stop(paste("extractSS doesn't know how to handle constraints of type", class(constraints)))
-  }
-  x
+  return(invisible(x))
 }
 
 

@@ -95,6 +95,7 @@ NumericMatrix prims(const NumericVector x_dist, const int n) {
   return(mst);
 }
 
+
 // [[Rcpp::export]]
 IntegerVector order_(NumericVector x) {
   if (is_true(any(duplicated(x)))) {
@@ -105,7 +106,7 @@ IntegerVector order_(NumericVector x) {
 }
 
 
-void visit(const NumericMatrix& merge, IntegerVector& order, int i, int j, int& ind) {
+void visit(const IntegerMatrix& merge, IntegerVector& order, int i, int j, int& ind) {
   // base case
   if (merge(i, j) < 0) {
     order.at(ind++) = -merge(i, j); 
@@ -116,7 +117,7 @@ void visit(const NumericMatrix& merge, IntegerVector& order, int i, int j, int& 
   }
 }
 
-IntegerVector extractOrder(NumericMatrix merge){
+IntegerVector extractOrder(IntegerMatrix merge){
   IntegerVector order = IntegerVector(merge.nrow()+1);
   int ind = 0;
   visit(merge, order, merge.nrow() - 1, 0, ind);
@@ -131,16 +132,16 @@ List hclustMergeOrder(NumericMatrix mst, IntegerVector o){
   
   // Extract order, reorder indices
   NumericVector left = mst(_, 0), right = mst(_, 1);
-  left = left[o-1], right = right[o-1];
+  IntegerVector left_int = as<IntegerVector>(left[o-1]), right_int = as<IntegerVector>(right[o-1]);
   
   // Labels and resulting merge matrix
   IntegerVector labs = -seq_len(npoints); 
-  NumericMatrix merge = NumericMatrix(npoints - 1, 2); 
+  IntegerMatrix merge = IntegerMatrix(npoints - 1, 2); 
 
   // Replace singletons as negative and record merge of non-singletons as positive
   for (int i = 0; i < npoints - 1; ++i) {
-    int lab_left = labs.at(left.at(i)-1), lab_right = labs.at(right.at(i)-1);
-    merge(i, _) = NumericVector::create(lab_left, lab_right); 
+    int lab_left = labs.at(left_int.at(i)-1), lab_right = labs.at(right_int.at(i)-1);
+    merge(i, _) = IntegerVector::create(lab_left, lab_right); 
     for (int c = 0; c < npoints; ++c){
       if (labs.at(c) == lab_left || labs.at(c) == lab_right){
         labs.at(c) = i+1; 

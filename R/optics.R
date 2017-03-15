@@ -195,37 +195,5 @@ as.dendrogram.optics <- function(object, ...) {
   if(object$minPts > length(object$order)) { stop("'minPts' should be less or equal to the points in the dataset.") }
   if(length(which(object$reachdist == Inf)) > 1) stop("Eps value is not large enough to capture the complete hiearchical structure of the dataset. Please use a large eps value (such as Inf).")
   as.dendrogram(as.reachability(object))
-  # # Start with 0-height leaves
-  # leaves <- lapply(1:length(x$order), function(cid) {
-  #   structure(x$order[cid], members=1, height=0, label=as.character(x$order[cid]),
-  #       leaf=T, class="dendrogram")
-  # })
-  #
-  # # Get sorted reachability distances and indices (ascending)
-  # pl <- sort(x$reachdist)
-  # pl_order <- order(x$reachdist)
-  #
-  # # For all the reachability distances excluding Inf
-  # for(i in which(pl != Inf)) {
-  #   # Get the index of the point with next smallest reach dist and its neighbor
-  #   p <- pl_order[i]
-  #   q <- x$order[which(x$order == p) - 1]
-  #
-  #   # Get the actual index fo the branch(es) containing the p and q
-  #   hier_indices <- lapply(leaves, labels)
-  #   p_leaf <- which(unlist(lapply(hier_indices, function(b) p %in% b)))
-  #   q_leaf <- which(unlist(lapply(hier_indices, function(b) q %in% b)))
-  #
-  #   # Create the new branch containing the leaves that were removed (midpoint filled in later)
-  #   children <- list(leaves[[q_leaf]], leaves[[p_leaf]])
-  #   cl_members <- as.integer(sum(sapply(children, function(b) attr(b, which="members"))))
-  #   N <- structure(children, members=cl_members, midpoint=NA,
-  #                  height=pl[i], class="dendrogram")
-  #
-  #   leaves <- append(leaves[-c(p_leaf, q_leaf)], list(N))
-  # }
-  #
-  # # Always shift down one; midpoint calculation expensive, so use center=T in plotting
-  # return(leaves[[1]])
-}# text(x=test$x, y=test$y, 1:nrow(test))
+}
 

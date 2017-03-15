@@ -7,76 +7,38 @@ using namespace Rcpp;
 #include <stack>
 #include <queue>
 
+// Helper functions 
+#include "utilities.h"
+
 // Macros
 #define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
 
-// std::to_string is apparently a c++11 only thing that crashes appveyor, so using ostringstream it is!
-namespace patch
-{
-  template < typename T > std::string to_string( const T& n )
-  {
-    std::ostringstream stm ;
-    stm << n ;
-    return stm.str() ;
-  }
-}
-
-template <typename T, typename C> bool contains (const T& container, const C& key)
-{
-  if (std::find(container.begin(), container.end(), key) != container.end()){
-    return true; 
-  } else {
-    return false; 
-  }
-}
-
-IntegerVector which_cpp( NumericVector x, double value) {
-  int nx = x.size();
-  std::vector<int> y;
-  y.reserve(nx);
-  for(int i = 0; i < nx; ++i) { if (x[i] == value) y.push_back(i); }
-  return wrap(y);
-}
-
-IntegerVector which_cpp( IntegerVector x, int value) {
-  int nx = x.size();
-  std::vector<int> y;
-  y.reserve(nx);
-  for(int i = 0; i < nx; ++i) { if (x[i] == value) y.push_back(i); }
-  return wrap(y);
-}
-
-IntegerVector which_geq( IntegerVector x, int value) {
-  int nx = x.size();
-  std::vector<int> y;
-  y.reserve(nx);
-  for(int i = 0; i < nx; ++i) { if (x[i] >= value) y.push_back(i); }
-  return wrap(y);
-}
-
-
+// Given a dist vector of "should-link" (1), "should-not-link" (-1), and "don't care" (0) 
+// constraints in the form of integers, convert constraints to a more compact adjacency list 
+// representation. 
 // [[Rcpp::export]]
-NumericVector combine(const NumericVector& t1, const NumericVector& t2){
-  std::size_t n = t1.size() + t2.size();
-  NumericVector output = Rcpp::no_init(n);
-  std::copy(t1.begin(), t1.end(), output.begin());
-  std::copy(t2.begin(), t2.end(), output.begin()+t1.size());
-  return output;
+List distToAdjacency(IntegerVector constraints, const int N){
+  std::unordered_map<int, std::vector<int> > key_map = std::unordered_map<int, std::vector<int> >();  
+  for (int i = 0; i < N; ++i){
+    for (int j = 0; j < N; ++j){
+      if (i == j) continue; 
+      int index = i > j ? INDEX_TF(N, j, i) : INDEX_TF(N, i, j);
+      int crule = constraints.at(index); 
+      if (crule != 0){
+        if (key_map.count(i+1) != 1){ key_map[i+1] = std::vector<int>(); } // add 1 for base 1
+        key_map[i+1].push_back(crule < 0 ? - (j + 1) : j + 1); // add 1 for base 1
+      }
+    }
+  }
+  return(wrap(key_map));
 }
 
-IntegerVector combine(const IntegerVector& t1, const IntegerVector& t2){
-  std::size_t n = t1.size() + t2.size();
-  IntegerVector output = Rcpp::no_init(n);
-  std::copy(t1.begin(), t1.end(), output.begin());
-  std::copy(t2.begin(), t2.end(), output.begin()+t1.size());
-  return output;
-}
-
+// Given an hclust object, convert to a dendrogram object (but much faster). 
 // [[Rcpp::export]]
 List buildDendrogram(List hcl) {
   
   // Extract hclust info
-  NumericMatrix merge = hcl["merge"]; 
+  IntegerMatrix merge = hcl["merge"]; 
   NumericVector height = hcl["height"];
   IntegerVector order = hcl["order"];
   List labels = List(); // allows to avoid type inference 
@@ -160,6 +122,7 @@ List buildDendrogram(List hcl) {
   return(res);
 }
 
+// Simple function to iteratively get the sub-children of a nested integer-hierarchy
 // [[Rcpp::export]]
 IntegerVector all_children(List hier, int key, bool leaves_only = false){
   IntegerVector res = IntegerVector(); 
@@ -196,20 +159,20 @@ IntegerVector all_children(List hier, int key, bool leaves_only = false){
 }
 
 // Extract 'flat' assignments
-IntegerVector getSalientAssignments(List hdbscan, List cl_hierarchy, std::list<int> sc, const int n){
+IntegerVector getSalientAssignments(List cl_tree, List cl_hierarchy, std::list<int> sc, const int n){
   IntegerVector cluster = IntegerVector(n, 0);
   for (std::list<int>::iterator it = sc.begin(); it != sc.end(); it++) {
     IntegerVector child_cl = all_children(cl_hierarchy, *it);
     
-    // If at a leaf, use not necessary to recursively get point indices, else need to traverse hierarchy
+    // If at a leaf, its not necessary to recursively get point indices, else need to traverse hierarchy
     if (child_cl.length() == 0){
-      List cl = hdbscan[patch::to_string(*it)]; 
+      List cl = cl_tree[patch::to_string(*it)]; 
       cluster[as<IntegerVector>(cl["contains"]) - 1] = *it;
     } else {
-      List cl = hdbscan[patch::to_string(*it)]; 
+      List cl = cl_tree[patch::to_string(*it)]; 
       cluster[as<IntegerVector>(cl["contains"]) - 1] = *it; 
       for (IntegerVector::iterator child_cid = child_cl.begin(); child_cid != child_cl.end(); ++child_cid){
-        cl = hdbscan[patch::to_string(*child_cid)];
+        cl = cl_tree[patch::to_string(*child_cid)];
         IntegerVector child_contains = as<IntegerVector>(cl["contains"]);
         if (child_contains.length() > 0){
           cluster[child_contains - 1] = *it;
@@ -220,38 +183,38 @@ IntegerVector getSalientAssignments(List hdbscan, List cl_hierarchy, std::list<i
   return(cluster);
 }
 
-
+// Retrieve node (x, y) positions in a cluster tree
 // [[Rcpp::export]]
-NumericMatrix node_xy(List hdbscan, List cl_hierarchy, int cid = 0){
+NumericMatrix node_xy(List cl_tree, List cl_hierarchy, int cid = 0){
   
   // Initialize
   if (cid == 0){
-    hdbscan["node_xy"] = NumericMatrix(all_children(cl_hierarchy, 0).size()+1, 2);
-    hdbscan["leaf_counter"] = 0; 
-    hdbscan["row_counter"] = 0; 
+    cl_tree["node_xy"] = NumericMatrix(all_children(cl_hierarchy, 0).size()+1, 2);
+    cl_tree["leaf_counter"] = 0; 
+    cl_tree["row_counter"] = 0; 
   }
   
   // Retrieve/set variables 
   std::string cid_str = patch::to_string(cid);
-  NumericMatrix node_xy_ = hdbscan["node_xy"]; 
-  List cl = hdbscan[cid_str]; 
+  NumericMatrix node_xy_ = cl_tree["node_xy"]; 
+  List cl = cl_tree[cid_str]; 
   
   // Increment row index every time
-  int row_index = (int) hdbscan["row_counter"];
-  hdbscan["row_counter"] = row_index+1;
+  int row_index = (int) cl_tree["row_counter"];
+  cl_tree["row_counter"] = row_index+1;
   
   // base case
   if (!cl_hierarchy.containsElementNamed(cid_str.c_str())){
-    int leaf_index = (int) hdbscan["leaf_counter"];
+    int leaf_index = (int) cl_tree["leaf_counter"];
     node_xy_(row_index, _) = NumericVector::create((double) ++leaf_index, (double) cl["eps_death"]);
-    hdbscan["leaf_counter"] = leaf_index; 
+    cl_tree["leaf_counter"] = leaf_index; 
     NumericMatrix res = NumericMatrix(1, 1);
     res[0] = row_index; 
     return(res);
   } else {
     IntegerVector children = cl_hierarchy[cid_str]; 
-    int l_row = (int) node_xy(hdbscan, cl_hierarchy, children.at(0))[0]; // left 
-    int r_row = (int) node_xy(hdbscan, cl_hierarchy, children.at(1))[0]; // right 
+    int l_row = (int) node_xy(cl_tree, cl_hierarchy, children.at(0))[0]; // left 
+    int r_row = (int) node_xy(cl_tree, cl_hierarchy, children.at(1))[0]; // right 
     double lvalue = (double) (node_xy_(l_row, 0) + node_xy_(r_row, 0)) / 2; 
     node_xy_(row_index, _) = NumericVector::create(lvalue, (double) cl["eps_death"]);
     
@@ -264,17 +227,18 @@ NumericMatrix node_xy(List hdbscan, List cl_hierarchy, int cid = 0){
   
   // Cleanup 
   if (cid == 0){
-    hdbscan["leaf_counter"] = R_NilValue;
-    hdbscan["row_counter"] = R_NilValue;
+    cl_tree["leaf_counter"] = R_NilValue;
+    cl_tree["row_counter"] = R_NilValue;
   }
   return (node_xy_);
 }
 
+// Given a cluster tree, convert to a simplified dendrogram
 // [[Rcpp::export]]
-List buildCondensedTree(List hdbscan) {
+List simplifiedTree(List cl_tree) {
   
   // Hierarchical information
-  List cl_hierarchy = hdbscan.attr("cl_hierarchy");
+  List cl_hierarchy = cl_tree.attr("cl_hierarchy");
   IntegerVector all_childs = all_children(cl_hierarchy, 0);
 
   // To keep track of members and midpoints 
@@ -291,7 +255,7 @@ List buildCondensedTree(List hdbscan) {
   // Premake children
   for (IntegerVector::iterator it = all_childs.begin(); it != all_childs.end(); ++it){
     std::string cid_label = patch::to_string(*it);
-    List cl = hdbscan[cid_label];
+    List cl = cl_tree[cid_label];
     if (!cl_hierarchy.containsElementNamed(cid_label.c_str())){
       // Create leaf
       IntegerVector leaf = IntegerVector::create(*it);
@@ -310,7 +274,7 @@ List buildCondensedTree(List hdbscan) {
   while(!cid_stack.empty()) {
     int cid = cid_stack.top();
     std::string cid_label = patch::to_string(cid);
-    List cl = hdbscan[cid_label];
+    List cl = cl_tree[cid_label];
     
     // Recursive calls
     IntegerVector local_children = cl_hierarchy[cid_label];
@@ -355,6 +319,268 @@ List buildCondensedTree(List hdbscan) {
   return(dendrogram["0"]);
 }
 
+/* Main processing step to compute all the relevent information in the form of the 
+ * 'cluster tree' for FOSC. The cluster stability scores are computed via the tree traversal rely on a separate function
+ * Requires information associated with hclust elements. See ?hclust in R for more info. 
+ * 1. merge := an (n-1) x d matrix representing the MST computed from any arbitrary similarity matrix
+ * 2. height := the (linkage) distance each new set of clusters forms from the MST 
+ * 3. order := the point indices of the original data the negative entries in merge refer to 
+ * Notation: eps is used to arbitrarily refer to the dissimilarity distance used
+*/ 
+// [[Rcpp::export]]
+List computeStability(const List hcl, const int minPts, bool compute_glosh = false){
+  // Extract hclust info
+  NumericMatrix merge = hcl["merge"]; 
+  NumericVector eps_dist = hcl["height"];
+  IntegerVector pt_order = hcl["order"]; 
+  int n = merge.nrow() + 1, k; 
+  
+  //  Which cluster does each merge step represent (after the merge, or before the split)
+  IntegerVector cl_tracker = IntegerVector(n-1 , 0),
+                member_sizes = IntegerVector(n-1, 0); // Size each step
+  
+  List clusters = List(), // Final cluster information
+       cl_hierarchy = List(); // Keeps track of hierarchy, which cluster contains who 
+
+  // The primary information needed  
+  std::unordered_map<std::string, IntegerVector> contains = std::unordered_map<std::string, IntegerVector>(); 
+  std::unordered_map<std::string, NumericVector> eps = std::unordered_map<std::string, NumericVector>(); 
+  
+  // Supplemental information for either conveniance or to reduce memory
+  std::unordered_map<std::string, int> n_children = std::unordered_map<std::string, int>(); 
+  std::unordered_map<std::string, double> eps_death = std::unordered_map<std::string, double>(); 
+  std::unordered_map<std::string, double> eps_birth = std::unordered_map<std::string, double>(); 
+  std::unordered_map<std::string, bool> processed = std::unordered_map<std::string, bool>(); 
+  
+  // First pass: Agglomerate up the hierarchy, recording member sizes. 
+  // This enables a dynamic programming strategy to improve performance below.  
+  for (k = 0; k < n-1; ++k){
+    int lm = merge(k, 0), rm = merge(k, 1);
+    IntegerVector m = IntegerVector::create(lm, rm);
+    if (all(m < 0).is_true()){
+      member_sizes[k] = 2;
+    } else if (any(m < 0).is_true()) {
+      int pos_merge = (lm < 0 ? rm : lm), merge_size = member_sizes[pos_merge - 1];
+      member_sizes[k] = merge_size + 1;
+    } else {
+      // Record Member Sizes
+      int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
+      member_sizes[k] = merge_size1 + merge_size2;
+    }
+  }  
+  
+  // Initialize root (unknown size, might be 0, so don't initialize length)
+  std::string root_str = "0";
+  contains[root_str] = NumericVector(); 
+  eps[root_str] = NumericVector(); 
+  eps_birth[root_str] = eps_dist.at(eps_dist.length()-1); 
+  
+  int global_cid = 0; 
+  // Second pass: Divisively split the hierarchy, recording the epsilon and point index values as needed
+  for (k = n-2; k >= 0; --k){
+    // Current Merge
+    int lm = merge(k, 0), rm = merge(k, 1), cid = cl_tracker.at(k);
+    IntegerVector m = IntegerVector::create(lm, rm);
+    std::string cl_cid = patch::to_string(cid);
+    
+    // Trivial case: split into singletons, record eps, contains, and ensure eps_death is minimal
+    if (all(m < 0).is_true()){
+      contains[cl_cid].push_back(-lm), contains[cl_cid].push_back(-rm);
+      double noise_eps = processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k); 
+      eps[cl_cid].push_back(noise_eps), eps[cl_cid].push_back(noise_eps); 
+      eps_death[cl_cid] = processed[cl_cid] ? eps_death[cl_cid] : std::min((double) eps_dist.at(k), (double) eps_death[cl_cid]); 
+    } else if (any(m < 0).is_true()) {
+      // Record new point info and mark the non-singleton with the cluster id
+      contains[cl_cid].push_back(-(lm < 0 ? lm : rm));
+      eps[cl_cid].push_back(processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k));
+      cl_tracker.at((lm < 0 ? rm : lm) - 1) = cid;
+    } else {
+      int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
+
+      // The minPts step 
+      if (merge_size1 >= minPts && merge_size2 >= minPts){
+        // Record death of current cluster
+        eps_death[cl_cid] = eps_dist.at(k);
+        processed[cl_cid] = true; 
+        
+        // Mark the lower merge steps as new clusters 
+        cl_hierarchy[cl_cid] = IntegerVector::create(global_cid+1, global_cid+2);
+        std::string l_index = patch::to_string(global_cid+1), r_index = patch::to_string(global_cid+2);
+        cl_tracker.at(lm - 1) = ++global_cid, cl_tracker.at(rm - 1) = ++global_cid; 
+        
+        // Record the distance the new clusters appeared and initialize containers
+        contains[l_index] = IntegerVector(), contains[r_index] = IntegerVector();
+        eps[l_index] = NumericVector(), eps[r_index] = NumericVector(); ;
+        eps_birth[l_index] = eps_dist.at(k), eps_birth[r_index] = eps_dist.at(k);
+        eps_death[l_index] = eps_dist.at(lm - 1), eps_death[r_index] = eps_dist.at(rm - 1); 
+        processed[l_index] = false, processed[r_index] = false; 
+        n_children[cl_cid] = merge_size1 + merge_size2; 
+      } else {
+        // Inherit cluster identity 
+        cl_tracker.at(lm - 1) = cid,  cl_tracker.at(rm - 1) = cid; 
+      }
+    }
+  }
+  
+  // Aggregate data into a returnable list 
+  // NOTE: the 'contains' element will be empty for all inner nodes w/ minPts == 1, else 
+  // it will contain only the objects that were considered 'noise' at that hierarchical level
+  List res = List(); 
+  NumericVector outlier_scores;
+  if (compute_glosh) { outlier_scores = NumericVector((int) n, -1.0); }
+  for (std::unordered_map<std::string, IntegerVector>::iterator key = contains.begin(); key != contains.end(); ++key){
+    int nc = n_children[key->first]; 
+    res[key->first] = List::create(
+      _["contains"] = key->second, 
+      _["eps"] = eps[key->first],
+      _["eps_birth"] = eps_birth[key->first], 
+      _["eps_death"] = eps_death[key->first], 
+      _["stability"] = sum(1/eps[key->first] - 1/eps_birth[key->first]) + (nc * 1/eps_death[key->first] - nc * 1/eps_birth[key->first]),
+      //_["_stability"] = 1/eps[key->first] - 1/eps_birth[key->first],
+      _["n_children"] = n_children[key->first]            
+    );
+    
+    // Compute GLOSH outlier scores (HDBSCAN only) 
+    if (compute_glosh){
+      if (eps[key->first].size() > 0){
+        double eps_max = std::numeric_limits<double>::infinity();
+        IntegerVector leaf_membership = all_children(cl_hierarchy, atoi(key->first.c_str()), true); 
+        if (leaf_membership.length() == 0){
+          eps_max = eps_death[key->first];
+        } else {
+          for (IntegerVector::iterator it = leaf_membership.begin(); it != leaf_membership.end(); ++it){
+            eps_max = std::min(eps_max, eps_death[patch::to_string(*it)]);
+          }
+        }
+        NumericVector glosh = NumericVector(key->second.length(), 1) - (eps_max/eps[key->first]);
+        outlier_scores[key->second - 1] = glosh; 
+      }
+    }
+  }
+
+  // Store meta-data as attributes
+  res.attr("n") = n; // number of points in the original data
+  res.attr("cl_hierarchy") = cl_hierarchy;  // Stores parent/child structure 
+  res.attr("cl_tracker") = cl_tracker; // stores cluster id formation for each merge step, used for cluster extraction
+  res.attr("minPts") = minPts; // needed later 
+  // res.attr("root") = minPts == 1; // needed later to ensure root is not captured as a cluster
+  if (compute_glosh){ res.attr("glosh") = outlier_scores; } // glosh outlier scores (hdbscan only)
+  return(res);
+}
+
+// Validates a given list of instance-level constraints for symmetry. Since the number of 
+// constraints might change dramatically based on the problem, and initial loop is performed 
+// to figure out whether it would be faster to check via an adjacencty list or matrix
+// [[Rcpp::export]]
+List validateConstraintList(List& constraints, int n){
+  std::vector< std::string > keys = as< std::vector< std::string > >(constraints.names());
+  bool is_valid = true, tmp_valid, use_matrix = false; 
+  
+  int n_constraints = 0; 
+  for (List::iterator it = constraints.begin(); it != constraints.end(); ++it){
+    n_constraints += as<IntegerVector>(*it).size();
+  }
+  
+  // Sparsity check: if the constraints make up a sufficiently large amount of
+  // the solution space, use matrix to check validity
+  if (n_constraints/(n*n) > 0.20){
+    use_matrix = true; 
+  }
+  
+  // Check using adjacency matrix 
+  if (use_matrix){
+    IntegerMatrix adj_matrix = IntegerMatrix(Dimension(n, n));
+    int from, to;
+    for (std::vector< std::string >::iterator it = keys.begin(); it != keys.end(); ++it){
+      // Get constraints
+      int cid = atoi(it->c_str()); // to base-0
+      IntegerVector cs_ = constraints[*it];
+      
+      // Positive "should-link" constraints 
+      IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]); 
+      for (IntegerVector::iterator pc = pcons.begin(); pc != pcons.end(); ++pc){
+        from = (*pc < cid ? *pc : cid) - 1; 
+        to = (*pc > cid ? *pc : cid) - 1; 
+        adj_matrix(from, to) = 1; 
+      }
+      
+      // Negative "should-not-link" constraints 
+      IntegerVector ncons = -(as<IntegerVector>(cs_[cs_ < 0]));
+      for (IntegerVector::iterator nc = ncons.begin(); nc != ncons.end(); ++nc){
+        from = (*nc < cid ? *nc : cid) - 1; 
+        to = (*nc > cid ? *nc : cid) - 1; 
+        adj_matrix(from, to) = -1; 
+      }
+    }
+    
+    // Check symmetry 
+    IntegerVector lower = lowerTri(adj_matrix);
+    IntegerMatrix adj_t = Rcpp::transpose(adj_matrix);
+    IntegerVector lower_t = lowerTri(adj_t); 
+    LogicalVector valid_check = lower == lower_t;
+    is_valid = all(valid_check == TRUE).is_true();
+    
+    // Try to merge the two 
+    if (!is_valid){
+      int sum = 0; 
+      for (int i = 0; i < lower.size(); ++i){
+        sum = lower.at(i) + lower_t.at(i);
+        lower[i] = sum > 0 ? 1 : sum < 0 ? -1 : 0; 
+      }
+    }
+    constraints = distToAdjacency(lower, n);
+  } 
+  // Else check using given adjacency list
+  else {
+    for (std::vector< std::string >::iterator it = keys.begin(); it != keys.end(); ++it){
+      // Get constraints
+      int cid = atoi(it->c_str());
+      IntegerVector cs_ = constraints[*it];
+      
+      // Positive "should-link" constraints 
+      IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]); 
+      for (IntegerVector::iterator pc = pcons.begin(); pc != pcons.end(); ++pc){
+        int ic = *pc < 0 ? -(*pc) : *pc; 
+        std::string ic_str = patch::to_string(ic); 
+        bool exists = constraints.containsElementNamed(ic_str.c_str()); 
+        tmp_valid = exists ? contains(as<IntegerVector>(constraints[ic_str]), cid) : false;
+        if (!tmp_valid){
+          if (!exists){
+            constraints[ic_str] = IntegerVector::create(cid); 
+          } else {
+            IntegerVector con_vec = constraints[ic_str];
+            con_vec.push_back(cid);
+            constraints[ic_str] = con_vec;
+          }
+          is_valid = false; 
+        }
+      }
+      
+      // Negative "should-not-link" constraints 
+      IntegerVector ncons = -(as<IntegerVector>(cs_[cs_ < 0]));
+      for (IntegerVector::iterator nc = ncons.begin(); nc != ncons.end(); ++nc){
+        int ic = *nc < 0 ? -(*nc) : *nc; 
+        std::string ic_str = patch::to_string(ic); 
+        bool exists = constraints.containsElementNamed(ic_str.c_str()); 
+        tmp_valid = exists ? contains(as<IntegerVector>(constraints[ic_str]), cid) : false;
+        if (!tmp_valid){
+          if (!exists){
+            constraints[ic_str] = IntegerVector::create(-cid); 
+          } else {
+            IntegerVector con_vec = constraints[ic_str];
+            con_vec.push_back(-cid);
+            constraints[ic_str] = con_vec;
+          }
+          is_valid = false; 
+        }
+      }
+    }
+  }
+  // Print warning if asymmetric constraints detected; return attempt at fixing constraints. 
+  if (!is_valid){ Rprintf("Warning: Incomplete (asymmetric) constraints detected. Populating constraint list.\n"); }
+  return(constraints);
+}
+
 // [[Rcpp::export]]
 double computeVirtualNode(IntegerVector noise, List constraints){
   if (noise.length() == 0) return(0);
@@ -362,14 +588,13 @@ double computeVirtualNode(IntegerVector noise, List constraints){
   
   // Semi-supervised extraction
   int satisfied_constraints = 0; 
-  Rcout << "Starting constraint based optimization" << std::endl; 
+  // Rcout << "Starting constraint based optimization" << std::endl; 
   for (IntegerVector::iterator it = noise.begin(); it != noise.end(); ++it){
     std::string cs_str = patch::to_string(*it); 
     if (constraints.containsElementNamed(cs_str.c_str())){
       // Get constraints
       IntegerVector cs_ = constraints[cs_str];
       
-      Rcout << "Testing: " << cs_str << std::endl; 
       // Positive "should-link" constraints 
       IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]); 
       for (IntegerVector::iterator pc = pcons.begin(); pc != pcons.end(); ++pc){
@@ -381,42 +606,56 @@ double computeVirtualNode(IntegerVector noise, List constraints){
       for (IntegerVector::iterator nc = ncons.begin(); nc != ncons.end(); ++nc){
         satisfied_constraints += (1 - contains(noise, *nc));
       }
-    }
+    } 
   }
   return(satisfied_constraints);
 }
 
-// Compute stability scores for cluster objects in the hierarchy
+
+// Framework for Optimal Selection of Clusters (FOSC)
+// Traverses a cluster tree hierarchy to compute a flat solution, maximizing the:
+// - Unsupervised soln: the 'most stable' clusters following the give linkage criterion 
+// - SS soln w/ instance level Constraints: constraint-based w/ unsupervised tiebreaker 
+// - SS soln w/ mixed objective function: maximizes J = α JU + (1 − α) JSS
 // [[Rcpp::export]]
-NumericVector computeSalientScores(List hdbscan, std::string cid, std::list<int>& sc, List cl_hierarchy, 
-                                   bool prune_unstable_leaves=false, 
-                                   bool useVirtual = false, const int n_constraints = 0, List constraints = R_NilValue){
+NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, 
+                   bool prune_unstable_leaves=false, // whether to prune -very- unstable subbranches
+                   const double alpha = 0, // mixed objective case 
+                   bool useVirtual = false, // return virtual node as well 
+                   const int n_constraints = 0, // number of constraints 
+                   List constraints = R_NilValue) // instance-level constraints 
+{
   // Base case: at a leaf
   if (!cl_hierarchy.containsElementNamed(cid.c_str())){
-    List cl = hdbscan[cid];
+    List cl = cl_tree[cid];
     sc.push_back(stoi(cid)); // assume the leaf will be a salient cluster until proven otherwise
-    return(NumericVector::create((double) cl["score"], useVirtual ? (double) cl["vscore"] : 0));  
+    return(NumericVector::create((double) cl["stability"], 
+                                 (double) useVirtual ? cl["vscore"] : 0));  
   } else {
-  // Non-base case: at a merge of clusters, determine which to keep
-    List cl = hdbscan[cid];
+    // Non-base case: at a merge of clusters, determine which to keep
+    List cl = cl_tree[cid];
     
     // Get child stability/constraint scores
     NumericVector scores, stability_scores = NumericVector(), constraint_scores = NumericVector();
     IntegerVector child_ids = cl_hierarchy[cid];
     for (int i = 0, clen = child_ids.length(); i < clen; ++i){
       int child_id = child_ids.at(i);
-      scores = computeSalientScores(hdbscan, patch::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, useVirtual, n_constraints, constraints);
+      scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints);
       stability_scores.push_back(scores.at(0));
       constraint_scores.push_back(scores.at(1)); 
     }
-  
+    
+    // If semisupervised scenario, normalizing should be stored in 'total_stability' 
+    double total_stability = (contains(cl_tree.attributeNames(),"total_stability") ? (double) cl_tree.attr("total_stability") : 1.0); 
+    
     // Compare and update stability scores 
-    double old_stability_score = (double) cl["score"]; 
-    double new_stability_score = (double) sum(stability_scores); 
+    double old_stability_score = (double) cl["stability"] / total_stability; 
+    double new_stability_score = (double) sum(stability_scores) / total_stability; 
     
     // Compute instance-level constraints if necessary
     double old_constraint_score = 0, new_constraint_score = 0; 
     if (useVirtual){
+      // Rcout << "old constraint score for " << cid << ": " << (double) cl["vscore"] << std::endl; 
       old_constraint_score = (double) cl["vscore"]; 
       new_constraint_score = (double) sum(constraint_scores) + (double) computeVirtualNode(cl["contains"], constraints)/n_constraints;
     }
@@ -425,35 +664,42 @@ NumericVector computeSalientScores(List hdbscan, std::string cid, std::list<int>
     // If the score is unchanged, remove the children and add parent
     if (useVirtual){
       if (old_constraint_score < new_constraint_score && cid != "0"){
-      // Children satisfies more constraints   
-        cl["new_vscore"] = new_constraint_score; 
-        cl["new_score"] = (double) sum(stability_scores);
+        // Children satisfies more constraints   
+        cl["vscore"] = new_constraint_score; 
+        cl["score"] = alpha * new_stability_score + (1 - alpha) * new_constraint_score;
+        // Rcout << "1: score for " << cid << ":" << (double) cl["score"] << std::endl;  
+        // Rcout << "(old constraint): " << old_constraint_score << ", (new constraint): " << new_constraint_score << std::endl;  
       } else if (old_constraint_score > new_constraint_score && cid != "0"){
-      // Parent satisfies more constraints  
-        cl["new_vscore"] = old_constraint_score; 
-        cl["new_score"] = old_stability_score;
+        // Parent satisfies more constraints  
+        cl["vscore"] = old_constraint_score; 
+        cl["score"] = alpha * old_stability_score + (1 - alpha) * old_constraint_score;
+        // Rcout << "2: score for " << cid << ":" << (double) cl["score"] << std::endl; 
         keep_children = false; 
       } else {
-      // Resolve tie using unsupervised, stability-based approach
-        if (old_stability_score < (double) sum(stability_scores)){
+        // Resolve tie using unsupervised, stability-based approach
+        if (old_stability_score < new_stability_score){
           // Children are more stable
-          cl["new_score"] = new_stability_score;
+          cl["score"] = new_stability_score / total_stability;
+          // Rcout << "3: score for " << cid << ":" << (double) cl["score"] << std::endl; 
         } else {
           // Parent is more stable
-          cl["new_score"] = old_stability_score;
+          cl["score"] = old_stability_score / total_stability;
+          // Rcout << "4: score for " << cid << ":" << (double) cl["score"] << std::endl; 
+          // Rcout << "(old stability): " << old_stability_score << ", (total stability): " << total_stability << std::endl; 
           keep_children = false; 
         }
-        cl["new_vscore"] = old_constraint_score;
+        cl["vscore"] = old_constraint_score;
       }
     } else {
       // Use unsupervised, stability-based approach only
-      if (old_stability_score < (double) sum(stability_scores)){
-        cl["new_score"] = new_stability_score;
+      if (old_stability_score < new_stability_score){
+        cl["score"] = new_stability_score; // keep children
       } else {
-        cl["new_score"] = old_stability_score;
+        cl["score"] = old_stability_score;
         keep_children = false; 
       }
     }
+    
     
     // Prune children and add parent (cid) if need be
     if (!keep_children && cid != "0") {
@@ -472,7 +718,8 @@ NumericVector computeSalientScores(List hdbscan, std::string cid, std::list<int>
           if (stability_scores.at(i) < old_stability_score){
             IntegerVector to_prune = all_children(cl_hierarchy, child_ids.at(i)); // all sub members
             for (IntegerVector::iterator it = to_prune.begin(); it != to_prune.end(); ++it){
-              sc.remove(*it); 
+              //Rcout << "Pruning: " << *it << std::endl;
+              sc.remove(*it);
             }
           }
         }
@@ -480,182 +727,36 @@ NumericVector computeSalientScores(List hdbscan, std::string cid, std::list<int>
     }
     
     // Save scores for traversal up and for later
-    hdbscan[cid] = cl;
+    cl_tree[cid] = cl;
     
     // Return this sub trees score
-    return(NumericVector::create((double) cl["new_score"], useVirtual ? (double) cl["new_vscore"] : 0));
+    return(NumericVector::create((double) cl["score"], useVirtual ? (double) cl["vscore"] : 0));
   }
 } 
 
-/* HDBSCAN*
-  Processing step to compute all the relevent information needed for HDBSCAN.
-  The cluster stability scores are computed via the tree traversal rely on a separate function
-  Requires information associated with hclust elements. See ?hclust in R for more info. 
-  merge := an (n-1) x 2 matrix representing the MST from the mutual reachability graph
-  height := the (epsilon) distance each new set of clusters formed from the MST 
-  order := the point indices of the original data the negative entries in merge refer to */ 
+// Given a cluster tree object with computed stability precomputed scores from computeStability,
+// extract the 'most stable' or salient flat cluster assignments. The large number of derivable 
+// arguments due to fosc being a recursive function 
 // [[Rcpp::export]]
-List hdbscan_fast(const List hcl, const int minPts, bool compute_glosh = true, bool prune_unstable_leaves = false){
-  // Extract hclust info
-  NumericMatrix merge = hcl["merge"]; 
-  NumericVector eps_dist = hcl["height"];
-  IntegerVector pt_order = hcl["order"]; 
-  int n = merge.nrow() + 1, k; 
-  
-  IntegerVector cl_tracker = IntegerVector(n-1 , 0), //  Which cluster does each merge step represent
-                member_sizes = IntegerVector(n-1, 0); // Size each step
-  
-  List clusters = List(), // Final cluster information
-       cl_hierarchy = List(); // Keeps track of hierarchy, which cluster contains who 
-
-  // The primary information needed  
-  std::unordered_map<std::string, IntegerVector> contains = std::unordered_map<std::string, IntegerVector>(); 
-  std::unordered_map<std::string, NumericVector> eps = std::unordered_map<std::string, NumericVector>(); 
-  
-  // Supplemental information for either conveniance or to reduce memory
-  std::unordered_map<std::string, int> n_children = std::unordered_map<std::string, int>(); 
-  std::unordered_map<std::string, double> eps_death = std::unordered_map<std::string, double>(); 
-  std::unordered_map<std::string, double> eps_birth = std::unordered_map<std::string, double>(); 
-  std::unordered_map<std::string, bool> processed = std::unordered_map<std::string, bool>(); 
-  
-  // First pass: Agglomerate up the hierarchy, recording member sizes
-  for (k = 0; k < n-1; ++k){
-    int lm = merge(k, 0), rm = merge(k, 1);
-    IntegerVector m = IntegerVector::create(lm, rm);
-    if (all(m < 0).is_true()){
-      member_sizes[k] = 2;
-    } else if (any(m < 0).is_true()) {
-      int pos_merge = (lm < 0 ? rm : lm), merge_size = member_sizes[pos_merge - 1];
-      member_sizes[k] = merge_size + 1;
-    } else {
-      // Record Member Sizes
-      int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
-      member_sizes[k] = merge_size1 + merge_size2;
-    }
-  }  
-  
-  // Initialize root 
-  contains["0"] = NumericVector(); 
-  eps["0"] = NumericVector();   // n, eps_dist.at(eps_dist.length()-1)
-  eps_birth["0"] = eps_dist.at(eps_dist.length()-1); 
-  
-  int global_cid = 0; 
-  // Second pass: Divisively split the hierarchy, recording the epsilon and point index values as needed
-  for (k = n-2; k >= 0; --k){
-    // Current Merge
-    int lm = merge(k, 0), rm = merge(k, 1), cid = cl_tracker.at(k);
-    IntegerVector m = IntegerVector::create(lm, rm);
-    std::string cl_cid = patch::to_string(cid);
-    
-    // Trivial case: merge of singletons, create a temporary *assumed* cluster to be resolved on merger
-    if (all(m < 0).is_true()){
-      contains[cl_cid].push_back(-lm), contains[cl_cid].push_back(-rm);
-      double noise_eps = processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k); 
-      eps[cl_cid].push_back(noise_eps), eps[cl_cid].push_back(noise_eps); 
-      eps_death[cl_cid] = processed[cl_cid] ? eps_death[cl_cid] : std::min((double) eps_dist.at(k), (double) eps_death[cl_cid]); 
-    } else if (any(m < 0).is_true()) {
-      // Record new point info and mark the non-singleton with the cluster id
-      contains[cl_cid].push_back(-(lm < 0 ? lm : rm));
-      eps[cl_cid].push_back(processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k));
-      cl_tracker.at((lm < 0 ? rm : lm) - 1) = cid;
-    } else {
-      int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
-
-      // The HDBSCAN step 
-      if (merge_size1 >= minPts && merge_size2 >= minPts){
-        // Record death of current cluster
-        eps_death[cl_cid] = eps_dist.at(k);
-        processed[cl_cid] = true; 
-        
-        // Mark the lower merge steps as new clusters 
-        cl_hierarchy[cl_cid] = IntegerVector::create(global_cid+1, global_cid+2);
-        std::string l_index = patch::to_string(global_cid+1), r_index = patch::to_string(global_cid+2);
-        cl_tracker.at(lm - 1) = ++global_cid, cl_tracker.at(rm - 1) = ++global_cid; 
-        
-        // Record the distance the new clusters appeared and initialize containers
-        contains[l_index] = IntegerVector(), contains[r_index] = IntegerVector();
-        eps[l_index] = NumericVector(), eps[r_index] = NumericVector(); 
-        // eps_birth[l_index] = eps_dist.at(lm - 1), eps_birth[r_index] = eps_dist.at(rm - 1);
-        eps_birth[l_index] = eps_dist.at(k), eps_birth[r_index] = eps_dist.at(k);
-        eps_death[l_index] = eps_dist.at(lm - 1), eps_death[r_index] = eps_dist.at(rm - 1); 
-        processed[l_index] = false, processed[r_index] = false; 
-        n_children[cl_cid] = merge_size1 + merge_size2; 
-      } else {
-        // Inherit cluster identity 
-        cl_tracker.at(lm - 1) = cid,  cl_tracker.at(rm - 1) = cid; 
-      }
-    }
-  }
-  
-  // Aggregate data into a returnable list 
-  List res = List(); 
-  NumericVector outlier_scores = NumericVector((int) n, -1.0);
-  for (std::unordered_map<std::string, IntegerVector>::iterator key = contains.begin(); key != contains.end(); ++key){
-    int nc = n_children[key->first]; 
-    res[key->first] = List::create(
-      _["contains"] = key->second, 
-      _["eps"] = eps[key->first],
-      _["eps_birth"] = eps_birth[key->first], 
-      _["eps_death"] = eps_death[key->first], 
-      _["score"] = sum(1/eps[key->first] - 1/eps_birth[key->first]) + (nc * 1/eps_death[key->first] - nc * 1/eps_birth[key->first]),
-      _["n_children"] = n_children[key->first]            
-    );
-    
-    // Compute GLOSH outlier scores 
-    if (compute_glosh){
-      if (eps[key->first].size() > 0){
-        double eps_max = std::numeric_limits<double>::infinity();
-        IntegerVector leaf_membership = all_children(cl_hierarchy, atoi(key->first.c_str()), true); 
-        if (leaf_membership.length() == 0){
-          eps_max = eps_death[key->first];
-        } else {
-          for (IntegerVector::iterator it = leaf_membership.begin(); it != leaf_membership.end(); ++it){
-            eps_max = std::min(eps_max, eps_death[patch::to_string(*it)]);
-          }
-        }
-        NumericVector glosh = NumericVector(key->second.length(), 1) - (eps_max/eps[key->first]);
-        outlier_scores[key->second - 1] = glosh; 
-      }
-    }
-  }
-  
+List extractUnsupervised(List cl_tree, bool prune_unstable = false){
   // Compute Salient Clusters
-  Rcout << "here" << std::endl; 
   std::list<int> sc = std::list<int>();
-  computeSalientScores(res, "0", sc, cl_hierarchy, prune_unstable_leaves);
+  List cl_hierarchy = cl_tree.attr("cl_hierarchy");
+  int n = as<int>(cl_tree.attr("n"));
+  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable); // Assume root node is always id == 0
   
-  Rcout << "here1" << std::endl; 
-  // Store meta-data as attributes
-  res.attr("salient_clusters") = wrap(sc); // salient clusters
-  res.attr("cl_hierarchy") = cl_hierarchy;  // Stores parent/child structure 
-  res.attr("cluster") = getSalientAssignments(res, cl_hierarchy, sc, n); // Flat assignments 
-  if (compute_glosh){ res.attr("glosh") = outlier_scores; } // glosh outlier scores 
-  return(res);
+  // Store results as attributes
+  cl_tree.attr("cluster") = getSalientAssignments(cl_tree, cl_hierarchy, sc, n); // Flat assignments 
+  cl_tree.attr("salient_clusters") = wrap(sc); // salient clusters
+  return(cl_tree);
 }
 
 // [[Rcpp::export]]
-List distToAdjacency(IntegerVector constraints, const int N){
-  std::unordered_map<int, std::vector<int> > key_map = std::unordered_map<int, std::vector<int> >();  
-  for (int i = 0; i < N; ++i){
-    if (key_map.count(i+1) != 1){ key_map[i+1] = std::vector<int>(); } // add 1 for base 1
-    for (int j = 0; j < N; ++j){
-      if (i == j) continue; 
-      int index = i > j ? INDEX_TF(N, j, i) : INDEX_TF(N, i, j);
-      int crule = constraints.at(index); 
-      if (crule != 0){
-        key_map[i+1].push_back(crule < 0 ? - (j + 1) : j + 1); // add 1 for base 1
-      }
-    }
-  }
-  return(wrap(key_map));
-}
-
-// [[Rcpp::export]]
-List extractSemiSupervised(List hdbscan, List constraints, bool prune_unstable_leaves = false){
-  
-  List root = hdbscan["0"]; 
-  List cl_hierarchy = hdbscan.attr("cl_hierarchy");
-  int N = (int) root["n_children"]; 
+List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool prune_unstable_leaves = false){
+  // Rcout << "Starting semisupervised extraction..." << std::endl; 
+  List root = cl_tree["0"]; 
+  List cl_hierarchy = cl_tree.attr("cl_hierarchy");
+  int n = as<int>(cl_tree.attr("n"));
   
   // Compute total number of constraints
   int n_constraints = 0; 
@@ -664,43 +765,61 @@ List extractSemiSupervised(List hdbscan, List constraints, bool prune_unstable_l
     n_constraints += cl_constraints.length();
   }
   
-  // Compute initial gamma values for both leaf and internal nodes
+  // Initialize root 
+  List cl = cl_tree["0"];
+  cl["vscore"] = 0; 
+  cl_tree["0"] = cl; // replace to keep changes
+  
+  // Compute initial gamma values or "virtual nodes" for both leaf and internal nodes
   IntegerVector cl_ids = all_children(cl_hierarchy, 0); 
   for (IntegerVector::iterator it = cl_ids.begin(); it != cl_ids.end(); ++it){
     if (*it != 0){
       std::string cid_str = patch::to_string(*it);
-      List cl = hdbscan[cid_str];
+      List cl = cl_tree[cid_str];
+      
+      // Store the initial fraction of constraints satisfied for each node as 'vscore' 
+      // NOTE: leaf scores represent \hat{gamma}, internal represent virtual node scores
       if (cl_hierarchy.containsElementNamed(cid_str.c_str())){
         // Extract the point indices the cluster contains
-        IntegerVector child_ids = IntegerVector(); 
-        IntegerVector child_cl = all_children(cl_hierarchy, *it); 
+        IntegerVector child_cl = all_children(cl_hierarchy, *it), child_ids; 
+        List cl_container = List();  
         for (IntegerVector::iterator ch_id = child_cl.begin(); ch_id != child_cl.end(); ++ch_id){
-          List ch_cl = hdbscan[patch::to_string(*ch_id)];
-          child_ids = combine(child_ids, ch_cl["contains"]);
+          List ch_cl = cl_tree[patch::to_string(*ch_id)];
+          //child_ids = combine(child_ids, ch_cl["contains"]);
+          cl_container.push_back(as<IntegerVector>(ch_cl["contains"]));
         }
+        cl_container.push_back(as<IntegerVector>(cl["contains"]));
+        child_ids = concat_int(cl_container); 
         cl["vscore"] = computeVirtualNode(child_ids, constraints)/n_constraints;
-        cl["new_vscore"] = R_NilValue;
       } else { // is leaf node
-        // Rcout << "Starting leaf node: " << cid_str << std::endl; 
         cl["vscore"] = computeVirtualNode(cl["contains"], constraints)/n_constraints;
-        cl["new_vscore"] = R_NilValue;
       }
-      hdbscan[cid_str] = cl; // replace to keep changes
+      cl_tree[cid_str] = cl; // replace to keep changes
     }
   }
   
-  // Initialize root 
-  List cl = hdbscan["0"];
-  cl["vscore"] = 0; 
-  hdbscan["0"] = cl; // replace to keep changes
+  // First pass: compute unsupervised soln as a means of extracting normalizing constant J_U^*
+  cl_tree = extractUnsupervised(cl_tree, false);
+  IntegerVector stable_sc = cl_tree.attr("salient_clusters");
+  double total_stability = 0.0f;
+  for (IntegerVector::iterator it = stable_sc.begin(); it != stable_sc.end(); ++it){
+    List cl = cl_tree[patch::to_string(*it)]; 
+    total_stability += (double) cl["stability"]; 
+  }
+  cl_tree.attr("total_stability") = total_stability;
+  // Rcout << "Total stability: " << total_stability << std::endl;  
 
-  // Compute Salient Clusters w/ instance-level constraints
+  // Compute stable clusters w/ instance-level constraints
   std::list<int> sc = std::list<int>();
-  computeSalientScores(hdbscan, "0", sc, cl_hierarchy, prune_unstable_leaves, true, n_constraints, constraints);
-  hdbscan.attr("salient_clusters") = wrap(sc);
-  hdbscan.attr("cluster") = getSalientAssignments(hdbscan, cl_hierarchy, sc, N);
-  return(hdbscan);
+  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable_leaves, 
+       alpha, true, n_constraints, constraints); // semi-supervised parameters 
+    
+  // Store results as attributes and return
+  cl_tree.attr("salient_clusters") = wrap(sc);
+  cl_tree.attr("cluster") = getSalientAssignments(cl_tree, cl_hierarchy, sc, n);
+  return(cl_tree);
 }
+
 
 
 

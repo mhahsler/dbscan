@@ -1,6 +1,7 @@
 \name{hdbscan}
 \alias{hdbscan}
 \alias{HDBSCAN}
+\alias{print.hdbscan}
 \alias{plot.hdbscan}
 \title{
   HDBSCAN
@@ -10,22 +11,24 @@
   algorithms using Rcpp. 
 }
 \usage{
-hdbscan(x, minPts, xdist = NULL, gen_rsl_tree = FALSE, gen_condensed_tree = FALSE, ...)
+hdbscan(x, minPts, xdist = NULL, 
+        gen_hdbscan_tree = FALSE, 
+        gen_simplified_tree = FALSE)
+        
+\method{print}{hdbscan}(x, ...)
 
-\method{plot}{hdbscan}(object, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...)
+\method{plot}{hdbscan}(x, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix or matrix-coercible object. }
   \item{minPts}{ integer; Minimum size of clusters. See details. }
   \item{xdist}{ dist object (euclidean required); if available. }
-  \item{gen_rsl_tree}{ logical; should the robust single linkage tree be 
+  \item{gen_hdbscan_tree}{ logical; should the robust single linkage tree be 
   explicitly computed. (see cluster tree in Chaudhuri et al, 2010).}
-  \item{gen_condensed_tree}{ logical; should the simplified hierarchy be 
+  \item{gen_simplified_tree}{ logical; should the simplified hierarchy be 
   explicitly computed. (see Campello et al, 2013). }
-  \item{...}{ additional arguments are passed on to the appropriate S3 methods when specialized, 
-  otherwise unused. }
-  \item{object}{ a HDBSCAN clustering object. }
+  \item{...}{ additional arguments are passed on to the appropriate S3 methods (such as plotting parameters). }
   \item{scale}{ integer; used to scale condensed tree based on the graphics device. Lower scale results in wider trees. }
   \item{gradient}{ character vector; the colors to build the condensed tree coloring with. }
   \item{show_flat}{ logical; whether to draw boxes indicating the most stable clusters. }  
@@ -52,14 +55,9 @@ estimates implicitly computed from HDBSCAN.
 \references{
 Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. \emph{Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96).}
 
-Campello, R. J. G. B.; Moulavi, D.; Sander, J. (2013). Density-Based Clustering
-Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th
-Pacific-Asia Conference on Knowledge Discovery
-in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
+Campello, R. J. G. B.; Moulavi, D.; Sander, J. (2013). Density-Based Clustering Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th Pacific-Asia Conference on Knowledge Discovery in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
 
 Campello, Ricardo JGB, et al. "Hierarchical density estimates for data clustering, visualization, and outlier detection." ACM Transactions on Knowledge Discovery from Data (TKDD) 10.1 (2015): 5.
-
-Chaudhuri, Kamalika, and Sanjoy Dasgupta. "Rates of convergence for the cluster tree." Advances in Neural Information Processing Systems. 2010.
 }
 
 \seealso{
@@ -75,7 +73,7 @@ Chaudhuri, Kamalika, and Sanjoy Dasgupta. "Rates of convergence for the cluster 
 data(moons)
 
 res <- hdbscan(moons, minPts = 5)
-res
+print(res)
 
 plot(moons, col = res$cluster + 1L)
 
@@ -88,10 +86,10 @@ x <- cbind(
   )
 
 res <- hdbscan(x, minPts = 3)
-res
+print(res)
 
 ## Plot the simplified tree, highlight the most stable clusters 
-plot(res, show_flat = T)
+plot(res, show_flat = TRUE)
 
 ## Plot the actual clusters
 plot(x, col=res$cluster+1)
@@ -101,4 +99,5 @@ plot(x, col=res$cluster+1)
 % R documentation directory.
 \keyword{ model }
 \keyword{ clustering }
+\keyword{ hierarchical }
 

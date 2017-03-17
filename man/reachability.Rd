@@ -1,9 +1,9 @@
 \name{reachability}
 \alias{reachability}
-\alias{dendrogram}
 \alias{as.reachability}
 \alias{as.reachability.optics}
 \alias{as.reachability.dendrogram}
+\alias{as.dendrogram}
 \alias{as.dendrogram.reachability}
 \alias{plot.reachability}
 \alias{print.reachability}

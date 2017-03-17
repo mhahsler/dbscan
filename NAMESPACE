@@ -11,17 +11,22 @@ importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
 importFrom("methods", "is")
 
 export(
+  adjacencylist,
   kNN,
   kNNdistplot,
   kNNdist,
   frNN,
+  sNN,
   dbscan,
   optics,
   extractDBSCAN,
   extractXi,
   hdbscan,
   extractFOSC, 
+  sNNclust,
+  jpclust,
   lof,
+  pointdensity,
   hullplot,
   as.reachability
 )
@@ -44,5 +49,12 @@ S3method(predict, dbscan_fast)
 S3method(print, kNN)
 S3method(print, frNN)
 
+
 S3method(print, hdbscan)
 S3method(plot, hdbscan)
+
+S3method(adjacencylist, kNN)
+S3method(adjacencylist, frNN)
+S3method(plot, NN)
+S3method(sort, kNN)
+S3method(sort, frNN)

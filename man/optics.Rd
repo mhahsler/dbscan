@@ -133,6 +133,10 @@ res$order
 ### plot produces a reachability plot
 plot(res)
 
+### plot the order of points in the reachability plot
+plot(x, col = "grey")
+polygon(x[res$order,])
+
 ### extract a DBSCAN clustering by cutting the reachability plot at eps_cl
 res <- extractDBSCAN(res, eps_cl = .065)
 res

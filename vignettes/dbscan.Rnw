@@ -1,0 +1,979 @@
+% !Rnw weave = Sweave
+%\documentclass[article]{jss}
+\documentclass[nojss]{jss}
+
+% Package includes
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+%\usepackage{esvect} % vv
+%\usepackage{algorithm} % algorithm tools
+%\usepackage[noend]{algpseudocode} % algorithmic (pseudocode) tools
+\usepackage{mathtools} % coloneqq
+\usepackage{amsthm}
+\usepackage[dvipsnames]{xcolor} % for adding color to code
+\usepackage{listings} % For pprinting r code blocks (w/o execution)
+\usepackage{amssymb}
+\usepackage{pifont} % http://ctan.org/pkg/pifont
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage[toc,page]{appendix}
+
+% Remove sweave margins if possible
+\usepackage[belowskip=-15pt,aboveskip=0pt]{caption}
+\setlength{\intextsep}{8pt plus 1pt minus 1pt}
+\setlength{\floatsep}{1ex}
+\setlength{\textfloatsep}{1ex plus 1pt minus 1pt}
+\setlength{\abovecaptionskip}{0ex}
+\setlength{\belowcaptionskip}{0ex}
+
+% Aliases and commands
+\newtheorem{mydef}{Definition}
+\newcommand{\minus}{\scalebox{0.75}[1.0]{$-$}}
+\newcommand{\exdb}{\texttt{extractDBSCAN} }
+\mathchardef\mhyphen="2D % Define a "math hyphen"
+\newcommand{\cmark}{\ding{51}} % checkmark
+
+%% \VignetteIndexEntry{Fast Density-based Clustering}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{
+        Michael Hahsler \\Southern Methodist University \And
+        Matthew Piekenbrock\\Wright State University \AND
+        Derek Doran \\ Wright State University
+    }
+\title{\pkg{dbscan}: Fast Density-based Clustering with \proglang{R}}
+\Plainauthor{Michael Hahsler, Matthew Piekenbrock, Derek Doran}
+\Plaintitle{dbscan: Fast Density-based Clustering with R}
+\Shorttitle{\pkg{dbscan}: Density-based Clustering with \proglang{R}}
+
+\Address{
+  Michael Hahsler\\
+  Department of Engineering Management, Information, and Systems\\
+  Bobby B. Lyle School of Engineering, SMU\\
+  P. O. Box 750123, Dallas, TX 75275\\
+  E-mail: \email{mhahsler@lyle.smu.edu}\\
+  URL: \url{http://michael.hahsler.net/}
+
+  \vspace{5mm}
+
+  Matt Piekenbrock\\
+  Department of Computer Science and Engineering\\
+  Dept. of Computer Science and Engineering, Wright State University\\
+  3640 Colonel Glenn Hwy, Dayton, OH, 45435\\
+  E-mail: \email{piekenbrock.5@wright.edu}\\
+  URL: \url{http://wright.edu/}
+
+  \vspace{5mm}
+
+  Derek Doran\\
+  Department of Computer Science and Engineering\\
+  Dept. of Computer Science and Engineering, Wright State University\\
+  3640 Colonel Glenn Hwy, Dayton, OH, 45435\\
+  E-mail: \email{derek.doran@wright.edu}\\
+  URL: \url{http://knoesis.org/doran}
+}
+
+\Abstract {
+    This article describes the implementation and use of the \proglang{R} package \pkg{dbscan}, which provides complete and fast implementations of the popular density-based clustering algorithm DBSCAN and the augmented ordering algorithm OPTICS. Compared to other implementations, \pkg{dbscan} offers open-source implementations using \proglang{C++} and advanced data structures like k-d trees to speed up computation. An important advantage of this implementation is that it is up-to-date with several primary advancements that have been added since their original publications, including artifact corrections and dendrogram extraction methods for OPTICS. Experiments with \pkg{dbscan}'s implementation of DBSCAN and OPTICS compared and other libraries such as FPC, ELKI, WEKA, PyClustering, SciKit-Learn and SPMF suggest that \pkg{dbscan} provides a very efficient implementation.
+}
+\Keywords{DBSCAN, OPTICS, Density-based Clustering, Hierarchical Clustering}
+
+\begin{document}
+
+% Do not move SweaveOpts into preamble
+\SweaveOpts{concordance=TRUE} % prefix.string=generated/dbscan
+\section{Introduction}
+Clustering is typically described as the process of finding structure in data by grouping similar objects together, where the resulting set of groups are called clusters.
+Many clustering algorithms directly apply the idea that clusters can be formed such that objects in the same cluster should be more similar to each other than to objects in other clusters. The notion of similarity (or distance) stems from the fact that objects are assumed to be data points embedded in a data space in which a similarity measure can be defined. Examples are methods based on solving the $k$-means problem or mixture models
+which find the parameters of a parametric generative probabilistic model from which the observed data are assumed to arise. Another approach is hierarchical clustering, which uses local heuristics to form a hierarchy of nested grouping of objects. Most of these approaches (with the notable exception of single-link hierarchical clustering) are biased towards clusters with convex, hyper-spherical shape. A detailed review of these clustering algorithms is provided in \cite{Kaufman:1990}, \cite{jain1999review},  and the more recent review by
+\cite{Aggarwal:2013}.
+
+Density-based clustering approaches clustering differently. It simply posits that clusters are contiguous `dense' regions in the data space (i.e., regions of high point density), separated by areas of low point density~\citep{kriegel:2011,sander2011density}.
+Density-based methods find such high-density regions representing clusters of arbitrary shape and typically have a structured means of identifying noise points in low-density regions. These properties provide advantages for many applications compared to other clustering approaches. For example, geospatial data may be fraught with noisy data points due to estimation errors in GPS-enabled sensors~\citep{Chen2014} and may have unique cluster shapes caused by the physical space the data was captured in. Density-based clustering is also a promising approach to clustering high-dimensional data~\citep{kailing2004density}, where partitions are difficult to discover, and where the physical shape constraints assumed by model-based methods are more likely to be violated.
+%While dimensionality reduction techniques enable the use of many clustering algorithms to cluster high dimensional data, density-based clustering enables us to group high-dimensional data without the loss of information and recognizing noisy data.
+% What DBSCAN has been used for
+
+Several density-based clustering algorithms have been proposed, including
+DBSCAN algorithm~\citep{ester1996density},
+DENCLUE~\citep{hinneburg1998efficient}
+and many DBSCAN derivates like HDBSCAN~\citep{campello2015hierarchical}.
+These clustering algorithms are widely used in practice with applications ranging from finding outliers in datasets for fraud prevention~\citep{breunig2000lof}, to finding patterns in streaming data~\citep{chen2007density, cao2006density}, noisy signals~\citep{kriegel2005density,ester1996density,tran2006knn,hinneburg1998efficient,duan2007local}, gene expression data~\citep{jiang2003dhc}, multimedia databases~\citep{kisilevich2010p}, and road traffic~\citep{li2007traffic}.
+
+%%% MFH: I am not sure this is true. Some of these are not pure density-based
+% What is the aim of the DBSCAN package?
+%There are many meaningful ways to define 'natural' clusters based on density. As a result, numerous density-based clustering algorithms have been proposed within the past two decades, e.g.,
+%BIRCH~\citep{zhang96},
+%DBSCAN algorithm~\citep{ester1996density},
+%DENCLUE~\citep{hinneburg1998efficient},
+%CURE~\citep{guha1998cure},
+%CHAMELEON~\citep{karypis1999chameleon},
+%CLARANS~\citep{ng2002clarans},
+%and HDBSCAN~\citep{campello2015hierarchical}.
+
+This paper focuses on an efficient implementation of the DBSCAN algorithm~\citep{ester1996density},
+one of the most popular density-based clustering algorithms,
+whose consistent use earned it the SIGKDD 2014's Test of Time Award~\citep{SIGKDDNe30:online}, and OPTICS~\citep{ankerst1999optics}, often referred to as an extension of DBSCAN.
+%Matt - what do you mean when you say related algorithms?
+%along with their related algorithms, such as the Local Outlier Factor \citep{breunig2000lof} and the conversion methods between reachability and dendrogram representations\citep{sander2003automatic}.
+%Matt - you can cite the KAIS 17 paper in this first sentence
+While surveying software tools that implement various density-based clustering algorithms, it was discovered that in a large number of statistical tools, not only do implementations vary significantly in performance~\citep{kriegel2016black}, but may also lack important components and corrections. Specifically, for the statistical computing environment \proglang{R}~\citep{team2013r}, only naive DBSCAN implementations without speed-up with spatial data structures are available (e.g., in the well-known Flexible Procedures for Clustering package~\citep{fpc}), and OPTICS is not available. %% Matt, what packages? : fixed (fpc). It's probably not worth mentioning largeVis, doesn't even compile/load properly on my machine.
+This motivated the development of a \proglang{R} package for density-based clustering with DBSCAN and related algorithms called \pkg{dbscan}. The \pkg{dbscan} package contains complete, correct and fast implementations of DBSCAN and OPTICS.
+% precisely as intended by the original authors of the algorithms.
+The package currently enjoys thousands of new installations from the CRAN repository every month.
+
+This article presents an overview of the \proglang{R} package~\pkg{dbscan}
+focusing on DBSCAN and OPTICS, outlining its operation and experimentally
+compares its performance with implementations in other open-source implementations. We first review the concept of density-based clustering and present the DBSCAN and OPTICS algorithms in Section~\ref{sec:dbc}. This section concludes with a short review of existing software packages that implement these algorithms. Details about \pkg{dbscan}, with examples of its use, are presented in Section~\ref{sec:dbscan}. A performance evaluation is presented in Section~\ref{sec:eval}. Concluding remarks are offered in Section~\ref{sec:conc}.
+
+\section{Density-based clustering}\label{sec:dbc}
+Density-based clustering is now a well-studied field. Conceptually, the idea behind density-based clustering is simple: given a set of data points, define a structure that accurately reflects the underlying density~\citep{sander2011density}. An important distinction between density-based clustering and alternative approaches to cluster analysis, such as the use of \emph{(Gaussian) mixture models}~\citep[see][]{jain1999review}, is that the latter represents a \emph{parametric} approach in which the observed data are assumed to have been produced by mixture of either Gaussian or other parametric families of distributions.
+While certainly useful in many applications, parametric approaches naturally assume clusters will exhibit some type convex (generally hyper-spherical or hyper-elliptical) shape. Other approaches, such as $k$-means clustering (where the $k$ parameter signifies the user-specified number of clusters to find), share this common theme of `minimum variance', where the underlying assumption is made that ideal clusters are found by minimizing some measure of intra-cluster variance (often referred to as cluster cohesion) and maximizing the inter-cluster variance (cluster separation)~\citep{arbelaitz2013extensive}. Conversely, the label density-based clustering is used for methods which do not assume parametric distributions, are capable of finding arbitrarily-shaped clusters, handle varying amounts of noise, and require no prior knowledge regarding how to set the number of clusters $k$. This methodology is best expressed in the DBSCAN algorithm, which we discuss next.
+
+\subsection{DBSCAN: Density Based Spatial Clustering of Applications with Noise}
+As one of the most cited of the density-based clustering algorithms~\citep{acade96:online}, DBSCAN~\citep{ester1996density} is likely the best known density-based clustering algorithm in the scientific community today. The central idea behind DBSCAN and its extensions and revisions is the notion that points are assigned to the same cluster if they are \emph{density-reachable} from each other. To understand this concept, we will go through the most important definitions used in DBSCAN and related algorithms. The definitions and the presented pseudo code follows the original by \cite{ester1996density}, but are adapted to provide a more consistent presentation with the other algorithms discussed in the paper.
+
+Clustering starts with a dataset $D$ containing a set of points
+$p \in D$.
+Density-based algorithms need to obtain a density estimate over the data space.
+DBSCAN estimates the density around a point using
+the concept of $\epsilon$-neighborhood.
+
+\begin{mydef} {\bf $\epsilon$-Neighborhood}.
+The $\epsilon$-neighborhood, $N_\epsilon(p)$, of a data point $p$ is the set of points within a specified radius $\epsilon$ around $p$.
+
+    $$N_\epsilon(p) = \{q \;|\; d(p,q) < \epsilon\}$$
+
+where $d$ is some distance measure and $\epsilon \in \mathbb{R}^+$. Note that the point $p$ is always in its own $\epsilon$-neighborhood, i.e., $p \in N_\epsilon(p)$ always holds.
+\end{mydef}
+
+% high density definition both below and above
+Following this definition, the size of the neighborhood $|N_\epsilon(p)|$ can
+be seen as a simple unnormalized kernel density estimate around $p$
+using a uniform kernel and a bandwidth of $\epsilon$.
+DBSCAN uses $N_\epsilon(p)$ and a threshold called $\mathit{minPts}$
+to detect dense regions and to classify the points in a data set into
+{\bf core}, {\bf border}, or {\bf noise} points.
+
+\begin{mydef} {\bf Point classes}.
+A point $p \in D$ is classified as
+    \begin{itemize}
+    \item
+    a {\bf core point} if $N_\epsilon(p)$ has
+        high density, i.e., $|N_\epsilon(p)| \geq \mathit{minPts}$ where $\mathit{minPts} \in \mathbb{Z}^+$ is a user-specified density threshold,
+    \item
+    a {\bf border point} if $p$ is not a core point, but
+        it is in the neighborhood of a core point $q \in D$,
+        i.e., $p \in N_\epsilon(q)$, or
+    \item
+    a {\bf noise point}, otherwise.
+    \end{itemize}
+\end{mydef}
+
+
+\begin{figure}
+    \minipage{0.49\textwidth}
+        \includegraphics[height=\linewidth, angle=-90, origin=c]{figures/dbscan_a}\\
+        \centerline{(a)}
+    \endminipage\hfill
+    \minipage{0.49\textwidth}
+        \includegraphics[height=\linewidth, angle=-90, origin=c]{figures/dbscan_b}\\
+        \centerline{(b)}
+    \endminipage\\
+\caption{Concepts used the DBSCAN family of algorithms.
+    (a) shows examples for the three point classes, core, border, and noise points,
+    (b)  illustrates the concept of density-reachability and density-connectivity.
+    }\label{fig:point_classes}
+\end{figure}
+
+
+
+A visual example is shown in
+Figure~\ref{fig:point_classes}(a). The size of the neighborhood for some points
+is shown as a circle and their class is shown as an annotation.
+
+To form contiguous dense regions from individual points, DBSCAN defines the
+notions of reachability and connectedness.
+
+\begin{mydef} {\bf Directly density-reachable}.
+A point $q \in D$ is directly density-reachable from a point $p \in D$ with respect to
+$\epsilon$ and $\mathit{minPts}$ if, and only if,
+\begin{enumerate}
+  \item $|N_\epsilon(p)|$ $\geq$ $\mathit{minPts}$, and
+  \item $q$ $\in$ $N_\epsilon(p)$.
+\end{enumerate}
+      That is,
+      $p$ is a core point and
+      $q$ is in its $\epsilon$-neighborhood.
+\end{mydef}
+
+\begin{mydef} {\bf Density-reachable}. A point $p$ is density-reachable from $q$ if there exists in $D$ an ordered sequence of points $(p_1, p_2, ..., p_n)$
+ with $q=p_1$ and $p=p_n$
+    such that $p_i+1$ directly density-reachable from $p_{i}$ $\forall$ $i \in \{1,2, ..., n-1\}$.
+\end{mydef}
+
+
+\begin{mydef} {\bf Density-connected}. A point $p \in D$ is density-connected to a point $q \in D$
+if there is a point $o$ $\in$ $D$ such that both $p$ and $q$ are density-reachable from $o$.
+\end{mydef}
+
+The notion of density-connection can be used to form clusters as
+contiguous dense regions.
+
+% DBSCAN definition of cluster
+\begin{mydef} {\bf Cluster}. A cluster $C$ is a non-empty subset of $D$ satisfying the following conditions:
+\begin{enumerate}
+    \item {\bf Maximality}: If $p \in C$ and $q$ is density-reachable from $p$, then $q \in C$; and
+    \item {\bf Connectivity}: $\forall$ $p, q \in C$, $p$ is density-connected to $q$.
+\end{enumerate}
+\end{mydef}
+
+The DBSCAN algorithm identifies all such clusters by finding all core points and expanding each to all density-reachable points.
+%Algorithm~\ref{alg:dbscan} presents the details of the DBSCAN implementation in \pkg{dbscan}. It largely follows the algorithm presented by \cite{ester1996density}, but presents DBSCAN and cluster expansion in a single function.
+The algorithm begins with an arbitrary point $p$ and retrieves its $\epsilon$-neighborhood.
+%, denoted $N_{\epsilon}(p)$.
+If it is a core point then it will start a new cluster that is expanded by assigning all points in its neighborhood to the cluster. If an additional core point is found in the neighborhood, then the search is expanded to include also all points in its neighborhood.
+If no more core points are found in the expanded neighborhood, then the cluster is complete and the remaining points are searched to see if another core point can be found to start a new cluster.
+%The algorithm returns the cluster assignments after all data points have been processed.
+After processing all points, points which were not assigned to a cluster are considered noise.
+%Note that border points are point which have been assigned a cluster, but are not core points.
+
+%\begin{algorithm}[t]
+%     \caption{DBSCAN}
+%     \begin{algorithmic}[1]
+%     \Require $D \coloneqq$ Database of points
+%     \Require $\epsilon \coloneqq$ User-defined neighborhood radius
+%     \Require $\mathit{minPts} \coloneqq$ Minimum number of points in the neighborhood of a core point
+%     \Function{DBSCAN}{D, eps, $\mathit{minPts}$}
+%    \For{$p$ in $D$}% Iterate through the DB of points, arbitrary starting point
+%     \Comment{Find core points}
+%        \If {$p$ has already been visited} % Already Processed points are skipped
+%                continue
+%        \EndIf
+%
+%        \State Mark $p$ as visited % Mark progress
+%            \State $N \gets N_{\epsilon}(p)$ % Get all points within eps radius
+%            \If{$|N| < \mathit{minPts}$} % How many points were found
+%        continue
+%        \EndIf
+%
+%        \State $c \gets$ new cluster label
+%        \Comment{Start new cluster for core point and expand}
+%        \State Assign $p$ to cluster $c$
+%        \While {$N \ne \emptyset$}
+%        \State $p' \gets pop(N)$
+%          \If {$p'$ has already been visited} % Already Processed points are skipped
+%                continue
+%          \EndIf
+%          \State Mark $p'$ as visited % Mark progress
+%          \State $N' \gets N_{\epsilon}(p')$ % Get all points within eps radius
+%          \State Assign $p'$ to cluster $c$
+%            \If{$|N'| \ge \mathit{minPts}$} % How many points were found
+%        \Comment{Expand cluster for additional core point}
+%        \State Mark $p'$ as a core point
+%        \State $N \gets N \cup N'$
+%
+%        \EndIf
+%
+%        \EndWhile
+%         \EndFor
+%     \State \Return cluster assignments
+%     \EndFunction
+%     \end{algorithmic}
+%\label{alg:dbscan}
+%\end{algorithm}
+
+In the DBSCAN algorithm, core points are always part of the same cluster, independent of the order in which the points in the dataset are processed.
+This is different for border points. Border points might be density-reachable from core points in several clusters and the algorithm assigns them to the
+first of these clusters processed which depends on the order of
+the data points and the particular implementation of the algorithm.
+%Border points, however, although density-reachable from a core point, do not share the density-reachable property (the relation is asymmetric) and thus their cluster assignment depends on the order of which points are visited in the algorithm. This needs to be taken into account when comparing two different implementations since they might visit the points in a different order and thus end up producing different cluster assignments for border points.
+To alleviate this behavior, \cite{campello2015hierarchical} suggest a modification called DBSCAN* which considers all border points as noise instead and leaves
+them unassigned.
+
+
+\subsection{OPTICS: Ordering Points To Identify Clustering Structure}\label{sec:optics}
+There are many instances where it would be useful to detect clusters of varying density. From identifying causes among similar seawater characteristics~\citep{birant2007st}, to network intrusion detection systems~\citep{ertoz2003finding}, point of interest detection using geo-tagged photos~\citep{kisilevich2010p}, classifying cancerous skin lesions~\citep{celebi2005mining}, the motivations for detecting clusters among varying densities are numerous. The inability to find clusters of varying density is a notable drawback of DBSCAN resulting from the fact that a combination of a specific neighborhood size with a single density threshold $\mathrm{minPts}$ is used to determine if a point resides in a dense neighborhood.
+
+In 1999, some of the original DBSCAN authors developed OPTICS~\citep{ankerst1999optics} to address this concern. OPTICS borrows the core density-reachable concept from DBSCAN. But while DBSCAN may be thought of as a clustering algorithm, searching for natural groups in data, OPTICS is an \emph{augmented ordering algorithm} from which either flat or hierarchical clustering results can be derived. OPTICS requires the same $\epsilon$ and $\mathit{minPts}$ parameters as DBSCAN, however, the $\epsilon$ parameter is theoretically unnecessary and is only used for the practical purpose of reducing the runtime complexity of the algorithm.
+
+To describe OPTICS, we introduce an additional concepts called core-distance
+and reachability-distance. All used distances are calculated using the same metric (often Euclidean distance) used for the neighborhood calculation.
+
+\begin{mydef} {\bf Core-distance}.
+The core-distance of a point $p \in D$ with respect to $\mathit{minPts}$ and $\epsilon$ is defined as
+    \[ \mathrm{core\mhyphen dist}(p; \epsilon, \mathit{minPts}) = \begin{cases}
+    \text{UNDEFINED} & \text{if} \; |N_{\epsilon}(p)| < \mathit{minPts}, \text{and} \\
+    \mathrm{minPts\mhyphen dist}(p) & \text{otherwise.}
+   \end{cases}
+    \] where $\mathrm{minPts\mhyphen dist}(p)$ is the
+    distance from $p$ to its $\mathit{minPts} - 1$ nearest neighbor, i.e.,
+    the minimal radius a neighborhood of size $\mathit{minPts}$ centered at and
+    including $p$ would have.
+\end{mydef}
+
+\begin{mydef} {\bf Reachability-distance}.
+ The reachability-distance of a point $p \in D$ to a point $q \in D$
+ parameterized by  $\epsilon$ and $\mathit{minPts}$ is defined as
+    \[ \mathrm{reachability\mhyphen dist}(p,q; \epsilon, \mathit{minPts}) = \begin{cases}
+    \text{UNDEFINED} & \text{if} \; |N_{\epsilon}(p)| < \mathit{minPts}, \text{and} \\
+    \max(\mathrm{core\mhyphen dist}(p), d(p, q)) & \text{otherwise.}
+   \end{cases}
+\]
+\end{mydef}
+
+The reachability-distance of a core point $p$ with respect to object $q$
+is the smallest neighborhood radius such that $p$ would be directly
+density-reachable from $q$.
+Note that $\epsilon$ is typically set very large compared to DBSCAN. Therefore,
+$\mathit{minPts}$ behaves differently for OPTICS: more points will be considered core points and it affects how many nearest neighbors are considered in the core-distance calculation, where larger values will lead to larger and more smooth reachability distributions. This needs to be kept in mind when choosing appropriate parameters.
+
+%The OPTICS algorithm pseudocode is shown in Algorithm~\ref{alg:optics}.
+OPTICS provides an augmented ordering.
+%sorts points by the reachability-distance to their closest core point.
+The algorithm starting with a point and expands it's neighborhood like DBSCAN, but it explores the new point in the order of lowest to highest core-distance. The order in which the points are explored along with each point's core- and reachability-distance is the final result of the algorithm.
+An example of the order and the resulting reachability-distance is shown
+in the form of a reachability plot
+in Figure~\ref{fig:opticsReachPlot1}. Low reachability-distances shown as
+valleys represent clusters separated by peaks representing
+points with larger distances.
+This density representation essentially conveys the same information as the often used dendrogram or `tree-like' structure.
+This is why OPTICS is often also noted as a visualization tool.
+\cite{sander2003automatic} showed how the output of OPTICS can
+be converted into an equivalent dendrogram, and that
+under certain conditions, the dendrogram produced by the well known hierarchical clustering with single linkage is identical to running OPTICS with the parameter $\mathit{minPts} = 2$
+%To make this connection explicit, an OPTICS extension~\citep{sander2003automatic} showed how that, under certain conditions, the dendrogram produced by the well known hierarchical clustering with single linkage is identical to running OPTICS with the parameter $\mathit{minPts} = 2$. Due to the widespread usage of dendrograms in
+%the \proglang{R} computing environment, this conversion algorithm between reachability and dendrogram representations is made available in \pkg{dbscan}.
+
+
+\begin{figure}
+    \centering
+      \includegraphics{dbscan-opticsReachPlot}
+      \caption{OPTICS reachability plot example for a data set with four clusters of 100 data points each.}
+      \label{fig:opticsReachPlot1}
+\end{figure}
+
+
+%
+%OPTICS evaluates each point's reachability-distance with respect to a neighbor, marks the point as processed, and then continues processing nearest neighbors.
+%The algorithm is similar to DBSCAN. Where OPTICS differs, however, is in the assignment of reachability-distance, a generalized extension to density-reachability. Rather than assigning cluster labels for each object processed, OPTICS stores reachability-distance and core-distance , in a specific ordering such that neighboring objects that have smaller reachability-distances are prioritized. Due to this prioritization, core objects are naturally grouped up near other core objects in the ordering, where each point is labeled with its minimum reachability-distance. An overview of the algorithm is shown below in Algorithm \ref{alg:optics}.
+%  OPTICS(DB, eps, \mathit{minPts})
+%     for each point p of DB
+%        p.reachability-distance = UNDEFINED
+%     for each unprocessed point p of DB
+%        N = getNeighbors(p, eps)
+%        mark p as processed
+%        output p to the ordered list
+%        if (core-distance(p, eps, \mathit{minPts}) != UNDEFINED)
+%           Seeds = empty priority queue
+%           update(N, p, Seeds, eps, \mathit{minPts})
+%           for each next q in Seeds
+%              N' = getNeighbors(q, eps)
+%              mark q as processed
+%              output q to the ordered list
+%              if (core-distance(q, eps, \mathit{minPts}) != UNDEFINED)
+%                 update(N', q, Seeds, eps, \mathit{minPts})
+
+%% \begin{algorithm}[tp]
+%     \caption{OPTICS}
+%     \begin{algorithmic}[1]
+%     \Require $D \coloneqq$ Database of points
+%     \Require $\epsilon \coloneqq$ User-defined neighborhood radius
+%     \Require $\mathit{minPts} \coloneqq$ Minimum number of points in the neighborhood of a core point
+%     \Function{OPTICS}{D, $\epsilon$, $\mathit{minPts}$}
+%         \For{$p$ in $D$}% Iterate through the DB of points, arbitrary starting point
+%            \If {$p$ has been processed} % Already Processed points are skipped
+%                \textit{continue}
+%            \EndIf
+%            \State $N \gets N_{\epsilon}(p)$ \Comment{expand cluster order}
+%        % Get all points within eps radius
+%            \State Mark $p$ as processed % Mark progress
+%            \State queue $\gets p$
+%            \If{$|N| \ \geq \mathit{minPts}$}
+%                \State $Seeds \gets \text{ < empty priority queue > }$
+%                \State update($N$, $p$, $Seeds$, $\epsilon$, $\mathit{minPts}$)
+%                \For{$q$ in $Seeds$}
+%                  \State $N' \gets N_{\epsilon}(q)$
+%                  \State Mark $q$ as processed % Mark progress
+%                  \State queue $\gets q$
+%                  \If{$|N'| \ \geq \mathit{minPts}$} % How many points were found
+%                      \State update($N'$, $p$, $Seeds$, $\epsilon$, $\mathit{minPts}$)
+%                  \EndIf
+%                \EndFor
+%            \EndIf
+%         \EndFor
+%     \State \Return core-distances
+%         % A call to a function that extracts clusters should be mentioned, but we dont need to specify the extractdbscan or opitics-xi algorithms.
+%         % Mentioned below?
+%     \EndFunction
+%     \end{algorithmic}
+%\label{alg:optics}
+%\end{algorithm}
+%
+%\begin{algorithm}[tp]
+%     \caption{update}
+%     \begin{algorithmic}[1]
+%     \Require $N \coloneqq$ NeighborPts
+%     \Require $p \coloneqq$ Current point to process
+%     \Require $Seeds \coloneqq$ Priority Queue of known, unprocessed cluster members
+%     \Require $\epsilon \coloneqq$ User-defined $\epsilon$ radius to consider
+%     \Require $\mathit{minPts} \coloneqq$ The minimum number of points that constitute a cluster
+%     \Function{update}{N, p, Seeds, $\epsilon$, $\mathit{minPts}$}
+%     \State $p_\mathrm{core\mhyphen dist} \coloneqq \mathrm{core\mhyphen dist}(p, \epsilon, \mathit{minPts})$
+%     \For{$o$ in $N$}
+%         \If {$o$ has not been processed} % Already Processed points are skipped
+%        \State $new_{rd} \coloneqq \max(p_{\mathrm{core\mhyphen dist}}, d(p, o))$
+%            \If{$o_{rd} == \text{UNDEFINED}$}
+%                \State $o_{rd} \gets new_{rd}$
+%                \State $Seeds.insert \mhyphen with \mhyphen priority(o, o_{rd})$
+%            \Else
+%                \If{$new_{rd} < o_{rd}$}
+%                  \State $o_{rd} \gets new_{rd}$
+%                  \State $Seeds.move \mhyphen up(o, new_{rd})$
+%                \EndIf
+%            \EndIf
+%        \EndIf
+%     \EndFor
+%     \EndFunction
+%     \end{algorithmic}
+%  \label{alg:update}
+%\end{algorithm}
+
+%\subsubsection{Cluster Extraction}\label{sub:opt_cluster_ex}
+From the order discovered by OPTICS, two ways to group points into clusters
+was discussed in ~\cite{ankerst1999optics}, one which we will refer to as the {\bf ExtractDBSCAN} method and one which we will refer to as the {\bf Extract-$\xi$} method summarized below:
+\begin{enumerate}
+  \item {\bf ExtractDBSCAN} uses a single global
+      reachability-distance threshold $\epsilon'$ to extract a clustering.
+     This can be seen as a horizontal line in the reachability plot
+	in~\ref{fig:opticsReachPlot1}.
+	Peaks above the cut-off represent noise points and separate the
+	clusters.
+  \item {\bf Extract-$\xi$}
+      identifies clusters \emph{hierarchically} by scanning through the ordering that OPTICS produces to identify significant, relative changes in reachability-distance. The authors of OPTICS noted that clusters can be thought of as identifying `dents' in the reachability plot.
+\end{enumerate}
+The ExtractDBSCAN method extracts a clustering
+equivalent to DBSCAN* (i.e., DBSCAN where border points stay unassigned).
+Because this method extracts clusters like DBSCAN, it cannot identify partitions that exhibit very significant differences in density. Clusters of significantly different density can only be identified if the data is well separated and very little noise is present.
+The second method, which we call Extract-$\xi$\footnote{In the original OPTICS publication \cite{ankerst1999optics}, the algorithm was outlined in Figure 19 and called the 'ExtractClusters' algorithm, where the clusters extracted were referred to as $\xi$-clusters. To distinguish the method uniquely, we refer to it as the Extract-$\xi$ method.},
+identifies a cluster hierarchy and replaces the data dependent global $\epsilon$ parameter with $\xi$, a data-independent density-threshold parameter ranging between $0$ and $1$. One interpretation of $\xi$ is that it describes the relative magnitude of the change of cluster density (i.e., reachability). Significant changes in relative reachability allow for clusters to manifest themselves hierarchically as `dents' in the ordering structure. The hierarchical representation Extract-$\xi$ can, as opposed to the ExtractDBSCAN method, produce clusters of varying densities.
+
+With its two ways of extracting clusters from the ordering, whether through either the global $\epsilon'$ or relative $\xi$ threshold, OPTICS can be seen as a generalization of DBSCAN. In contexts where one wants to find clusters of similar density, OPTICS's ExtractDBSCAN yields a DBSCAN-like solution, while in other contexts Extract-$\xi$ can generate a hierarchy representing clusters of varying density. It is thus interesting to note that while DBSCAN has reached critical acclaim, even motivating numerous extensions~\citep{rehman2014dbscan}, OPTICS has received decidedly less attention. Perhaps one of the reasons for this is because the Extract-$\xi$ method for grouping points into clusters has gone largely unnoticed, as it is not implemented in most open-source software packages that advertise an implementation of OPTICS. This includes implementations in WEKA~\citep{hall2009weka}, SPMF~\citep{fournier2014spmf}, and the PyClustering~\citep{PyCluste54:online} and Scikit-learn~\citep{pedregosa2011scikit} libraries for Python. To the best of our knowledge, the only other open-source library
+sporting a complete implementation of OPTICS is ELKI~\citep{DBLP:journals/pvldb/SchubertKEZSZ15}, written in \proglang{Java}.
+%\subsection{A Note on DBSCAN and OPTICS Extensions}\label{sec:extensions}
+
+In fact, perhaps due to the (incomplete) implementations of OPTICS cluster extraction across various software libraries, there has been some confusion regarding the usage of OPTICS, and the benefits it offers compared to DBSCAN.
+Several papers motivate DBSCAN extensions or devise new algorithms by citing OPTICS as incapable of finding density-heterogeneous clusters~\citep{ghanbarpour2014exdbscan,chowdhury2010efficient,Gupta2010,duan2007local}. Along the same line of thought, others cite OPTICS as capable of finding clusters of varying density, but either use the DBSCAN-like global density threshold extraction method or refer to OPTICS as a clustering algorithm, without mention of which cluster extraction method was used in their experimentation~\citep{verma2012comparative,roy2005approach,liu2007vdbscan,pei2009decode}.
+However, OPTICS fundamentally returns an ordering of the data which can be post-processed to extract either
+1) a flat clustering with clusters of relatively similar density or
+2) a cluster hierarchy, which is adaptive to representing local densities within the data.
+To clear up this confusion,
+it seems to be important to add complete implementations to
+existing software packages and introduce new complete implementations of OPTICS like the \proglang{R} package~\pkg{dbscan} described in this paper.
+
+
+
+\subsection{Current implementations of DBSCAN and OPTICS}\label{sec:review}
+Implementations of DBSCAN and/or OPTICS are available in many statistical software packages. We focus here on open-source solutions. These include the Waikato Environment for Knowledge Analysis (WEKA)~\citep{hall2009weka}, the Sequential Pattern Mining Framework (SPMF)~\citep{fournier2014spmf}, the Environment for Developing KDD-Application supported by Index Structures (ELKI)~\citep{DBLP:journals/pvldb/SchubertKEZSZ15}, the Python
+%% Matt - need a cite for PyClustering.
+library scikit-learn~\citep{pedregosa2011scikit}, the PyClustering Data Mining library~\citep{PyCluste54:online}, the Flexible Procedures for Clustering \proglang{R} package~\citep{fpc}, and the \pkg{dbscan} package~\citep{dbscan-R} introduced in this paper.
+
+\begin{table}
+  \begin{tabularx}{\textwidth}{ c  c  c  c  c  X }
+        \hline
+      {\bf Library} & {\bf DBSCAN} & {\bf OPTICS} & {\bf ExtractDBSCAN} & {\bf Extract-$\xi$} & \\
+      \hline
+      \rule{0pt}{3ex}
+\pkg{dbscan}    & \cmark & \cmark & \cmark & \cmark & \\
+      ELKI    & \cmark & \cmark & \cmark & \cmark & \\
+      SPMF    & \cmark & \cmark & \cmark & & \\
+      PyClustering & \cmark & \cmark & \cmark & & \\
+      WEKA    & \cmark & \cmark & \cmark & & \\
+      SCIKIT-LEARN & \cmark & & & & \\
+      FPC    & \cmark & & & & \\
+      \hline
+  \end{tabularx}
+    \vspace{2mm}
+    \begin{tabularx}{\textwidth}{ c  c c  c  X }
+     \hline
+    {\bf Library} & {\bf Index Acceleration} & {\bf Dendrogram for OPTICS} & {\bf Language} & \\
+      \hline
+      \rule{0pt}{3ex}
+    \pkg{dbscan} & \cmark & \cmark & \proglang{R} & \\
+    ELKI & \cmark & \cmark & \proglang{Java} & \\
+    SPMF & \cmark & & \proglang{Java} & \\
+    PyClustering & \cmark & & \proglang{Python} & \\
+    WEKA & & & \proglang{Java} & \\
+    SCIKIT-LEARN & \cmark & & \proglang{Python} & \\
+    FPC & & & \proglang{R} & \\
+      \hline
+  \end{tabularx}
+  \caption{A Comparison of DBSCAN and OPTICS implementations in various
+    open-source statistical software libraries. A \cmark \ symbol denotes availability.}
+  \label{tab:comp}
+\end{table}
+
+Table~\ref{tab:comp} presents a comparison of the features offered by these packages. All packages support DBSCAN and most use index acceleration to speed up the $\epsilon$-neighborhood queries involved in both DBSCAN and OPTICS algorithms, the known bottleneck that typically dominates the runtime and is essential for processing larger data sets. \pkg{dbscan} is the first \proglang{R} implementation offering this improvement. OPTICS with ExtractDBSCAN is also widely implemented, but the Extract-$\xi$ method, as well as the use of dendrograms with OPTICS, is only available in \pkg{dbscan} and ELKI.
+%It is notable that there still remain minor discrepancies between the implementations (see Completeness subsection %in Section~\ref{sec:eval} for details).
+A small experimental runtime comparison is provided in Section~\ref{sec:eval}.
+
+
+\section{The dbscan package}\label{sec:dbscan}
+The package \pkg{dbscan} provides high performance code for DBSCAN and OPTICS through a \proglang{C++} implementation (interfaced via the \pkg{Rcpp} package by \cite{eddelbuettel2011rcpp}) using the $k$-d tree data structure implemented in the \proglang{C++} library ANN~\citep{mount1998ann} to improve $k$ nearest neighbor (kNN) and fixed-radius nearest neighbor search speed.
+DBSCAN and OPTICS share a similar interface.
+
+\begin{Schunk}
+\begin{Sinput}
+dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
+optics(x, eps, minPts = 5, ...)
+\end{Sinput}
+\end{Schunk}
+
+The first argument \code{x} is the data set in form of a \code{data.frame} or a \code{matrix}. The implementations use by default Euclidean distance for neighborhood computation. Alternatively, a precomputed set of pair-wise distances between data points stored in a \code{dist} object can be supplied. Using precomputed distances, arbitrary distance metrics can be used, however, note that $k$-d trees are not used for distance data, but lists of nearest neighbors are precomputed. For \code{dbscan()} and \code{optics()}, the parameter \code{eps} represents the radius of the $\epsilon$-neighborhood considered for density estimation  and \code{minPts} represents the density threshold to identify core points.
+Note that \code{eps} is not strictly necessary for OPTICS but is only used as an upper limit for the considered neighborhood size used to reduce computational complexity.
+\code{dbscan()} also can use weights for the data points in \code{x}. The density in a neighborhood is just the sum of the weights of the points inside the neighborhood. By default, each data point has a weight of one, so the density estimate for the neighborhood is just the number of data points inside the neighborhood.
+%This is the reason why the density threshold is called minPoints, i.e., the minimum number of required points in the eps-neighborhood.
+Using weights, the importance of points can be changed.
+
+The original DBSCAN implementation assigns border points to the first cluster
+it is density reachable from. Since this may result in different clustering results if the data points are processed in a different order, \cite{campello2015hierarchical} suggest for DBSCAN* to consider border points as noise. This can be achieved by using \code{borderPoints = FALSE}. All functions accept additional arguments. % in~\code{...}.
+These arguments are passed on to the fixed-radius nearest neighbor search. More details about the implementation of the nearest neighbor search will be presented in Section~\ref{sec:nn} below.
+
+Clusters can be extracted from the linear order produced by OPTICS. The \pkg{dbscan} implementation of the cluster extraction methods for ExtractDBSCAN and Extract-$\xi$ are:
+
+\begin{Schunk}
+\begin{Sinput}
+extractDBSCAN(object, eps_cl)
+extractXi(object, xi, minimum = FALSE, correctPredecessor = TRUE)
+\end{Sinput}
+\end{Schunk}
+
+\code{extractDBSCAN()} extracts a clustering from an OPTICS ordering that is similar to what DBSCAN would produce with a single global $\epsilon$ set to \code{eps_cl}. \code{extractXi()} extracts clusters hierarchically based on the steepness of the reachability plot. \code{minimum} controls whether only the minimal (non-overlapping) cluster are extracted. \code{correctPredecessor} corrects a common artifact known of the original $\xi$ method presented in~\cite{ankerst1999optics} by pruning the steep up area for points that have predecessors not in the cluster (see Technical Note in Appendix~\ref{sec:technote} for details).
+
+\subsection{Nearest Neighbor Search}\label{sec:nn}
+The density based algorithms in \pkg{dbscan} rely heavily on forming neighborhoods, i.e., finding all points belonging to an $\epsilon$-neighborhood. A simple approach is to perform a linear search, i.e., always calculating the distances to all other points to find the closest points. This requires $O(n)$ operations, with $n$ being the number of data points, for each time a neighborhood is needed. Since DBSCAN and OPTICS process each data point once, this results in a $O(n^2)$ runtime complexity. A convenient way in \proglang{R} is to compute a distance matrix with all pairwise distances between points and sort the distances for each point (row in the distance matrix) to precompute the nearest neighbors for each point. However, this method has the drawback that the size of the full distance matrix is $O(n^2)$, and becomes very large and slow to compute for medium to large data sets.
+
+In order to avoid computing the complete distance matrix,
+\pkg{dbscan} relies on a space-partitioning data structure called a $k$-d trees~\citep{bentley1975multidimensional}. This data structure allows \pkg{dbscan} to identify the kNN or all neighbors within a fixed radius $eps$ more efficiently in sub-linear time using on average only $O(\mathop{log}(n))$ operations per query.
+This results in a reduced runtime complexity of $O(n\mathop{log}(n))$.
+However, note that $k$-d trees are known to degenerate for high-dimensional data requiring $O(n)$ operations and leading to a performance no better than linear search.
+% See above
+%However, for high-dimensional data, $k$-d trees are known to degenerate
+%resulting again in a runtime complexity of $O(n^2)$.
+Fast kNN search and fixed-radius nearest neighbor search are used in DBSCAN and OPTICS, but we also provide a direct interface in \pkg{dbscan}, since they are useful in their own right.
+
+\begin{Schunk}
+\begin{Sinput}
+kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
+     splitRule = "suggest", approx = 0)
+
+frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
+     splitRule = "suggest", approx = 0)
+\end{Sinput}
+\end{Schunk}
+
+The interfaces only differ in the way that \code{kNN()} requires to specify \code{k} while \code{frNN()} needs the radius \code{eps}. All other arguments are the same. \code{x} is the data and the result will be a list of neighbors in \code{x} for each point in \code{x}. \code{sort} controls if the returned points are sorted by distance. \code{search} controls what searching method should be used. Available search methods are \code{"kdtree"}, \code{"linear"} and \code{"dist"}. The linear search method does not build a search data structure, but performs a complete linear search to find the nearest neighbors.
+%This is typically slow for large data sets, however,
+The dist method precomputes a dissimilarity matrix which is very fast for small data sets, but problematic for large sets. The default method is to build a $k$-d tree. $k$-d trees are implemented in \proglang{C++} using a modified version of the ANN library \citep{mount1998ann} compiled for Euclidean distances. Parameters \code{bucketSize}, \code{splitRule} and \code{approx} are algorithmic parameters which control the way the $k$-d tree is built. \code{bucketSize} controls the maximal size of the $k$-d tree leaf nodes. \code{splitRule} specifies the method how the $k$-d tree partitions the data space. We use \code{"suggest"}, which uses the best guess of the ANN library given the data. \code{approx} greater than zero uses approximate NN search. Only nearest neighbors up to a distance of a factor of $(1+\mathrm{approx})\mathrm{eps}$ will be returned, but some actual neighbors may be omitted potentially leading to spurious clusters and noise points. However, the algorithm will enjoy a significant speedup. For more details, we refer the reader to the documentation of the ANN library~\citep{mount1998ann}. \code{dbscan()} and \code{optics()} use internally \code{frNN()} and the additional arguments in~\code{...} are passed on to the nearest neighbor search method.
+
+% \section{Using the dbscan package}
+\subsection{Clustering with DBSCAN}
+We use a very simple artificial data set of four slightly overlapping Gaussians in two-dimensional space with 100 points each. We load \pkg{dbscan},
+set the random number generator to make the results reproducible and create the data set.
+
+<<echo=FALSE>>=
+options(width = 75)
+@
+
+<<>>=
+library("dbscan")
+
+set.seed(2)
+n <- 400
+
+x <- cbind(
+  x = runif(4, 0, 1) + rnorm(n, sd = 0.1),
+  y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
+  )
+
+true_clusters <- rep(1:4, time = 100)
+@
+
+<<fig=TRUE, include=FALSE, label=sampleData, width=5, height=5>>=
+plot(x, col = true_clusters, pch = true_clusters)
+@
+
+\begin{figure}
+\centering
+\includegraphics[width=8cm]{dbscan-sampleData}
+\caption{The sample dataset, consisting of 4 noisy Gaussian distributions with slight overlap.}
+\label{fig:sampleData}
+\end{figure}
+
+The resulting data set is shown in Figure~\ref{fig:sampleData}.
+
+To apply DBSCAN, we need to decide on the neighborhood radius~\code{eps} and
+the density threshold~\code{minPts}. The rule of thumb for minPts is to use at least the number of dimensions of the data set plus one. In our case, this is 3. For eps, we can plot the points' kNN distances (i.e., the distance to the $k$th nearest neighbor) in decreasing order and look for a knee in the plot. The idea behind this heuristic is that points located inside of clusters will have a small $k$-nearest neighbor distance, because they are close to other points in the same cluster, while noise points are isolated and will have a rather large kNN distance. \pkg{dbscan} provides a function called \code{kNNdistplot()} to make this easier. For $k$ we use the \code{minPts} value of 3.
+
+<<fig=TRUE, include=FALSE, label=kNNdistplot, width=7, height=4>>=
+kNNdistplot(x, k = 3)
+abline(h=.05, col = "red", lty=2)
+@
+\begin{figure}
+\centering
+\includegraphics{dbscan-kNNdistplot}
+\caption{$k$-Nearest Neighbor Distance plot.}
+\label{fig:kNNdistplot}
+\end{figure}
+
+The kNN distance plot is shown in Figure~\ref{fig:kNNdistplot}. A knee is visible at around a 3-NN distance of 0.05. We have manually added a horizontal
+line for reference.
+
+Now we can perform the clustering with the chosen parameters.
+<<>>=
+res <- dbscan(x, eps = 0.05, minPts = 3)
+res
+@
+
+The resulting clustering identified one large cluster with 185 member points
+and 2 medium size clusters of between 87 and 89 points, three very small
+clusters and 30 noise points (represented by cluster id 0). The available
+fields can be directly accessed using the list extraction operator \code{$}.
+For example, the cluster assignment information can be used to plot the data
+with the clusters identified by different labels and colors.
+
+<<fig=TRUE, include=FALSE, label=dbscanPlot, width=5, height=5>>=
+plot(x, col = res$cluster + 1L, pch = res$cluster + 1L)
+@
+\begin{figure}
+    \centering
+      \includegraphics[width=9cm]{dbscan-dbscanPlot}
+      \caption{Result of clustering with DBSCAN. Noise is represented as black circles.}
+      \label{fig:dbscanPlot}
+\end{figure}
+
+The scatter plot in Figure~\ref{fig:dbscanPlot} shows that the clustering
+algorithm correctly identified the upper two clusters, but merged the lower two
+clusters because the region between them has a high enough density. The small
+clusters are isolated groups of 3 points (passing $\mathit{minPts}$) and the
+noise points isolated points. \pkg{dbscan} also provides a plot that adds
+convex cluster hulls to the scatter plot shown in Figure~\ref{fig:dbscanHullPlot}.
+
+<<fig=TRUE, include=FALSE, label=dbscanHullPlot, width=5, height=5>>=
+hullplot(x, res)
+@
+\begin{figure}
+    \centering
+    \includegraphics[width=9cm]{dbscan-dbscanHullPlot}
+    \caption{Convex hull plot of the DBSCAN clustering. Noise points
+are black.
+Note that noise points and points of another cluster may lie
+within the convex hull of a different cluster. }
+    \label{fig:dbscanHullPlot}
+    \vspace{0.1cm}
+\end{figure}
+
+A clustering can also be used to find out to which clusters new data points
+would be assigned using
+\code{predict(object, newdata = NULL, data, ...)}.
+The predict method uses nearest neighbor assignment to core points and needs the original dataset. Additional parameters %(\code{...})
+are passed on to the nearest neighbor search method. Here we obtain the cluster assignment for the first 25 data points. Note that an assignment to cluster~0 means that the data point is considered noise because it is not close enough to a core point.
+
+<<>>=
+predict(res, x[1:25,], data = x)
+@
+
+
+\subsection{Clustering with OPTICS}
+
+Unless OPTICS is purely used to extract a DBSCAN clustering, its parameters
+have a different effect than for DBSCAN: \code{eps} is typically chosen rather large (we use 10 here) and \code{minPts} mostly affects core and reachability-distance calculation, where larger values have a smoothing effect. We use also 10, i.e., the core-distance is defined as the distance to the 9th nearest neighbor (spanning a neighborhood of 10 points).
+
+<<>>=
+res <- optics(x, eps = 10, minPts = 10)
+res
+@
+
+OPTICS is an augmented ordering algorithm, which stores the computed order of the points it found in the \code{order} element of the returned object.
+
+<<>>=
+head(res$order, n = 15)
+@
+
+This means that data point 1 in the data set is the first in the order,
+data point 363 is the second and so forth.
+The density-based order produced by OPTICS can be directly plotted
+as a reachability plot.
+
+<<fig=TRUE, include=FALSE, label=opticsReachPlot, width=7, height=4>>=
+plot(res)
+@
+\begin{figure}
+    \centering
+      \includegraphics{dbscan-opticsReachPlot}
+      \caption{OPTICS reachability plot. Note that the first reachability value is always UNDEFINED.}
+      \label{fig:opticsReachPlot}
+\end{figure}
+
+
+The reachability plot in Figure~\ref{fig:opticsReachPlot} shows the reachability distance for points
+ordered by OPTICS. Valleys represent potential clusters separated by peaks.
+Very high peaks may indicate noise points. To visualize the order
+on the original data sets we can plot a line connecting the points in order.
+
+<<fig=TRUE, include=FALSE, label=opticsOrder, width=5, height=5>>=
+plot(x, col = "grey")
+polygon(x[res$order,], )
+@
+\begin{figure}
+    \centering
+      \includegraphics[width=8cm]{dbscan-opticsOrder}
+      \caption{OPTICS order of data points represented as a line.}
+      \label{fig:opticsOrder}
+\end{figure}
+
+Figure~\ref{fig:opticsOrder} shows that points in each cluster are
+visited in consecutive order starting with the points in the center (the densest region) and then the points in the surrounding area.
+
+
+As noted in Section~\ref{sec:optics}, OPTICS has two primary cluster extraction methods using the ordered reachability structure it produces. A DBSCAN-type clustering can be extracted using \code{extractDBSCAN()} by specifying the global eps parameter. The reachability plot in figure~\ref{fig:opticsReachPlot} shows four peaks, i.e., points with a high reachability-distance. These points indicate boundaries between clusters four clusters. An \code{eps} threshold that separates the four clusters can be visually determined. In this case we use \code{eps_cl}  of 0.065.
+<<fig=TRUE, include=FALSE, label=extractDBSCANReachPlot2, width=7, height=4>>=
+res <- extractDBSCAN(res, eps_cl = .065)
+plot(res)
+@
+
+<<fig=TRUE, include=FALSE, label=extractDBSCANHullPlot2>>=
+hullplot(x, res)
+@
+
+\begin{figure}
+  \centering
+  \includegraphics{dbscan-extractDBSCANReachPlot2}
+      \caption{Reachability plot for a DBSCAN-type clustering extracted at global $\epsilon = 0.065$ results in four clusters.}
+  \label{fig:extractDBSCANReachPlot2}
+  \centering
+  \includegraphics[width=9cm]{dbscan-extractDBSCANHullPlot2}
+      \caption{Convex hull plot for a DBSCAN-type clustering extracted at global $\epsilon = 0.065$ results in four clusters.}
+  \label{fig:extractDBSCANHullPlot2}
+\end{figure}
+
+The resulting reachability and corresponding clusters are shown in Figures~\ref{fig:extractDBSCANReachPlot2} and \ref{fig:extractDBSCANHullPlot2}. The clustering  resembles closely the original structure
+of the four clusters with which the data were generated, with the only difference
+that points on the boundary of the clusters are marked as noise points.
+
+\pkg{dbscan} also provides \code{extractXi()} to extract a hierarchical cluster
+structure. We use here a \code{xi} value of 0.05.
+<<>>=
+res <- extractXi(res, xi = 0.05)
+res
+@
+
+The $\xi$ method results in a hierarchical clustering structure, and thus points can be members of several nested clusters. Clusters are represented as contiguous ranges in the reachability plot and are available the field \code{clusters_xi}.
+
+<<>>=
+res$clusters_xi
+@
+
+Here we have seven clusters.
+The clusters are also visible in the reachability plot.
+
+
+<<fig=TRUE, include=FALSE, label=extractXiReachPlot, height=4, width=7>>=
+plot(res)
+@
+<<fig=TRUE, include=FALSE, label=extractXiHullPlot, width=5, height=5>>=
+hullplot(x, res)
+@
+
+\begin{figure}
+    \centering
+      \includegraphics{dbscan-extractXiReachPlot}
+      \caption{Reachability plot of a hierarchical clustering
+    extracted with Extract-$\xi$.}
+      \label{fig:extractXiReachPlot}
+%\end{figure}
+%\begin{figure}[htb]
+    \centering
+      \includegraphics[width=9cm]{dbscan-extractXiHullPlot}
+      \caption{Convex hull plot of a hierarchical clustering
+            extracted with Extract-$\xi$.}
+      \label{fig:extractXiHullPlot}
+\end{figure}
+
+Figure~\ref{fig:extractXiReachPlot} shows the reachability plot with clusters represented using colors and vertical bars below the plot. The clusters themselves can also be plotted with the convex hull plot function shown in Figure~\ref{fig:extractXiHullPlot}. Note how the nested structure is shown by clusters inside of clusters. Also note that it is possible for the convex hull, while useful for visualizations, to contain a point that is not considered as part of a cluster grouping.
+
+%\subsection{LOF}
+%The Local Outlier Factor score can be computed as follows
+%\ifdefined\USESWEAVE
+%<<>>=
+%lof <- lof(x, k=3)
+%summary(lof)
+%@
+%The distribution of outlier factors can be view simply using the specialized hist function:
+%<<fig=TRUE, include=FALSE, label=LOF_hist, height=4, widht=9>>=
+%hist(lof, breaks=20)
+%@
+%\begin{figure}
+%    \centering
+%    \includegraphics{dbscan-LOF_hist}
+%    \caption{LOF outlier histogram.}
+%    \label{fig:LOF_hist}
+%\end{figure}
+%
+%The outlier factor can be visualized in a scatter plot through the following:
+%<<fig=TRUE, include=FALSE, label=LOF_plot>>=
+%plot(x, pch = ".", main = "LOF (k=3)")
+%points(x, cex = (lof-1)*3, pch = 1, col="red")
+%text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 3)
+%@
+%\begin{figure}
+%    \centering
+%      \includegraphics[width=9cm]{dbscan-LOF_plot}
+%      \caption{Visualization of the local outlier factor of each point in the data set.}
+%      \label{fig:LOF_plot}
+%\end{figure}
+%\else
+%\fi
+
+\subsection{Reachability and Dendrograms}
+%The \pkg{dbscan} package contains a variety of visualization options.
+Reachability plots can be converted into equivalent dendrograms
+\citep{sander2003automatic}.
+\pkg{dbscan} contains a fast implementation of the reachability-to-dendrogram
+conversion algorithm through the use of a disjoint-set data structure~\citep{cormen2001introduction, patwary2010experiments}, allowing the user to choose which hierarchical representation they prefer.
+The conversion algorithm can be directly called for OPTICS objects using the coercion method \code{as.dendrogram()}.
+
+<<>>=
+dend <- as.dendrogram(res)
+dend
+@
+
+The dendrogram can be plotted using the standard plot method.
+<<fig=TRUE, include=FALSE, label=opticsDendrogram, height=5, width=7>>=
+plot(dend, ylab = "Reachability dist.", leaflab = "none")
+@
+\begin{figure}[t]
+    \centering
+      \includegraphics{dbscan-opticsDendrogram}
+      \caption{Dendrogram structure of OPTICS reordering.}
+      \label{fig:opticsDendrogram}
+\end{figure}
+
+Note how the dendrogram in Figure~\ref{fig:opticsDendrogram} closely resembles
+the reachability plots with added binary splits. Since the object is a standard dendrogram (from package \pkg{stats}), it can be used like any other dendrogram
+created with hierarchical clustering.
+
+\section{Performance Comparison}\label{sec:eval}
+
+\begin{table}
+\begin{center}
+    \begin{tabular}{ c c c }
+    \hline
+      {\bf Data set} & \bf{Size} & \bf{Dimension}\\
+    \hline
+     Aggregation & 788 & 2\\
+     Compound & 399 & 2\\
+     D31 & 3,100 & 2 \\
+     flame & 240 & 2 \\
+     jain & 373 & 2 \\
+     pathbased & 300 & 2 \\
+     R15 & 600 & 2 \\
+     s1 & 5,000 & 2 \\
+     s4 & 5,000 & 2 \\
+     spiral & 312 & 2\\
+     t4.8k & 8,000 & 2 \\
+     synth1 & 1000 & 3 \\
+     synth2 & 1000 & 10 \\
+     synth3 & 1000 & 100 \\
+     \hline
+    \end{tabular}
+\end{center}
+    \caption{Datasets used for comparison.}
+    \label{tab:dsizes}
+\end{table}
+
+Finally, we evaluate the performance of \pkg{dbscan}'s implementation of DBSCAN and OPTICS against other open-source implementations. This is not a comprehensive evaluation study, but is used to demonstrate the performance of \pkg{dbscan}'s DBSCAN and OPTICS implementation on datasets of varying sizes as compared to other software packages. A comparative test was performed using both DBSCAN and OPTICS algorithms, where supported, for the libraries listed in Table~\ref{tab:comp}
+on page~\pageref{tab:comp}. The used datasets and their sizes are listed in Table~\ref{tab:dsizes}.
+The data sets tested include s1 and s2,
+the randomly generated but moderately-separated Gaussian clusters often used for agglomerative cluster analysis~\citep{Ssets},
+the R15 validation data set used for maximum variance based clustering approach by \cite{veenman2002maximum},
+the well-known spatial data set t4.8k used for validation of the CHAMELEON algorithm~\citep{karypis1999chameleon},
+along with a variety of shape data sets commonly found in clustering validation papers~\citep{gionis2007clustering, zahn1971graph, chang2008robust, jain2005law, fu2007flame}.
+
+We performed the comparison with ELKI version 0.7, PyClustering 0.6.6, \pkg{fpc} 2.1-10, \pkg{dbscan} 0.9-8, SPMF v2.10, WEKA 3.8.0, SciKit-Learn 0.17.1 on a MacBook Pro equipped with an 2.5 GHz Intel Core i7 processor, running OS X El Capitan 10.11.6.
+All data sets where normalized to the unit interval, [0, 1], per dimension to standardize neighbor queries. For all data sets we used $\mathit{minPts} = 2$ and $\epsilon = 0.10$ for DBSCAN. For OPTICS, $\mathit{minPts} = 2$ with a large $\epsilon = 1$ was used.
+We replicated each run for each data set 15 times and report
+the average runtime here.
+Figures~\ref{fig:dbscan_bench}
+and \ref{fig:optics_bench}
+shows the runtimes. The datasets are sorted from easiest to hardest
+and the algorithm in the legend are sorted from on average fastest to slowest.
+The results show that the implementation in $\pkg{dbscan}$
+compares very favorably to the other implementations.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.80\textwidth]{figures/dbscan_benchmark}
+    \caption{Runtime of DBSCAN in milliseconds (y-axis, logarithmic scale) vs. the name of the data set tested (x-axis).}
+    \label{fig:dbscan_bench}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.80\textwidth]{figures/optics_benchmark}
+    \caption{Runtime of OPTICS in milliseconds (y-axis, logarithmic scale) vs. the name of the data set tested (x-axis).}
+    \label{fig:optics_bench}
+\end{figure}
+
+% Clear page for Before Conclusind Remarks
+%\clearpage
+
+\section{Concluding Remarks}\label{sec:conc}
+The \pkg{dbscan} package offers a set of scalable, robust, and complete implementations of popular density-based clustering algorithms from the DBSCAN family. The main features of \pkg{dbscan} are a
+simple interface to fast clustering and cluster extraction algorithms, extensible data structures and methods for both density-based clustering visualization and representation including efficient conversion algorithms between
+OPTICS ordering and dendrograms. In addition to DBSCAN and OPTICS discussed in this paper, \pkg{dbscan} also contains a fast version of the local outlier factor (LOF) algorithm~\citep{breunig2000lof} and an implementation of HDBSCAN~\citep{campello2015hierarchical} is under development.
+
+\section{Acknowledgments}
+This work is partially supported by industrial and government partners at the Center for Surveillance Research, a National Science Foundation I/UCRC.
+
+%\clearpage
+\bibliography{dbscan}
+\clearpage
+
+\appendix
+\section{Technical Note on OPTICS cluster extraction}\label{sec:technote}
+Of the two cluster extraction methods outlined in the publication, the flat DBSCAN-type extraction method seems to remain the defacto clustering method implemented across most statistical software for OPTICS. However, this method does not provide any advantage over the original DBSCAN method. To the best of the authors' knowledge, the only (other) library that has implemented the Extract-$\xi$ method for finding $\xi$-clusters is the Environment for Developing KDD-Applications Supported by Index Structures (ELKI) \citep{DBLP:journals/pvldb/SchubertKEZSZ15}. Perhaps much of the complication as to why nearly every statistical computing framework has neglected the Extract-$\xi$ cluster method stems from the fact that the original specification (Figure~19 in~\cite{ankerst1999optics}), while mostly complete, lacks important corrections that otherwise produce artifacts when clustering data. In the original specification of the algorithm, the `dents' of the ordering structure OPTICS produces are scanned for significant changes in reachability (hence the $\xi$ threshold), where clusters are represented by contiguous ranges of points that are distinguished by $1 - \xi$ density-reachability changes in the reachability plot. It is possible, however, after the recursive completion of the \code{update} algorithm
+(Figure~7 in~\cite{ankerst1999optics})
+that the next point processed in the ordering is not actually within the reachability distance of other members of cluster being currently processed. To account for the missing details described above, Erich Schubert introduces a number of supplemental processing steps, added in the ELKI framework. These changes are only briefly mentioned in the ELKI's release notes\footnote{see \url{https://elki-project.github.io/releases/release_notes_0.7}}, and details can only be found by reading the source code. These steps do correct the artifacting through the addition of a small filtering step, thus improving the $\xi$-cluster method from the original implementation mentioned in the original OPTICS paper. This correction was not introduced until version 0.7.0 of the ELKI framework, released in 2015, 16 years after the original publication of OPTICS and the Extract-$\xi$ metho. \pkg{dbscan} has incorporated these important changes
+in \code{extractXi()}
+via the option \code{correctPredecessors} which is by default enabled.
+
+%% Not included to keep things simple
+% To further complicate the status of the \opxi algorithm's existing
+% implementations, the current ELKI implementation, aside from the predecessor
+% correction, does not match the original specification of the OPTICS algorithm.
+% Mentioned by~\cite{ankerst1999optics}, \opxi should not include the last
+% point of a steep-up area inside of each cluster range\footnote{We alerted the
+% authors of ELKI to our correction, which is to be included in the next major
+% release.}. The differences on even a small, randomly generated dataset
+% are shown on Figures~\ref{fig:dbscan_xi} and \ref{fig:elki_xi} using the
+% \pkg{dbscan} package result. Thus, \pkg{dbscan} offers complete, a correct
+% \opxi implementation, true to the original specification.
+%
+% \begin{figure}
+%   \centering
+%     \begin{minipage}[t]{0.48\textwidth}
+%       \includegraphics[width=\textwidth]{figures/dbscan_xi_bare}
+%       \caption{Excluding the last point in the steep-up area.}
+%       \label{fig:dbscan_xi}
+%     \end{minipage}
+%   \hfill
+%     \begin{minipage}[t]{0.48\textwidth}
+%       \includegraphics[width=\textwidth]{figures/elki_xi_bare}
+%       \caption{Including the last point in the steep-up area. Note the sharp edges caused by points that are clearly not density-connected to their respective clusters.}
+%       \label{fig:elki_xi}
+%     \end{minipage}
+% \end{figure}
+% % Much of the complication stems from the fact that the original specification of the \opxi extraction method defined in the paper (Figure 19 of~\cite{}), while mostly complete, lacks important corrections that otherwise produces many artifacts when clustering data.  In the original specification of the \opxi algorithm, points within the ``dents'' of the ordering structure represent collections of spatially dense neighborhoods. Its possible, however, after OPTICS finishes ordering a spatially close cluster, that the next point included in the ordering may not be a member of current cluster (there are no more points in the current cluster to add). This can be remedied by pruning an area of each cluster known as the steep-up area (see Figure 19 in \citep{ankerst1999optics} for details) of points that do not contain predecessors within the same cluster.
+
+\end{document}

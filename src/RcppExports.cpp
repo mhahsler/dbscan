@@ -273,6 +273,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dbscan_density_int
+IntegerVector dbscan_density_int(NumericMatrix data, double eps, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP dbscan_dbscan_density_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
+    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
+    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
+    rcpp_result_gen = Rcpp::wrap(dbscan_density_int(data, eps, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // frNN_int
 List frNN_int(NumericMatrix data, double eps, int type, int bucketSize, int splitRule, double approx);
 RcppExport SEXP dbscan_frNN_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
@@ -286,6 +302,29 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
     Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
     rcpp_result_gen = Rcpp::wrap(frNN_int(data, eps, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// JP_int
+IntegerVector JP_int(IntegerMatrix nn, unsigned int kt);
+RcppExport SEXP dbscan_JP_int(SEXP nnSEXP, SEXP ktSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type nn(nnSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type kt(ktSEXP);
+    rcpp_result_gen = Rcpp::wrap(JP_int(nn, kt));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SNN_sim_int
+IntegerMatrix SNN_sim_int(IntegerMatrix nn);
+RcppExport SEXP dbscan_SNN_sim_int(SEXP nnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type nn(nnSEXP);
+    rcpp_result_gen = Rcpp::wrap(SNN_sim_int(nn));
     return rcpp_result_gen;
 END_RCPP
 }

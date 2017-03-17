@@ -1,6 +1,7 @@
 \name{frNN}
 \alias{frNN}
 \alias{frnn}
+\alias{sort.frNN}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Find the Fixed Radius Nearest Neighbors}
 \description{
@@ -13,11 +14,11 @@ frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ a data matrix or a dist object.}
+  \item{x}{ a data matrix, a dist object or a frNN object.}
   \item{eps}{ neighbors radius. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree"
     or "linear", "dist").}
-  \item{sort}{ sort the neighbors by distance? }
+  \item{sort}{ sort the neighbors by distance? This is expensive and can be done later using \code{sort()}. }
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
@@ -40,7 +41,7 @@ for each point and \code{eps} (see below).
 }
 \value{
 %%  ~Describe the value returned
-An object of class frNN containing a list with the following components:
+An object of class frNN (subclass of NN) containing a list with the following components:
   \item{id }{a list of integer vectors. Each vector contains the ids
   of the fixed radius nearest neighbors. }
   \item{dist }{a list with distances (same stucture as \code{ids}). }
@@ -48,7 +49,7 @@ An object of class frNN containing a list with the following components:
 %% ...
 }
 \seealso{
-\code{\link{kNN}} for k nearest neighbor search.
+\code{\link{NN}} and \code{\link{kNN}} for k nearest neighbor search.
 }
 \references{
 David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Neighbor Searching, \url{http://www.cs.umd.edu/~mount/ANN/}.
@@ -60,12 +61,13 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Nei
 
 \examples{
 data(iris)
+x <- iris[, -5]
 
 # Find fixed radius nearest neighbors for each point
-nn <- frNN(iris[,-5], eps=.5)
+nn <- frNN(x, eps=.5)
 
 # Number of neighbors
-hist(sapply(nn$id, length),
+hist(sapply(adjacencylist(nn), length),
   xlab = "k", main="Number of Neighbors",
   sub = paste("Neighborhood size eps =", nn$eps))
 
@@ -73,12 +75,18 @@ hist(sapply(nn$id, length),
 i <- 10
 nn$id[[i]]
 nn$dist[[i]]
+plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[[i]], "red", "black"))
 
-plot(iris[,-5], col = ifelse(1:nrow(iris) \%in\% nn$id[[i]], "red", "black"))
+# get an adjacency list
+head(adjacencylist(nn))
+
+# plot the fixed radius neighbors (and then reduced to a radius of .3)
+plot(nn, x)
+plot(frNN(nn, .3), x)
 
 ## manually create a frNN object for dbscan (dbscan only needs ids and eps)
-nn <- list(ids = list(c(2,3), c(1,3), c(1,2), c(3,5), c(4,5)), eps = 1)
-class(nn) <- "frNN"
+nn <- list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1)
+class(nn) <- c("NN", "frNN")
 nn
 dbscan(nn, minPts = 2)
 }

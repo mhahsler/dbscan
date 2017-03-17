@@ -1,6 +1,7 @@
 \name{kNN}
 \alias{kNN}
 \alias{knn}
+\alias{sort.kNN}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Find the k Nearest Neighbors}
 \description{
@@ -13,11 +14,13 @@ kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ a data matrix or a dist object. }
+  \item{x}{ a data matrix, a dist object or a kNN object. }
   \item{k}{ number of neighbors to find. }
     \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
-  \item{sort}{ sort the neighbors by distance? }
+  \item{sort}{ sort the neighbors by distance? Note that this is expensive and
+      \code{sort = FALSE} is much faster. kNN objects can be sorted using
+      \code{sort()}.}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
@@ -54,7 +57,7 @@ An object of class kNN containing a list with the following components:
 David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Neighbor Searching, \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
-\code{\link{frNN}} for fixed radius nearest neighbors.
+\code{\link{NN}} and \code{\link{frNN}} for fixed radius nearest neighbors.
 }
 
 \author{
@@ -63,15 +66,22 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Nei
 
 \examples{
 data(iris)
+x <- iris[, -5]
+
 # finding kNN directly in data (using a kd-tree)
-nn <- kNN(iris[,-5], k=10)
+nn <- kNN(x, k=5)
 nn
 
 # explore neighborhood of point 10
 i <- 10
 nn$id[i,]
-plot(iris[,-5], col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
+plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
 
+# Visualize the 5 nearest neighbors
+plot(nn, x)
+
+# Visualize a reduced 2-NN graph
+plot(kNN(nn, k = 2), x)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

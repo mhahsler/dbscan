@@ -25,6 +25,16 @@
 kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
+  if(is(x, "kNN")) {
+    if(x$k < k) stop("kNN in x has not enough nearest neighbors.")
+    if(!x$sort) x <- sort(x)
+    x$id <- x$id[,1:k]
+    if(!is.null(x$dist)) x$dist <- x$dist[,1:k]
+    if(!is.null(x$shared)) x$dist <- x$shared[,1:k]
+    x$k <- k
+    return(x)
+  }
+
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 
@@ -54,7 +64,8 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     d <- t(sapply(1:nrow(id), FUN = function(i) x[i, id[i,]]))
     dimnames(d) <- list(rownames(x), 1:k)
 
-    return(structure(list(dist = d, id = id, k = k), class = "kNN"))
+    return(structure(list(dist = d, id = id, k = k, sort = TRUE),
+      class = c("NN", "kNN")))
   }
 
   ## make sure x is numeric
@@ -77,6 +88,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     as.integer(splitRule), as.double(approx))
 
   ### sort entries (by dist and id)?
+  ### FIXME: This is expensive! We should do this in C++
   if(sort && k>1) {
     o <- sapply(1:nrow(ret$dist), FUN =
         function(i) order(ret$dist[i,], ret$id[i,], decreasing=FALSE))
@@ -88,11 +100,31 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   dimnames(ret$dist) <- list(rownames(x), 1:k)
   dimnames(ret$id) <- list(rownames(x), 1:k)
+  ret$sort <- sort
 
-  class(ret) <- "kNN"
+  class(ret) <- c("NN", "kNN")
   ret
 }
 
+sort.kNN <- function(x, decreasing = FALSE, ...) {
+  if(!is.null(x$sort) && x$sort) return(x)
+  if(is.null(x$dist)) stop("Unable to sort. Distances are missing.")
+  if(ncol(x$id)<2) {
+    x$sort <- TRUE
+    return(x)
+  }
+
+  o <- sapply(1:nrow(x$dist), FUN =
+      function(i) order(x$dist[i,], x$id[i,], decreasing=decreasing))
+  for(i in 1:ncol(o)) {
+    x$dist[i,] <- x$dist[i,][o[,i]]
+    x$id[i,] <- x$id[i,][o[,i]]
+  }
+  x$sort <- TRUE
+
+  x
+}
+              
 print.kNN <- function(x, ...) {
   cat("k-nearest neighbors for ", nrow(x$id), " objects (k=", x$k,").",
     "\n", sep = "")

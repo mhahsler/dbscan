@@ -20,6 +20,19 @@
 frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
+  if(is(x, "frNN")) {
+    if(x$eps < eps) stop("frNN in x has not a sufficient eps radius.")
+
+    for(i in 1:length(x$dist)) {
+      take <- x$dist[[i]] <= eps
+      x$dist[[i]] <- x$dist[[i]][take]
+      x$id[[i]] <- x$id[[i]][take]
+    }
+    x$eps <- eps
+
+    return(x)
+  }
+
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
   if(is.na(search)) stop("Unknown NN search type!")
 
@@ -53,7 +66,8 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
     )
     names(d) <- rownames(x)
 
-    return(structure(list(dist = d, id = id, eps = eps), class = "frNN"))
+    return(structure(list(dist = d, id = id, eps = eps, sort = TRUE),
+      class = c("NN", "frNN")))
   }
 
   ## make sure x is numeric
@@ -82,12 +96,28 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   names(ret$id) <- rownames(x)
 
   ret$eps <- eps
+  ret$sort <- sort
+
+  class(ret) <- c("NN", "frNN")
 
   class(ret) <- "frNN"
 
   ret
 }
 
+sort.frNN <- function(x, decreasing = FALSE, ...) {
+  if(!is.null(x$sort) && x$sort) return(x)
+  if(is.null(x$dist)) stop("Unable to sort. Distances are missing.")
+
+  o <- lapply(1:length(x$dist), FUN =
+      function(i) order(x$dist[[i]], x$id[[i]], decreasing=FALSE))
+  x$dist <- lapply(1:length(o), FUN = function(p) x$dist[[p]][o[[p]]])
+  x$id <- lapply(1:length(o), FUN = function(p) x$id[[p]][o[[p]]])
+
+  x$sort <- TRUE
+
+  x
+}
 
 print.frNN <- function(x, ...) {
   cat("fixed radius nearest neighbors for ", length(x$id),

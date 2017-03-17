@@ -98,16 +98,21 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
 
 
 print.dbscan_fast <- function(x, ...) {
-  cat("DBSCAN clustering for ", length(x$cluster), " objects.", "\n", sep = "")
-  cat("Parameters: eps = ", x$eps, ", minPts = ", x$minPts, "\n", sep = "")
   cl <- unique(x$cluster)
   cl <- length(cl[cl!=0L])
-  cat("The clustering contains ", cl, " cluster(s) and ", sum(x$cluster==0L),
-    " noise points.",
-      "\n", sep = "")
+
+  writeLines(c(
+    paste0("DBSCAN clustering for ", length(x$cluster), " objects."),
+    paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
+    paste0("The clustering contains ", cl, " cluster(s) and ",
+      sum(x$cluster==0L), " noise points.")
+    ))
+
   print(table(x$cluster))
-  message <- paste("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep="")
-  cat(paste0(strwrap(message, width = 75), collapse = "\n                  "))
+  cat("\n")
+
+  writeLines(strwrap(paste0("Available fields: ",
+    paste(names(x), collapse = ", ")), exdent = 18))
 }
 
 predict.dbscan_fast <- function (object, newdata = NULL, data, ...) {

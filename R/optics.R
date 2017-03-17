@@ -84,91 +84,72 @@ optics <- function(x, eps, minPts = 5, ...) {
   ret
 }
 
+
+
 print.optics <- function(x, ...) {
-  cat("OPTICS clustering for ", length(x$order), " objects.", "\n", sep = "")
-  cat("Parameters: ", "minPts = ", x$minPts,
-    ", eps = ", x$eps,
-    ", eps_cl = ", x$eps_cl,
-    ", xi = ", x$xi,
-    "\n", sep = "")
+  writeLines(c(
+    paste0("OPTICS ordering/clustering for ", length(x$order), " objects."),
+    paste0("Parameters: ",
+      "minPts = ", x$minPts,
+      ", eps = ", x$eps,
+      ", eps_cl = ", x$eps_cl,
+      ", xi = ", x$xi)
+  ))
+
   if(!is.null(x$cluster)) {
     cl <- unique(x$cluster)
     cl <- length(cl[cl!=0L])
+
     if(is.na(x$xi)) {
-      cat("The clustering contains ", cl, " cluster(s) and ",
-          sum(x$cluster==0L), " noise points.",
-          "\n", sep = "")
+      writeLines(paste0("The clustering contains ", cl, " cluster(s) and ",
+          sum(x$cluster==0L), " noise points."))
+
       print(table(x$cluster))
     } else {
-      cat("The clustering contains ", nrow(x$clusters_xi), " cluster(s) and ",
-          sum(x$cluster==0L), " noise points.",
-          "\n", sep = "")
+      writeLines(paste0("The clustering contains ", nrow(x$clusters_xi),
+        " cluster(s) and ", sum(x$cluster==0L), " noise points."))
     }
     cat("\n")
   }
-  message <- paste("\nAvailable fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
-  cat(paste0(strwrap(message, width = 75), collapse = "\n                  "))
+  writeLines(strwrap(paste0("Available fields: ",
+    paste(names(x), collapse = ", ")), exdent = 18))
 }
 
-plot.optics <- function(x, cluster = TRUE, type=c("reachability", "dendrogram"), predecessor = FALSE, ...) {
-  if(missing(type) || type == "reachability") {
-    # OPTICS cluster extraction methods
-    if (is(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
+plot.optics <- function(x, cluster = TRUE, predecessor = FALSE, ...) {
+  # OPTICS cluster extraction methods
+  if (is(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
 
-      # Sort clusters by size
-      hclusters <- x$clusters_xi[order(x$clusters_xi$end - x$clusters_xi$start),]
+    # Sort clusters by size
+    hclusters <- x$clusters_xi[order(x$clusters_xi$end - x$clusters_xi$start),]
 
-      # .1 means to leave 15% for the cluster lines
-      def.par <- par(no.readonly = TRUE)
-      par(mar= c(2, 4, 4, 2) + 0.1, omd = c(0, 1, .15, 1))
+    # .1 means to leave 15% for the cluster lines
+    def.par <- par(no.readonly = TRUE)
+    par(mar= c(2, 4, 4, 2) + 0.1, omd = c(0, 1, .15, 1))
 
-      # Need to know how to spread out lines
-      y_max <- max(x$reachdist[which(x$reachdist != Inf)])
-      y_increments <- (y_max/0.85*.15)/(nrow(hclusters)+1L)
+    # Need to know how to spread out lines
+    y_max <- max(x$reachdist[which(x$reachdist != Inf)])
+    y_increments <- (y_max/0.85*.15)/(nrow(hclusters)+1L)
 
-      # Get top level cluster labels
-      # top_level <- extractClusterLabels(x$clusters_xi, x$order)
-      plot(as.reachability(x),  col=x$cluster[x$order]+1L,
-           xlab = NA, xaxt='n',
-           yaxs="i", ylim=c(0,y_max), ...)
+    # Get top level cluster labels
+    # top_level <- extractClusterLabels(x$clusters_xi, x$order)
+    plot(as.reachability(x),  col=x$cluster[x$order]+1L,
+         xlab = NA, xaxt='n',
+         yaxs="i", ylim=c(0,y_max), ...)
 
-      # Lines beneath plotting region indicating Xi clusters
-      i <- 1:nrow(hclusters)
-      segments(x0=hclusters$start[i], y0=-(y_increments*i),
-               x1=hclusters$end[i], col=hclusters$cluster_id[i]+1L, lwd=2, xpd=NA)
-      ## Restore previous settings
-      par(def.par)
-    } else if (is.numeric(x$cluster) && !is.null(x$eps_cl)) { # Works for integers too
-      ## extractDBSCAN clustering
-      plot(as.reachability(x), col=x$cluster[x$order]+1L, ...)
-      lines(x = c(0, length(x$cluster)), y = c(x$eps_cl, x$eps_cl), col="black", lty=2)
-    } else {
-      # Regular reachability plot
-      plot(as.reachability(x), ...)
-    }
-  } else if (!missing(type) && type == "dendrogram") {
-      d_x <- as.dendrogram(x)
-      if (!is.null(x$cluster) && cluster) {
-        if(requireNamespace("dendextend", quietly = TRUE)) {
-          ## Use dendextend plotting abilities if possible
-          if (!is.na(x$eps_cl)) { # Plotting according to epsilon threshold
-            d_x <- dendextend::set(d_x, "labels_col", value = c(x$cluster + 1)[x$order])
-          } else if (is(x, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
-            ## Plotting according to Xi method
-            hier_asc <- x$clusters_xi[order(-(x$clusters_xi$end - x$clusters_xi$start)),]
-            minimal <- sort(unique(extractClusterLabels(x$clusters_xi, x$order, minimum = TRUE)))[-1]
-            for(cl in 1:nrow(hier_asc)) {
-              cl_indices <- unlist(hier_asc[cl,])
-              cl_labels <- x$order[cl_indices[1]:cl_indices[2]]
-              # rule <- if (cl_indices[3] %in% minimal) "all" else "any"
-              d_x <- dendextend::branches_attr_by_labels(d_x, labels=cl_labels, type = "all",
-                                             TF_values = c(cl_indices[3]+1,Inf))
-            }
-          }
-        }
-      }
-      plot(d_x, ...)
-    } else { stop("Unknown plot type") }
+    # Lines beneath plotting region indicating Xi clusters
+    i <- 1:nrow(hclusters)
+    segments(x0=hclusters$start[i], y0=-(y_increments*i),
+             x1=hclusters$end[i], col=hclusters$cluster_id[i]+1L, lwd=2, xpd=NA)
+    ## Restore previous settings
+    par(def.par)
+  } else if (is.numeric(x$cluster) && !is.null(x$eps_cl)) { # Works for integers too
+    ## extractDBSCAN clustering
+    plot(as.reachability(x), col=x$cluster[x$order]+1L, ...)
+    lines(x = c(0, length(x$cluster)), y = c(x$eps_cl, x$eps_cl), col="black", lty=2)
+  } else {
+    # Regular reachability plot
+    plot(as.reachability(x), ...)
+  }
 }
 
 predict.optics <- function (object, newdata = NULL, data, ...) {

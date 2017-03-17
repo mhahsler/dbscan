@@ -1,10 +1,10 @@
 ---
 title: "HDBSCAN with the dbscan package"
 author: "Matt Piekenbrock, Michael Hahsler"
-output:
-  html_document: default
-  html_notebook: default
-  pdf_document: default
+vignette: >
+  %\VignetteIndexEntry{HDBSCAN with the dbscan package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 header-includes: \usepackage{animation}
 ---
 The dbscan package includes a fast implementation of Hierarchical DBSCAN (HDBSCAN) and its related algorithm(s) for the 
@@ -116,10 +116,6 @@ __Note:__ Because of the distinction made that noise points, points that _are no
   text(moons[top_outliers, ], labels = top_outliers, pos=3)
 ```
 
-## How HDBSCAN Works 
-Per the name, HDBSCAN is an algorithm that computes a hierarchy of (DBSCAN) clusters. (more explanation coming soon)
-![HDBSCAN animated](hdbscan_pts.gif)
-
 ## A Larger Clustering Example 
 A larger example data set may be more beneficial in explicitly revealing the usefulness of HDSBCAN. Consider the 'DS3' 
 data set originally published as part of a benchmark test data set for the Chameleon clustering algorithm [5]. It's
@@ -154,30 +150,8 @@ The simplified tree can be particularly useful for larger data sets
 
 ## Performance 
 All of the computational and memory intensive tasks required by HDSBCAN were written in C++ using the Rcpp package. With DBSCAN, the performance depends on the parameter settings, primarily on the radius at which points are considered as candidates for clustering ('eps'), and generally less so on the 'minPts' parameter. Intuitively, larger values of eps increase the computation time. 
-```{r}
-  library("microbenchmark")
-  ## eps_vals == 4 increasing percentiles of neighbor sizes
-  eps_vals <- quantile(as.vector(dist(DS3)))[2:5]
-  microbenchmark(dbscan(DS3, eps = eps_vals[1], minPts = 15), times=15)
-  microbenchmark(dbscan(DS3, eps = eps_vals[2], minPts = 15), times=15)
-  microbenchmark(dbscan(DS3, eps = eps_vals[3], minPts = 15), times=15)
-  microbenchmark(dbscan(DS3, eps = eps_vals[4], minPts = 15), times=15)
-```
-
-This demonstrates a problem. Because HDBSCAN creates a hierarchical representation, the algorithm requires the information equivalent to running DBSCAN at _every_ 'eps' value that creates a distinct clustering solution! Since there are $n$ - 1 of these clusterings, where $n$ is the length of the data set, a naïve approach might be to run DBSCAN at each of these eps values, recording the clustering at each value. Although DBSCAN itself is a fast algorithm, such an nested approach would inevitably lead to extremely inefficient performance for large data sets! Luckily, the implementation of HDBSCAN is a bit more sophisticated, allowing the efficiency of HDBSCAN to maintain a 'reasonable' level relative to DBSCAN 
-```{r}
-  microbenchmark(dbscan(DS3, eps = eps_vals[4], minPts = 15), times = 15)
-  microbenchmark(hdbscan(DS3, minPts = 15), times = 15)
-```
 
 One of the primary computational bottleneck with using HDBSCAN is the computation of the full (euclidean) pairwise distance between all points, for which HDBSCAN currently relies on base R 'dist' method for. If a precomputed one is available, the running time of HDBSCAN can be moderately reduced. 
-```{r}
-  microbenchmark(hdbscan(DS3, minPts = 15), times = 15)
-  DS3_dist <- dist(DS3)
-  microbenchmark(hdbscan(DS3, xdist = DS3_dist, minPts = 15), times = 15)
-```
-
-Generally speaking, the larger the data set, the more likely the 'dist' method will dominate the calculation. 
 
 ## References 
 1. Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96).

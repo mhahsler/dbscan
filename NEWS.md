@@ -1,10 +1,17 @@
 # Changes in version 0.9-8.1 (2016-xx-x)
 
-* Improved interface for dbscan() and optics(): ... is not passed on to frNN.
-* OPTICS clustering extraction methods are now called extractDBSCAN and 
-  extractXi.
+## New features
+
+* HDBSCAN was added.
+* extractFOSC (optimal selection of clusters for HDBSCAN) was added.
 * hullplot uses now filled polygons as the default.
 * hullplot now used PCA if the data has more than 2 dimensions.
+
+## Interface changes
+
+* Improved interface for dbscan() and optics(): ... is now passed on to frNN.
+* OPTICS clustering extraction methods are now called extractDBSCAN and 
+  extractXi.
 * kNN and frNN are now objects with a print function.
 * dbscan now also accepts a frNN object as input.
 

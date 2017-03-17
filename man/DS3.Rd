@@ -5,8 +5,8 @@
 DS3: Spatial data with arbitrary shapes
 }
 \description{
-  Contains 8000 2-d points, with 6 "natural" looking shapes, all of which have an sinesoid-like shape that intersects 
-  with each cluster. 
+  Contains 8000 2-d points, with 6 "natural" looking shapes, all of which have an sinesoid-like shape that intersects
+  with each cluster.
 }
 \usage{data("DS3")}
 \format{
@@ -18,13 +18,13 @@ DS3: Spatial data with arbitrary shapes
 }
 \details{
 Originally used as a benchmark data set for the Chameleon clustering algorithm[1] to illustrate the a data set
-containing arbitrarily shaped spatial data surrounded by both noise and artifacts. 
+containing arbitrarily shaped spatial data surrounded by both noise and artifacts.
 }
 \source{
 Obtained at https://cs.joensuu.fi/sipu/datasets/
 }
 \references{
-1. Karypis, George, Eui-Hong Han, and Vipin Kumar. "Chameleon: Hierarchical clustering using dynamic modeling." Computer 32, no. 8 (1999): 68-75.
+Karypis, George, Eui-Hong Han, and Vipin Kumar (1999). "Chameleon: Hierarchical clustering using dynamic modeling." \emph{Computer} 32(8): 68-75.
 }
 \examples{
 data(DS3)

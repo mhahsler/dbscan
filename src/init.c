@@ -15,6 +15,7 @@ extern SEXP dbscan_computeStability(SEXP, SEXP, SEXP);
 extern SEXP dbscan_computeVirtualNode(SEXP, SEXP);
 extern SEXP dbscan_concat_int(SEXP);
 extern SEXP dbscan_coreFromDist(SEXP, SEXP, SEXP);
+extern SEXP dbscan_dbscan_density_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_dbscan_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_dendrogram_to_reach(SEXP);
 extern SEXP dbscan_distToAdjacency(SEXP, SEXP);
@@ -23,6 +24,7 @@ extern SEXP dbscan_extractUnsupervised(SEXP, SEXP);
 extern SEXP dbscan_fosc(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_frNN_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_hclustMergeOrder(SEXP, SEXP);
+extern SEXP dbscan_JP_int(SEXP, SEXP);
 extern SEXP dbscan_kNN_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_lowerTri(SEXP);
 extern SEXP dbscan_mrd(SEXP, SEXP);
@@ -34,6 +36,7 @@ extern SEXP dbscan_order_(SEXP);
 extern SEXP dbscan_prims(SEXP, SEXP);
 extern SEXP dbscan_reach_to_dendrogram(SEXP, SEXP);
 extern SEXP dbscan_simplifiedTree(SEXP);
+extern SEXP dbscan_SNN_sim_int(SEXP);
 extern SEXP dbscan_validateConstraintList(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
@@ -44,6 +47,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"dbscan_computeVirtualNode",     (DL_FUNC) &dbscan_computeVirtualNode,      2},
     {"dbscan_concat_int",             (DL_FUNC) &dbscan_concat_int,              1},
     {"dbscan_coreFromDist",           (DL_FUNC) &dbscan_coreFromDist,            3},
+    {"dbscan_dbscan_density_int",     (DL_FUNC) &dbscan_dbscan_density_int,      6},
     {"dbscan_dbscan_int",             (DL_FUNC) &dbscan_dbscan_int,             10},
     {"dbscan_dendrogram_to_reach",    (DL_FUNC) &dbscan_dendrogram_to_reach,     1},
     {"dbscan_distToAdjacency",        (DL_FUNC) &dbscan_distToAdjacency,         2},
@@ -52,6 +56,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"dbscan_fosc",                   (DL_FUNC) &dbscan_fosc,                    9},
     {"dbscan_frNN_int",               (DL_FUNC) &dbscan_frNN_int,                6},
     {"dbscan_hclustMergeOrder",       (DL_FUNC) &dbscan_hclustMergeOrder,        2},
+    {"dbscan_JP_int",                 (DL_FUNC) &dbscan_JP_int,                  2},
     {"dbscan_kNN_int",                (DL_FUNC) &dbscan_kNN_int,                 6},
     {"dbscan_lowerTri",               (DL_FUNC) &dbscan_lowerTri,                1},
     {"dbscan_mrd",                    (DL_FUNC) &dbscan_mrd,                     2},
@@ -63,6 +68,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"dbscan_prims",                  (DL_FUNC) &dbscan_prims,                   2},
     {"dbscan_reach_to_dendrogram",    (DL_FUNC) &dbscan_reach_to_dendrogram,     2},
     {"dbscan_simplifiedTree",         (DL_FUNC) &dbscan_simplifiedTree,          1},
+    {"dbscan_SNN_sim_int",            (DL_FUNC) &dbscan_SNN_sim_int,             1},
     {"dbscan_validateConstraintList", (DL_FUNC) &dbscan_validateConstraintList,  2},
     {NULL, NULL, 0}
 };

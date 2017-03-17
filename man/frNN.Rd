@@ -84,7 +84,6 @@ head(adjacencylist(nn))
 plot(nn, x)
 plot(frNN(nn, .3), x)
 
-
 ## manually create a frNN object for dbscan (dbscan only needs ids and eps)
 nn <- list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1)
 class(nn) <- c("NN", "frNN")

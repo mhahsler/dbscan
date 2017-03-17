@@ -80,22 +80,17 @@ plot(res)
 
 plot(moons, col = res$cluster + 1L)
 
-## example data from fpc
-set.seed(665544)
-n <- 100
-x <- cbind(
-  x = runif(10, 0, 10) + rnorm(n, sd = 0.2),
-  y = runif(10, 0, 10) + rnorm(n, sd = 0.2)
-  )
+## DS3 from Chameleon
+data("DS3")
 
-res <- hdbscan(x, minPts = 3)
+res <- hdbscan(DS3, minPts = 50)
 res
 
 ## Plot the simplified tree, highlight the most stable clusters
 plot(res, show_flat = TRUE)
 
 ## Plot the actual clusters
-plot(x, col=res$cluster+1)
+plot(DS3, col=res$cluster+1L, cex = .5)
 }
 \keyword{ model }
 \keyword{ clustering }

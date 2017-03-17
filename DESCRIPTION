@@ -26,7 +26,9 @@ Suggests:
     microbenchmark,
     testthat, 
     dendextend,
-    igraph
+    igraph,
+    knitr
+VignetteBuilder: knitr
 BugReports: https://github.com/mhahsler/dbscan
 License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and

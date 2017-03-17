@@ -9,11 +9,13 @@
 
 ## Interface changes
 
-* Improved interface for dbscan() and optics(): ... is now passed on to frNN.
+* Improved interface for dbscan() and optics(): ... it now passed on to frNN.
 * OPTICS clustering extraction methods are now called extractDBSCAN and 
   extractXi.
 * kNN and frNN are now objects with a print function.
 * dbscan now also accepts a frNN object as input.
+* jpclust and sNNclust now return a list instead of just the 
+  cluster assignments.
 
 ## New Features
 

@@ -16,9 +16,9 @@
 
 The implementations uses the kd-tree data 
  structure (from library ANN) for faster k-nearest neighbor search. 
- An R interface to __fast kNN and fixed-radius NN search__ is also provided.
+ An R interface to __fast kNN and fixed-radius NN search__ is provided along with __Jarvis-Patrick clustering__ and __Shared Nearest Neighbor Clustering.__
 
-This implementation is typically faster than the native R implementation in package `fpc`, or the 
+The implementations are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
 implementations in [WEKA](http://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](http://scikit-learn.org/).
 
 ## Installation

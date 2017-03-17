@@ -18,14 +18,14 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
-  ## Type Checking 
+  ## Type Checking
   if (is(x, "data.table") || is(x, "data.frame") || is(x, "matrix")){
     x <- as.matrix(x)
     if (!storage.mode(x) %in% c("integer", "double")){
       stop("hdbscan expects numerical data")
     }
   } else { stop("hdbscan expects a matrix-conformable object for x") }
-  
+
   ## Calculate Core distance using kNN
   if (missing(xdist)) {
     euc_dist <- dist(as.matrix(x), method = "euclidean")
@@ -52,7 +52,7 @@ hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplif
   res <- extractUnsupervised(res)
   cl <- attr(res, "cluster")
   sl <- attr(res, "salient_clusters")
-  
+
   ## Generate membership 'probabilities' using core distance as the measure of density
   prob <- rep(0, length(cl))
   for (cid in sl){
@@ -67,21 +67,21 @@ hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplif
     cluster <- match(cl, c(0, sl))-1
   } else { cluster <- match(cl, sl) }
   cl_map <- structure(sl, names=unique(cluster[hc$order][cluster[hc$order] != 0]))
-  
+
   ## Stability scores
   ## NOTE: These scores represent the stability scores -before- the hierarchy traversal
   cluster_scores <- sapply(sl, function(sl_cid) res[[as.character(sl_cid)]]$stability)
   names(cluster_scores) <- names(cl_map)
 
   ## Return everything HDBSCAN does
-  attr(res, "cl_map") <- cl_map # Mapping of hierarchical IDS to 'normalized' incremental ids  
-  out <- structure(list(cluster=cluster, minPts=minPts, 
+  attr(res, "cl_map") <- cl_map # Mapping of hierarchical IDS to 'normalized' incremental ids
+  out <- structure(list(cluster=cluster, minPts=minPts,
                         cluster_scores=cluster_scores, # (Cluster-wide cumulative) Stability Scores
                         membership_prob=prob, # Individual point membership probabilities
                         outlier_scores=attr(res, "glosh"), # Outlier Scores
                         hc=hc # Hclust object of MST (can be cut for quick assignments)
-  ), class="hdbscan", hdbscan=res) # hdbscan attributes contains actual HDBSCAN hierarchy 
-  
+  ), class="hdbscan", hdbscan=res) # hdbscan attributes contains actual HDBSCAN hierarchy
+
   ## The trees don't need to be explicitly computed, but they may be useful if the user wants them
   if (gen_hdbscan_tree){ out$hdbscan_tree = buildDendrogram(hc) }
   if (gen_simplified_tree) { out$simplified_tree = simplifiedTree(res) }
@@ -97,17 +97,17 @@ print.hdbscan <- function(x, ...) {
     paste0("The clustering contains ", cl, " cluster(s) and ",
            sum(x$cluster==0L), " noise points.")
   ))
-  
+
   print(table(x$cluster))
   cat("\n")
   writeLines(strwrap(paste0("Available fields: ", paste(names(x), collapse = ", ")), exdent = 18))
 }
 
-plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_flat = F, ...){
+plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_flat = FALSE, ...){
   ## Logic checks
   if(!(scale == "suggest" || scale > 0.0)) stop("scale parameter must be greater than 0.")
-  
-  ## Main information needed 
+
+  ## Main information needed
   hd_info <- attr(x, "hdbscan")
   dend <- if (is.null(x$simplified_tree)) simplifiedTree(hd_info) else x$simplified_tree
   coords <- node_xy(hd_info, cl_hierarchy = attr(hd_info, "cl_hierarchy"))
@@ -117,7 +117,7 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
   npoints <- length(x$cluster)
   nleaves <- length(all_children(attr(hd_info, "cl_hierarchy"), key = 0, leaves_only = T))
   scale <- ifelse(scale == "suggest", nclusters, nclusters/as.numeric(scale))
-  
+
   ## Color variables
   col_breaks <- seq(0, length(x$cluster)+nclusters, by=nclusters)
   gcolors <- grDevices::colorRampPalette(gradient)(length(col_breaks))
@@ -126,7 +126,7 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
   eps_dfs <- function(dend, index, parent_height, scale){
     coord <- coords[index,]
     cl_key <- as.character(attr(dend, "label"))
-    
+
     ## widths == number of points in the cluster at each eps it was alive
     widths <- sapply(sort(hd_info[[cl_key]]$eps, decreasing = T), function(eps) length(which(hd_info[[cl_key]]$eps <= eps)))
     if (length(widths) > 0){
@@ -134,12 +134,12 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
     } else {
       widths <- as.vector(rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children))
     }
-    
+
     ## Normalize and scale widths to length of x-axis
     normalize <- function(x) (nleaves)*(x - 1) / (npoints - 1)
     xleft <- coord[[1]] - normalize(widths)/scale
     xright <- coord[[1]] + normalize(widths)/scale
-    
+
     ## Top is always parent height, bottom is when the points died
     ## Minor adjustment made if at the root equivalent to plot.dendrogram(edge.root=T)
     if (cl_key == "0"){
@@ -149,8 +149,8 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
       ytop <- rep(parent_height, length(widths))
       ybottom <- c(sort(hd_info[[cl_key]]$eps, decreasing = T), rep(hd_info[[cl_key]]$eps_death, hd_info[[cl_key]]$n_children))
     }
-    
-    ## Draw the rectangles 
+
+    ## Draw the rectangles
     rect_color <- gcolors[.bincode(length(widths), breaks = col_breaks)]
     graphics::rect(xleft = xleft, xright = xright, ybottom = ybottom, ytop = ytop,
          col = rect_color, border=NA, lwd=0)
@@ -168,8 +168,8 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
         text(x=coord[[1]], y=min(ybottom), pos=1, labels=n_label)
       }
     }
-    
-    ## Recurse in depth-first-manner 
+
+    ## Recurse in depth-first-manner
     if (is.leaf(dend)){
       return(index)
     } else {
@@ -178,7 +178,7 @@ plot.hdbscan <- function(x, scale="suggest", gradient=c("yellow", "red"), show_f
       return(right)
     }
   }
-  
+
   ## Run the recursive plotting
   plot(dend, edge.root = TRUE, main="HDBSCAN*", ylab="eps value", leaflab="none", ...)
   eps_dfs(dend, index = 1, parent_height = 0, scale = scale)

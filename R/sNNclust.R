@@ -28,5 +28,9 @@ sNNclust <- function(x, k, eps, minPts, borderPoints = TRUE, ...) {
 
   # run dbscan
   cl <- dbscan(snn, minPts = minPts, borderPoints = borderPoints)
-  cl$cluster
+
+  structure(list(cluster = cl$cluster,
+    type = "SharedNN clustering",
+    param = list(k = k, eps = eps, minPts = minPts, borderPoints = borderPoints)),
+    class = c("general_clustering"))
 }

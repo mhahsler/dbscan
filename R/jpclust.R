@@ -36,4 +36,30 @@ jpclust <- function(x, k, kt, ...) {
 
   # Step 3
   as.integer(factor(cl))
+
+  structure(list(cluster = as.integer(factor(cl)),
+    type = "Jarvis-Patrick clustering",
+    param = list(k = k, kt = kt)),
+    class = c("general_clustering"))
+}
+
+
+
+print.general_clustering <- function(x, ...) {
+  cl <- unique(x$cluster)
+  cl <- length(cl[cl!=0L])
+
+  writeLines(c(
+    paste0(x$type," for ", length(x$cluster), " objects."),
+    paste0("Parameters: ",
+    paste(names(x$param), unlist(x$param), sep = "=", collapse = ", ")),
+    paste0("The clustering contains ", cl, " cluster(s) and ",
+      sum(x$cluster==0L), " noise points.")
+    ))
+
+  print(table(x$cluster))
+  cat("\n")
+
+  writeLines(strwrap(paste0("Available fields: ",
+    paste(names(x), collapse = ", ")), exdent = 18))
 }

@@ -40,7 +40,10 @@ greater than MinPts.
 Note that steps 2-4 are DBSCAN and that \code{eps} is used on a similarity (the number of shared neighbors) and not on a distance like in DBSCAN.
 }
 \value{
-  A vector with cluster assignments.
+  A object of class 'general_clustering' with the following components:
+  \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}
+  \item{type }{ name of used clustering algorithm.}
+  \item{param }{ list of used clustering parameters. }
 }
 \references{
 Levent Ertoz, Michael Steinbach, Vipin Kumar, Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data, \emph{SIAM International Conference on Data Mining,} 2003, 47-59.
@@ -55,13 +58,13 @@ Levent Ertoz, Michael Steinbach, Vipin Kumar, Finding Clusters of Different Size
 }
 
 \examples{
-data("Chameleon")
+data("DS3")
 
 # Out of k = 20 NN 7 (eps) have to be shared to create a link in the sNN graph.
 # A point needs a least 16 (minPts) links in the sNN graph to be a core point.
 # Noise points have cluster id 0 and are shown in black.
-cl <- sNNclust(chameleon_ds4, k = 20, eps = 7, minPts = 16)
-plot(chameleon_ds4, col = cl + 1L, cex = .5)
+cl <- sNNclust(DS3, k = 20, eps = 7, minPts = 16)
+plot(DS3, col = cl$cluster + 1L, cex = .5)
 }
 \keyword{ model }
 \keyword{ clustering }

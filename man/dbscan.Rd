@@ -70,7 +70,6 @@ cluster will be reported as members of the noise cluster 0.
     \item{eps }{ value of the eps parameter.}
     \item{minPts }{ value of the minPts parameter.}
     \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}
-  %% ...
 }
 \references{
 Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. \emph{Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96).}

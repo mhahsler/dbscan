@@ -100,8 +100,6 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   class(ret) <- c("NN", "frNN")
 
-  class(ret) <- "frNN"
-
   ret
 }
 

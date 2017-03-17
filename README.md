@@ -7,15 +7,19 @@
 
  This R package provides a fast C++ reimplementation of several density-based algorithms of the DBSCAN 
  family for spatial data. 
- Includes the __DBSCAN__ (density-based spatial clustering of applications with noise) and 
- __OPTICS/OPTICSXi__ (ordering points to identify the clustering structure) clustering algorithms and the 
- __LOF__ (local outlier factor) algorithm. The implementations uses the kd-tree data 
+ The package includes: 
+ 
+* __DBSCAN:__ Density-based spatial clustering of applications with noise.
+* __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure clustering algorithms.
+* __HDBSCAN:__  Hierarchical DBSCAN with simplified hierarchy extraction.
+* __LOF:__ Local outlier factor algorithm. 
+
+The implementations uses the kd-tree data 
  structure (from library ANN) for faster k-nearest neighbor search. 
  An R interface to __fast kNN and fixed-radius NN search__ is also provided.
 
 This implementation is typically faster than the native R implementation in package `fpc`, or the 
 implementations in [WEKA](http://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](http://scikit-learn.org/).
-
 
 ## Installation
 

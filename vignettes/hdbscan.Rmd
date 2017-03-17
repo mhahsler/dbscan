@@ -1,9 +1,9 @@
 ---
 title: "HDBSCAN with the dbscan package"
-author: "Michael Hahsler, Matt Piekenbrock"
+author: "Matt Piekenbrock, Michael Hahsler"
 output:
-  html_notebook: default
   html_document: default
+  html_notebook: default
   pdf_document: default
 header-includes: \usepackage{animation}
 ---

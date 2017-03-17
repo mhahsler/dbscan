@@ -85,4 +85,3 @@ expect_equal(all(sapply(nn5s$dist, FUN = function(x) all(x == sort(x)))), TRUE)
 expect_error(frNN(nn5, eps = 1))
 nn2 <- frNN(nn5, eps = .2)
 expect_equal(all(sapply(nn2$dist, FUN = function(x) all(x <=.2))), TRUE)
-

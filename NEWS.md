@@ -1,5 +1,20 @@
 # dbscan 1.0-0.1 (2017-xx-xx)
 
+## New features
+
+* HDBSCAN was added.
+* extractFOSC (optimal selection of clusters for HDBSCAN) was added.
+* hullplot uses now filled polygons as the default.
+* hullplot now used PCA if the data has more than 2 dimensions.
+
+## Interface changes
+
+* Improved interface for dbscan() and optics(): ... is now passed on to frNN.
+* OPTICS clustering extraction methods are now called extractDBSCAN and 
+  extractXi.
+* kNN and frNN are now objects with a print function.
+* dbscan now also accepts a frNN object as input.
+
 ## New Features
 
 * Added NN superclass for kNN and frNN with plot and with adjacencylist().

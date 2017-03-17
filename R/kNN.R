@@ -124,7 +124,7 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
 
   x
 }
-
+              
 print.kNN <- function(x, ...) {
   cat("k-nearest neighbors for ", nrow(x$id), " objects (k=", x$k,").",
     "\n", sep = "")

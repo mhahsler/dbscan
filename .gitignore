@@ -21,6 +21,10 @@ vignettes/*.html
 vignettes/*.pdf
 .Rproj.user
 
+# OS stuff 
+.DS*
+
 # Personal work directories 
 Work
 ignore
+jss

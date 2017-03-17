@@ -111,7 +111,6 @@ print.optics <- function(x, ...) {
     }
     cat("\n")
   }
-
   writeLines(strwrap(paste0("Available fields: ",
     paste(names(x), collapse = ", ")), exdent = 18))
 }

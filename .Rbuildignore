@@ -8,3 +8,5 @@ proj$
 ^.*\.Rproj$
 ^LICENSE
 Work
+jss
+ignore

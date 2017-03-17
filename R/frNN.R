@@ -100,6 +100,8 @@ frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 
   class(ret) <- c("NN", "frNN")
 
+  class(ret) <- "frNN"
+
   ret
 }
 
@@ -116,8 +118,6 @@ sort.frNN <- function(x, decreasing = FALSE, ...) {
 
   x
 }
-
-
 
 print.frNN <- function(x, ...) {
   cat("fixed radius nearest neighbors for ", length(x$id),

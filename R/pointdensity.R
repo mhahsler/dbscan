@@ -39,4 +39,9 @@ pointdensity <- function(x, eps, type = "frequency",
   d
 }
 
+#gof <- function(x, eps, ...) {
+#  d <- pointdensity(x, eps, ...)
+#  1/(d/mean(d))
+#}
+
 

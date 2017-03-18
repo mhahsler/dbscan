@@ -71,9 +71,10 @@ cl
 
 # cluster with noise removed (use low pointdensity to identify noise)
 d <- pointdensity(DS3, eps = 25)
-DS3_noiseless <- DS3[d > 100,]
+hist(d, breaks = 20)
+DS3_noiseless <- DS3[d > 110,]
 
-cl <- jpclust(DS3_noiseless, k = 20, kt = 12)
+cl <- jpclust(DS3_noiseless, k = 20, kt = 10)
 cl
 
 plot(DS3_noiseless, col = cl$cluster+1L, cex = .5)

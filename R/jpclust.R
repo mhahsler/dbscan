@@ -20,7 +20,7 @@
 
 jpclust <- function(x, k, kt, ...) {
 
-  # Step 1
+  # Create NN graph
   if(is(x, "kNN")) {
     if(missing(k)) k <- nn$k
     nn <- x$id[,1:k]
@@ -31,11 +31,8 @@ jpclust <- function(x, k, kt, ...) {
   if(length(kt) != 1 || kt < 1 || kt > k)
     stop("kt needs to be a threshold in range [1, k].")
 
-  # Step 2
+  # Perform clustering
   cl <- JP_int(nn, kt = as.integer(kt))
-
-  # Step 3
-  as.integer(factor(cl))
 
   structure(list(cluster = as.integer(factor(cl)),
     type = "Jarvis-Patrick clustering",

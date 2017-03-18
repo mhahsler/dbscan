@@ -40,7 +40,7 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
   for(i = 0; i < n; ++i) {
     // check all neighbors of i
     for (it = nn_set[i].begin(); it != nn_set[i].end(); ++it) {
-      j = *it-1;
+      j = *it-1; // index in nn starts with 1
 
       // edge was already checked
       if(j<i) continue;
@@ -48,7 +48,7 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
       // already in the same cluster
       if(label[i] == label[j]) continue;
 
-      // check if points are in each others snn list (is is already in j)
+      // check if points are in each others snn list (i is already in j)
       if(nn_set[j].find(i+1) != nn_set[j].end()) {
 
         // calculate link strength as the number of shared points

@@ -3,9 +3,10 @@ title: "HDBSCAN with the dbscan package"
 author: "Matt Piekenbrock, Michael Hahsler"
 vignette: >
   %\VignetteIndexEntry{HDBSCAN with the dbscan package}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 header-includes: \usepackage{animation}
+output: html_document
 ---
 The dbscan package includes a fast implementation of Hierarchical DBSCAN (HDBSCAN) and its related algorithm(s) for the 
 R platform. This vignette introduces how to interface with these features. To understand how HDBSCAN works, there is an excellent Python Notebook resource that goes over te basic concepts of the algorithm (see [ the SciKit-learn docs](http://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)). For the sake of simplicity, consider the same sample 
@@ -101,7 +102,8 @@ The individual point membership 'probabilities' are in the probabilities member 
 These can be used to show the 'degree of cluster membership' by, for example, plotting points with transparencies that correspond to their membership degrees.   
 ```{r}
   plot(moons, col=cl$cluster+1, pch=21)
-  colors <- sapply(1:length(cl$cluster), function(i) adjustcolor(palette()[(cl$cluster+1)[i]], alpha.f = cl$membership_prob[i]))
+  colors <- mapply(function(col, i) adjustcolor(col, alpha.f = cl$membership_prob[i]), 
+                   palette()[cl$cluster+1], seq_along(cl$cluster))
   points(moons, col=colors, pch=20)
 ```
 
@@ -111,7 +113,8 @@ A recent journal publication on HDBSCAN comes with a new outlier measure that co
 __Note:__ Because of the distinction made that noise points, points that _are not_ assigned to any clusters, should be considered in the definition of an outlier, the outlier scores computed are not just the inversely-proportional scores to the membership probabilities. 
 ```{r}
   top_outliers <- order(cl$outlier_scores, decreasing = T)[1:10]
-  colors <- sapply(1:length(cl$cluster), function(i) adjustcolor(palette()[(cl$cluster+1)[i]], alpha.f = cl$outlier_scores[i]))
+  colors <- mapply(function(col, i) adjustcolor(col, alpha.f = cl$outlier_scores[i]), 
+                   palette()[cl$cluster+1], seq_along(cl$cluster))
   plot(moons, col=colors, pch=20)
   text(moons[top_outliers, ], labels = top_outliers, pos=3)
 ```

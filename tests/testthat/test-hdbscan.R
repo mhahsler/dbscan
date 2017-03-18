@@ -27,10 +27,8 @@ res <- dbscan::hdbscan(moons, minPts = 5)
 expect_identical(length(res$cluster), nrow(moons))
 
 ## compare with dist-based versions; note hclust won't be the same call
-## FIXME: Outlier score is differnt
 res_d <- dbscan::hdbscan(moons, minPts = 5, xdist = dist(moons))
-expect_identical(res[!names(res) %in% c("hc", "outlier_scores")],
-  res_d[!names(res_d) %in% c("hc", "outlier_scores")])
+expect_identical(res[!names(res) %in% c("hc")], res_d[!names(res_d) %in% c("hc")])
 
 ## Check hierarchy matches dbscan* at every value
 check <- rep(F, nrow(moons)-1)

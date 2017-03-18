@@ -427,7 +427,7 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
   // it will contain only the objects that were considered 'noise' at that hierarchical level
   List res = List(); 
   NumericVector outlier_scores;
-  if (compute_glosh) { outlier_scores = NumericVector((int) n, -1.0); }
+  if (compute_glosh) { outlier_scores = NumericVector( n, -1.0); }
   for (std::unordered_map<std::string, IntegerVector>::iterator key = contains.begin(); key != contains.end(); ++key){
     int nc = n_children[key->first]; 
     res[key->first] = List::create(
@@ -442,18 +442,18 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
     
     // Compute GLOSH outlier scores (HDBSCAN only) 
     if (compute_glosh){
-      if (eps[key->first].size() > 0){
+      if (eps[key->first].size() > 0){ // contains noise points
         double eps_max = std::numeric_limits<double>::infinity();
         IntegerVector leaf_membership = all_children(cl_hierarchy, atoi(key->first.c_str()), true); 
-        if (leaf_membership.length() == 0){
+        if (leaf_membership.length() == 0){ // is itself a leaf
           eps_max = eps_death[key->first];
         } else {
           for (IntegerVector::iterator it = leaf_membership.begin(); it != leaf_membership.end(); ++it){
             eps_max = std::min(eps_max, eps_death[patch::to_string(*it)]);
           }
         }
-        NumericVector eps_max_vec = NumericVector(eps_max, eps.size())/Rcpp::as<NumericVector>(eps[key->first]);
-        NumericVector glosh = NumericVector((double) key->second.length(), 1) - eps_max_vec;
+        NumericVector eps_max_vec =  NumericVector(eps[key->first].size(), eps_max) / as<NumericVector>(eps[key->first]);
+        NumericVector glosh = Rcpp::rep(1.0, key->second.length()) - eps_max_vec;
         outlier_scores[key->second - 1] = glosh; 
       }
     }

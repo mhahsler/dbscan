@@ -68,6 +68,15 @@ nn
 
 cl <- jpclust(nn, k = 20, kt = 12)
 cl
+
+# cluster with noise removed (use low pointdensity to identify noise)
+d <- pointdensity(DS3, eps = 25)
+DS3_noiseless <- DS3[d > 100,]
+
+cl <- jpclust(DS3_noiseless, k = 20, kt = 12)
+cl
+
+plot(DS3_noiseless, col = cl$cluster+1L, cex = .5)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

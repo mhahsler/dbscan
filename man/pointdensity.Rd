@@ -58,9 +58,9 @@ plot(x)
 ### calculate density
 d <- pointdensity(x, eps = .5, type = "density")
 
-### distribution of outlier factors
+### density distribution
 summary(d)
-hist(d, breaks=10)
+hist(d, breaks = 10)
 
 ### point size is proportional to Density
 plot(x, pch = 19, main = "Density (eps = .5)", cex = d*5)
@@ -72,8 +72,8 @@ x_nonoise <- x[f >= 5,]
 
 # 2. use single-linkage on the non-noise points
 hc <- hclust(dist(x_nonoise), method = "single")
-plot(x, pch = ".")
-points(x_nonoise, col= cutree(hc, k = 4)+1L)
+plot(x, pch = 19, cex = .5)
+points(x_nonoise, pch = 19, col= cutree(hc, k = 4)+1L)
 }
 \keyword{model}
 

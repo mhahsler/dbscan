@@ -97,15 +97,15 @@ iris <- as.matrix(iris[,1:4])
 ## find suitable eps parameter using a k-NN plot for k = dim + 1
 ## Look for the knee!
 kNNdistplot(iris, k = 5)
-abline(h=.4, col = "red", lty=2)
+abline(h=.5, col = "red", lty=2)
 
-res <- dbscan(iris, eps = .4, minPts = 5)
+res <- dbscan(iris, eps = .5, minPts = 5)
 res
 
 pairs(iris, col = res$cluster + 1L)
 
 ## use precomputed frNN
-fr <- frNN(iris, eps = .4)
+fr <- frNN(iris, eps = .5)
 dbscan(fr, minPts = 5)
 
 ## example data from fpc

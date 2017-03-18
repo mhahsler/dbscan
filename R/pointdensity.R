@@ -22,9 +22,6 @@ pointdensity <- function(x, eps, type = "frequency",
   search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0){
 
-  ### ANN uses squared distance
-  eps2 <- eps*eps
-
   type <- match.arg(type, choices = c("frequency", "density"))
 
   search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
@@ -33,7 +30,7 @@ pointdensity <- function(x, eps, type = "frequency",
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
 
-  d <- dbscan_density_int(as.matrix(x), as.double(eps2),
+  d <- dbscan_density_int(as.matrix(x), as.double(eps),
   as.integer(search), as.integer(bucketSize),
   as.integer(splitRule), as.double(approx))
 

@@ -13,7 +13,7 @@ lof(x, k = 4, ...)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix or a dist object. }
-  \item{k}{ size if neighborhood. }
+  \item{k}{ size of the neighborhood. }
   \item{\dots}{ further arguments are passed on to \code{kNN}. }
 }
 \details{

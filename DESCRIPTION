@@ -1,6 +1,6 @@
 Package: dbscan
-Version: 1.0-0.1
-Date: 2017-xx-xx
+Version: 1.1-0
+Date: 2017-03-18
 Title: Density Based Clustering of Applications with Noise (DBSCAN) and Related
     Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
@@ -11,7 +11,7 @@ Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
 Description: A fast reimplementation of several density-based algorithms of
     the DBSCAN family for spatial data. Includes the DBSCAN (density-based spatial
     clustering of applications with noise) and OPTICS (ordering points to identify
-    the clustering structure) clustering algorithms and the LOF (local outlier
+    the clustering structure) clustering algorithms HDBSCAN (hierarchical DBSCAN) and the LOF (local outlier
     factor) algorithm. The implementations uses the kd-tree data structure (from
     library ANN) for faster k-nearest neighbor search. An R interface to fast kNN
     and fixed-radius NN search is also provided.

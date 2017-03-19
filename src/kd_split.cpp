@@ -6,12 +6,12 @@
 //----------------------------------------------------------------------
 // Copyright (c) 1997-2005 University of Maryland and Sunil Arya and
 // David Mount.  All Rights Reserved.
-// 
+//
 // This software and related documentation is part of the Approximate
 // Nearest Neighbor Library (ANN).  This software is provided under
 // the provisions of the Lesser GNU Public License (LGPL).  See the
 // file ../ReadMe.txt for further information.
-// 
+//
 // The University of Maryland (U.M.) and the authors make no
 // representations about the suitability or fitness of this software for
 // any purpose.  It is provided "as is" without express or implied
@@ -31,7 +31,7 @@
 //	Constants
 //----------------------------------------------------------------------
 
-const double ERR = 0.001;				// a small value
+const double EPS = 0.001;				// a small value
 const double FS_ASPECT_RATIO = 3.0;		// maximum allowed aspect ratio
 										// in fair split. Must be >= 2.
 
@@ -95,7 +95,7 @@ void midpt_split(
 	ANNcoord max_spread = -1;			// find long side with most spread
 	for (d = 0; d < dim; d++) {
 										// is it among longest?
-		if (double(bnds.hi[d] - bnds.lo[d]) >= (1-ERR)*max_length) {
+		if (double(bnds.hi[d] - bnds.lo[d]) >= (1-EPS)*max_length) {
 										// compute its spread
 			ANNcoord spr = annSpread(pa, pidx, n, d);
 			if (spr > max_spread) {		// is it max so far?
@@ -165,7 +165,7 @@ void sl_midpt_split(
 	ANNcoord max_spread = -1;			// find long side with most spread
 	for (d = 0; d < dim; d++) {
 										// is it among longest?
-		if ((bnds.hi[d] - bnds.lo[d]) >= (1-ERR)*max_length) {
+		if ((bnds.hi[d] - bnds.lo[d]) >= (1-EPS)*max_length) {
 										// compute its spread
 			ANNcoord spr = annSpread(pa, pidx, n, d);
 			if (spr > max_spread) {		// is it max so far?

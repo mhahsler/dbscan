@@ -42,7 +42,7 @@ Breunig, M., Kriegel, H., Ng, R., and Sander, J. (2000). LOF: identifying
     Michael Hahsler
 }
 \seealso{
-\code{\link{kNN}}, \code{\link{pointdensity}}.
+\code{\link{kNN}}, \code{\link{pointdensity}}, \code{\link{glosh}}.
 }
 \examples{
 set.seed(665544)

@@ -17,14 +17,14 @@ glosh(x, k = 4, ...)
   \item{\dots}{ further arguments are passed on to \code{kNN}. }
 }
 \details{
-GLOSH compares the density of a point to densities of any points associated within current and child clusters (if any). 
+GLOSH compares the density of a point to densities of any points associated within current and child clusters (if any).
 Points that have a substantially lower density than the density mode (cluster) they most associate with are considered outliers.
-GLOSH is computed from a hierarchy a clusters. 
+GLOSH is computed from a hierarchy a clusters.
 
-Specifically, consider a point \emph{x} and a density or distance threshold \emph{lambda}. GLOSH is calculated by taking 
-1 minus the ratio of how long any of the child clusters of the cluster \emph{x} belongs to "survives" changes in \emph{lambda} to the highest \emph{lambda} threshold of x, above which x becomes a noise point. 
+Specifically, consider a point \emph{x} and a density or distance threshold \emph{lambda}. GLOSH is calculated by taking
+1 minus the ratio of how long any of the child clusters of the cluster \emph{x} belongs to "survives" changes in \emph{lambda} to the highest \emph{lambda} threshold of x, above which x becomes a noise point.
 
-Scores close to 1 indicate outliers. For more details on the motivation for this calculation, see Campello et al (2015). 
+Scores close to 1 indicate outliers. For more details on the motivation for this calculation, see Campello et al (2015).
 }
 \value{
 A numeric vector of length equal to the size of the original data set containing GLOSH values for
@@ -35,10 +35,10 @@ Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander. "Hierarch
 }
 
 \author{
-    Matt Piekenbrock, Michael Hahsler
+    Matt Piekenbrock
 }
 \seealso{
-\code{\link{kNN}}, \code{\link{pointdensity}}.
+\code{\link{kNN}}, \code{\link{pointdensity}}, \code{\link{lof}}.
 }
 \examples{
 set.seed(665544)
@@ -63,7 +63,7 @@ plot_glosh <- function(x, glosh){
 }
 plot_glosh(x, glosh)
 
-### GLOSH with any hierarchy 
+### GLOSH with any hierarchy
 x_dist <- dist(x)
 x_sl <- hclust(x_dist, method = "single")
 x_upgma <- hclust(x_dist, method = "average")
@@ -79,7 +79,7 @@ plot_glosh(x, glosh_upgma)
 glosh_ward <- glosh(x_ward, k = 3)
 plot_glosh(x, glosh_ward)
 
-## GLOSH is automatically computed with HDBSCAN 
+## GLOSH is automatically computed with HDBSCAN
 all(hdbscan(x, minPts = 3)$outlier_scores == glosh(x, k = 3))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

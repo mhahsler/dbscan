@@ -22,11 +22,11 @@ export(
   extractDBSCAN,
   extractXi,
   hdbscan,
-  extractFOSC, 
+  extractFOSC,
   sNNclust,
   jpclust,
   lof,
-  glosh, 
+  glosh,
   pointdensity,
   hullplot,
   as.reachability
@@ -49,6 +49,7 @@ S3method(predict, dbscan_fast)
 
 S3method(print, kNN)
 S3method(print, frNN)
+S3method(print, sNN)
 
 
 S3method(print, hdbscan)
@@ -59,3 +60,4 @@ S3method(adjacencylist, frNN)
 S3method(plot, NN)
 S3method(sort, kNN)
 S3method(sort, frNN)
+S3method(sort, sNN)

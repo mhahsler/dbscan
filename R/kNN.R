@@ -65,7 +65,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     dimnames(d) <- list(rownames(x), 1:k)
 
     return(structure(list(dist = d, id = id, k = k, sort = TRUE),
-      class = c("NN", "kNN")))
+      class = c("kNN", "NN")))
   }
 
   ## make sure x is numeric
@@ -102,7 +102,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   dimnames(ret$id) <- list(rownames(x), 1:k)
   ret$sort <- sort
 
-  class(ret) <- c("NN", "kNN")
+  class(ret) <- c("kNN", "NN")
   ret
 }
 
@@ -124,7 +124,7 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
 
   x
 }
-              
+
 print.kNN <- function(x, ...) {
   cat("k-nearest neighbors for ", nrow(x$id), " objects (k=", x$k,").",
     "\n", sep = "")

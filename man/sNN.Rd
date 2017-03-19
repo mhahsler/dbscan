@@ -1,20 +1,23 @@
 \name{sNN}
 \alias{sNN}
 \alias{snn}
+\alias{sort.sNN}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Shared Nearest Neighbors}
 \description{
 Calculates the number of shared nearest neighbors.
 }
 \usage{
-sNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
+sNN(x, k, kt = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix, a dist object or a kNN object. }
   \item{k}{ number of neighbors to consider to calculate the shared nearest neighbors. }
-    \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
+  \item{kt}{ threshold on the number of shared nearest neighbors graph. Edges
+    are only preserved if \code{kt} or more neighbors are shared. }
+  \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
   \item{sort}{ sort the neighbors by distance? Note that this is expensive and
       \code{sort = FALSE} is much faster. kNN objects can be sorted using
@@ -66,11 +69,11 @@ table(as.vector(nn$shared))
 i <- 10
 nn$shared[i,]
 
-# add sNN to existing kNN
-nn <- kNN(x, k = k)
-nn
+plot(nn, x)
 
-sNN(nn)
+# apply a threshold to create a sNN graph with edges
+# if more than 3 neighbors are shared.
+plot(sNN(nn, kt = 3), x)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

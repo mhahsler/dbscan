@@ -18,7 +18,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # number of shared nearest neighbors including the point itself.
-sNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
+sNN <- function(x, k, kt = NULL, sort = TRUE,
+  search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0){
 
   if(is(x, "kNN")) {
@@ -30,13 +31,50 @@ sNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
       nn$id <- nn$id[,1:k]
       nn$dist <- nn$dist[,1:k]
     }
+    nn$sort <- FALSE ### not sorted for sNN
   } else nn <- kNN(x, k, sort = FALSE, search = search, bucketSize = bucketSize,
     splitRule = splitRule, approx = approx)
 
   nn$shared <- SNN_sim_int(nn$id)
-  class(nn) <- c("NN", "kNN", "sNN")
+  class(nn) <- c("sNN", "kNN", "NN")
 
   if(sort) nn <- sort(nn)
 
+  nn$kt <- kt
+
+  if(!is.null(kt)) {
+    if(kt > k) stop("kt needs to be less than k.")
+    rem <- nn$shared < kt
+    nn$id[rem] <- NA
+    nn$dist[rem] <- NA
+    nn$shared[rem] <- NA
+  }
+
   nn
+}
+
+
+sort.sNN <- function(x, decreasing = TRUE, ...) {
+  if(!is.null(x$sort) && x$sort) return(x)
+  if(is.null(x$shared)) stop("Unable to sort. Number of shared neighbors is missing.")
+  if(ncol(x$id)<2) {
+    x$sort <- TRUE
+    return(x)
+  }
+
+  o <- sapply(1:nrow(x$shared), FUN =
+      function(i) order(x$shared[i,], x$id[i,], decreasing=decreasing))
+  for(i in 1:ncol(o)) {
+    x$shared[i,] <- x$shared[i,][o[,i]]
+    x$id[i,] <- x$id[i,][o[,i]]
+  }
+  x$sort <- TRUE
+
+  x
+}
+
+print.sNN <- function(x, ...) {
+  cat("shared-nearest neighbors for ", nrow(x$id), " objects (k=", x$k,
+    ", kt=", ifelse(is.null(x$kt), "NULL", x$kt), ").", "\n", sep = "")
+  cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }

@@ -1,9 +1,10 @@
-# dbscan 1.0-0.1 (2017-xx-xx)
+# dbscan 1.1-0 (2017-03-18)
 
 ## New Features
 
 * HDBSCAN was added.
 * extractFOSC (optimal selection of clusters for HDBSCAN) was added.
+* GLOSH outlier score was added.
 * hullplot uses now filled polygons as the default.
 * hullplot now used PCA if the data has more than 2 dimensions.
 * Added NN superclass for kNN and frNN with plot and with adjacencylist().

@@ -17,27 +17,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-hdbscan <- function(x, minPts, xdist=NULL, gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
-  ## Type Checking
-  if (is(x, "data.table") || is(x, "data.frame") || is(x, "matrix")){
-    x <- as.matrix(x)
-    if (!storage.mode(x) %in% c("integer", "double")){
-      stop("hdbscan expects numerical data")
-    }
-  } else { stop("hdbscan expects a matrix-conformable object for x") }
+hdbscan <- function(x, minPts, xdist = NULL,
+  gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
 
-  ## Calculate Core distance using kNN
-  if (missing(xdist)) {
-    euc_dist <- dist(as.matrix(x), method = "euclidean")
-    core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
-    n <- nrow(x)
-  } else if (!missing(xdist) && is(xdist, "dist")) {
-    euc_dist <- xdist
-    core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
-    n <- nrow(x)
-  } else {
-    stop("xdist must be a dist object")
+  if(!is(x, "dist")) {
+    x <- as.matrix(x)
+    if (!is.numeric(x)) stop("hdbscan expects numerical data")
   }
+  core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
+
+  if(!is(x, "dist"))
+    if(!is.null(xdist)) euc_dist <- xdist else euc_dist <- dist(x)
+  else euc_dist <- x
+
+  if(is.null(attr(euc_dist, "method")) || attr(euc_dist, "method") != "euclidean") warning("Distances do not use the required Euclidean metric.")
+  n <- attr(euc_dist, "Size")
 
   ## Mutual Reachability matrix
   mrd <- mrd(euc_dist, core_dist)

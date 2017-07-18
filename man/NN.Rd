@@ -50,15 +50,17 @@ plot(nn, x)
 # show the first few elements of the adjacency list
 head(adjacencylist(nn))
 
-# create a graph and find connected components
-library("igraph")
-g <- graph_from_adj_list(adjacencylist(nn))
-comp <- components(g)
-plot(x, col = comp$membership)
+# create a graph and find connected components (if igraph is installed)
+if("igraph" \%in\% installed.packages()){
+  library("igraph")
+  g <- graph_from_adj_list(adjacencylist(nn))
+  comp <- components(g)
+  plot(x, col = comp$membership)
 
-# detect clusters (communities) with the label propagation algorithm
-cl <- membership(cluster_label_prop(g))
-plot(x, col = cl)
+  # detect clusters (communities) with the label propagation algorithm
+  cl <- membership(cluster_label_prop(g))
+  plot(x, col = cl)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

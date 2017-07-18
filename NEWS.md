@@ -1,3 +1,10 @@
+# dbscan 1.1-2 (2017-xx-xx)
+
+## Bugfix
+
+* Example now only uses igraph conditionally since it is unavailable 
+  on Solaris (reported by B. Ripley).
+
 # dbscan 1.1-1 (2017-03-19)
 
 ## Bugfix

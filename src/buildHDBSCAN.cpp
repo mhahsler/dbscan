@@ -12,26 +12,66 @@ using namespace Rcpp;
 
 // Macros
 #define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
+#define INDEX_TO(k, n) n - 2 - floor(sqrt(-8*k + 4*n*(n-1)-7)/2.0 - 0.5)
+#define INDEX_FROM(k, n, i) k + i + 1 - n*(n-1)/2 + (n-i)*((n-i)-1)/2
 
 // Given a dist vector of "should-link" (1), "should-not-link" (-1), and "don't care" (0) 
 // constraints in the form of integers, convert constraints to a more compact adjacency list 
 // representation. 
 // [[Rcpp::export]]
 List distToAdjacency(IntegerVector constraints, const int N){
-  std::unordered_map<int, std::vector<int> > key_map = std::unordered_map<int, std::vector<int> >();  
-  for (int i = 0; i < N; ++i){
-    for (int j = 0; j < N; ++j){
-      if (i == j) continue; 
-      int index = i > j ? INDEX_TF(N, j, i) : INDEX_TF(N, i, j);
-      int crule = constraints.at(index); 
-      if (crule != 0){
-        if (key_map.count(i+1) != 1){ key_map[i+1] = std::vector<int>(); } // add 1 for base 1
-        key_map[i+1].push_back(crule < 0 ? - (j + 1) : j + 1); // add 1 for base 1
-      }
+  std::unordered_map<int, IntegerVector > key_map = std::unordered_map<int, IntegerVector >();  
+  int i = 0; 
+  for (IntegerVector::iterator con = constraints.begin(); con != constraints.end(); ++con, ++i){
+    int to = INDEX_TO(i, N);
+    int from = INDEX_FROM(i, N, to);
+    if (*con == 0) continue; 
+    else {
+      if (key_map.count(from+1) != 1) { key_map[from+1] = IntegerVector(); } 
+      if (key_map.count(to+1) != 1) { key_map[to+1] = IntegerVector(); } 
+      key_map[from+1].push_back(*con < 0 ? - (to + 1) : to + 1); // add 1 for base 1
+      key_map[to+1].push_back(*con < 0 ? - (from + 1) : from + 1); // add 1 for base 1
     }
   }
   return(wrap(key_map));
 }
+
+// Converts an adjacency list to an edge list. 
+// NOTE: Assumes each element in the adj_list contains a vector of integers! 
+// [[Rcpp::export]]
+IntegerMatrix alToEL(List adj_list) {
+  int n = 0, adj_len = adj_list.length(); 
+  IntegerVector vec; 
+  for (List::iterator it = adj_list.begin(); it != adj_list.end(); ++it){
+    vec = as<IntegerVector>(*it);
+    n += vec.length();
+  }
+  
+  // If named adjacency list given, build constraints using that
+  bool named_list_given = (bool) adj_list.hasAttribute("names");
+  IntegerVector name_vec;
+  if (named_list_given) {
+    std::vector< std::string > names = adj_list.attr("names");
+    name_vec = IntegerVector(names.size());
+    int i = 0; 
+    for (std::vector<std::string>::iterator it = names.begin(); it != names.end(); ++it)
+    { name_vec[i++] = atoi(it->c_str()); } 
+  } else {
+  // Otherwise, assume the indices along the list given correspond to the node 'from' constraints
+    name_vec = seq(1, adj_len);
+  }
+  
+  // Build edge list 
+  IntegerMatrix edge_list = IntegerMatrix(n, 2);
+  for (int i = 0, c = 0; i < adj_len; ++i){
+    vec = as<IntegerVector>(adj_list.at(i));
+    for (IntegerVector::iterator con = vec.begin(); con != vec.end(); ++con){
+      edge_list.row(c++) = IntegerVector::create(name_vec.at(i), *con);
+    }
+  }
+  return(edge_list);
+}
+
 
 // Given an hclust object, convert to a dendrogram object (but much faster). 
 // [[Rcpp::export]]
@@ -233,6 +273,132 @@ NumericMatrix node_xy(List cl_tree, List cl_hierarchy, int cid = 0){
   return (node_xy_);
 }
 
+// Given an hclust object and a minimum cluster size, traverse the tree divisely to create a 
+// simplified hclust object, where each leaf contains at least min_sz points
+// [[Rcpp::export]]
+List simplifiedTree_hclust(List hcl, const int min_sz) {
+  // Extract hclust info
+  NumericMatrix merge = hcl["merge"]; 
+  NumericVector eps_dist = hcl["height"];
+  IntegerVector pt_order = hcl["order"]; 
+  int n = merge.nrow() + 1, k; 
+  
+  //  Which cluster does each merge step represent (after the merge, or before the split)
+  IntegerVector cl_tracker = IntegerVector(n-1 , 0),
+    member_sizes = IntegerVector(n-1, 0); // Size each step
+  
+  List clusters = List(), // Final cluster information
+    cl_hierarchy = List(); // Keeps track of hierarchy, which cluster contains who 
+  
+  // The primary information needed  
+  std::unordered_map<std::string, IntegerVector> contains = std::unordered_map<std::string, IntegerVector>(); 
+  std::unordered_map<std::string, NumericVector> eps = std::unordered_map<std::string, NumericVector>(); 
+  
+  // Supplemental information for either conveniance or to reduce memory
+  std::unordered_map<std::string, int> n_children = std::unordered_map<std::string, int>(); 
+  std::unordered_map<std::string, double> eps_death = std::unordered_map<std::string, double>(); 
+  std::unordered_map<std::string, double> eps_birth = std::unordered_map<std::string, double>(); 
+  std::unordered_map<std::string, bool> processed = std::unordered_map<std::string, bool>(); 
+  
+  // First pass: Agglomerate up the hierarchy, recording member sizes. 
+  // This enables a dynamic programming strategy to improve performance below.  
+  for (k = 0; k < n-1; ++k){
+    int lm = merge(k, 0), rm = merge(k, 1);
+    IntegerVector m = IntegerVector::create(lm, rm);
+    if (all(m < 0).is_true()){
+      member_sizes[k] = 2;
+    } else if (any(m < 0).is_true()) {
+      int pos_merge = (lm < 0 ? rm : lm), merge_size = member_sizes[pos_merge - 1];
+      member_sizes[k] = merge_size + 1;
+    } else {
+      // Record Member Sizes
+      int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
+      member_sizes[k] = merge_size1 + merge_size2;
+    }
+  }  
+  
+  // Initialize root (unknown size, might be 0, so don't initialize length)
+  std::string root_str = "0";
+  contains[root_str] = NumericVector(); 
+  eps[root_str] = NumericVector(); 
+  eps_birth[root_str] = eps_dist.at(eps_dist.length()-1); 
+  
+  int global_cid = 0; 
+  // Second pass: Divisively split the hierarchy, recording the epsilon and point index values as needed
+  for (k = n-2; k >= 0; --k){
+    // Current Merge
+    int lm = merge(k, 0), rm = merge(k, 1), cid = cl_tracker.at(k);
+    IntegerVector m = IntegerVector::create(lm, rm);
+    std::string cl_cid = patch::to_string(cid);
+    
+    // Trivial case: split into singletons, record eps, contains, and ensure eps_death is minimal
+    if (all(m < 0).is_true()){
+      contains[cl_cid].push_back(-lm), contains[cl_cid].push_back(-rm);
+      double noise_eps = processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k); 
+      eps[cl_cid].push_back(noise_eps), eps[cl_cid].push_back(noise_eps); 
+      eps_death[cl_cid] = processed[cl_cid] ? eps_death[cl_cid] : std::min((double) eps_dist.at(k), (double) eps_death[cl_cid]); 
+    } else if (any(m < 0).is_true()) {
+      // Record new point info and mark the non-singleton with the cluster id
+      contains[cl_cid].push_back(-(lm < 0 ? lm : rm));
+      eps[cl_cid].push_back(processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k));
+      cl_tracker.at((lm < 0 ? rm : lm) - 1) = cid;
+    } else {
+      int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
+      
+      // The minPts cluster-simplification step 
+      if (merge_size1 >= minPts && merge_size2 >= minPts){
+        // Record death of current cluster
+        eps_death[cl_cid] = eps_dist.at(k);
+        processed[cl_cid] = true; 
+        
+        // Mark the lower merge steps as new clusters 
+        cl_hierarchy[cl_cid] = IntegerVector::create(global_cid+1, global_cid+2);
+        std::string l_index = patch::to_string(global_cid+1), r_index = patch::to_string(global_cid+2);
+        cl_tracker.at(lm - 1) = ++global_cid, cl_tracker.at(rm - 1) = ++global_cid; 
+        
+        // Record the distance the new clusters appeared and initialize containers
+        contains[l_index] = IntegerVector(), contains[r_index] = IntegerVector();
+        eps[l_index] = NumericVector(), eps[r_index] = NumericVector(); ;
+        eps_birth[l_index] = eps_dist.at(k), eps_birth[r_index] = eps_dist.at(k);
+        eps_death[l_index] = eps_dist.at(lm - 1), eps_death[r_index] = eps_dist.at(rm - 1); 
+        processed[l_index] = false, processed[r_index] = false; 
+        n_children[cl_cid] = merge_size1 + merge_size2; 
+      } else {
+        // Inherit cluster identity 
+        cl_tracker.at(lm - 1) = cid,  cl_tracker.at(rm - 1) = cid; 
+      }
+    }
+  }
+  
+  // Aggregate data into a returnable list 
+  // NOTE: the 'contains' element will be empty for all inner nodes w/ minPts == 1, else 
+  // it will contain only the objects that were considered 'noise' at that hierarchical level
+  List res = List(); 
+  NumericVector outlier_scores;
+  if (compute_glosh) { outlier_scores = NumericVector( n, -1.0); }
+  for (std::unordered_map<std::string, IntegerVector>::iterator key = contains.begin(); key != contains.end(); ++key){
+    int nc = n_children[key->first]; 
+    res[key->first] = List::create(
+      _["contains"] = key->second, 
+      _["eps"] = eps[key->first],
+                    _["eps_birth"] = eps_birth[key->first], 
+                                              _["eps_death"] = eps_death[key->first], 
+                                                                        _["stability"] = sum(1/eps[key->first] - 1/eps_birth[key->first]) + (nc * 1/eps_death[key->first] - nc * 1/eps_birth[key->first]),
+                                                                        _["n_children"] = nc            
+    );
+  
+  }
+  
+  // Store meta-data as attributes
+  res.attr("n") = n; // number of points in the original data
+  res.attr("cl_hierarchy") = cl_hierarchy;  // Stores parent/child structure 
+  res.attr("cl_tracker") = cl_tracker; // Stores cluster id formation for each merge step, used for cluster extraction
+  res.attr("minPts") = minPts; // Store parameter setting
+  
+  
+  
+}
+
 // Given a cluster tree, convert to a simplified dendrogram
 // [[Rcpp::export]]
 List simplifiedTree(List cl_tree) {
@@ -287,7 +453,6 @@ List simplifiedTree(List cl_tree) {
     
     // Continue building up the hierarchy 
     List left = dendrogram[l_str], right = dendrogram[r_str];
-    
     int l_members = members[l_str], r_members = members[r_str];
     float l_mid = mids[l_str], r_mid = mids[r_str];
   
@@ -397,7 +562,7 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
     } else {
       int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
 
-      // The minPts step 
+      // The minPts cluster-simplification step 
       if (merge_size1 >= minPts && merge_size2 >= minPts){
         // Record death of current cluster
         eps_death[cl_cid] = eps_dist.at(k);
@@ -436,8 +601,7 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
       _["eps_birth"] = eps_birth[key->first], 
       _["eps_death"] = eps_death[key->first], 
       _["stability"] = sum(1/eps[key->first] - 1/eps_birth[key->first]) + (nc * 1/eps_death[key->first] - nc * 1/eps_birth[key->first]),
-      //_["_stability"] = 1/eps[key->first] - 1/eps_birth[key->first],
-      _["n_children"] = n_children[key->first]            
+      _["n_children"] = nc            
     );
     
     // Compute GLOSH outlier scores (HDBSCAN only) 
@@ -462,9 +626,8 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
   // Store meta-data as attributes
   res.attr("n") = n; // number of points in the original data
   res.attr("cl_hierarchy") = cl_hierarchy;  // Stores parent/child structure 
-  res.attr("cl_tracker") = cl_tracker; // stores cluster id formation for each merge step, used for cluster extraction
-  res.attr("minPts") = minPts; // needed later 
-  // res.attr("root") = minPts == 1; // needed later to ensure root is not captured as a cluster
+  res.attr("cl_tracker") = cl_tracker; // Stores cluster id formation for each merge step, used for cluster extraction
+  res.attr("minPts") = minPts; // Store parameter setting
   if (compute_glosh){ res.attr("glosh") = outlier_scores; } // glosh outlier scores (hdbscan only)
   return(res);
 }
@@ -484,9 +647,7 @@ List validateConstraintList(List& constraints, int n){
   
   // Sparsity check: if the constraints make up a sufficiently large amount of
   // the solution space, use matrix to check validity
-  if (n_constraints/(n*n) > 0.20){
-    use_matrix = true; 
-  }
+  if (n_constraints/(n*n) > 0.20){ use_matrix = true; }
   
   // Check using adjacency matrix 
   if (use_matrix){
@@ -500,7 +661,7 @@ List validateConstraintList(List& constraints, int n){
       // Positive "should-link" constraints 
       IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]); 
       for (IntegerVector::iterator pc = pcons.begin(); pc != pcons.end(); ++pc){
-        from = (*pc < cid ? *pc : cid) - 1; 
+        from = (*pc < cid ? *pc : cid) - 1; // from should always be < to
         to = (*pc > cid ? *pc : cid) - 1; 
         adj_matrix(from, to) = 1; 
       }
@@ -582,6 +743,9 @@ List validateConstraintList(List& constraints, int n){
   return(constraints);
 }
 
+// For each point id in 'noise', given an adjacency list of instance-level constraints, 
+// compute the raw count of the number of constraints satisfied. Note that positive constraints are
+// satisfied when the noise vector contains 
 // [[Rcpp::export]]
 double computeVirtualNode(IntegerVector noise, List constraints){
   if (noise.length() == 0) return(0);
@@ -589,49 +753,72 @@ double computeVirtualNode(IntegerVector noise, List constraints){
   
   // Semi-supervised extraction
   int satisfied_constraints = 0; 
-  // Rcout << "Starting constraint based optimization" << std::endl; 
   for (IntegerVector::iterator it = noise.begin(); it != noise.end(); ++it){
     std::string cs_str = patch::to_string(*it); 
     if (constraints.containsElementNamed(cs_str.c_str())){
       // Get constraints
       IntegerVector cs_ = constraints[cs_str];
+      IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]), ncons = -(as<IntegerVector>(cs_[cs_ < 0])); 
       
-      // Positive "should-link" constraints 
-      IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]); 
-      for (IntegerVector::iterator pc = pcons.begin(); pc != pcons.end(); ++pc){
-        satisfied_constraints += contains(noise, *pc);
-      }
-      
-      // Negative "should-not-link" constraints 
-      IntegerVector ncons = -(as<IntegerVector>(cs_[cs_ < 0])); 
-      for (IntegerVector::iterator nc = ncons.begin(); nc != ncons.end(); ++nc){
-        satisfied_constraints += (1 - contains(noise, *nc));
-      }
+      // Use intersection to determine how many positive and negative constraints are met 
+      satisfied_constraints += as<IntegerVector>(Rcpp::intersect(noise, pcons)).size();
+      satisfied_constraints += ncons.size() - as<IntegerVector>(Rcpp::intersect(noise, ncons)).size();
     } 
   }
   return(satisfied_constraints);
 }
 
+// Edgelist version
+// [[Rcpp::export]]
+double computeVirtualNodeEL(IntegerVector noise, IntegerMatrix constraints){
+  if (noise.length() == 0) return(0);
+  if (Rf_isNull(constraints) || constraints.nrow() == 0) return(0);
+  IntegerVector from = constraints.column(0), to = constraints.column(1); 
+  
+  // Semi-supervised extraction
+  int satisfied_constraints = 0; 
+  for (IntegerVector::iterator x_i = noise.begin(); x_i != noise.end(); ++x_i){
+    
+    // Get indices of constraints involving object x_i
+    IntegerVector indices = Rcpp::union_(which_cpp(abs(from), *x_i), which_cpp(abs(to), *x_i)), il_con;
+    for (int i = 0, scalar_con; i < indices.length(); ++i){
+      il_con = constraints.row(indices.at(i));
+      
+      // Negative instance-level constraint
+      if (any(il_con < 0).is_true()){
+        scalar_con = abs(il_con.at(0)) == *x_i ? abs(il_con.at(1)) : abs(il_con.at(0));
+        satisfied_constraints += (1 - contains(noise, scalar_con));
+      } 
+      // Positive instance-level constraint
+      else if (all(il_con > 0).is_true()) {
+        scalar_con = il_con.at(0) == *x_i ? il_con.at(1) : il_con.at(0);
+        satisfied_constraints += contains(noise, scalar_con); 
+      }
+    }
+  }
+  return(satisfied_constraints);
+}
 
 // Framework for Optimal Selection of Clusters (FOSC)
 // Traverses a cluster tree hierarchy to compute a flat solution, maximizing the:
 // - Unsupervised soln: the 'most stable' clusters following the give linkage criterion 
 // - SS soln w/ instance level Constraints: constraint-based w/ unsupervised tiebreaker 
-// - SS soln w/ mixed objective function: maximizes J = α JU + (1 − α) JSS
+// - SS soln w/ mixed objective function: maximizes J = α JU + (1 − α) JSS (normalized to the unit interval)
+// Each recursive call returns the stability and constraint scores of the current branch before normalization. 
+// The normalization that occurs w.r.t total stability is stored in the "score" attribute of each branch.
 // [[Rcpp::export]]
-NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, 
-                   bool prune_unstable_leaves=false, // whether to prune -very- unstable subbranches
-                   const double alpha = 0, // mixed objective case 
-                   bool useVirtual = false, // return virtual node as well 
+NumericVector fosc(List& cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, 
+                   const double alpha = 0, // weight applied in mixed objective case
                    const int n_constraints = 0, // number of constraints 
                    List constraints = R_NilValue) // instance-level constraints 
 {
+  double max_stability = (contains(cl_tree.attributeNames(),"max_stability") ? (double) cl_tree.attr("max_stability") : 1.0); 
   // Base case: at a leaf
   if (!cl_hierarchy.containsElementNamed(cid.c_str())){
     List cl = cl_tree[cid];
     sc.push_back(stoi(cid)); // assume the leaf will be a salient cluster until proven otherwise
-    return(NumericVector::create((double) cl["stability"], 
-                                 (double) useVirtual ? cl["vscore"] : 0));  
+    return(NumericVector::create((double) cl["stability"],  // Leaf total stability == regular stability score
+                                 (double) alpha < 1 ? cl["vscore"] : 0));  
   } else {
     // Non-base case: at a merge of clusters, determine which to keep
     List cl = cl_tree[cid];
@@ -641,110 +828,162 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
     IntegerVector child_ids = cl_hierarchy[cid];
     for (int i = 0, clen = child_ids.length(); i < clen; ++i){
       int child_id = child_ids.at(i);
-      scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints);
-      stability_scores.push_back(scores.at(0));
-      constraint_scores.push_back(scores.at(1)); 
+      scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, alpha, n_constraints, constraints);
+      stability_scores.push_back(scores.at(0)); // stability score for child
+      constraint_scores.push_back(scores.at(1)); // constraint score for child
     }
     
-    // If semisupervised scenario, normalizing should be stored in 'total_stability' 
-    double total_stability = (contains(cl_tree.attributeNames(),"total_stability") ? (double) cl_tree.attr("total_stability") : 1.0); 
+    // Compare and update stability & constraint scores 
+    double split_stability = (double) sum(stability_scores);  // stability if the branches were disjoint
+    double merge_stability = (double) cl["stability"]; // stability if the branches were merged
+    double split_constraint_score = (double) sum(constraint_scores) + (double) computeVirtualNode(cl["contains"], constraints)/2*n_constraints;
+    double merge_constraint_score = (double) cl["vscore"]; 
     
-    // Compare and update stability scores 
-    double old_stability_score = (double) cl["stability"] / total_stability; 
-    double new_stability_score = (double) sum(stability_scores) / total_stability; 
-    
-    // Compute instance-level constraints if necessary
-    double old_constraint_score = 0, new_constraint_score = 0; 
-    if (useVirtual){
-      // Rcout << "old constraint score for " << cid << ": " << (double) cl["vscore"] << std::endl; 
-      old_constraint_score = (double) cl["vscore"]; 
-      new_constraint_score = (double) sum(constraint_scores) + (double) computeVirtualNode(cl["contains"], constraints)/n_constraints;
-    }
-    
-    bool keep_children = true; 
-    // If the score is unchanged, remove the children and add parent
-    if (useVirtual){
-      if (old_constraint_score < new_constraint_score && cid != "0"){
-        // Children satisfies more constraints   
-        cl["vscore"] = new_constraint_score; 
-        cl["score"] = alpha * new_stability_score + (1 - alpha) * new_constraint_score;
-        // Rcout << "1: score for " << cid << ":" << (double) cl["score"] << std::endl;  
-        // Rcout << "(old constraint): " << old_constraint_score << ", (new constraint): " << new_constraint_score << std::endl;  
-      } else if (old_constraint_score > new_constraint_score && cid != "0"){
-        // Parent satisfies more constraints  
-        cl["vscore"] = old_constraint_score; 
-        cl["score"] = alpha * old_stability_score + (1 - alpha) * old_constraint_score;
-        // Rcout << "2: score for " << cid << ":" << (double) cl["score"] << std::endl; 
-        keep_children = false; 
-      } else {
-        // Resolve tie using unsupervised, stability-based approach
-        if (old_stability_score < new_stability_score){
-          // Children are more stable
-          cl["score"] = new_stability_score / total_stability;
-          // Rcout << "3: score for " << cid << ":" << (double) cl["score"] << std::endl; 
-        } else {
-          // Parent is more stable
-          cl["score"] = old_stability_score / total_stability;
-          // Rcout << "4: score for " << cid << ":" << (double) cl["score"] << std::endl; 
-          // Rcout << "(old stability): " << old_stability_score << ", (total stability): " << total_stability << std::endl; 
-          keep_children = false; 
-        }
-        cl["vscore"] = old_constraint_score;
-      }
-    } else {
-      // Use unsupervised, stability-based approach only
-      if (old_stability_score < new_stability_score){
-        cl["score"] = new_stability_score; // keep children
-      } else {
-        cl["score"] = old_stability_score;
-        keep_children = false; 
-      }
-    }
-    
-    
+    // Compute total scores
+    double split_score = alpha * (split_stability/max_stability) + (1 - alpha) * split_constraint_score;
+    double merge_score = alpha * (merge_stability/max_stability) + (1 - alpha) * merge_constraint_score;
+    bool merge_children = merge_score > split_score; // Whether to merge the child branches or keep them as disjoint clusters
+    cl["score"] = merge_children ? merge_score : split_score;
+    cl["vscore"] = merge_children ? merge_constraint_score : split_constraint_score; 
+   
     // Prune children and add parent (cid) if need be
-    if (!keep_children && cid != "0") {
+    if (merge_children && cid != "0") {
       IntegerVector children = all_children(cl_hierarchy, stoi(cid)); // use all_children to prune subtrees
-      for (int i = 0, clen = children.length(); i < clen; ++i){
-        sc.remove(children.at(i)); // use list for slightly better random deletion performance
-      }
+      for (int i = 0, clen = children.length(); i < clen; ++i){ sc.remove(children.at(i)); } 
       sc.push_back(stoi(cid));
-    } else if (keep_children && prune_unstable_leaves){
-      // If flag passed, prunes leaves with insignificant stability scores
-      // this can happen in cases where one leaf has a stability score significantly greater 
-      // than both its siblings and its parent (or other ancestors), causing sibling branches 
-      // to be considered as clusters even though they may nto be significantly more stable than their parent
-      if (all(stability_scores < old_stability_score).is_false()){
-        for (int i = 0, clen = child_ids.length(); i < clen; ++i){
-          if (stability_scores.at(i) < old_stability_score){
-            IntegerVector to_prune = all_children(cl_hierarchy, child_ids.at(i)); // all sub members
-            for (IntegerVector::iterator it = to_prune.begin(); it != to_prune.end(); ++it){
-              //Rcout << "Pruning: " << *it << std::endl;
-              sc.remove(*it);
-            }
-          }
-        }
-      }
     }
     
     // Save scores for traversal up and for later
     cl_tree[cid] = cl;
     
     // Return this sub trees score
-    return(NumericVector::create((double) cl["score"], useVirtual ? (double) cl["vscore"] : 0));
+    return(NumericVector::create((double) cl["score"], alpha < 1 ? (double) cl["vscore"] : 0));
   }
 } 
+
+// Framework for optimal cluster extraction using an hclust object  
+// NumericVector fosc_hclust(const List& hcl, std::list<int>& sc, 
+//                    const double alpha = 0, // weight applied in mixed objective case
+//                    const int n_constraints = 0, // number of constraints 
+//                    List constraints = R_NilValue) // instance-level constraints 
+// {
+//   // double max_stability = (contains(cl_tree.attributeNames(),"max_stability") ? (double) cl_tree.attr("max_stability") : 1.0); 
+//   
+//   // Extract hclust info
+//   NumericMatrix merge = hcl["merge"]; 
+//   NumericVector eps_dist = hcl["height"];
+//   IntegerVector pt_order = hcl["order"]; 
+//   int n = merge.nrow() + 1, k; 
+//   
+//   //  Which cluster does each merge step represent (after the merge, or before the split)
+//   IntegerVector cl_tracker = IntegerVector(n-1 , 0),
+//                 member_sizes = IntegerVector(n-1, 0); // Size each step
+//   
+//   // Map from component id to vector of the points it contains
+//   std::unordered_map<std::string, IntegerVector> contains = std::unordered_map<std::string, IntegerVector>(); 
+//   
+//   for (k = 0; k < n - 1; ++k){
+//     // Current Merge
+//     int lm = merge(k, 0), rm = merge(k, 1), cid = cl_tracker.at(k);
+//     IntegerVector m = IntegerVector::create(lm, rm);
+//     std::string cid_str = patch::to_string(cid);
+//     
+//     // Trivial case: split into singletons, record eps, contains, and ensure eps_death is minimal
+//     if (all(m < 0).is_true()){
+//       contains[cl_cid].push_back(-lm), contains[cl_cid].push_back(-rm);
+//       if (-lm)
+//     } else if (any(m < 0).is_true()) {
+//       // Record new point info and mark the non-singleton with the cluster id
+//       contains[cl_cid].push_back(-(lm < 0 ? lm : rm));
+//       eps[cl_cid].push_back(processed[cl_cid] ? eps_death[cl_cid] : eps_dist.at(k));
+//       cl_tracker.at((lm < 0 ? rm : lm) - 1) = cid;
+//     } else {
+//       int merge_size1 = member_sizes[lm-1], merge_size2 = member_sizes[rm-1];
+//       
+//       // The minPts cluster-simplification step 
+//       if (merge_size1 >= minPts && merge_size2 >= minPts){
+//         // Record death of current cluster
+//         eps_death[cl_cid] = eps_dist.at(k);
+//         processed[cl_cid] = true; 
+//         
+//         // Mark the lower merge steps as new clusters 
+//         cl_hierarchy[cl_cid] = IntegerVector::create(global_cid+1, global_cid+2);
+//         std::string l_index = patch::to_string(global_cid+1), r_index = patch::to_string(global_cid+2);
+//         cl_tracker.at(lm - 1) = ++global_cid, cl_tracker.at(rm - 1) = ++global_cid; 
+//         
+//         // Record the distance the new clusters appeared and initialize containers
+//         contains[l_index] = IntegerVector(), contains[r_index] = IntegerVector();
+//         eps[l_index] = NumericVector(), eps[r_index] = NumericVector(); ;
+//         eps_birth[l_index] = eps_dist.at(k), eps_birth[r_index] = eps_dist.at(k);
+//         eps_death[l_index] = eps_dist.at(lm - 1), eps_death[r_index] = eps_dist.at(rm - 1); 
+//         processed[l_index] = false, processed[r_index] = false; 
+//         n_children[cl_cid] = merge_size1 + merge_size2; 
+//       } else {
+//         // Inherit cluster identity 
+//         cl_tracker.at(lm - 1) = cid,  cl_tracker.at(rm - 1) = cid; 
+//       }
+//     }
+//   }
+//   
+//   // Base case: at a leaf
+//   if (!cl_hierarchy.containsElementNamed(cid.c_str())){
+//     List cl = cl_tree[cid];
+//     sc.push_back(stoi(cid)); // assume the leaf will be a salient cluster until proven otherwise
+//     return(NumericVector::create((double) cl["stability"],  // Leaf total stability == regular stability score
+//                                  (double) alpha < 1 ? cl["vscore"] : 0));  
+//   } else {
+//     // Non-base case: at a merge of clusters, determine which to keep
+//     List cl = cl_tree[cid];
+//     
+//     // Get child stability/constraint scores
+//     NumericVector scores, stability_scores = NumericVector(), constraint_scores = NumericVector();
+//     IntegerVector child_ids = cl_hierarchy[cid];
+//     for (int i = 0, clen = child_ids.length(); i < clen; ++i){
+//       int child_id = child_ids.at(i);
+//       scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, alpha, n_constraints, constraints);
+//       stability_scores.push_back(scores.at(0)); // stability score for child
+//       constraint_scores.push_back(scores.at(1)); // constraint score for child
+//     }
+//     
+//     // Compare and update stability & constraint scores 
+//     double split_stability = (double) sum(stability_scores);  // stability if the branches were disjoint
+//     double merge_stability = (double) cl["stability"]; // stability if the branches were merged
+//     double split_constraint_score = (double) sum(constraint_scores) + (double) computeVirtualNode(cl["contains"], constraints)/2*n_constraints;
+//     double merge_constraint_score = (double) cl["vscore"]; 
+//     
+//     // Compute total scores
+//     double split_score = alpha * (split_stability/max_stability) + (1 - alpha) * split_constraint_score;
+//     double merge_score = alpha * (merge_stability/max_stability) + (1 - alpha) * merge_constraint_score;
+//     bool merge_children = merge_score > split_score; // Whether to merge the child branches or keep them as disjoint clusters
+//     cl["score"] = merge_children ? merge_score : split_score;
+//     cl["vscore"] = merge_children ? merge_constraint_score : split_constraint_score; 
+//     
+//     // Prune children and add parent (cid) if need be
+//     if (merge_children && cid != "0") {
+//       IntegerVector children = all_children(cl_hierarchy, stoi(cid)); // use all_children to prune subtrees
+//       for (int i = 0, clen = children.length(); i < clen; ++i){ sc.remove(children.at(i)); } 
+//       sc.push_back(stoi(cid));
+//     }
+//     
+//     // Save scores for traversal up and for later
+//     cl_tree[cid] = cl;
+//     
+//     // Return this sub trees score
+//     return(NumericVector::create((double) cl["score"], alpha < 1 ? (double) cl["vscore"] : 0));
+//   }
+// } 
+
 
 // Given a cluster tree object with computed stability precomputed scores from computeStability,
 // extract the 'most stable' or salient flat cluster assignments. The large number of derivable 
 // arguments due to fosc being a recursive function 
 // [[Rcpp::export]]
-List extractUnsupervised(List cl_tree, bool prune_unstable = false){
+List extractUnsupervised(List cl_tree){
   // Compute Salient Clusters
   std::list<int> sc = std::list<int>();
   List cl_hierarchy = cl_tree.attr("cl_hierarchy");
   int n = as<int>(cl_tree.attr("n"));
-  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable); // Assume root node is always id == 0
+  fosc(cl_tree, "0", sc, cl_hierarchy); // Assume root node is always id == 0
   
   // Store results as attributes
   cl_tree.attr("cluster") = getSalientAssignments(cl_tree, cl_hierarchy, sc, n); // Flat assignments 
@@ -753,8 +992,8 @@ List extractUnsupervised(List cl_tree, bool prune_unstable = false){
 }
 
 // [[Rcpp::export]]
-List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool prune_unstable_leaves = false){
-  // Rcout << "Starting semisupervised extraction..." << std::endl; 
+List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0){
+  //Rcout << "Starting semisupervised extraction..." << std::endl; 
   List root = cl_tree["0"]; 
   List cl_hierarchy = cl_tree.attr("cl_hierarchy");
   int n = as<int>(cl_tree.attr("n"));
@@ -765,10 +1004,11 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
     IntegerVector cl_constraints = constraints.at(i); 
     n_constraints += cl_constraints.length();
   }
+  // IntegerMatrix cl_constraints_el = alToEL(constraints);
   
   // Initialize root 
   List cl = cl_tree["0"];
-  cl["vscore"] = 0; 
+  cl["vscore"] = 0.0; 
   cl_tree["0"] = cl; // replace to keep changes
   
   // Compute initial gamma values or "virtual nodes" for both leaf and internal nodes
@@ -784,36 +1024,43 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
         // Extract the point indices the cluster contains
         IntegerVector child_cl = all_children(cl_hierarchy, *it), child_ids; 
         List cl_container = List();  
+        
+        // Get the point indices the child leaves contain
         for (IntegerVector::iterator ch_id = child_cl.begin(); ch_id != child_cl.end(); ++ch_id){
           List ch_cl = cl_tree[patch::to_string(*ch_id)];
-          //child_ids = combine(child_ids, ch_cl["contains"]);
           cl_container.push_back(as<IntegerVector>(ch_cl["contains"]));
         }
+        // Get the point indices the current branchs contains (as noise)
         cl_container.push_back(as<IntegerVector>(cl["contains"]));
         child_ids = concat_int(cl_container); 
-        cl["vscore"] = computeVirtualNode(child_ids, constraints)/n_constraints;
+        
+        // Compute initial constraint score (do not remove local variable)
+        double vscore = computeVirtualNode(child_ids, constraints) / int(n_constraints*2);
+        cl["vscore"] = vscore;
       } else { // is leaf node
-        cl["vscore"] = computeVirtualNode(cl["contains"], constraints)/n_constraints;
+        // Compute initial constraint score (do not remove local variable)
+        double vscore = computeVirtualNode(cl["contains"], constraints) / int(n_constraints*2);
+        cl["vscore"] = vscore;
       }
       cl_tree[cid_str] = cl; // replace to keep changes
     }
   }
   
   // First pass: compute unsupervised soln as a means of extracting normalizing constant J_U^*
-  cl_tree = extractUnsupervised(cl_tree, false);
+  cl_tree = extractUnsupervised(cl_tree);
   IntegerVector stable_sc = cl_tree.attr("salient_clusters");
-  double total_stability = 0.0f;
+  double max_stability = 0.0;
   for (IntegerVector::iterator it = stable_sc.begin(); it != stable_sc.end(); ++it){
     List cl = cl_tree[patch::to_string(*it)]; 
-    total_stability += (double) cl["stability"]; 
+    max_stability += (double) cl["stability"]; 
   }
-  cl_tree.attr("total_stability") = total_stability;
-  // Rcout << "Total stability: " << total_stability << std::endl;  
+  cl_tree.attr("max_stability") = max_stability;
+  // Rcout << "Total stability: " << (double) cl_tree.attr("total_stability") << std::endl;  
 
   // Compute stable clusters w/ instance-level constraints
   std::list<int> sc = std::list<int>();
-  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable_leaves, 
-       alpha, true, n_constraints, constraints); // semi-supervised parameters 
+  fosc(cl_tree, "0", sc, cl_hierarchy, 
+       alpha, n_constraints, constraints); // semi-supervised parameters 
     
   // Store results as attributes and return
   cl_tree.attr("salient_clusters") = wrap(sc);

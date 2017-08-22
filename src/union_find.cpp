@@ -34,7 +34,7 @@ void UnionFind::Union(const int x, const int y)
     parent[xRoot] = yRoot; 
   else if (rank[xRoot] == rank[yRoot])
   {
-    parent[yRoot] = parent[xRoot];
+    parent[yRoot] = xRoot;
     rank[xRoot] = rank[xRoot] + 1;
   }
 }

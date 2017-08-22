@@ -11,90 +11,50 @@
   constraint and stability-based objective extraction.
 }
 \usage{
-extractFOSC(x, constraints = NA, alpha = 0, minPts = 2L,
-            prune_unstable = FALSE,
-            validate_constraints = FALSE)
+extractFOSC(x, minPts = 2L, constraints = NA, alpha = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a valid hclust object.}
-  \item{constraints}{ Either a list or matrix of pairwise constraints. If not supplied, an unsupervised measure of stability is used to make local cuts and extract the optimal clusters. See details. }
-  \item{alpha}{ numeric; weight between [0, 1] for mixed-objective semi-supervised extraction. Defaults to 0. }
   \item{minPts}{ numeric; Defaults to 2. Only needed if class-less noise is a valid label in the model. }
-  \item{prune_unstable}{ logical; should significantly unstable subtrees be pruned? The default
-    is \code{FALSE} for the original optimal extraction framework (see Campello et al, 2013). See details for
-    what \code{TRUE} implies.}
-  \item{validate_constraints}{ logical; should constraints be checked for validity? See details for what are
-  considered valid constraints. }
+  \item{constraints}{ Either a list or matrix of pairwise constraints. 
+  If not supplied, an unsupervised measure of stability is used for cluster extraction. See details. }
+  \item{alpha}{ numeric; weight between [0, 1] for mixed-objective semi-supervised extraction. Defaults to 0. }
 }
 \details{
-Campello et al (2013) suggested a 'Framework for Optimal Selection of Clusters' (FOSC) as a framework to make local (non-horizontal)
-cuts to any cluster tree hierarchy. This function implements the original extraction algorithms as described by
-the framework for hclust objects. Traditional cluster extraction methods from hierarchical representations
-(such as 'hclust' objects) generally rely on global parameters or cutting values which are used to partition a
-cluster hierarchy into a set of disjoint, flat clusters. Although such methods are widespread, using global parameter
-settings are inherently limited in that they cannot capture patterns within the cluster hierarchy at varying \emph{local}
-levels of granularity.
+Campello et al (2013) suggested a 'Framework for Optimal Selection of Clusters' (FOSC) for 
+optimizing arbitrary objective measures that enable local cuts through cluster hierarchies. 
+This function implements this framework for hclust objects.
 
-Rather than partitioning a hierarchy based on the number of the cluster one expects to find (\eqn{k}) or based on some linkage
-distance threshold (\eqn{H}), the FOSC proposes that the optimal clusters may exist at varying distance thresholds in the
-hierarchy. To enable this idea, FOSC requires one parameter (minPts) that represents \emph{the minimum number of
-points that constitute a valid cluster.} The first step of the FOSC algorithm is to traverse the given cluster hierarchy
-divisely, recording new clusters at each split if both branches represent more than or equal to minPts. Branches
-that contain less than minPts points at one or both branches inherit the parent clusters identity. Note that using FOSC,
-due to the constraint that minPts must be greater than or equal to 2, it is possible that the optimal cluster solution
-chosen makes local cuts that render parent branches of sizes less than minPts as noise, which are denoted as 0 in the
-final solution.
-
-Traversing the original cluster tree using minPts creates a new, simplified cluster tree that is then post-processed
-recursively to extract clusters that maximize for each cluster \eqn{C_i}{Ci}
-the cost function
+In contrast to global cluster extraction methods (e.g. 'cutting' the tree at a specific height), FOSC traverses a given hierarchy to find a clustering results that is the globally optimal solution to an arbitrary objective measure. As a result of this, multiple subbranches may be 'cut' in the cluster hierarchy to form the final clustering solution. FOSC requires one parameter (minPts) that represents a \emph{minimum} number of points that constitute a valid cluster. Clusters below this threshold are marked as noise, and given the '0' label in the result. Traversing the original cluster tree using minPts creates a new, simplified cluster tree that is then post-processed to maximize the cost function \eqn{J} for each cluster \eqn{C_i}{Ci}, 
 
 \deqn{\max_{\delta_2, \dots, \delta_k} J = \sum\limits_{i=2}^{k} \delta_i S(C_i)}{ J = \sum \delta S(Ci) for all i clusters, }
-where \eqn{S(C_i)}{S(Ci)} is the stability-based measure as
+
+for some objective measure, \eqn{S}. Currently, the only objective measure supported is the following generic 'stability-based' measure: 
 \deqn{ S(C_i) = \sum_{x_j \in C_i}(\frac{1}{h_{min} (x_j, C_i)} - \frac{1}{h_{max} (C_i)}) }{ S(Ci) = \sum (1/Hmin(Xj, Ci) - 1/Hmax(Ci)) for all Xj in Ci.}
 
 \eqn{\delta_i}{\delta} represents an indicator function, which constrains the solution space such that clusters must be
-disjoint (cannot assign more than 1 label to each cluster). The measure \eqn{S(C_i)}{S(Ci)} used by FOSC is an unsupervised
-validation measure based on the assumption that, if you vary the linkage/distance threshold across all possible values,
-more prominent clusters that survive over many threshold variations should be considered as stronger
-candidates of the optimal solution. For this reason, using this measure to detect clusters is referred to as
-an unsupervised, \emph{stability-based} extraction approach. In some cases it may be useful to enact \emph{instance-level}
-constraints that ensure the solution space conforms to linkage expectations known \emph{a priori}. This general idea
-of using preliminary expectations to augment the clustering solution will be referred to as \emph{semisupervised clustering}.
-If constraints are given in the call to \code{extractFOSC}, the following alternative objective function is maximized:
+disjoint (cannot assign more than 1 label to each cluster). 
+
+FOSC supports a form of \emph{semisupervised clustering} through \emph{instance-level} constraints (see Wagstaff et al (2002)
+for more details). If constraints are given in the call to \code{extractFOSC}, the following alternative objective function is maximized:
 
 \deqn{J = \frac{1}{2n_c}\sum\limits_{j=1}^n \gamma (x_j)}{J = 1/(2 * nc) \sum \gamma(Xj)}
 
-\eqn{n_c}{nc} is the total number of constraints given and \eqn{\gamma(x_j)}{\gamma(Xj)} represents the number of
+where \eqn{n_c}{nc} is the total number of constraints given and \eqn{\gamma(x_j)}{\gamma(Xj)} represents the number of
 constraints involving object \eqn{x_j}{Xj} that are satisfied. In the case of ties (such as solutions where no constraints
-were given), the unsupervised solution is used as a tiebreaker. See Campello et al (2013) for more details.
-
-As a third option, if one wishes to prioritize the degree at which the unsupervised and semisupervised solutions
-contribute to the overall optimal solution, the parameter \eqn{\alpha} can be set to enable the extraction of
-clusters that maxmize the \emph{mixed} objective function
-
-\deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))}{J = \alpha S(Ci) + (1 - \alpha) \gamma(Ci).}
-
-FOSC expects the pairwise constraints to be passed as either 1) an \eqn{n(n-1)/2} vector of integers representing
+were given), the unsupervised solution is used as a tiebreaker. See Campello et al (2013) for more details. FOSC expects the 
+pairwise constraints to be passed as either 1) an \eqn{n(n-1)/2} vector of integers representing
 the constraints, where 1 represents should-link, -1 represents should-not-link, and 0 represents no preference using the unsupervised solution (see below for examples). Alternatively, if only a few constraints are needed, a named list
 representing the (symmetric) adjacency list can be used, where the names correspond to indices of the points in the
 original data, and the values correspond to integer vectors of constraints (positive indices for should-link, negative
-indices for should-not-link). Again, see the examples section for a demonstration of this.
+indices for should-not-link). Again, see the examples section for a demonstration of this. Asymmetric constraints are not supported.
 
-The parameters to the input function correspond to the concepts discussed above. The \code{minPts} parameter to
-represent the minimum cluster size to extract. The optional \code{constraints} parameter contains the pairwise,
-instance-level constraints of the data. The optional \code{alpha} parameters controls whether the mixed objective
-function is used (if \code{alpha} is greater than 0). If the \code{validate_constraints} parameter is set to true,
-the constraints are checked (and fixed) for symmetry (if point A has a should-link contraint with point B, point
-B should also have the same constraint). Asymmetric constraints are not supported.
+The unsupervised and semisupervised solutions can be weighted with the \eqn{\alpha} parameter to maximize the
+following mixed objective function
 
-Unstable branch pruning was not discussed by Campello et al (2013), however in some data sets it may be the case that specific
-subbranches scores are significantly greater than sibling and parent branches, and thus sibling branches should be
-considered as noise if their scores are cumulatively lower than the parents. This can happen in extremely nonhomogeneous
-data sets, where there exists locally very stable branches surrounded by unstable branches that contain more than
-\emph{minPts} points. \code{prune_unstable = TRUE} will remove the unstable
-branches.
+\deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))}{J = \alpha S(Ci) + (1 - \alpha) \gamma(Ci).}
+
 }
 \value{
   \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points (if any).}
@@ -102,7 +62,9 @@ branches.
   encoded in the 'stability', 'constraint', and 'total' named members.}
 }
 \references{
-Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander (2013). "A framework for semi-supervised and unsupervised optimal extraction of clusters from hierarchies." \emph{Data Mining and Knowledge Discovery} 27(3): 344-371.
+Campello, Ricardo JGB, et al. "A framework for semi-supervised and unsupervised optimal extraction of clusters from hierarchies." \emph{Data Mining and Knowledge Discovery} 27.3 (2013): 344-371.
+
+Wagstaff, Kiri Lou, and Claire Cardie. \emph{Intelligent clustering with instance-level constraints}. USA: Cornell University, 2002.
 }
 
 \seealso{

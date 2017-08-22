@@ -45,3 +45,6 @@ plot.NN <- function(x, data, main = NULL, ...) {
   }
 }
 
+as.edgelist.adjacencylist <- function(x){
+  adjacencyToEdgeList(x)
+}

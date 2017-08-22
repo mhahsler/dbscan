@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // distToAdjacency
 List distToAdjacency(IntegerVector constraints, const int N);
-RcppExport SEXP dbscan_distToAdjacency(SEXP constraintsSEXP, SEXP NSEXP) {
+RcppExport SEXP _dbscan_distToAdjacency(SEXP constraintsSEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -17,9 +17,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// alToEL
+IntegerMatrix alToEL(List adj_list);
+RcppExport SEXP _dbscan_alToEL(SEXP adj_listSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type adj_list(adj_listSEXP);
+    rcpp_result_gen = Rcpp::wrap(alToEL(adj_list));
+    return rcpp_result_gen;
+END_RCPP
+}
 // buildDendrogram
 List buildDendrogram(List hcl);
-RcppExport SEXP dbscan_buildDendrogram(SEXP hclSEXP) {
+RcppExport SEXP _dbscan_buildDendrogram(SEXP hclSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,7 +41,7 @@ END_RCPP
 }
 // all_children
 IntegerVector all_children(List hier, int key, bool leaves_only);
-RcppExport SEXP dbscan_all_children(SEXP hierSEXP, SEXP keySEXP, SEXP leaves_onlySEXP) {
+RcppExport SEXP _dbscan_all_children(SEXP hierSEXP, SEXP keySEXP, SEXP leaves_onlySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -43,7 +54,7 @@ END_RCPP
 }
 // node_xy
 NumericMatrix node_xy(List cl_tree, List cl_hierarchy, int cid);
-RcppExport SEXP dbscan_node_xy(SEXP cl_treeSEXP, SEXP cl_hierarchySEXP, SEXP cidSEXP) {
+RcppExport SEXP _dbscan_node_xy(SEXP cl_treeSEXP, SEXP cl_hierarchySEXP, SEXP cidSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -54,9 +65,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// simplifiedTree_hclust
+List simplifiedTree_hclust(List hcl, const int min_sz);
+RcppExport SEXP _dbscan_simplifiedTree_hclust(SEXP hclSEXP, SEXP min_szSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type hcl(hclSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_sz(min_szSEXP);
+    rcpp_result_gen = Rcpp::wrap(simplifiedTree_hclust(hcl, min_sz));
+    return rcpp_result_gen;
+END_RCPP
+}
 // simplifiedTree
 List simplifiedTree(List cl_tree);
-RcppExport SEXP dbscan_simplifiedTree(SEXP cl_treeSEXP) {
+RcppExport SEXP _dbscan_simplifiedTree(SEXP cl_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -67,7 +90,7 @@ END_RCPP
 }
 // computeStability
 List computeStability(const List hcl, const int minPts, bool compute_glosh);
-RcppExport SEXP dbscan_computeStability(SEXP hclSEXP, SEXP minPtsSEXP, SEXP compute_gloshSEXP) {
+RcppExport SEXP _dbscan_computeStability(SEXP hclSEXP, SEXP minPtsSEXP, SEXP compute_gloshSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -80,7 +103,7 @@ END_RCPP
 }
 // validateConstraintList
 List validateConstraintList(List& constraints, int n);
-RcppExport SEXP dbscan_validateConstraintList(SEXP constraintsSEXP, SEXP nSEXP) {
+RcppExport SEXP _dbscan_validateConstraintList(SEXP constraintsSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -92,7 +115,7 @@ END_RCPP
 }
 // computeVirtualNode
 double computeVirtualNode(IntegerVector noise, List constraints);
-RcppExport SEXP dbscan_computeVirtualNode(SEXP noiseSEXP, SEXP constraintsSEXP) {
+RcppExport SEXP _dbscan_computeVirtualNode(SEXP noiseSEXP, SEXP constraintsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -102,54 +125,62 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// fosc
-NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, bool prune_unstable_leaves, const double alpha, bool useVirtual, const int n_constraints, List constraints);
-RcppExport SEXP dbscan_fosc(SEXP cl_treeSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP, SEXP prune_unstable_leavesSEXP, SEXP alphaSEXP, SEXP useVirtualSEXP, SEXP n_constraintsSEXP, SEXP constraintsSEXP) {
+// computeVirtualNodeEL
+double computeVirtualNodeEL(IntegerVector noise, IntegerMatrix constraints);
+RcppExport SEXP _dbscan_computeVirtualNodeEL(SEXP noiseSEXP, SEXP constraintsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type cl_tree(cl_treeSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type noise(noiseSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type constraints(constraintsSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeVirtualNodeEL(noise, constraints));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fosc
+NumericVector fosc(List& cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, const double alpha, const int n_constraints, List constraints);
+RcppExport SEXP _dbscan_fosc(SEXP cl_treeSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP, SEXP alphaSEXP, SEXP n_constraintsSEXP, SEXP constraintsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List& >::type cl_tree(cl_treeSEXP);
     Rcpp::traits::input_parameter< std::string >::type cid(cidSEXP);
     Rcpp::traits::input_parameter< std::list<int>& >::type sc(scSEXP);
     Rcpp::traits::input_parameter< List >::type cl_hierarchy(cl_hierarchySEXP);
-    Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
     Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< bool >::type useVirtual(useVirtualSEXP);
     Rcpp::traits::input_parameter< const int >::type n_constraints(n_constraintsSEXP);
     Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
-    rcpp_result_gen = Rcpp::wrap(fosc(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints));
+    rcpp_result_gen = Rcpp::wrap(fosc(cl_tree, cid, sc, cl_hierarchy, alpha, n_constraints, constraints));
     return rcpp_result_gen;
 END_RCPP
 }
 // extractUnsupervised
-List extractUnsupervised(List cl_tree, bool prune_unstable);
-RcppExport SEXP dbscan_extractUnsupervised(SEXP cl_treeSEXP, SEXP prune_unstableSEXP) {
+List extractUnsupervised(List cl_tree);
+RcppExport SEXP _dbscan_extractUnsupervised(SEXP cl_treeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type cl_tree(cl_treeSEXP);
-    Rcpp::traits::input_parameter< bool >::type prune_unstable(prune_unstableSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractUnsupervised(cl_tree, prune_unstable));
+    rcpp_result_gen = Rcpp::wrap(extractUnsupervised(cl_tree));
     return rcpp_result_gen;
 END_RCPP
 }
 // extractSemiSupervised
-List extractSemiSupervised(List cl_tree, List constraints, float alpha, bool prune_unstable_leaves);
-RcppExport SEXP dbscan_extractSemiSupervised(SEXP cl_treeSEXP, SEXP constraintsSEXP, SEXP alphaSEXP, SEXP prune_unstable_leavesSEXP) {
+List extractSemiSupervised(List cl_tree, List constraints, float alpha);
+RcppExport SEXP _dbscan_extractSemiSupervised(SEXP cl_treeSEXP, SEXP constraintsSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type cl_tree(cl_treeSEXP);
     Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
     Rcpp::traits::input_parameter< float >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSemiSupervised(cl_tree, constraints, alpha, prune_unstable_leaves));
+    rcpp_result_gen = Rcpp::wrap(extractSemiSupervised(cl_tree, constraints, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
 // reach_to_dendrogram
 List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_order);
-RcppExport SEXP dbscan_reach_to_dendrogram(SEXP reachabilitySEXP, SEXP pl_orderSEXP) {
+RcppExport SEXP _dbscan_reach_to_dendrogram(SEXP reachabilitySEXP, SEXP pl_orderSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -161,7 +192,7 @@ END_RCPP
 }
 // dendrogram_to_reach
 List dendrogram_to_reach(const Rcpp::List x);
-RcppExport SEXP dbscan_dendrogram_to_reach(SEXP xSEXP) {
+RcppExport SEXP _dbscan_dendrogram_to_reach(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -172,7 +203,7 @@ END_RCPP
 }
 // mst_to_dendrogram
 List mst_to_dendrogram(const NumericMatrix mst);
-RcppExport SEXP dbscan_mst_to_dendrogram(SEXP mstSEXP) {
+RcppExport SEXP _dbscan_mst_to_dendrogram(SEXP mstSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -183,7 +214,7 @@ END_RCPP
 }
 // mrd
 NumericVector mrd(NumericVector dm, NumericVector cd);
-RcppExport SEXP dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {
+RcppExport SEXP _dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -195,7 +226,7 @@ END_RCPP
 }
 // mrd_m
 NumericMatrix mrd_m(NumericMatrix dm, NumericVector cd);
-RcppExport SEXP dbscan_mrd_m(SEXP dmSEXP, SEXP cdSEXP) {
+RcppExport SEXP _dbscan_mrd_m(SEXP dmSEXP, SEXP cdSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -207,7 +238,7 @@ END_RCPP
 }
 // coreFromDist
 NumericVector coreFromDist(const NumericVector dist, const int n, const int minPts);
-RcppExport SEXP dbscan_coreFromDist(SEXP distSEXP, SEXP nSEXP, SEXP minPtsSEXP) {
+RcppExport SEXP _dbscan_coreFromDist(SEXP distSEXP, SEXP nSEXP, SEXP minPtsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -220,7 +251,7 @@ END_RCPP
 }
 // prims
 NumericMatrix prims(const NumericVector x_dist, const int n);
-RcppExport SEXP dbscan_prims(SEXP x_distSEXP, SEXP nSEXP) {
+RcppExport SEXP _dbscan_prims(SEXP x_distSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -232,7 +263,7 @@ END_RCPP
 }
 // order_
 IntegerVector order_(NumericVector x);
-RcppExport SEXP dbscan_order_(SEXP xSEXP) {
+RcppExport SEXP _dbscan_order_(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -243,7 +274,7 @@ END_RCPP
 }
 // hclustMergeOrder
 List hclustMergeOrder(NumericMatrix mst, IntegerVector o);
-RcppExport SEXP dbscan_hclustMergeOrder(SEXP mstSEXP, SEXP oSEXP) {
+RcppExport SEXP _dbscan_hclustMergeOrder(SEXP mstSEXP, SEXP oSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -255,7 +286,7 @@ END_RCPP
 }
 // dbscan_int
 IntegerVector dbscan_int(NumericMatrix data, double eps, int minPts, NumericVector weights, int borderPoints, int type, int bucketSize, int splitRule, double approx, List frNN);
-RcppExport SEXP dbscan_dbscan_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP weightsSEXP, SEXP borderPointsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {
+RcppExport SEXP _dbscan_dbscan_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP weightsSEXP, SEXP borderPointsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -275,7 +306,7 @@ END_RCPP
 }
 // dbscan_density_int
 IntegerVector dbscan_density_int(NumericMatrix data, double eps, int type, int bucketSize, int splitRule, double approx);
-RcppExport SEXP dbscan_dbscan_density_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+RcppExport SEXP _dbscan_dbscan_density_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -291,7 +322,7 @@ END_RCPP
 }
 // frNN_int
 List frNN_int(NumericMatrix data, double eps, int type, int bucketSize, int splitRule, double approx);
-RcppExport SEXP dbscan_frNN_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+RcppExport SEXP _dbscan_frNN_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -307,7 +338,7 @@ END_RCPP
 }
 // JP_int
 IntegerVector JP_int(IntegerMatrix nn, unsigned int kt);
-RcppExport SEXP dbscan_JP_int(SEXP nnSEXP, SEXP ktSEXP) {
+RcppExport SEXP _dbscan_JP_int(SEXP nnSEXP, SEXP ktSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -319,7 +350,7 @@ END_RCPP
 }
 // SNN_sim_int
 IntegerMatrix SNN_sim_int(IntegerMatrix nn);
-RcppExport SEXP dbscan_SNN_sim_int(SEXP nnSEXP) {
+RcppExport SEXP _dbscan_SNN_sim_int(SEXP nnSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -330,7 +361,7 @@ END_RCPP
 }
 // kNN_int
 List kNN_int(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
-RcppExport SEXP dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+RcppExport SEXP _dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -346,7 +377,7 @@ END_RCPP
 }
 // optics_int
 List optics_int(NumericMatrix data, double eps, int minPts, int type, int bucketSize, int splitRule, double approx, List frNN);
-RcppExport SEXP dbscan_optics_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {
+RcppExport SEXP _dbscan_optics_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -364,7 +395,7 @@ END_RCPP
 }
 // lowerTri
 IntegerVector lowerTri(IntegerMatrix m);
-RcppExport SEXP dbscan_lowerTri(SEXP mSEXP) {
+RcppExport SEXP _dbscan_lowerTri(SEXP mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -375,7 +406,7 @@ END_RCPP
 }
 // combine
 NumericVector combine(const NumericVector& t1, const NumericVector& t2);
-RcppExport SEXP dbscan_combine(SEXP t1SEXP, SEXP t2SEXP) {
+RcppExport SEXP _dbscan_combine(SEXP t1SEXP, SEXP t2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -387,7 +418,7 @@ END_RCPP
 }
 // concat_int
 IntegerVector concat_int(List const& container);
-RcppExport SEXP dbscan_concat_int(SEXP containerSEXP) {
+RcppExport SEXP _dbscan_concat_int(SEXP containerSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;

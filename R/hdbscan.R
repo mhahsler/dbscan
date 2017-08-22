@@ -41,6 +41,9 @@ hdbscan <- function(x, minPts, xdist = NULL,
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
   hc$call <- match.call()
 
+  ## Replace any zero-distances with the smallest possible value;
+  hc$height[hc$height == 0] = .Machine$double.eps;
+  
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
   res <- extractUnsupervised(res)

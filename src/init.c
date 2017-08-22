@@ -19,9 +19,9 @@ extern SEXP dbscan_dbscan_density_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_dbscan_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_dendrogram_to_reach(SEXP);
 extern SEXP dbscan_distToAdjacency(SEXP, SEXP);
-extern SEXP dbscan_extractSemiSupervised(SEXP, SEXP, SEXP, SEXP);
-extern SEXP dbscan_extractUnsupervised(SEXP, SEXP);
-extern SEXP dbscan_fosc(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP dbscan_extractSemiSupervised(SEXP, SEXP, SEXP);
+extern SEXP dbscan_extractUnsupervised(SEXP);
+extern SEXP dbscan_fosc(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_frNN_int(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dbscan_hclustMergeOrder(SEXP, SEXP);
 extern SEXP dbscan_JP_int(SEXP, SEXP);
@@ -51,9 +51,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"dbscan_dbscan_int",             (DL_FUNC) &dbscan_dbscan_int,             10},
     {"dbscan_dendrogram_to_reach",    (DL_FUNC) &dbscan_dendrogram_to_reach,     1},
     {"dbscan_distToAdjacency",        (DL_FUNC) &dbscan_distToAdjacency,         2},
-    {"dbscan_extractSemiSupervised",  (DL_FUNC) &dbscan_extractSemiSupervised,   4},
-    {"dbscan_extractUnsupervised",    (DL_FUNC) &dbscan_extractUnsupervised,     2},
-    {"dbscan_fosc",                   (DL_FUNC) &dbscan_fosc,                    9},
+    {"dbscan_extractSemiSupervised",  (DL_FUNC) &dbscan_extractSemiSupervised,   3},
+    {"dbscan_extractUnsupervised",    (DL_FUNC) &dbscan_extractUnsupervised,     1},
+    {"dbscan_fosc",                   (DL_FUNC) &dbscan_fosc,                    7},
     {"dbscan_frNN_int",               (DL_FUNC) &dbscan_frNN_int,                6},
     {"dbscan_hclustMergeOrder",       (DL_FUNC) &dbscan_hclustMergeOrder,        2},
     {"dbscan_JP_int",                 (DL_FUNC) &dbscan_JP_int,                  2},

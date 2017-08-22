@@ -34,3 +34,4 @@ License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and
     David Mount. All other code is copyright by Michael Hahsler and Matthew Piekenbrock.
 SystemRequirements: C++11
+RoxygenNote: 6.0.1

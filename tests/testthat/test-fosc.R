@@ -14,9 +14,8 @@ x_sl <- hclust(dist(x), "single")
 ## Should return augmented hclust object and cluster assignments 
 expect_length(extractFOSC(x_sl), 2)
 res <- extractFOSC(x_sl)
-expect_equal(res$hc$method, "single (w/ stability-based extraction)")
 
-## Constraint-checking 
+## Constraint-checking: only list should be used as adjacency list 
 expect_error(extractFOSC(x_sl, constraints = c("1" = 2)))
 
 ## Matrix inputs must be nxn 
@@ -27,12 +26,9 @@ expect_error(extractFOSC(x_sl, constraints = matrix(-2, nrow=nrow(x), ncol=nrow(
 
 ## Valid constraints 
 expect_warning(extractFOSC(x_sl, constraints = matrix(1, nrow=nrow(x), ncol=nrow(x))))
-expect_silent(extractFOSC(x_sl, constraints = list("1" = 2, "2" = 1)))
+expect_silent(extractFOSC(x_sl, constraints = list("1" = 2)))
 expect_silent(extractFOSC(x_sl, constraints = ifelse(dist(x) > 2, -1, 1)))
 
-## Constraints should be symmetric, but symmetry test is only done if specified. Asymmetric 
-## constraints through warning, but proceeds with manual warning 
-expect_output(extractFOSC(x_sl, constraints = list("1" = 2), validate_constraints = T), regexp = "Warning.*")
 
 ## Make sure that's whats returned
 res <- extractFOSC(x_sl)
@@ -48,7 +44,6 @@ res <- extractFOSC(x_sl, il_constraints)
 
 ## Positive-only constraints should link to best unsupervised solution 
 expect_equivalent(table(res$cluster), as.table(c("1" = 50L, "2" = 100L)))
-expect_equal(res$hc$method, "single (w/ constraint-based extraction)")
 
 ## Test negative constraints 
 set2 <- c(il_constraints[[as.character(set[1])]], -unlist(il_constraints[as.character(c(ver[1], vir[1]))], use.names = F))
@@ -59,7 +54,6 @@ res2 <- extractFOSC(x_sl, constraints = il_constraints2)
 
 ## Positive and Negative should produce a different solution 
 expect_false(all(res$cluster == res2$cluster))
-expect_equal(res2$hc$method, "single (w/ constraint-based extraction)")
 
 ## Test minPts parameters 
 expect_error(extractFOSC(x_sl, constraints = il_constraints2, minPts = 1))
@@ -69,7 +63,3 @@ expect_silent(extractFOSC(x_sl, constraints = il_constraints2, minPts = 5))
 expect_silent(extractFOSC(x_sl, constraints = il_constraints2, alpha = 0.5))
 expect_error(extractFOSC(x_sl, constraints = il_constraints2, alpha = 1.5))
 res3 <- extractFOSC(x_sl, constraints = il_constraints2, alpha = 0.5)
-expect_equal(res3$hc$method, "single (w/ mixed-objective extraction)")
-
-## Test unstable pruning 
-expect_silent(extractFOSC(x_sl, constraints = il_constraints2, prune_unstable = T))

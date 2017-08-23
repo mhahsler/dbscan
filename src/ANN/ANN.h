@@ -788,9 +788,10 @@ class DLL_API ANNkd_tree: public ANNpointSet {
 	ANNpointArray thePoints()			// return pointer to points
 	{  return pts;  }
 
+	// MJP 08/23/2017 
+	// Removed ostream from print methods 
 	virtual void Print(					// print the tree (for debugging)
-		ANNbool			with_pts,		// print points as well?
-		std::ostream&	out);			// output stream
+		ANNbool			with_pts);		// print points as well?
 
 	virtual void Dump(					// dump entire tree
 		ANNbool			with_pts,		// print points as well?

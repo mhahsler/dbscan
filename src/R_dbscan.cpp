@@ -12,6 +12,7 @@
 #include <Rcpp.h>
 #include "ANN/ANN.h"
 #include "R_regionQuery.h"
+#include "R_kd_tree.h"
 
 using namespace Rcpp;
 
@@ -24,7 +25,7 @@ using namespace Rcpp;
 IntegerVector dbscan_int(
     NumericMatrix data, double eps, int minPts, NumericVector weights,
     int borderPoints, int type, int bucketSize, int splitRule, double approx,
-    List frNN) {
+    List frNN, SEXP kd_tree) {
 
   // kd-tree uses squared distances
   double eps2 = eps*eps;
@@ -39,7 +40,7 @@ IntegerVector dbscan_int(
   if(frNN.size()) {
     // no kd-tree but use frNN list from distances
     nrow = frNN.size();
-  }else{
+  } else{
 
     // copy data for kd-tree
     nrow = data.nrow();
@@ -53,9 +54,15 @@ IntegerVector dbscan_int(
     //Rprintf("Points copied.\n");
 
     // create kd-tree (1) or linear search structure (2)
-    if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule) splitRule);
-    else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+    if (kd_tree == NULL || Rf_isNull(kd_tree)){
+      // Rcout << "Building kd tree" << std::endl; 
+      if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
+          (ANNsplitRule) splitRule);
+      else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+    } else {//Rcout << "Using pre-built kd tree" << std::endl; 
+      kdTree = getKdTree(kd_tree);  
+    }
+    
     //Rprintf("kd-tree ready. starting DBSCAN.\n");
   }
 
@@ -141,7 +148,8 @@ IntegerVector dbscan_int(
   }
 
   // cleanup
-  if(kdTree != NULL) {
+  // Only deallocate 'kdTree' if the passed argument 'kd_tree' was null
+  if(kd_tree == NULL || Rf_isNull(kd_tree)) {
     delete kdTree;
     annDeallocPts(dataPts);
     annClose();

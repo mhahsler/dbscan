@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+set.seed(665544)
+n <- 5000
+X_n <- cbind(
+  x = runif(10, 0, 10) + rnorm(n, mean = 0,  sd = 0.5),
+  y = runif(10, 0, 10) + rnorm(n, mean = 0, sd = 0.7), 
+  z = runif(10, 0, 10) + rnorm(n, mean = 0, sd = 0.8)
+  )
+X_n <- rbind(X_n, 
+  cbind(
+    x = runif(10, 0, 10) + rnorm(n, mean = 3,  sd = 0.5),
+    y = runif(10, 0, 10) + rnorm(n, mean = 3, sd = 0.7), 
+    z = runif(10, 0, 10) + rnorm(n, mean = 3, sd = 0.8)
+  ))
+
+library("microbenchmark")
+library("dbscan")
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15), times = 15)
+
+xn_kdtree <- kd_tree(X_n)
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15, kd_tree = xn_kdtree), times = 15)
+
+
+xn_kdtree1 <- kd_tree(X_n, bucketSize = 20, splitRule = "SL_FAIR")
+xn_kdtree2 <- kd_tree(X_n, bucketSize = 20, splitRule = "MIDPT")
+xn_kdtree3 <- kd_tree(X_n, bucketSize = 20, splitRule = "FAIR")
+xn_kdtree4 <- kd_tree(X_n, bucketSize = 20, splitRule = "SL_MIDPT")
+xn_kdtree5 <- kd_tree(X_n, bucketSize = 20, splitRule = "SL_FAIR")
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15, kd_tree = xn_kdtree1), times = 15)
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15, kd_tree = xn_kdtree2), times = 15)
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15, kd_tree = xn_kdtree3), times = 15)
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15, kd_tree = xn_kdtree4), times = 15)
+microbenchmark(dbscan(X_n, eps = 1.8, minPts = 15, kd_tree = xn_kdtree5), times = 15)
+```

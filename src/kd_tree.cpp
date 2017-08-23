@@ -33,6 +33,9 @@
 #include "kd_util.h"					// kd-tree utilities
 #include "ANN/ANNperf.h"				// performance evaluation
 
+// MJP 08/23/2017 
+// The only changes made to this file simply changing all 'out's to 'Rcout's 
+#include <Rcpp.h> 
 //----------------------------------------------------------------------
 //	Global data
 //
@@ -65,59 +68,61 @@ ANNkd_leaf				*KD_TRIVIAL = NULL;		// trivial leaf node
 //----------------------------------------------------------------------
 
 void ANNkd_split::print(				// print splitting node
-		int level,						// depth of node in tree
-		ostream &out)					// output stream
+		int level)						// depth of node in tree
 {
-	child[ANN_HI]->print(level+1, out);	// print high child
-	out << "    ";
+	child[ANN_HI]->print(level+1);	// print high child
+	Rcpp::Rcout << "    ";
 	for (int i = 0; i < level; i++)		// print indentation
-		out << "..";
-	out << "Split cd=" << cut_dim << " cv=" << cut_val;
-	out << " lbnd=" << cd_bnds[ANN_LO];
-	out << " hbnd=" << cd_bnds[ANN_HI];
-	out << "\n";
-	child[ANN_LO]->print(level+1, out);	// print low child
+	  Rcpp::Rcout << "..";
+	Rcpp::Rcout << "Split cd=" << cut_dim << " cv=" << cut_val;
+	Rcpp::Rcout << " lbnd=" << cd_bnds[ANN_LO];
+	Rcpp::Rcout << " hbnd=" << cd_bnds[ANN_HI];
+	Rcpp::Rcout << "\n";
+	child[ANN_LO]->print(level+1);	// print low child
 }
 
 void ANNkd_leaf::print(					// print leaf node
-		int level,						// depth of node in tree
-		ostream &out)					// output stream
+		int level)						// depth of node in tree
 {
 
-	out << "    ";
+  Rcpp::Rcout << "    ";
 	for (int i = 0; i < level; i++)		// print indentation
-		out << "..";
+	  Rcpp::Rcout << "..";
 
 	if (this == KD_TRIVIAL) {			// canonical trivial leaf node
-		out << "Leaf (trivial)\n";
+	  Rcpp::Rcout << "Leaf (trivial)\n";
 	}
 	else{
-		out << "Leaf n=" << n_pts << " <";
+	  Rcpp::Rcout << "Leaf n=" << n_pts << " <";
 		for (int j = 0; j < n_pts; j++) {
-			out << bkt[j];
-			if (j < n_pts-1) out << ",";
+		  Rcpp::Rcout << bkt[j];
+			if (j < n_pts-1) 	Rcpp::Rcout << ",";
 		}
-		out << ">\n";
+		Rcpp::Rcout << ">\n";
 	}
 }
 
 void ANNkd_tree::Print(					// print entire tree
-		ANNbool with_pts,				// print points as well?
-		ostream &out)					// output stream
+		ANNbool with_pts)				// print points as well?
 {
-	out << "ANN Version " << ANNversion << "\n";
+	//out << "ANN Version " << ANNversion << "\n";
 	if (with_pts) {						// print point coordinates
-		out << "    Points:\n";
+	  Rcpp::Rcout << "    Points:\n";
 		for (int i = 0; i < n_pts; i++) {
-			out << "\t" << i << ": ";
-			annPrintPt(pts[i], dim, out);
-			out << "\n";
+		  Rcpp::Rcout << "\t" << i << ": ";
+		  //annPrintPt(pts[i], dim);
+		  for (int j = 0; j < dim; j++) {
+		    Rcpp::Rcout << pts[j];
+		    if (j < dim-1) Rcpp::Rcout << " ";
+		  }
+
+			Rcpp::Rcout << "\n";
 		}
 	}
 	if (root == NULL)					// empty tree?
-		out << "    Null tree.\n";
+	  Rcpp::Rcout << "    Null tree.\n";
 	else {
-		root->print(0, out);			// invoke printing at root
+		root->print(0);			// invoke printing at root
 	}
 }
 

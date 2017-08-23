@@ -89,7 +89,7 @@ public:
 				int dim,						// dimension of space
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box);			// bounding box
-	virtual void print(int level, ostream &out);// print node
+	virtual void print(int level);// print node
 	virtual void dump(ostream &out);			// dump node
 
 	virtual void ann_search(ANNdist);			// standard search

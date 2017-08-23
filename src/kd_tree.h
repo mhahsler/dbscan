@@ -56,7 +56,7 @@ public:
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box) = 0;		// bounding box
 												// print node
-	virtual void print(int level, ostream &out) = 0;
+	virtual void print(int level) = 0;
 	virtual void dump(ostream &out) = 0;		// dump node
 
 	friend class ANNkd_tree;					// allow kd-tree to access us
@@ -107,7 +107,7 @@ public:
 				int dim,						// dimension of space
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box);			// bounding box
-	virtual void print(int level, ostream &out);// print node
+	virtual void print(int level);// print node
 	virtual void dump(ostream &out);			// dump node
 
 	virtual void ann_search(ANNdist);			// standard search
@@ -173,7 +173,7 @@ public:
 				int dim,						// dimension of space
 				ANNkdStats &st,					// statistics
 				ANNorthRect &bnd_box);			// bounding box
-	virtual void print(int level, ostream &out);// print node
+	virtual void print(int level);// print node
 	virtual void dump(ostream &out);			// dump node
 
 	virtual void ann_search(ANNdist);			// standard search

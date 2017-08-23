@@ -32,6 +32,8 @@
 
 #include "ANN/ANNperf.h"				// performance evaluation
 
+#include <Rcpp.h> // MJP 08/23/2017
+
 //----------------------------------------------------------------------
 //	Printing a bd-tree 
 //		These routines print a bd-tree.   See the analogous procedure
@@ -39,27 +41,26 @@
 //----------------------------------------------------------------------
 
 void ANNbd_shrink::print(				// print shrinking node
-		int level,						// depth of node in tree
-		ostream &out)					// output stream
+		int level)// depth of node in tree
 {
-	child[ANN_OUT]->print(level+1, out);		// print out-child
+	child[ANN_OUT]->print(level+1);		// print out-child
 
-	out << "    ";
+	Rcpp::Rcout << "    ";
 	for (int i = 0; i < level; i++)				// print indentation
-		out << "..";
-	out << "Shrink";
+	  Rcpp::Rcout << "..";
+	Rcpp::Rcout << "Shrink";
 	for (int j = 0; j < n_bnds; j++) {			// print sides, 2 per line
 		if (j % 2 == 0) {
-			out << "\n";						// newline and indentation
-			for (int i = 0; i < level+2; i++) out << "  ";
+		  Rcpp::Rcout << "\n";						// newline and indentation
+			for (int i = 0; i < level+2; i++) Rcpp::Rcout << "  ";
 		}
-		out << "  ([" << bnds[j].cd << "]"
+		Rcpp::Rcout << "  ([" << bnds[j].cd << "]"
 			 << (bnds[j].sd > 0 ? ">=" : "< ")
 			 << bnds[j].cv << ")";
 	}
-	out << "\n";
+	Rcpp::Rcout << "\n";
 
-	child[ANN_IN]->print(level+1, out);			// print in-child
+	child[ANN_IN]->print(level+1);			// print in-child
 }
 
 //----------------------------------------------------------------------

@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
-  ...) {
+                   kd_tree = NULL, ...) {
 
   if(is(x, "frNN") && missing(eps)) eps <- x$eps
 
@@ -87,10 +87,25 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
   if(length(frNN) > 0)
     frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
 
+  ## Check to see if kd tree was given as input 
+  kd_tree_inp <- kd_tree
+  if (missing(kd_tree) || is.null(kd_tree)){
+    kd_tree_inp <- NULL
+  } else {
+    if (!is(kd_tree, "kd_tree")) stop("object passed to 'kd_tree' parameter not a kd_tree object.")
+    
+    ## Extract the external pointer
+    kd_tree_inp <- attr(kd_tree, ".kd_tree_ptr")
+    if (class(kd_tree_inp) != "externalptr" || deparse(kd_tree_inp) == "<pointer: 0x0>"){
+      stop("kd_tree pointing to invalid memory location. Often this happens when a kd_tree R object 
+           is saved between R sessions. Please rebuild the tree.")
+    }
+  }
+  
   ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
     as.double(weights), as.integer(borderPoints),
     as.integer(search), as.integer(bucketSize),
-    as.integer(splitRule), as.double(approx), frNN)
+    as.integer(splitRule), as.double(approx), frNN, kd_tree_inp)
 
   structure(list(cluster = ret, eps = eps, minPts = minPts),
     class = c("dbscan_fast", "dbscan"))

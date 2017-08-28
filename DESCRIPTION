@@ -12,7 +12,7 @@ Description: A fast reimplementation of several density-based algorithms of
     the DBSCAN family for spatial data. Includes the DBSCAN (density-based spatial
     clustering of applications with noise) and OPTICS (ordering points to identify
     the clustering structure) clustering algorithms HDBSCAN (hierarchical DBSCAN) and the LOF (local outlier
-    factor) algorithm. The implementations uses the kd-tree data structure (from
+    factor) algorithm. The implementations use the kd-tree data structure (from
     library ANN) for faster k-nearest neighbor search. An R interface to fast kNN
     and fixed-radius NN search is also provided.
 Imports:

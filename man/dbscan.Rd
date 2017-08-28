@@ -66,7 +66,7 @@ neighborhood of a member of the cluster. Points which cannot be assigned to a
 cluster will be reported as members of the noise cluster 0.
 }
 \value{
-  A object of class 'dbscan_fast' with the following components:
+  An object of class 'dbscan_fast' with the following components:
     \item{eps }{ value of the eps parameter.}
     \item{minPts }{ value of the minPts parameter.}
     \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}

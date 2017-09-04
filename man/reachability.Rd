@@ -47,13 +47,13 @@ The original ordering algorithm OPTICS as described by Ankerst et al (1999) intr
 visualization. This representation was shown to essentially convey the same information as the more
 traditional dendrogram structure by Sanders et al (2003).
 
-Different hierarchical representations, such as dendrograms or reachability plots, may be preferable depending on the context. In smaller datasets, cluster memberships may be more easily identifeable through a dendrogram representation, particularly is the user is already familiar with tree-like representations. For larger datasets however, a reachability plot may be prefered for visualizing macro-level density relationships.
+Different hierarchical representations, such as dendrograms or reachability plots, may be preferable depending on the context. In smaller datasets, cluster memberships may be more easily identifiable through a dendrogram representation, particularly is the user is already familiar with tree-like representations. For larger datasets however, a reachability plot may be preferred for visualizing macro-level density relationships.
 
 The central idea behind a reachability plot is that the ordering in which points are plotted identifies
 underlying hierarchical density representation. OPTICS linearly orders the data points such that points which are spatially closest become neighbors in the ordering. Valleys represent clusters, which can be represented hierarchically. Although the ordering is crucial to the structure of the reachability plot, its important to note that OPTICS, like DBSCAN, is not entirely deterministic and, just like the dendrogram, isomorphisms may exist
 
 A variety of cluster extraction methods have been proposed using reachability plots. Because both cluster
-extraction depend directly on the ordering OPTICS produces, they are part of the optics interface. Noneless,
+extraction depend directly on the ordering OPTICS produces, they are part of the optics interface. Nonetheless,
 reachability plots can be created directly from other types of linkage trees, and vice versa.
 
 See \code{\link{optics}} for more information on how OPTICS is formulated. \code{\link{extractDBSCAN}} and \code{\link{extractXi}} are the two cluster extraction methods presented in the original OPTICS publication.

@@ -5,7 +5,7 @@
 DS3: Spatial data with arbitrary shapes
 }
 \description{
-  Contains 8000 2-d points, with 6 "natural" looking shapes, all of which have an sinesoid-like shape that intersects
+  Contains 8000 2-d points, with 6 "natural" looking shapes, all of which have an sinusoid-like shape that intersects
   with each cluster.
 }
 \usage{data("DS3")}

@@ -72,7 +72,7 @@ were given), the unsupervised solution is used as a tiebreaker. See Campello et 
 
 As a third option, if one wishes to prioritize the degree at which the unsupervised and semisupervised solutions
 contribute to the overall optimal solution, the parameter \eqn{\alpha} can be set to enable the extraction of
-clusters that maxmize the \emph{mixed} objective function
+clusters that maximize the \emph{mixed} objective function
 
 \deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))}{J = \alpha S(Ci) + (1 - \alpha) \gamma(Ci).}
 
@@ -86,7 +86,7 @@ The parameters to the input function correspond to the concepts discussed above.
 represent the minimum cluster size to extract. The optional \code{constraints} parameter contains the pairwise,
 instance-level constraints of the data. The optional \code{alpha} parameters controls whether the mixed objective
 function is used (if \code{alpha} is greater than 0). If the \code{validate_constraints} parameter is set to true,
-the constraints are checked (and fixed) for symmetry (if point A has a should-link contraint with point B, point
+the constraints are checked (and fixed) for symmetry (if point A has a should-link constraint with point B, point
 B should also have the same constraint). Asymmetric constraints are not supported.
 
 Unstable branch pruning was not discussed by Campello et al (2013), however in some data sets it may be the case that specific

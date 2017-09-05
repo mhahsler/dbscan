@@ -21,7 +21,7 @@ kNNdistplot(x, k = 4, ...)
   \item{...}{further arguments are passed on to \code{kNN}.}
   }
 \details{
-See \code{\link{kNN}} for a discusion of the kd-tree related parameters.
+See \code{\link{kNN}} for a discussion of the kd-tree related parameters.
 }
 \value{
 \code{kNNdist} returns a numeric vector with the distance to its k nearest

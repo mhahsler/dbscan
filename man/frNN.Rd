@@ -44,7 +44,7 @@ for each point and \code{eps} (see below).
 An object of class frNN (subclass of NN) containing a list with the following components:
   \item{id }{a list of integer vectors. Each vector contains the ids
   of the fixed radius nearest neighbors. }
-  \item{dist }{a list with distances (same stucture as \code{ids}). }
+  \item{dist }{a list with distances (same structure as \code{ids}). }
   \item{eps }{ eps used. }
 %% ...
 }

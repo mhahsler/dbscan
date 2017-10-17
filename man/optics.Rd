@@ -23,7 +23,7 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix, a distance matrix.}
+  \item{x}{ a data matrix or a dist object.}
   \item{eps}{ upper limit of the size of the epsilon neighborhood. Limiting the
     neighborhood size improves performance and has no or very little impact on
     the ordering as long as it is not set too low.}

@@ -162,7 +162,7 @@ res$clusters_xi
 
 ### use OPTICS on a precomputed distance matrix
 d <- dist(x)
-res <- optics(x, eps = 1, minPts = 10)
+res <- optics(d, eps = 1, minPts = 10)
 plot(res)
 }
 \keyword{ model }

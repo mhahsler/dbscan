@@ -16,7 +16,7 @@ Description: A fast reimplementation of several density-based algorithms of
     library ANN) for faster k-nearest neighbor search. An R interface to fast kNN
     and fixed-radius NN search is also provided.
 Imports:
-    Rcpp,
+    Rcpp (>= 0.12.12),
     graphics,
     stats,
     methods

@@ -6,7 +6,7 @@
 Calculate and plot the k-Nearest Neighbor Distance
 }
 \description{
-Fast caclulation of the k-nearest neighbor distances in a matrix of points.
+Fast calculation of the k-nearest neighbor distances in a matrix of points.
 The plot can be used to help find a suitable value for the
 \code{eps} neighborhood for DBSCAN. Look for the knee in the plot.
 }

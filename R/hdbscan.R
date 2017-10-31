@@ -20,21 +20,28 @@
 hdbscan <- function(x, minPts, xdist = NULL,
   gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
 
-  if(!is(x, "dist")) {
+  if(.matrixlike(x) && !is(x, "dist")) {
     x <- as.matrix(x)
-    if (!is.numeric(x)) stop("hdbscan expects numerical data")
-  }
-  core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
+    if (!storage.mode(x) %in% c("integer", "double")) stop("hdbscan expects numerical data")
 
-  if(!is(x, "dist"))
-    if(!is.null(xdist)) euc_dist <- xdist else euc_dist <- dist(x)
-  else euc_dist <- x
-
-  if(is.null(attr(euc_dist, "method")) || attr(euc_dist, "method") != "euclidean") warning("Distances do not use the required Euclidean metric.")
-  n <- attr(euc_dist, "Size")
+    ## x is a point cloud. Whether xdist is given or not, need all the distances. 
+    if (missing(xdist)){ 
+      core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
+      xdist <- dist(x, method = "euclidean") 
+    } else if (is(xdist, "dist")) {
+      core_dist <- kNNdist(xdist, k = minPts - 1)[, minPts - 1] 
+    }
+  } else if (is(x, "dist") && missing(xdist)) {
+    ## let kNNdist handle the any non-euclidean knn-queries
+    xdist <- x
+    core_dist <- kNNdist(xdist, k = minPts - 1)[, minPts - 1] 
+  } else{ stop("hdbscan expects a matrix-coercible object of numerical data, and xdist to be a 'dist' object (or not supplied).") }
+  
+  ## At this point, xdist should be a dist object. 
+  n <- attr(xdist, "Size")
 
   ## Mutual Reachability matrix
-  mrd <- mrd(euc_dist, core_dist)
+  mrd <- mrd(xdist, core_dist)
 
   ## Get MST, convert to RSL representation
   mst <- prims(mrd, n)

@@ -23,7 +23,7 @@ hdbscan(x, minPts, xdist = NULL,
 \arguments{
   \item{x}{a data matrix or a dist object. }
   \item{minPts}{ integer; Minimum size of clusters. See details. }
-  \item{xdist}{ a precomputed dist object (Euclidean required) to reduce computation time. }
+  \item{xdist}{ an optional precomputed dist object. May reduce computation time if supplied. }
   \item{gen_hdbscan_tree}{ logical; should the robust single linkage tree be
   explicitly computed. (see cluster tree in Chaudhuri et al, 2010).}
   \item{gen_simplified_tree}{ logical; should the simplified hierarchy be

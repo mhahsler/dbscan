@@ -38,7 +38,7 @@ of its own kNN neighborhood. The range for the shared nearest neighbors is
 [0,k].
 }
 \value{
-An object of class sNN containing a list with the following components:
+An object of class sNN (subclass of kNN and NN) containing a list with the following components:
   \item{id }{a matrix with ids. }
   \item{dist }{a matrix with the distances. }
   \item{shared }{a matrix with the number of shared nearest neighbors. }

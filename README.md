@@ -5,23 +5,29 @@
 [![Travis-CI Build Status](https://travis-ci.org/mhahsler/dbscan.svg?branch=master)](https://travis-ci.org/mhahsler/dbscan)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
 
- This R package provides a fast C++ reimplementation of several density-based algorithms of the DBSCAN 
- family for spatial data. 
- The package includes: 
+This R package provides a fast C++ (re)implementation of several density-based algorithms with a focus on the DBSCAN family for clustering spatial data.
+The package includes: 
  
-* __DBSCAN:__ Density-based spatial clustering of applications with noise.
-* __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure clustering algorithms.
-* __HDBSCAN:__  Hierarchical DBSCAN with simplified hierarchy extraction.
-* __LOF:__ Local outlier factor algorithm. 
-* __GLOSH:__ Global-Local Outlier Score from Hierarchies algorithm. 
+__Clustering__
 
-The implementations uses the kd-tree data 
- structure (from library ANN) for faster k-nearest neighbor search. 
- An R interface to __fast kNN and fixed-radius NN search__ is provided along with __Jarvis-Patrick clustering__ and __Shared Nearest Neighbor Clustering.__ Additionally, a fast implementation of the __Framework for Optimal Selection of Clusters (FOSC)__ is
- available that supports unsupervised and semisupervised clustering of hierarchical cluster tree ('hclust' object). 
- Supports any arbitrary linkage criterion. 
+- __DBSCAN:__ Density-based spatial clustering of applications with noise.
+- __HDBSCAN:__  Hierarchical DBSCAN with simplified hierarchy extraction.
+- __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure clustering algorithms.
+- __FOSC:__ Framework for Optimal Selection of Clusters for unsupervised and semisupervised clustering of hierarchical cluster tree.
+- __Jarvis-Patrick clustering__
+- __SNN Clustering__: Shared Nearest Neighbor Clustering.
 
-The implementations are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
+__Outlier Detection__
+
+- __LOF:__ Local outlier factor algorithm. 
+- __GLOSH:__ Global-Local Outlier Score from Hierarchies algorithm. 
+
+__Fast Nearest-Neighbor Search (using kd-trees)__
+
+- __kNN search__
+- __Fixed-radius NN search__
+
+The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
 implementations in [WEKA](http://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](http://scikit-learn.org/).
 
 ## Installation

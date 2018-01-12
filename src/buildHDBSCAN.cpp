@@ -6,6 +6,7 @@ using namespace Rcpp;
 #include <unordered_map>
 #include <stack>
 #include <queue>
+#include <string> // std::atoi 
 
 // Helper functions 
 #include "utilities.h"
@@ -629,7 +630,7 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
   // Base case: at a leaf
   if (!cl_hierarchy.containsElementNamed(cid.c_str())){
     List cl = cl_tree[cid];
-    sc.push_back(stoi(cid)); // assume the leaf will be a salient cluster until proven otherwise
+    sc.push_back(std::atoi(cid.c_str())); // assume the leaf will be a salient cluster until proven otherwise
     return(NumericVector::create((double) cl["stability"], 
                                  (double) useVirtual ? cl["vscore"] : 0));  
   } else {
@@ -704,11 +705,11 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
     
     // Prune children and add parent (cid) if need be
     if (!keep_children && cid != "0") {
-      IntegerVector children = all_children(cl_hierarchy, stoi(cid)); // use all_children to prune subtrees
+      IntegerVector children = all_children(cl_hierarchy, std::atoi(cid.c_str())); // use all_children to prune subtrees
       for (int i = 0, clen = children.length(); i < clen; ++i){
         sc.remove(children.at(i)); // use list for slightly better random deletion performance
       }
-      sc.push_back(stoi(cid));
+      sc.push_back(std::atoi(cid.c_str()));
     } else if (keep_children && prune_unstable_leaves){
       // If flag passed, prunes leaves with insignificant stability scores
       // this can happen in cases where one leaf has a stability score significantly greater 

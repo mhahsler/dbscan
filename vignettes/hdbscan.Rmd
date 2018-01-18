@@ -9,15 +9,15 @@ header-includes: \usepackage{animation}
 output: html_document
 ---
 The dbscan package includes a fast implementation of Hierarchical DBSCAN (HDBSCAN) and its related algorithm(s) for the 
-R platform. This vignette introduces how to interface with these features. To understand how HDBSCAN works, there is an excellent Python Notebook resource that goes over te basic concepts of the algorithm (see [ the SciKit-learn docs](http://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)). For the sake of simplicity, consider the same sample 
-data set from the notebook:
+R platform. This vignette introduces how to interface with these features. To understand how HDBSCAN works, we refer to an excellent Python Notebook resource that goes over the basic concepts of the algorithm (see [ the SciKit-learn docs](http://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)). For the sake of simplicity, consider the same sample 
+dataset from the notebook:
 ```{r}
 library("dbscan")
 data("moons")
 plot(moons, pch=20)
 ```
 
-To run the HDBSCAN algorithm, simply pass the data set and the (single) parameter value 'minPts' to the hdbscan function. 
+To run the HDBSCAN algorithm, simply pass the dataset and the (single) parameter value 'minPts' to the hdbscan function. 
 
 ```{r}
   cl <- hdbscan(moons, minPts = 5)
@@ -68,7 +68,7 @@ print(all(check == T))
 ```
 
 ## Simplified Tree
-The HDBSCAN\* hierarchy is useful, but for larger data sets it can become overly cumbersome, since every data point is represented as a leaf somewhere in the hierarchy. The hdbscan object comes with a powerful visualization tool that plots the 'simplified' hierarchy(see [2] for more details), which shows __cluster wide__ changes over an infinite number of $eps$ thresholds. It is the default visualization dispatched by the 'plot' method
+The HDBSCAN\* hierarchy is useful, but for larger datasets it can become overly cumbersome since every data point is represented as a leaf somewhere in the hierarchy. The hdbscan object comes with a powerful visualization tool that plots the 'simplified' hierarchy(see [2] for more details), which shows __cluster-wide__ changes over an infinite number of $eps$ thresholds. It is the default visualization dispatched by the 'plot' method
 ```{r}
  plot(cl)
 ```
@@ -89,7 +89,7 @@ plot(cl, gradient = c("purple", "blue", "green", "yellow"), show_flat = T)
 ```
 
 ## Cluster Stability Scores
-Note the stability scores correspond to the labels on the condensed tree, but the cluster assignments in the cluster member element does not correspond to the labels in the condensed tree. Also note that these scores represent the stability scores _before_ the traversal up the tree that updates the scores based on the children. 
+Note the stability scores correspond to the labels on the condensed tree, but the cluster assignments in the cluster member element do not correspond to the labels in the condensed tree. Also, note that these scores represent the stability scores _before_ the traversal up the tree that updates the scores based on the children. 
 ```{r}
 print(cl$cluster_scores)
 ```
@@ -120,10 +120,10 @@ __Note:__ Because of the distinction made that noise points, points that _are no
 ```
 
 ## A Larger Clustering Example 
-A larger example data set may be more beneficial in explicitly revealing the usefulness of HDSBCAN. Consider the 'DS3' 
-data set originally published as part of a benchmark test data set for the Chameleon clustering algorithm [5]. It's
-clear that the shapes in this data set can be distinguished sufficiently well by a human, however it's well known that 
-many clustering algorithm fail to capture the intuitive structure. 
+A larger example dataset may be more beneficial in explicitly revealing the usefulness of HDSBCAN. Consider the 'DS3' 
+dataset originally published as part of a benchmark test dataset for the Chameleon clustering algorithm [5]. It's
+clear that the shapes in this dataset can be distinguished sufficiently well by a human, however, it is well known that 
+many clustering algorithms fail to capture the intuitive structure. 
 ```{r}
 data("DS3")
 plot(DS3, pch=20, cex=0.25)
@@ -135,7 +135,7 @@ cl2 <- hdbscan(DS3, minPts = 25)
 cl2
 ```
 
-Marking the noise appropriately and highlighting points based on their 'membership probabilities' as before, a nice visualization of the cluster structure can be easily crafted.   
+Marking the noise appropriately and highlighting points based on their 'membership probabilities' as before, a visualization of the cluster structure can be easily crafted.   
 ```{r}
   plot(DS3, col=cl2$cluster+1, 
        pch=ifelse(cl2$cluster == 0, 8, 1), # Mark noise as star
@@ -146,7 +146,7 @@ Marking the noise appropriately and highlighting points based on their 'membersh
   points(DS3, col=colors, pch=20)
 ```
 
-The simplified tree can be particularly useful for larger data sets  
+The simplified tree can be particularly useful for larger datasets  
 ```{r}
   plot(cl2, scale = 3, gradient = c("purple", "orange", "red"), show_flat = T)
 ```

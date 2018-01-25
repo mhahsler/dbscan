@@ -66,12 +66,12 @@ dbcv <- function(x, cl, xdist = NULL){
     idx <- combn(length(cl_idx), 2L)
     idx <- cbind(cl_idx[idx[1,]], cl_idx[idx[2,]])
     ## You can verify with all(dist(x[cl_idx,])^2 == xdist[(INDEX_TF(n, idx[, 1] - 1, idx[, 2] - 1))+1])
-    dbscan:::mrd(dm = xdist[(INDEX_TF(n, idx[, 1] - 1, idx[, 2] - 1))+1], cl_cd) 
+    mrd(dm = xdist[(INDEX_TF(n, idx[, 1] - 1, idx[, 2] - 1))+1], cl_cd) 
   }, cl_ids_idx, all_pts_cd, SIMPLIFY = FALSE)
   
   ## Mutual reachability MSTs
   mrd_graphs <- mapply(function(cl_idx, cl_mrd){ 
-    mst <- dbscan:::prims(x_dist = cl_mrd, n = length(cl_idx))
+    mst <- prims(x_dist = cl_mrd, n = length(cl_idx))
     mst[order(mst[, 3]),] # return mst ordered by edge weight
   }, cl_ids_idx, mrd_dist, SIMPLIFY = FALSE)
   

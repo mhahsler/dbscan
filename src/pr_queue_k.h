@@ -83,7 +83,13 @@ public:
 
 	~ANNmin_k()							// destructor
 		{ delete [] mk; }
-	
+  
+  // MJP 01/24/2018 
+	void reset(){
+	  n = 0; 
+	  for (int i = 0; i < k; ++i){ mk[i] = mk_node(); }
+	}
+  
 	PQKkey ANNmin_key()					// return minimum key
 		{ return (n > 0 ? mk[0].key : PQ_NULL_KEY); }
 	

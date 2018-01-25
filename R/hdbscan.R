@@ -23,14 +23,7 @@ hdbscan <- function(x, minPts, xdist = NULL,
   if(.matrixlike(x) && !is(x, "dist")) {
     x <- as.matrix(x)
     if (!storage.mode(x) %in% c("integer", "double")) stop("hdbscan expects numerical data")
-
-    ## x is a point cloud. Whether xdist is given or not, need all the distances. 
-    if (missing(xdist)){ 
-      core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
-      xdist <- dist(x, method = "euclidean") 
-    } else if (is(xdist, "dist")) {
-      core_dist <- kNNdist(xdist, k = minPts - 1)[, minPts - 1] 
-    }
+    core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
   } else if (is(x, "dist") && missing(xdist)) {
     ## let kNNdist handle the any non-euclidean knn-queries
     xdist <- x

@@ -11,9 +11,6 @@ using namespace Rcpp;
 // Helper functions 
 #include "utilities.h"
 
-// Macros
-#define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
-
 // Given a dist vector of "should-link" (1), "should-not-link" (-1), and "don't care" (0) 
 // constraints in the form of integers, convert constraints to a more compact adjacency list 
 // representation. 

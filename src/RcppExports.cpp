@@ -181,6 +181,41 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// intToStr
+StringVector intToStr(IntegerVector iv);
+RcppExport SEXP _dbscan_intToStr(SEXP ivSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type iv(ivSEXP);
+    rcpp_result_gen = Rcpp::wrap(intToStr(iv));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dspc
+NumericMatrix dspc(List config);
+RcppExport SEXP _dbscan_dspc(SEXP configSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type config(configSEXP);
+    rcpp_result_gen = Rcpp::wrap(dspc(config));
+    return rcpp_result_gen;
+END_RCPP
+}
+// knn_dist
+List knn_dist(NumericVector dist_x, const int k, int all);
+RcppExport SEXP _dbscan_knn_dist(SEXP dist_xSEXP, SEXP kSEXP, SEXP allSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type dist_x(dist_xSEXP);
+    Rcpp::traits::input_parameter< const int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type all(allSEXP);
+    rcpp_result_gen = Rcpp::wrap(knn_dist(dist_x, k, all));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mrd
 NumericVector mrd(NumericVector dm, NumericVector cd);
 RcppExport SEXP _dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {

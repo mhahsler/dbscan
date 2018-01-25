@@ -38,6 +38,8 @@ extern SEXP _dbscan_reach_to_dendrogram(SEXP, SEXP);
 extern SEXP _dbscan_simplifiedTree(SEXP);
 extern SEXP _dbscan_SNN_sim_int(SEXP);
 extern SEXP _dbscan_validateConstraintList(SEXP, SEXP);
+extern SEXP _dbscan_dspc(SEXP);
+extern SEXP _dbscan_knn_dist(SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
   {"_dbscan_all_children",           (DL_FUNC) &_dbscan_all_children,            3},
@@ -70,6 +72,8 @@ static const R_CallMethodDef CallEntries[] = {
   {"_dbscan_simplifiedTree",         (DL_FUNC) &_dbscan_simplifiedTree,          1},
   {"_dbscan_SNN_sim_int",            (DL_FUNC) &_dbscan_SNN_sim_int,             1},
   {"_dbscan_validateConstraintList", (DL_FUNC) &_dbscan_validateConstraintList,  2},
+  {"_dbscan_dspc",                   (DL_FUNC) &_dbscan_dspc,  1},
+  {"_dbscan_knn_dist",               (DL_FUNC) &_dbscan_knn_dist,  3},
   {NULL, NULL, 0}
 };
 

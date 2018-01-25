@@ -57,6 +57,18 @@ mst_to_dendrogram <- function(mst) {
     .Call('_dbscan_mst_to_dendrogram', PACKAGE = 'dbscan', mst)
 }
 
+intToStr <- function(iv) {
+    .Call('_dbscan_intToStr', PACKAGE = 'dbscan', iv)
+}
+
+dspc <- function(config) {
+    .Call('_dbscan_dspc', PACKAGE = 'dbscan', config)
+}
+
+knn_dist <- function(dist_x, k, all) {
+    .Call('_dbscan_knn_dist', PACKAGE = 'dbscan', dist_x, k, all)
+}
+
 mrd <- function(dm, cd) {
     .Call('_dbscan_mrd', PACKAGE = 'dbscan', dm, cd)
 }

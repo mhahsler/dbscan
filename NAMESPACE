@@ -29,7 +29,8 @@ export(
   glosh,
   pointdensity,
   hullplot,
-  as.reachability
+  as.reachability, 
+  dbcv
 )
 
 S3method(print, optics)

@@ -1,0 +1,56 @@
+---
+title: "Density-based Cluster Validation"
+output: html_notebook
+---
+
+```{r}
+set.seed(2)
+gen_square <- function(n, sd){
+  x <- cbind(
+    x = replicate(n, expr = runif(1, max = sd)) + rnorm(n, mean = c(0, 5, 5, 0), sd = sd),
+    y = replicate(n, expr = runif(1, max = sd)) + rnorm(n, mean = c(0, 0, 5, 5), sd = sd)
+  )
+  true_clusters <- rep(1:4, time = n/4)
+  return(list(x=x, cl = true_clusters))
+}
+```
+
+
+```{r}
+sds <- c(0.1, 0.5, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 1, 1.5, 2, 5)
+test <- lapply(sds, function(sd_i) gen_square(400, sd_i))
+layout(matrix(c(1:12), nrow = 3, ncol = 4, byrow = TRUE))
+invisible(lapply(test, function(t1){
+  plot(t1$x, col = t1$cl, pch = t1$cl, main = sprintf("DBCV: %.6s", dbscan::dbcv(x = t1$x, cl = t1$cl)))
+}))
+```
+
+```{r}
+dbscan::dbcv(x = test[[3]]$x, cl = test[[3]]$cl) 
+```
+
+
+```{r}
+data("spiral")
+plot(spiral[, 1:2], col = spiral[, 3], main = sprintf("DBCV: %0.4s", dbscan::dbcv(spiral[, 1:2], cl = spiral[, 3])))
+```
+
+```{r}
+## Mimicking the test scenario done in the paper
+minPts <- seq(4, 20, by = 2)
+iris_dist <- dist(iris[, 1:4])
+eps <- seq(min(iris_dist), max(iris_dist), length.out = 1000L)
+
+params <- expand.grid(minPts=minPts, eps=eps)
+cl_res <- mapply(function(mp_i, eps_i){
+  dbscan::dbscan(x = iris[, 1:4], minPts = mp_i, eps = eps_i)
+}, params[, 1], params[, 2], SIMPLIFY = FALSE)
+
+
+ari_values <- sapply(cl_res, function(cl) mclust::adjustedRandIndex(x = cl$cluster, y = iris[,5]))
+dbcv_values <- sapply(cl_res, function(cl) dbscan::dbcv(x = iris[,1:4], cl = cl$cluster, xdist = iris_dist))
+ari_values[which.max(dbcv_values)]
+plot(iris[, 1:4], col = cl_res[[which.max(dbcv_values)]]$cluster + 1)
+
+```
+

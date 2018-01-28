@@ -24,6 +24,11 @@ dbcv <- function(x, cl, xdist = NULL){
   if (!.matrixlike(x)) { stop("'dbcv' expects x needs to be a matrix to calculate distances.") }
   if (!missing(xdist) && !is(xdist, 'dist')) { stop("'dbcv' expects xdist to be a dist object, if given.") }
   if (!missing(xdist) && attr(xdist, "method") != "euclidean") { stop("Only euclidean distance is supported.") }
+  
+  ## In DBCV, singletons are ambiguously defined. However, the cannot be considered valid clusters, for reasons 
+  ## listed in section 4 of the original paper. To ensure coverage, they are assigned into the noise category. 
+  cl_freq <- table(cl)
+  cl[which(cl %in% as.integer(names(cl_freq[cl_freq == 1])))] <- 0L
   if (all(cl == 0)){ return(0) }
   
   ## Basic info
@@ -45,12 +50,14 @@ dbcv <- function(x, cl, xdist = NULL){
   
   ## Get the all-points-core-distance for each point, within each cluster
   all_pts_cd <- lapply(cl_ids_idx, function(cl_idx){
+    if (length(cl_idx) == 1){ return(0) }
     cl_x <- x[cl_idx,] # cluster point coordinates
     cl_n <- nrow(cl_x) # number of points in the cluster
     # cl_knn <- kNN(cl_x, k = cl_n - 1) # KNN distances 
     # cl_knn_dist <- cl_knn$dist^2 # KNN dist (NOTE: squared euclidean)
     dist_cl <- as.matrix(dist(cl_x, method = "euclidean")^2)
     apply(dist_cl, 1, function(i_all_knn) {
+      if (all(i_all_knn == 0)){ return(0) }
       (sum((1/i_all_knn[i_all_knn != 0])^dim_x)/(cl_n-1))^(-1/dim_x) # Note the squared euclidean distance
     })
   })
@@ -72,7 +79,7 @@ dbcv <- function(x, cl, xdist = NULL){
   ## Mutual reachability MSTs
   mrd_graphs <- mapply(function(cl_idx, cl_mrd){ 
     mst <- prims(x_dist = cl_mrd, n = length(cl_idx))
-    mst[order(mst[, 3]),] # return mst ordered by edge weight
+    matrix(mst[order(mst[, 3]),], ncol = 3) # return mst ordered by edge weight
   }, cl_ids_idx, mrd_dist, SIMPLIFY = FALSE)
   
   ## Get the indices of the points making up the internal nodes of the MSTs
@@ -93,9 +100,9 @@ dbcv <- function(x, cl, xdist = NULL){
   }, mrd_graphs, internal_nodes)
   
   ## Density Separation of a Pair of Clusters (DSPC) [per cluster pair]
-  node_ids <- mapply(function(idx, i) cl_ids_idx[[i]][idx], internal_nodes, 1:n_cl, SIMPLIFY = FALSE)
+  node_ids <- mapply(function(idx, i) if(length(idx) == 0) cl_ids_idx[[i]] else cl_ids_idx[[i]][idx], internal_nodes, 1:n_cl, SIMPLIFY = FALSE)
   config <- list(n = n, ncl = n_cl, n_pairs = choose(n_cl, 2), node_ids = node_ids, acp = acp_dist_map, xdist = xdist)
-  dspc_mat <- dspc(config = config) ## Computationally intensive
+  dspc_mat <- dspc(config = config) ## O(n^4); Computationally intensive
 
   ## Validity index [Vc(C_i)]; callable for a given cluster
   v_c <- function(i) {

@@ -54,6 +54,7 @@ NumericMatrix dspc(List config) {
   int c = 0; 
   for (int ci = 0; ci < ncl; ++ci) {
     for (int cj = (ci+1); cj < ncl; ++cj){
+      Rcpp::checkUserInterrupt();
       IntegerVector i_idx = node_ids[ci], j_idx = node_ids[cj]; // i and j cluster point indices
       for (IntegerVector::iterator i = i_idx.begin(); i != i_idx.end(); ++i){
         for (IntegerVector::iterator j = j_idx.begin(); j != j_idx.end(); ++j){

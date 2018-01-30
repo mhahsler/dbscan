@@ -14,7 +14,7 @@
   algorithm using a kd-tree.
 }
 \usage{
-optics(x, eps, minPts = 5, ...)
+optics(x, eps = NULL, minPts = 5, ...)
 
 extractDBSCAN(object, eps_cl)
 extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
@@ -26,10 +26,10 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
   \item{x}{ a data matrix or a dist object.}
   \item{eps}{ upper limit of the size of the epsilon neighborhood. Limiting the
     neighborhood size improves performance and has no or very little impact on
-    the ordering as long as it is not set too low.}
+    the ordering as long as it is not set too low. If not specified, the largest minPts-distance in the data set is used which gives the same result as infinity. }
   \item{minPts}{ the parameter is used to identify dense neighborhoods
     and the reachability distance is calculated as the distance to the
-    minPts nearest neighbor. Default is 5 points.}
+    minPts nearest neighbor. Controls the smoothness of the reachability distribution. Default is 5 points.}
   \item{eps_cl}{ Threshold to identify clusters (eps_cl <= eps).}
   \item{xi}{ Steepness threshold to identify clusters hierarchically using
     the Xi method.}
@@ -123,8 +123,8 @@ x <- cbind(
 
 plot(x, col=rep(1:4, time = 100))
 
-### run OPTICS
-res <- optics(x, eps = 10,  minPts = 10)
+### run OPTICS (Note: we use the default eps calculation)
+res <- optics(x, minPts = 10)
 res
 
 ### get order
@@ -162,7 +162,7 @@ res$clusters_xi
 
 ### use OPTICS on a precomputed distance matrix
 d <- dist(x)
-res <- optics(d, eps = 1, minPts = 10)
+res <- optics(d, minPts = 10)
 plot(res)
 }
 \keyword{ model }

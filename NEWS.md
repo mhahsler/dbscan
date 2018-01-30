@@ -1,5 +1,8 @@
 # dbscan 1.1-2 (2017-xx-xx)
 
+## New Features
+* OPTICS now calculated eps if it is ommited.
+
 ## Bugfix
 
 * Example now only uses igraph conditionally since it is unavailable 

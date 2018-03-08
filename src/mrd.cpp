@@ -5,7 +5,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector mrd(NumericVector dm, NumericVector cd) {
   NumericVector res = NumericVector(dm.length());
-  int n = cd.length();
+  const int n = cd.length();
   for (int i = 0, c_ = 0; i < n; ++i) {
     for (int j = i+1; j < n; ++j) {
       res[c_] = std::max(dm[c_], std::max(cd[i], cd[j]));

@@ -20,7 +20,7 @@
 ## Macro to allow indexing into lower-triangular. Useful for indexing distances in 'dist' objects.
 INDEX_TF <- function(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1) ## 0-based!
 
-dbcv <- function(x, cl, xdist = NULL){
+dbcv <- function(x, cl, xdist = NULL, squared=TRUE){
   if (!.matrixlike(x)) { stop("'dbcv' expects x needs to be a matrix to calculate distances.") }
   if (!missing(xdist) && !is(xdist, 'dist')) { stop("'dbcv' expects xdist to be a dist object, if given.") }
   if (!missing(xdist) && attr(xdist, "method") != "euclidean") { stop("Only euclidean distance is supported.") }
@@ -32,7 +32,9 @@ dbcv <- function(x, cl, xdist = NULL){
   if (all(cl == 0)){ return(0) }
   
   ## Basic info
-  xdist <- if (!missing(xdist)) xdist else dist(x, method = "euclidean")^2 # Note the use of squared euclidean
+  if (missing(xdist) || is.null(xdist)) { 
+    xdist <- dist(x, method = "euclidean")^(ifelse(squared, 2, 1)) ## use squared if flagged
+  }
   n <- nrow(x)                    # number of coordinates
   dim_x <- ncol(x)                # dimensionality of space
   cl_ids <- unique(cl)            # all cluster ids
@@ -49,38 +51,19 @@ dbcv <- function(x, cl, xdist = NULL){
   cl_ids_idx <- lapply(cl_valid, function(id) sort(which(cl == id))) ## the sort is important for indexing purposes
   
   ## Get the all-points-core-distance for each point, within each cluster
-  all_pts_cd <- lapply(cl_ids_idx, function(cl_idx){
-    if (length(cl_idx) == 1){ return(0) }
-    cl_x <- x[cl_idx,] # cluster point coordinates
-    cl_n <- nrow(cl_x) # number of points in the cluster
-    # cl_knn <- kNN(cl_x, k = cl_n - 1) # KNN distances 
-    # cl_knn_dist <- cl_knn$dist^2 # KNN dist (NOTE: squared euclidean)
-    dist_cl <- as.matrix(dist(cl_x, method = "euclidean")^2)
-    apply(dist_cl, 1, function(i_all_knn) {
-      if (all(i_all_knn == 0)){ return(0) }
-      (sum((1/i_all_knn[i_all_knn != 0])^dim_x)/(cl_n-1))^(-1/dim_x) # Note the squared euclidean distance
-    })
-  })
+  all_pts_cd <- all_pts_core(x, cl_ids_idx, squared)
   
   ## Given an original point index 'idx', retrieve it's all point core distance
-  acp_dist_map <- structure(unlist(all_pts_cd), names = as.character(unlist(cl_ids_idx)))
-  
-  ## Mutual Reachability distances 
-  ## To avoid computing the full mutual reachability matrix, cluster indices are used to get subsets 
-  ## of the 'dist' object corresponding to the given clustering, and then that is combined with the all points core 
-  ## distance to compute the resulting mutual reachability distances for each point
-  mrd_dist <- mapply(function(cl_idx, cl_cd){ 
-    idx <- combn(length(cl_idx), 2L)
-    idx <- cbind(cl_idx[idx[1,]], cl_idx[idx[2,]])
-    ## You can verify with all(dist(x[cl_idx,])^2 == xdist[(INDEX_TF(n, idx[, 1] - 1, idx[, 2] - 1))+1])
-    mrd(dm = xdist[(INDEX_TF(n, idx[, 1] - 1, idx[, 2] - 1))+1], cl_cd) 
-  }, cl_ids_idx, all_pts_cd, SIMPLIFY = FALSE)
+  all_cl_ids <- unlist(cl_ids_idx)
+  cl_dist <- dist_subset(xdist, all_cl_ids)
+  cl_mrd <- structure(mrd(cl_dist, unlist(all_pts_cd)), class = "dist", Size = length(all_cl_ids))
   
   ## Mutual reachability MSTs
-  mrd_graphs <- mapply(function(cl_idx, cl_mrd){ 
-    mst <- prims(x_dist = cl_mrd, n = length(cl_idx))
+  mrd_graphs <- lapply(cl_ids_idx, function(idx){
+    rel_idx <- match(idx, all_cl_ids)
+    mst <- prims(x_dist = dist_subset(cl_mrd, rel_idx), n = length(rel_idx))
     matrix(mst[order(mst[, 3]),], ncol = 3) # return mst ordered by edge weight
-  }, cl_ids_idx, mrd_dist, SIMPLIFY = FALSE)
+  })
   
   ## Get the indices of the points making up the internal nodes of the MSTs
   internal_nodes <- lapply(mrd_graphs, function(mst){
@@ -100,9 +83,9 @@ dbcv <- function(x, cl, xdist = NULL){
   }, mrd_graphs, internal_nodes)
   
   ## Density Separation of a Pair of Clusters (DSPC) [per cluster pair]
-  node_ids <- mapply(function(idx, i) if(length(idx) == 0) cl_ids_idx[[i]] else cl_ids_idx[[i]][idx], internal_nodes, 1:n_cl, SIMPLIFY = FALSE)
-  config <- list(n = n, ncl = n_cl, n_pairs = choose(n_cl, 2), node_ids = node_ids, acp = acp_dist_map, xdist = xdist)
-  dspc_mat <- dspc(config = config) ## O(n^4); Computationally intensive
+  ## Using the internal nodes only, extract the MRD subsets corresponding to all of the pairwise clusters 
+  ## Algorithmically, this uses a fast MST to find shortest path between them
+  dspc_mat <- dspc(cl_ids_idx, internal_nodes, unlist(cl_ids_idx), cl_mrd) ## Computationally intensive
 
   ## Validity index [Vc(C_i)]; callable for a given cluster
   v_c <- function(i) {

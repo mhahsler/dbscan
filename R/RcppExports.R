@@ -61,8 +61,20 @@ intToStr <- function(iv) {
     .Call('_dbscan_intToStr', PACKAGE = 'dbscan', iv)
 }
 
-dspc <- function(config) {
-    .Call('_dbscan_dspc', PACKAGE = 'dbscan', config)
+dist_subset <- function(dist, idx) {
+    .Call('_dbscan_dist_subset', PACKAGE = 'dbscan', dist, idx)
+}
+
+all_pts_core <- function(data, cl, squared) {
+    .Call('_dbscan_all_pts_core', PACKAGE = 'dbscan', data, cl, squared)
+}
+
+XOR <- function(lhs, rhs) {
+    .Call('_dbscan_XOR', PACKAGE = 'dbscan', lhs, rhs)
+}
+
+dspc <- function(cl_idx, internal_nodes, all_cl_ids, mrd_dist) {
+    .Call('_dbscan_dspc', PACKAGE = 'dbscan', cl_idx, internal_nodes, all_cl_ids, mrd_dist)
 }
 
 knn_dist <- function(dist_x, k, all) {

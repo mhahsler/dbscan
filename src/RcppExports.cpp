@@ -192,14 +192,54 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dspc
-NumericMatrix dspc(List config);
-RcppExport SEXP _dbscan_dspc(SEXP configSEXP) {
+// dist_subset
+NumericVector dist_subset(const NumericVector& dist, IntegerVector idx);
+RcppExport SEXP _dbscan_dist_subset(SEXP distSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type config(configSEXP);
-    rcpp_result_gen = Rcpp::wrap(dspc(config));
+    Rcpp::traits::input_parameter< const NumericVector& >::type dist(distSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(dist_subset(dist, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// all_pts_core
+List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared);
+RcppExport SEXP _dbscan_all_pts_core(SEXP dataSEXP, SEXP clSEXP, SEXP squaredSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const List& >::type cl(clSEXP);
+    Rcpp::traits::input_parameter< const bool >::type squared(squaredSEXP);
+    rcpp_result_gen = Rcpp::wrap(all_pts_core(data, cl, squared));
+    return rcpp_result_gen;
+END_RCPP
+}
+// XOR
+Rcpp::LogicalVector XOR(Rcpp::LogicalVector lhs, Rcpp::LogicalVector rhs);
+RcppExport SEXP _dbscan_XOR(SEXP lhsSEXP, SEXP rhsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type lhs(lhsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type rhs(rhsSEXP);
+    rcpp_result_gen = Rcpp::wrap(XOR(lhs, rhs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dspc
+NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const IntegerVector& all_cl_ids, const NumericVector& mrd_dist);
+RcppExport SEXP _dbscan_dspc(SEXP cl_idxSEXP, SEXP internal_nodesSEXP, SEXP all_cl_idsSEXP, SEXP mrd_distSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const List& >::type cl_idx(cl_idxSEXP);
+    Rcpp::traits::input_parameter< const List& >::type internal_nodes(internal_nodesSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type all_cl_ids(all_cl_idsSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type mrd_dist(mrd_distSEXP);
+    rcpp_result_gen = Rcpp::wrap(dspc(cl_idx, internal_nodes, all_cl_ids, mrd_dist));
     return rcpp_result_gen;
 END_RCPP
 }

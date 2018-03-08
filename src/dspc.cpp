@@ -1,9 +1,14 @@
 #include <Rcpp.h>
 using namespace Rcpp;
+// [[Rcpp::plugins(cpp11)]]
+
+// Includes 
+#include "prims_mst.h"
 #include "utilities.h"
+#include "ANN/ANN.h"
+#include "R_kNN.h"
 #include <string>
 #include <unordered_map>
-// [[Rcpp::plugins(cpp11)]]
 
 // [[Rcpp::export]]
 StringVector intToStr(IntegerVector iv){
@@ -32,48 +37,201 @@ NumericVector retrieve(StringVector keys, std::unordered_map<std::string, double
   return(res);
 }
 
-
-// Density Separation code
+// Provides a fast of extracting subsets of a dist object. Expects as input the full dist 
+// object to subset 'dist', and a (1-based!) integer vector 'idx' of the points to keep in the subset
 // [[Rcpp::export]]
-NumericMatrix dspc(List config) {
+NumericVector dist_subset(const NumericVector& dist, IntegerVector idx){
+  const int n = dist.attr("Size");
+  const int cl_n = idx.length();
+  NumericVector new_dist = Rcpp::no_init((cl_n * (cl_n - 1))/2);
+  int ii = 0; 
+  for (IntegerVector::iterator i = idx.begin(); i != idx.end(); ++i){
+    for (IntegerVector::iterator j = i; j != idx.end(); ++j){
+      if (*i == *j) { continue; }
+      const int ij_idx = INDEX_TF(n, (*i < *j ? *i : *j) - 1, (*i < *j ? *j : *i) - 1); 
+      new_dist[ii++] = dist[ij_idx];
+    }
+  }
+  new_dist.attr("Size") = cl_n;
+  new_dist.attr("class") = "dist";
+  return(new_dist);
+}
+
+// [[Rcpp::export]]
+List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
+  // copy data
+  int nrow = data.nrow();
+  int ncol = data.ncol();
+  ANNpointArray dataPts = annAllocPts(nrow, ncol);
+  for(int i = 0; i < nrow; i++){
+    for(int j = 0; j < ncol; j++){
+      (dataPts[i])[j] = data(i, j);
+    }
+  }
+
+  // create kd-tree (1) or linear search structure (2)
+  ANNpointSet* kdTree = new ANNkd_tree(dataPts, nrow, ncol, 10, (ANNsplitRule)  5);
+
+  // The all core dists to 
+  List all_core_res = List(cl.size());
   
-  // Load configuration from list
-  const int n = config["n"];
-  const int ncl = config["ncl"]; 
-  const int n_pairs = config["n_pairs"]; 
-  List node_ids = config["node_ids"];
-  List acp = config["acp"];
-  NumericVector xdist = config["xdist"];
+  // Do the kNN searches per cluster; note that k varies with the cluster
+  int i = 0; 
+  for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
+    const IntegerVector& cl = (*it); 
+    const int k = cl.size();
+    
+    // Initial vector to record the per-point all core dists
+    NumericVector all_core_cl = Rcpp::no_init_vector(k);  
+      
+    // For each point in the cluster, get the all core points dist
+    int j = 0;
+    ANNdistArray dists = new ANNdist[k+1];
+    ANNidxArray nnIdx = new ANNidx[k+1];
+    for (IntegerVector::const_iterator pt_id = cl.begin(); pt_id != cl.end(); ++pt_id, ++j){
+      // Do the search 
+      ANNpoint queryPt = dataPts[(*pt_id) - 1]; // use original data points
+      kdTree->annkSearch(queryPt, k+1, nnIdx, dists);
+      
+      // Get the dists 
+      IntegerVector ids = IntegerVector(nnIdx, nnIdx+k+1);
+      LogicalVector take = ids != ((*pt_id) - 1);
+      NumericVector ndists = NumericVector(dists, dists+k+1)[take];
+      
+      // Switch out 0's with very small numbers to not break everything
+      ndists = ifelse(ndists == 0, std::numeric_limits<double>::epsilon(), ndists);
+      
+      // Apply all core points equation 
+      double acdist = pow(sum(pow(1/ndists, ncol))/(k - 1.0), -(1.0 / ncol));
+      all_core_cl[j] = acdist;
+    }
+    delete [] dists;
+    delete [] nnIdx;
+    all_core_res[i] = all_core_cl;
+  }
   
-  // Conversions and basic setup 
-  std::unordered_map<std::string, double> acp_map = toMap(acp);
-  double min_mrd = std::numeric_limits<double>::infinity(); 
-  NumericMatrix min_mrd_dist = NumericMatrix(n_pairs, 3);
+  // cleanup
+  delete kdTree;
+  annDeallocPts(dataPts);
+  annClose();
+  
+  // Return the all point core distance 
+  if(!squared){ for (int i = 0; i < cl.size(); ++i){ all_core_res[i] = Rcpp::sqrt(all_core_res[i]); } }
+  return(all_core_res);
+}
+
+
+
+// NumericVector all_pts_core(const NumericVector& dist, IntegerVector cl, const int d){
+//   const int n = dist.attr("Size");
+//   const int cl_n = cl.length();
+//   NumericVector all_pts_cd = NumericVector(cl_n);
+//   NumericVector tmp = NumericVector(cl_n);
+//   int knn_i = 0, ii = 0;
+//   for (IntegerVector::iterator i = cl.begin(); i != cl.end(); ++i){
+//     for (IntegerVector::iterator j = cl.begin(); j != cl.end(); ++j){
+//       if (*i == *j) { continue; }
+//       const int idx = INDEX_TF(n, (*i < *j ? *i : *j) - 1, (*i < *j ? *j : *i) - 1);
+//       double dist_ij = dist[idx];
+//       tmp[knn_i++] = 1.0 / (dist_ij == 0.0 ? std::numeric_limits<double>::epsilon() : dist_ij);
+//     }
+//     all_pts_cd[ii++] = pow(sum(pow(tmp, d))/(cl_n - 1.0), -(1.0 / d));
+//     knn_i = 0;
+//   }
+//   return(all_pts_cd);
+// }
+
+
+// [[Rcpp::export]]
+Rcpp::LogicalVector XOR(Rcpp::LogicalVector lhs, Rcpp::LogicalVector rhs) {
+  R_xlen_t i = 0, n = lhs.size();
+  Rcpp::LogicalVector result(n);
+  for ( ; i < n; i++) {  result[i] = (lhs[i] ^ rhs[i]); }
+  return result;
+}
+
+// [[Rcpp::export]]
+NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const IntegerVector& all_cl_ids, const NumericVector& mrd_dist) {
+  
+  // Setup variables
+  const int ncl = cl_idx.length(); // number of clusters 
+  NumericMatrix res = Rcpp::no_init_matrix((ncl * (ncl - 1))/2, 3); // resulting separation measures
   
   // Loop through cluster combinations, and for each combination 
   int c = 0; 
+  double min_edge = std::numeric_limits<double>::infinity();
   for (int ci = 0; ci < ncl; ++ci) {
     for (int cj = (ci+1); cj < ncl; ++cj){
       Rcpp::checkUserInterrupt();
-      IntegerVector i_idx = node_ids[ci], j_idx = node_ids[cj]; // i and j cluster point indices
-      for (IntegerVector::iterator i = i_idx.begin(); i != i_idx.end(); ++i){
-        for (IntegerVector::iterator j = j_idx.begin(); j != j_idx.end(); ++j){
-          const int lhs = *i < *j ? *i : *j, rhs = *i < *j ? *j : *i;
-          double dist_ij = xdist[INDEX_TF(n, lhs - 1, rhs - 1)]; // dist(p_i, p_j)
-          double acd_i = acp_map[patch::to_string(*i)]; // all core distance for p_i
-          double acd_j = acp_map[patch::to_string(*j)]; // all core distance for p_i
-          double mrd_ij = std::max(std::max(acd_i, acd_j), dist_ij); // mutual reachability distance of the pair
-          if (mrd_ij < min_mrd){
-            min_mrd = mrd_ij; 
-          }
-        }
-      }
-      min_mrd_dist(c++, _) = NumericVector::create(ci+1, cj+1, min_mrd);
-      min_mrd = std::numeric_limits<double>::infinity(); 
+      
+      // Do lots of indexing to get the relative indexes corresponding to internal nodes
+      const IntegerVector i_idx = internal_nodes[ci], j_idx = internal_nodes[cj]; // i and j cluster point indices
+      const IntegerVector rel_i_idx = match(as<IntegerVector>(cl_idx[ci]), all_cl_ids)[i_idx - 1];
+      const IntegerVector rel_j_idx = match(as<IntegerVector>(cl_idx[cj]), all_cl_ids)[j_idx - 1];
+      IntegerVector int_idx = combine(rel_i_idx, rel_j_idx);
+      
+      // Get the pairwise MST 
+      NumericMatrix pairwise_mst = prims(dist_subset(mrd_dist, int_idx), int_idx.length());
+      
+      // Do lots of indexing / casting
+      const IntegerVector from_int = seq_len(rel_i_idx.length()); 
+      const NumericVector from_idx = as<NumericVector>(from_int);
+      const NumericVector from = pairwise_mst.column(0), to = pairwise_mst.column(1), height = pairwise_mst.column(2);
+      
+      // Find which distances in the MST cross to both clusters 
+      LogicalVector cross_edges = XOR(Rcpp::in(from, from_idx), Rcpp::in(to, from_idx));
+      
+      // The minimum weighted edge of these cross edges is the density separation between the two clusters
+      min_edge = min(as<NumericVector>(height[cross_edges]));
+      
+      // Save the minimum edge 
+      res(c++, _) = NumericVector::create(ci+1, cj+1, min_edge);
+      min_edge = std::numeric_limits<double>::infinity();
     }
   }
-  return(min_mrd_dist);
+  return(res);
 }
+
+
+// Density Separation code
+// NumericMatrix dspc(List config, const NumericVector& xdist) {
+//   
+//   // Load configuration from list
+//   const int n = config["n"];
+//   const int ncl = config["ncl"]; 
+//   const int n_pairs = config["n_pairs"]; 
+//   List node_ids = config["node_ids"];
+//   List acp = config["acp"];
+//   
+//   // Conversions and basic setup 
+//   std::unordered_map<std::string, double> acp_map = toMap(acp);
+//   double min_mrd = std::numeric_limits<double>::infinity(); 
+//   NumericMatrix min_mrd_dist = NumericMatrix(n_pairs, 3);
+//   
+//   // Loop through cluster combinations, and for each combination 
+//   int c = 0; 
+//   for (int ci = 0; ci < ncl; ++ci) {
+//     for (int cj = (ci+1); cj < ncl; ++cj){
+//       Rcpp::checkUserInterrupt();
+//       IntegerVector i_idx = node_ids[ci], j_idx = node_ids[cj]; // i and j cluster point indices
+//       for (IntegerVector::iterator i = i_idx.begin(); i != i_idx.end(); ++i){
+//         for (IntegerVector::iterator j = j_idx.begin(); j != j_idx.end(); ++j){
+//           const int lhs = *i < *j ? *i : *j, rhs = *i < *j ? *j : *i;
+//           double dist_ij = xdist[INDEX_TF(n, lhs - 1, rhs - 1)]; // dist(p_i, p_j)
+//           double acd_i = acp_map[patch::to_string(*i)]; // all core distance for p_i
+//           double acd_j = acp_map[patch::to_string(*j)]; // all core distance for p_i
+//           double mrd_ij = std::max(std::max(acd_i, acd_j), dist_ij); // mutual reachability distance of the pair
+//           if (mrd_ij < min_mrd){
+//             min_mrd = mrd_ij; 
+//           }
+//         }
+//       }
+//       min_mrd_dist(c++, _) = NumericVector::create(ci+1, cj+1, min_mrd);
+//       min_mrd = std::numeric_limits<double>::infinity(); 
+//     }
+//   }
+//   return(min_mrd_dist);
+// }
 
 
 /*** R
@@ -87,4 +245,22 @@ NumericMatrix dspc(List config) {
 # config <- list(n = 3, ncl = 3L, node_ids = as.list(1:3), acp = km, xdist=dist(1:3))
 # dspc(config)
 # # toMap(km)
+# 
+# x <- as.matrix(iris[, 1:4])
+# xdist <- dist(x)
+# cl <- 1L:10L
+# all_pts_core(xdist, cl, ncol(x))
+
+dspc2 <- mapply(function(idx1, idx2){
+  rel_idx1 <- match(cl_ids_idx[[idx1]], all_cl_ids)[ (internal_nodes[[idx1]]) ]
+  rel_idx2 <- match(cl_ids_idx[[idx2]], all_cl_ids)[ (internal_nodes[[idx2]]) ]
+  int_idx <- c(rel_idx1, rel_idx2)
+  pairwise_mst <- dbscan:::prims(dbscan::dist_subset(cl_mrd, idx = int_idx), n = length(int_idx))
+  from_idx <- 1:length(rel_idx1)
+  min(pairwise_mst[xor(pairwise_mst[, 1] %in% from_idx, pairwise_mst[, 2] %in% from_idx), 3])
+}, cl_pairs[, 1], cl_pairs[, 2])
+
+# all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
+dbscan:::dspc(cl_ids_idx, internal_nodes, unlist(cl_ids_idx), cl_mrd)
+
 */

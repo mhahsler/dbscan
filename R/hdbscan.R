@@ -19,14 +19,16 @@
 
 hdbscan <- function(x, minPts, xdist = NULL,
   gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
-
-  if(.matrixlike(x) && !is(x, "dist")) {
+  no_dist_supplied <- (missing(xdist) || is.null(xdist))
+  if(.matrixlike(x) && !is(x, "dist") && no_dist_supplied) {
     x <- as.matrix(x)
     if (!storage.mode(x) %in% c("integer", "double")) stop("hdbscan expects numerical data")
     core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
     xdist <- dist(x, method = "euclidean")
-  } else if (is(x, "dist") && missing(xdist)) {
-    ## let kNNdist handle the any non-euclidean knn-queries
+  } else if (.matrixlike(x) && !is(x, "dist") && !no_dist_supplied){
+    ## let knn_dist handle the any non-euclidean knn-queries
+    core_dist <- as.numeric(knn_dist(xdist, k = minPts - 1, all = 0L)$dist)
+  } else if (is(x, "dist")){
     xdist <- x
     core_dist <- as.numeric(knn_dist(xdist, k = minPts - 1, all = 0L)$dist)
   } else{ stop("hdbscan expects a matrix-coercible object of numerical data, and xdist to be a 'dist' object (or not supplied).") }

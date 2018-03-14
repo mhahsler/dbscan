@@ -37,6 +37,17 @@ NumericVector retrieve(StringVector keys, std::unordered_map<std::string, double
   return(res);
 }
 
+
+NumericVector dist_subset_arma(const NumericVector& dist, IntegerVector idx){
+  // vec v1 = as<vec>(v1in);
+  // uvec idx = as<uvec>(idxin) - 1;
+  // vec subset = v1.elem(idx);
+  // return(wrap(subset));
+  return(NumericVector::create());
+}
+
+
+
 // Provides a fast of extracting subsets of a dist object. Expects as input the full dist 
 // object to subset 'dist', and a (1-based!) integer vector 'idx' of the points to keep in the subset
 // [[Rcpp::export]]
@@ -57,6 +68,16 @@ NumericVector dist_subset(const NumericVector& dist, IntegerVector idx){
   return(new_dist);
 }
 
+// Replace every 0 with very small epsilon, o/w with itself
+ANNdist replace_zero(ANNdist cdist){
+  return(cdist ? cdist : std::numeric_limits<ANNdist>::epsilon()); 
+}
+
+ANNdist inv_density(ANNdist cdist){
+  return(1.0/cdist);
+}
+
+
 // [[Rcpp::export]]
 List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
   // copy data
@@ -70,7 +91,7 @@ List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared)
   }
 
   // create kd-tree (1) or linear search structure (2)
-  ANNpointSet* kdTree = new ANNkd_tree(dataPts, nrow, ncol, 10, (ANNsplitRule)  5);
+  ANNpointSet* kdTree = new ANNkd_tree(dataPts, nrow, ncol, 30, (ANNsplitRule)  5);
 
   // The all core dists to 
   List all_core_res = List(cl.size());
@@ -78,8 +99,8 @@ List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared)
   // Do the kNN searches per cluster; note that k varies with the cluster
   int i = 0; 
   for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
-    const IntegerVector& cl = (*it); 
-    const int k = cl.size();
+    const IntegerVector& cl_pts = (*it); 
+    const int k = cl_pts.size();
     
     // Initial vector to record the per-point all core dists
     NumericVector all_core_cl = Rcpp::no_init_vector(k);  
@@ -88,21 +109,17 @@ List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared)
     int j = 0;
     ANNdistArray dists = new ANNdist[k+1];
     ANNidxArray nnIdx = new ANNidx[k+1];
-    for (IntegerVector::const_iterator pt_id = cl.begin(); pt_id != cl.end(); ++pt_id, ++j){
+    for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
       // Do the search 
       ANNpoint queryPt = dataPts[(*pt_id) - 1]; // use original data points
       kdTree->annkSearch(queryPt, k+1, nnIdx, dists);
-      
-      // Get the dists 
-      IntegerVector ids = IntegerVector(nnIdx, nnIdx+k+1);
-      LogicalVector take = ids != ((*pt_id) - 1);
-      NumericVector ndists = NumericVector(dists, dists+k+1)[take];
-      
-      // Switch out 0's with very small numbers to not break everything
-      ndists = ifelse(ndists == 0, std::numeric_limits<double>::epsilon(), ndists);
-      
-      // Apply all core points equation 
-      double acdist = pow(sum(pow(1/ndists, ncol))/(k - 1.0), -(1.0 / ncol));
+
+      // V2.
+      std::vector<ANNdist> ndists = std::vector<ANNdist>(dists, dists+k+1);
+      std::transform(ndists.begin(), ndists.end(), ndists.begin(), replace_zero);
+      std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, ncol); });
+      ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
+      double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / ncol)); // Apply all core points equation
       all_core_cl[j] = acdist;
     }
     delete [] dists;

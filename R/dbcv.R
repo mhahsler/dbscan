@@ -21,6 +21,7 @@
 INDEX_TF <- function(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1) ## 0-based!
 
 dbcv <- function(x, cl, xdist = NULL, squared=TRUE){
+  if (is.numeric(x) && is.null(dim(x))){ x <- matrix(x) }
   if (!.matrixlike(x)) { stop("'dbcv' expects x needs to be a matrix to calculate distances.") }
   if (!missing(xdist) && !is(xdist, 'dist')) { stop("'dbcv' expects xdist to be a dist object, if given.") }
   if (!missing(xdist) && attr(xdist, "method") != "euclidean") { stop("Only euclidean distance is supported.") }
@@ -68,15 +69,21 @@ dbcv <- function(x, cl, xdist = NULL, squared=TRUE){
   ## Get the indices of the points making up the internal nodes of the MSTs
   internal_nodes <- lapply(mrd_graphs, function(mst){
     node_deg <- table(c(mst[, 1], mst[, 2]))
-    as.integer(names(node_deg)[which(node_deg > 1)])
+    idx <- as.integer(names(node_deg)[which(node_deg > 1)])
+    int_edge_idx <- (mst[, 1] %in% idx) & (mst[, 2] %in% idx)
+    if (length(which(int_edge_idx)) == 0){
+      # Exception case: if there are no internal edges (e.g. when there are 1-3 vertices in the cluster), density sparseness is undefined. 
+      # Since this is a border case, assume the validation index isn't affected and treat all edges as internal.
+      return(as.integer(names(node_deg)))
+    } else {
+      return(idx)
+    }
   })
   
   ## Density Sparseness of a Cluster (DSC) [per cluster]
   dsc <- mapply(function(mst, int_idx){
     int_edge_idx <- (mst[, 1] %in% int_idx) & (mst[, 2] %in% int_idx)
     if (length(which(int_edge_idx)) == 0){
-      # Exception case: if there are no internal edges (e.g. when there are 1-3 vertices in the cluster), density sparseness is undefined. 
-      # Since this is a border case, assume the validation index isn't affected and treat all edges as internal.
       return(as.numeric(max(mst[, 3]))) 
     } 
     as.numeric(max(mst[which(int_edge_idx), 3])) # largest edge weight between internal nodes

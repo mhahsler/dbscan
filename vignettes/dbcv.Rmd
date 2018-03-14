@@ -19,9 +19,64 @@ Benchmarking
 
 ```{r}
 X <- gen_square(1000, sd = 1)
-x <- X$x
-cl <- X$cl
-microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = X$cl) })
+microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = X$cl) }, times = 5L)
+```
+
+```{r}
+X <- gen_square(10000, sd = 1)
+microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = X$cl) }, times = 1L)
+```
+
+## Test cases 
+
+```{r}
+## 1-dimensional case
+x <- rnorm(1000)
+n_class <- 6
+class_prob <- runif(n_class)
+cl <- sample(0:5, size = 1000, replace = TRUE, prob = class_prob/sum(class_prob <- runif(n_class)))
+dbscan::dbcv(x, cl = cl)
+
+## 2-dimensional case
+x <- cbind(rnorm(1000), rnorm(1000))
+n_class <- 6
+class_prob <- runif(n_class)
+cl <- sample(0:5, size = 1000, replace = TRUE, prob = class_prob/sum(class_prob <- runif(n_class)))
+dbscan::dbcv(x, cl = cl)
+
+## All 1 cluster case 
+x <- rnorm(100)
+cl <- rep(1L, 100)
+dbscan::dbcv(x, cl = cl) ## should be warning 
+
+## All noise case
+x <- rnorm(100)
+cl <- rep(0L, 100)
+dbscan::dbcv(x, cl = cl) ## should be 0 
+
+## All noise case
+x <- rnorm(100)
+cl <- 1:100
+dbscan::dbcv(x, cl = cl) ## should be 0 
+
+## All noise case
+x <- rnorm(100)
+cl <- rep(1:50, 2)
+dbscan::dbcv(x, cl = cl) ## should be 0 
+
+
+```
+
+```{r}
+load("~/WaCS/ClusterTreePOIs/Data_sets/GeoLife 1.3 2012 GPS Trajectories (Beijing)/geolife_exemplar.rdata")
+dist_geolife <- parallelDist::parDist(geolife_exemplar)
+sl_geolife <- hclust(dist_geolife, method = "single")
+sl_cl <- cutree(sl_geolife, k = 2)
+dbcv(x = geolife_exemplar, cl = sl_cl, xdist = dist_geolife)
+
+sl_cl <- cutree(sl_geolife, k = 3)
+dbcv(x = geolife_exemplar, cl = sl_cl, xdist = dist_geolife)
+
 ```
 
 ```{r}

@@ -145,3 +145,7 @@ concat_int <- function(container) {
     .Call('_dbscan_concat_int', PACKAGE = 'dbscan', container)
 }
 
+timesTwo <- function(int_list) {
+    invisible(.Call('_dbscan_timesTwo', PACKAGE = 'dbscan', int_list))
+}
+

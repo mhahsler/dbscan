@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 set.seed(2)
+library("dbscan")
 gen_square <- function(n, sd){
   x <- cbind(
     x = replicate(n, expr = runif(1, max = sd)) + rnorm(n, mean = c(0, 5, 5, 0), sd = sd),
@@ -20,12 +21,27 @@ Benchmarking
 ```{r}
 X <- gen_square(1000, sd = 1)
 microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = X$cl) }, times = 5L)
+
+
 ```
 
 ```{r}
 X <- gen_square(10000, sd = 1)
 microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = X$cl) }, times = 1L)
 ```
+
+```{r}
+microbenchmark::microbenchmark({ all_pts_cd <- dbscan:::all_pts_core(x, cl_ids_idx, squared) }, times = 1L)
+
+microbenchmark::microbenchmark({ 
+  wut <- dbscan::kNN(X$x, k = 250, sort = FALSE) 
+  all_cp_dist2 <- apply(wut$dist, 1, function(knn_dist){ (sum((1/knn_dist)^ncol(X$x))/(length(knn_dist)-1))^(-1/ncol(X$x)) })
+}, times = 5L)
+microbenchmark::microbenchmark({ dbscan::kNN(X$x, k = 250, sort = FALSE) }, times = 1L)
+lapply(unique(X$cl), function(cl_id) which(X$cl == cl_id))
+X$cl
+```
+
 
 ## Test cases 
 
@@ -65,7 +81,67 @@ cl <- rep(1:50, 2)
 dbscan::dbcv(x, cl = cl) ## should be 0 
 
 
+X <- gen_square(5000, sd = 1)
+cl_ids_idx <- lapply(unique(X$cl), function(cid) which(X$cl == cid))
+
+microbenchmark::microbenchmark({ 
+test1 <- lapply(cl_ids_idx, function(cl_ids){
+  clustertree:::testKNN_ref(qx = X$x[cl_ids,], rx = X$x, k = length(cl_ids), bucketSize = length(cl_ids)/2)
+}) }, times = 5L)
+
+all_pt_cd <- lapply(cl_ids_idx, function(cl_ids){
+  res <- FNN::get.knnx(data = X$x, query = X$x[cl_ids,], k = length(cl_ids))
+  apply((res$nn.dist^2)[, -1], 1, function(knn_dist){
+    (sum((1/knn_dist[knn_dist != 0])^ncol(X$x))/(length(cl_ids) - 1))^(-1/ncol(X$x))
+  })
+})
+
+cl_ids <- cl_ids_idx[[1]]
+res <- FNN::get.knnx(data = X$x, query = X$x[cl_ids,], k = length(cl_ids))
+(res$nn.dist^2)[1,]
+
+all((res2$ndists - (res$nn.dist^2)[1,]) < sqrt(.Machine$double.eps))
+
+res2 <- dbscan:::all_pts_core(X$x, cl_ids_idx, squared) 
+range(res2$ndists)
+range((res$nn.dist^2)[1,])
+
+
+head((1/test)^ncol(X$x))
+head(res2$ndists)
+
+res2$ndists
+
+test <- (res$nn.dist^2)[2,]
+test[test == 0] <- (.Machine$double.eps*1e9)
+(sum((1/test)^ncol(X$x))/(length(cl_ids)-1))^(-1/ncol(X$x))
+
+sum(test)
+
+
+microbenchmark::microbenchmark({ res2 <- dbscan:::all_pts_core(X$x, cl_ids_idx, squared) }, times = 5L)
+
+
+mrd_graphs <- lapply(cl_ids_idx, function(idx){
+  clustertree:::testClusterTree(X$x[idx,], k = length(idx), alpha = 1)
+  # rel_idx <- match(idx, all_cl_ids)
+  # mst <- prims(x_dist = dist_subset(cl_mrd, rel_idx), n = length(rel_idx))
+  # matrix(mst[order(mst[, 3]),], ncol = 3) # return mst ordered by edge weight
+})
+
+peakRAM::peakRAM({ wut <- dbscan:::dbcv(x = X$x, cl = X$cl, squared = TRUE) })
+
 ```
+
+```{r}
+x1 <- "hi"
+with(new.env(), expr = {
+  testing1 <- paste0(x1, "wut")
+  print(testing1)
+})
+```
+
+
 
 ```{r}
 load("~/WaCS/ClusterTreePOIs/Data_sets/GeoLife 1.3 2012 GPS Trajectories (Beijing)/geolife_exemplar.rdata")

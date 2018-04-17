@@ -471,3 +471,13 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// timesTwo
+void timesTwo(const List& int_list);
+RcppExport SEXP _dbscan_timesTwo(SEXP int_listSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const List& >::type int_list(int_listSEXP);
+    timesTwo(int_list);
+    return R_NilValue;
+END_RCPP
+}

@@ -61,6 +61,7 @@ dbcv <- function(x, cl, xdist = NULL, squared=TRUE){
   
   ## Mutual reachability MSTs
   mrd_graphs <- lapply(cl_ids_idx, function(idx){
+    # clustertree:::testClusterTree(x[idx,], k = k, alpha = 1)
     rel_idx <- match(idx, all_cl_ids)
     mst <- prims(x_dist = dist_subset(cl_mrd, rel_idx), n = length(rel_idx))
     matrix(mst[order(mst[, 3]),], ncol = 3) # return mst ordered by edge weight

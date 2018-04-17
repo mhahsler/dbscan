@@ -68,15 +68,14 @@ NumericVector dist_subset(const NumericVector& dist, IntegerVector idx){
   return(new_dist);
 }
 
-// Replace every 0 with very small epsilon, o/w with itself
-ANNdist replace_zero(ANNdist cdist){
-  return(cdist ? cdist : std::numeric_limits<ANNdist>::epsilon()); 
+// Returns true if a given distance is less than 32-bit floating point precision
+bool remove_zero(ANNdist cdist){
+  return(cdist <= std::numeric_limits<float>::epsilon()); 
 }
 
 ANNdist inv_density(ANNdist cdist){
   return(1.0/cdist);
 }
-
 
 // [[Rcpp::export]]
 List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
@@ -100,27 +99,28 @@ List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared)
   int i = 0; 
   for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
     const IntegerVector& cl_pts = (*it); 
-    const int k = cl_pts.size();
+    const int k = cl_pts.length();
     
     // Initial vector to record the per-point all core dists
     NumericVector all_core_cl = Rcpp::no_init_vector(k);  
       
     // For each point in the cluster, get the all core points dist
     int j = 0;
-    ANNdistArray dists = new ANNdist[k+1];
-    ANNidxArray nnIdx = new ANNidx[k+1];
+    ANNdistArray dists = new ANNdist[k];
+    ANNidxArray nnIdx = new ANNidx[k];
     for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
       // Do the search 
       ANNpoint queryPt = dataPts[(*pt_id) - 1]; // use original data points
-      kdTree->annkSearch(queryPt, k+1, nnIdx, dists);
+      kdTree->annkSearch(queryPt, k, nnIdx, dists);
 
       // V2.
-      std::vector<ANNdist> ndists = std::vector<ANNdist>(dists, dists+k+1);
-      std::transform(ndists.begin(), ndists.end(), ndists.begin(), replace_zero);
+      std::vector<ANNdist> ndists = std::vector<ANNdist>(dists, dists+k);
+      std::remove_if(ndists.begin(), ndists.end(), remove_zero);
       std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, ncol); });
       ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
-      double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / ncol)); // Apply all core points equation
+      double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / double(ncol))); // Apply all core points equation
       all_core_cl[j] = acdist;
+      // return(List::create(_["ndists"] = acdist, _["denom"] = sum_inv_density/(k - 1.0), _["k"] = k));
     }
     delete [] dists;
     delete [] nnIdx;

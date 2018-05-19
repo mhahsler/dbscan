@@ -138,7 +138,7 @@ See how well each point corresponds to the clusters found by the model used
 ```
 
 ## License 
-The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the [ELKI](http://elki.dbs.ifi.lmu.de/) framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, [Erich Schubert](http://www.dbs.ifi.lmu.de/cms/Erich_Schubert).  
+The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the [ELKI](http://elki.dbs.ifi.lmu.de/) framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  
 
 
 ## Further Information

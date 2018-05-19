@@ -1,7 +1,7 @@
-# dbscan 1.1-2 (2017-xx-xx)
+# dbscan 1.1-2 (2018-05-18)
 
 ## New Features
-* OPTICS now calculated eps if it is ommited.
+* OPTICS now calculates eps if it is ommited.
 
 ## Bugfix
 

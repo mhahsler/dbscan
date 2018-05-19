@@ -16,7 +16,7 @@
 \usepackage{pifont} % http://ctan.org/pkg/pifont
 \usepackage{float}
 \usepackage{tabularx}
-\usepackage[toc,page]{appendix}
+%\usepackage[toc,page]{appendix}
 
 % Remove sweave margins if possible
 \usepackage[belowskip=-15pt,aboveskip=0pt]{caption}

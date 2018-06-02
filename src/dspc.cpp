@@ -78,6 +78,39 @@ ANNdist inv_density(ANNdist cdist){
 }
 
 // [[Rcpp::export]]
+List all_pts_core_sorted_dist(const NumericMatrix& sorted_dist, const List& cl, const int d, const bool squared){
+  // The all core dists to return
+  List all_core_res = List(cl.size());
+  
+  // Do the kNN searches per cluster; note that k varies with the cluster
+  int i = 0; 
+  for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
+    const IntegerVector& cl_pts = (*it); 
+    const int k = cl_pts.length();
+    
+    // Initial vector to record the per-point all core dists
+    NumericVector all_core_cl = Rcpp::no_init_vector(k);  
+    
+    // For each point in the cluster, get the all core points dist
+    int j = 0; 
+    for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
+      const NumericMatrix::ConstColumn& knn_dist = sorted_dist.column((*pt_id) - 1);
+      
+      // Calculate the all core points distance for this point
+      std::vector<ANNdist> ndists = std::vector<ANNdist>(knn_dist.begin(), knn_dist.begin()+k);
+      std::remove_if(ndists.begin(), ndists.end(), remove_zero);
+      std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, d); });
+      ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
+      double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / double(d))); // Apply all core points equation
+      all_core_cl[j] = acdist;
+      // return(List::create(_["ndists"] = acdist, _["denom"] = sum_inv_density/(k - 1.0), _["k"] = k));
+    }
+    all_core_res[i] = all_core_cl;
+  }
+  return(all_core_res);
+}
+
+// [[Rcpp::export]]
 List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
   // copy data
   int nrow = data.nrow();

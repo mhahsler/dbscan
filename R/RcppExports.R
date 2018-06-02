@@ -65,6 +65,10 @@ dist_subset <- function(dist, idx) {
     .Call('_dbscan_dist_subset', PACKAGE = 'dbscan', dist, idx)
 }
 
+all_pts_core_sorted_dist <- function(sorted_dist, cl, d, squared) {
+    .Call('_dbscan_all_pts_core_sorted_dist', PACKAGE = 'dbscan', sorted_dist, cl, d, squared)
+}
+
 all_pts_core <- function(data, cl, squared) {
     .Call('_dbscan_all_pts_core', PACKAGE = 'dbscan', data, cl, squared)
 }

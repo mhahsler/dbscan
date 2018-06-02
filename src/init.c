@@ -42,6 +42,7 @@ extern SEXP _dbscan_dspc(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _dbscan_all_pts_core(SEXP, SEXP, SEXP);
 extern SEXP _dbscan_dist_subset(SEXP, SEXP);
 extern SEXP _dbscan_knn_dist(SEXP, SEXP, SEXP);
+extern SEXP _dbscan_all_pts_core_sorted_dist(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
   {"_dbscan_all_children",           (DL_FUNC) &_dbscan_all_children,            3},
@@ -77,6 +78,8 @@ static const R_CallMethodDef CallEntries[] = {
   {"_dbscan_dspc",                   (DL_FUNC) &_dbscan_dspc,                    4},
   {"_dbscan_all_pts_core",           (DL_FUNC) &_dbscan_all_pts_core,            3},
   {"_dbscan_knn_dist",               (DL_FUNC) &_dbscan_knn_dist,                3},
+  {"_dbscan_dist_subset",            (DL_FUNC) &_dbscan_dist_subset,             2},
+  {"_dbscan_all_pts_core_sorted_dist", (DL_FUNC) &_dbscan_all_pts_core_sorted_dist, 4},
   {"_dbscan_dist_subset",            (DL_FUNC) &_dbscan_dist_subset,             2},
   {NULL, NULL, 0}
 };

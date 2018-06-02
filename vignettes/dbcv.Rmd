@@ -19,9 +19,15 @@ gen_square <- function(n, sd){
 Benchmarking 
 
 ```{r}
-X <- gen_square(1000, sd = 1)
+X <- gen_square(10000, sd = 1)
 microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = X$cl) }, times = 5L)
 
+cl_list <- lapply(1:100, function(i) sample(1:as.integer(runif(1, min = 3, max = 100)), size = length(X$cl), replace = TRUE))
+
+microbenchmark::microbenchmark({ dbscan::dbcv(X$x, cl = cl_list) }, times = 1L)
+microbenchmark::microbenchmark({ 
+  for (i in 1:100){  dbscan::dbcv(X$x, cl = cl_list[[i]]) }
+}, times = 1L)
 
 ```
 

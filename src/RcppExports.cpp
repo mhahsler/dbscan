@@ -204,6 +204,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// all_pts_core_sorted_dist
+List all_pts_core_sorted_dist(const NumericMatrix& sorted_dist, const List& cl, const int d, const bool squared);
+RcppExport SEXP _dbscan_all_pts_core_sorted_dist(SEXP sorted_distSEXP, SEXP clSEXP, SEXP dSEXP, SEXP squaredSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type sorted_dist(sorted_distSEXP);
+    Rcpp::traits::input_parameter< const List& >::type cl(clSEXP);
+    Rcpp::traits::input_parameter< const int >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const bool >::type squared(squaredSEXP);
+    rcpp_result_gen = Rcpp::wrap(all_pts_core_sorted_dist(sorted_dist, cl, d, squared));
+    return rcpp_result_gen;
+END_RCPP
+}
 // all_pts_core
 List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared);
 RcppExport SEXP _dbscan_all_pts_core(SEXP dataSEXP, SEXP clSEXP, SEXP squaredSEXP) {

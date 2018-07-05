@@ -52,7 +52,7 @@ IntegerVector dbscan_density_int(
     if (!(i % 100)) Rcpp::checkUserInterrupt();
 
     N = regionQuery(i, dataPts, kdTree, eps2, approx);
-    count[i] = N.size()+1;
+    count[i] = N.size();
   }
 
   // cleanup

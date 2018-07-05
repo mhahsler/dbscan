@@ -1,10 +1,14 @@
+# dbscan 1.1-2.1 (2018-xx-xx)
+
+## Bugfix
+* pointdensity was double counting the query point (reported by Marius Hofert).
+
 # dbscan 1.1-2 (2018-05-18)
 
 ## New Features
 * OPTICS now calculates eps if it is omitted.
 
 ## Bugfix
-
 * Example now only uses igraph conditionally since it is unavailable 
   on Solaris (reported by B. Ripley).
 

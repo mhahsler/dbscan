@@ -24,7 +24,7 @@ pointdensity(x, eps, type = "frequency",
 }
 \details{
 DBSCAN estimates the density around a point as the number of points in the
-eps-neighborhood of the point. The kde using a uniform
+eps-neighborhood of the point (including the query point itself). The kde using a uniform
 kernel is just this count divided by \eqn{2 eps n}, where \eqn{n} is the number
 of points in \code{x}.
 

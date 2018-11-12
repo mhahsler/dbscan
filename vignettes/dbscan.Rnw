@@ -10,7 +10,7 @@
 %\usepackage[noend]{algpseudocode} % algorithmic (pseudocode) tools
 \usepackage{mathtools} % coloneqq
 \usepackage{amsthm}
-\usepackage[dvipsnames]{xcolor} % for adding color to code
+%\usepackage[dvipsnames]{xcolor} % for adding color to code
 \usepackage{listings} % For pprinting r code blocks (w/o execution)
 \usepackage{amssymb}
 \usepackage{pifont} % http://ctan.org/pkg/pifont

@@ -128,7 +128,7 @@ hullplot(x, res)
 ## predict cluster membership for new data points
 ## (Note: 0 means it is predicted as noise)
 newdata <- x[1:5,] + rnorm(10, 0, .2)
-predict(res, x, newdata)
+predict(res, newdata, data = x)
 
 ## compare speed against fpc version (if microbenchmark is installed)
 ## Note: we use dbscan::dbscan to make sure that we do now run the

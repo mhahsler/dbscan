@@ -1,4 +1,4 @@
-# dbscan 1.1-2.1 (2018-xx-xx)
+# dbscan 1.1-3 (2018-11-12)
 
 ## Bugfix
 * pointdensity was double counting the query point (reported by Marius Hofert).

@@ -11,20 +11,20 @@
 \usepackage{mathtools} % coloneqq
 \usepackage{amsthm}
 %\usepackage[dvipsnames]{xcolor} % for adding color to code
-\usepackage{listings} % For pprinting r code blocks (w/o execution)
+%\usepackage{listings} % For pprinting r code blocks (w/o execution)
 \usepackage{amssymb}
 \usepackage{pifont} % http://ctan.org/pkg/pifont
-\usepackage{float}
+%\usepackage{float}
 \usepackage{tabularx}
 %\usepackage[toc,page]{appendix}
 
 % Remove sweave margins if possible
-\usepackage[belowskip=-15pt,aboveskip=0pt]{caption}
-\setlength{\intextsep}{8pt plus 1pt minus 1pt}
-\setlength{\floatsep}{1ex}
-\setlength{\textfloatsep}{1ex plus 1pt minus 1pt}
-\setlength{\abovecaptionskip}{0ex}
-\setlength{\belowcaptionskip}{0ex}
+%\usepackage[belowskip=-15pt,aboveskip=0pt]{caption}
+%\setlength{\intextsep}{8pt plus 1pt minus 1pt}
+%\setlength{\floatsep}{1ex}
+%\setlength{\textfloatsep}{1ex plus 1pt minus 1pt}
+%\setlength{\abovecaptionskip}{0ex}
+%\setlength{\belowcaptionskip}{0ex}
 
 % Aliases and commands
 \newtheorem{mydef}{Definition}

@@ -51,7 +51,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
     x <- as.matrix(x)
     diag(x) <- NA
 
-    if(k >= nrow(x)) stop("Not enought neighbors in data set!")
+    if(k >= nrow(x)) stop("Not enough neighbors in data set!")
 
     o <- t(apply(x, 1, order, decreasing = FALSE))
     id <- o[,1:k, drop = FALSE]

@@ -19,8 +19,13 @@
 
 kNNdist <- function(x, k, ...) dbscan::kNN(x, k, sort = TRUE, ...)$dist
 
-kNNdistplot <- function(x, k = 4, ...) {
-  kNNdist <- sort(kNNdist(x, k ,...))
-  plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
-    xlab = "Points (sample) sorted by distance")
+kNNdistplot <- function(x, k = 4, all.K = FALSE, ...) {
+    # allow option of only plotting the kth distance for each observation
+    if (!all.K){
+      kNNdist <- sort(kNNdist(x, k ,...)[, k])
+    } else {
+      kNNdist <- sort(kNNdist(x, k ,...))
+    }
+    plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
+         xlab = "Points (sample) sorted by distance")
 }

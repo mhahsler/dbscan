@@ -23,10 +23,9 @@ kNNdistplot <- function(x, k = 4, all.K = FALSE, ...) {
     # allow option of only plotting the kth distance for each observation
     if (!all.K){
       kNNdist <- sort(kNNdist(x, k ,...)[, k])
-  } else {
+    } else {
       kNNdist <- sort(kNNdist(x, k ,...))
-  }
-  
-  plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
-    xlab = "Points (sample) sorted by distance")
+    }
+    plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
+         xlab = "Points (sample) sorted by distance")
 }

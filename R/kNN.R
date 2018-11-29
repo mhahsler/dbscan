@@ -70,7 +70,7 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   if(storage.mode(x) == "integer") storage.mode(x) <- "double"
   if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
 
-  if(k >= nrow(x)) stop("Not enought neighbors in data set!")
+  if(k >= nrow(x)) stop("Not enough neighbors in data set!")
 
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L

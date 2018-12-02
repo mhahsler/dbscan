@@ -26,15 +26,15 @@ hdbscan <- function(x, minPts, xdist = NULL,
 
     ## x is a point cloud. Whether xdist is given or not, need all the distances. 
     if (missing(xdist)){ 
-      core_dist <- kNNdist(x, k = minPts - 1)[, minPts - 1]
+      core_dist <- kNNdist(x, k = minPts - 1)
       xdist <- dist(x, method = "euclidean") 
     } else if (is(xdist, "dist")) {
-      core_dist <- kNNdist(xdist, k = minPts - 1)[, minPts - 1] 
+      core_dist <- kNNdist(xdist, k = minPts - 1) 
     }
   } else if (is(x, "dist") && missing(xdist)) {
     ## let kNNdist handle the any non-euclidean knn-queries
     xdist <- x
-    core_dist <- kNNdist(xdist, k = minPts - 1)[, minPts - 1] 
+    core_dist <- kNNdist(xdist, k = minPts - 1) 
   } else{ stop("hdbscan expects a matrix-coercible object of numerical data, and xdist to be a 'dist' object (or not supplied).") }
   
   ## At this point, xdist should be a dist object. 

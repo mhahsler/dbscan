@@ -11,7 +11,11 @@ x <- cbind(
   z = runif(10, 0, 10) + rnorm(n, sd = 0.2)
 )
 
+
 d <- kNNdist(x, k = 5)
+expect_equal(length(d), n)
+
+d <- kNNdist(x, k = 5, all = TRUE)
 expect_equal(dim(d), c(n, 5))
 
 # does the plot work?

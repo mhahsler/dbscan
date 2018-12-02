@@ -32,7 +32,7 @@ expect_equivalent(res[!names(res) %in% c("hc")], res_d[!names(res_d) %in% c("hc"
 
 ## Check hierarchy matches dbscan* at every value
 check <- rep(F, nrow(moons)-1)
-core_dist <- kNNdist(moons, k=5-1)[,5-1]
+core_dist <- kNNdist(moons, k=5-1)
 
 ## cutree doesn't distinguish noise as 0, so we make a new method to do it manually
 cut_tree <- function(hcl, eps, core_dist){

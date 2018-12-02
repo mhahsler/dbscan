@@ -17,15 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-kNNdist <- function(x, k, ...) dbscan::kNN(x, k, sort = TRUE, ...)$dist
-
-kNNdistplot <- function(x, k = 4, all.K = FALSE, ...) {
-    # allow option of only plotting the kth distance for each observation
-    if (!all.K){
-      kNNdist <- sort(kNNdist(x, k ,...)[, k])
-    } else {
-      kNNdist <- sort(kNNdist(x, k ,...))
-    }
-    plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
-         xlab = "Points (sample) sorted by distance")
+kNNdist <- function(x, k, all = FALSE, ...) {
+  kNNd <- dbscan::kNN(x, k, sort = TRUE, ...)$dist
+  if(!all)  kNNd <- kNNd[,k]
+  kNNd
 }
+
+kNNdistplot <- function(x, k = 4, ...) {
+  kNNdist <- sort(kNNdist(x, k ,...))
+  plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
+    xlab = "Points (sample) sorted by distance")
+}
+

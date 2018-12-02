@@ -20,7 +20,7 @@
 optics <- function(x, eps = NULL, minPts = 5, ...) {
 
   ### find eps from minPts
-  if(is.null(eps)) eps <- max(kNNdist(x, k =  minPts)[,minPts])
+  if(is.null(eps)) eps <- max(kNNdist(x, k =  minPts))
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0

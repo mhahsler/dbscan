@@ -73,7 +73,8 @@ assign some border points and reports them instead as noise.
 specified in Ankerst et al (1999) based on the steepness of the reachability plot.
 One interpretation of the \code{xi}
 parameter is that it classifies clusters by change in relative cluster density.
-The used algorithm was originally contributed by the ELKI framework,
+The used algorithm was originally contributed by the ELKI framework
+and is explained in Schubert et al (2018),
 but contains a set of fixes.
 
 See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
@@ -101,6 +102,8 @@ See \code{\link{frNN}} for more information on the parameters related to nearest
 }
 \references{
 Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49--60.
+
+Erich Schubert, Michael Gertz (2018). Improving the Cluster Structure Extracted from OPTICS Plots. Lernen, Wissen, Daten, Analysen (LWDA 2018). pp. 318--329.
 }
 
 \author{

@@ -15,7 +15,7 @@ frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix, a dist object or a frNN object.}
-  \item{eps}{ neighbors radius. }
+  \item{eps}{ neighbors radius (dist <= eps). }
     \item{search}{ nearest neighbor search strategy (one of "kdtree"
     or "linear", "dist").}
   \item{sort}{ sort the neighbors by distance? This is expensive and can be done later using \code{sort()}. }

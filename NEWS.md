@@ -1,8 +1,12 @@
 # dbscan 1.1-3.1 (20xx-xx-x)
 
-## Bugfix
-* kNNdist now correctly returnd the distanes to the kth neighbor (reported by zschuster). * kNNdist gained parameter all to indicate if a matrix with all nearest neighbors up 
-  to k should be returned.
+## Bugfixes
+* kNNdist now correctly returns the distances to the kth neighbor 
+  (reported by zschuster). 
+
+## New Features
+* kNNdist gained parameter all to indicate if a matrix with the distance to all 
+  nearest neighbors up to k should be returned.
 
 # dbscan 1.1-3 (2018-11-12)
 

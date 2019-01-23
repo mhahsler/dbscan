@@ -143,7 +143,7 @@ the concept of $\epsilon$-neighborhood.
 \begin{mydef} {\bf $\epsilon$-Neighborhood}.
 The $\epsilon$-neighborhood, $N_\epsilon(p)$, of a data point $p$ is the set of points within a specified radius $\epsilon$ around $p$.
 
-    $$N_\epsilon(p) = \{q \;|\; d(p,q) < \epsilon\}$$
+    $$N_\epsilon(p) = \{q \;|\; d(p,q) \le \epsilon\}$$
 
 where $d$ is some distance measure and $\epsilon \in \mathbb{R}^+$. Note that the point $p$ is always in its own $\epsilon$-neighborhood, i.e., $p \in N_\epsilon(p)$ always holds.
 \end{mydef}

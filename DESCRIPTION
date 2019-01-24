@@ -30,7 +30,8 @@ Suggests:
     knitr,
     DMwR
 VignetteBuilder: knitr
-BugReports: https://github.com/mhahsler/dbscan
+URL: https://github.com/mhahsler/dbscan
+BugReports: https://github.com/mhahsler/dbscan/issues
 License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and
     David Mount. All other code is copyright by Michael Hahsler and Matthew Piekenbrock.

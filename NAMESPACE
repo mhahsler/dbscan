@@ -1,13 +1,10 @@
 useDynLib("dbscan")
 
 import("Rcpp")
-
 importFrom("graphics", "plot", "par", "segments", "lines", "polygon", "text")
 importFrom("grDevices", "palette", "chull", "adjustcolor")
-
 importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
   "is.leaf", "prcomp")
-
 importFrom("methods", "is")
 
 export(
@@ -32,11 +29,17 @@ export(
   as.reachability
 )
 
+S3method(print, dbscan_fast)
+S3method(predict, dbscan_fast)
+
 S3method(print, optics)
 S3method(plot, optics)
 S3method(predict, optics)
 S3method(as.dendrogram, optics)
 S3method(as.reachability, optics)
+
+S3method(print, hdbscan)
+S3method(plot, hdbscan)
 
 S3method(as.reachability, dendrogram)
 
@@ -44,20 +47,15 @@ S3method(print, reachability)
 S3method(plot, reachability)
 S3method(as.dendrogram, reachability)
 
-S3method(print, dbscan_fast)
-S3method(predict, dbscan_fast)
-
+S3method(adjacencylist, kNN)
+S3method(sort, kNN)
 S3method(print, kNN)
+
+S3method(adjacencylist, frNN)
+S3method(sort, frNN)
 S3method(print, frNN)
+
+S3method(sort, sNN)
 S3method(print, sNN)
 
-
-S3method(print, hdbscan)
-S3method(plot, hdbscan)
-
-S3method(adjacencylist, kNN)
-S3method(adjacencylist, frNN)
 S3method(plot, NN)
-S3method(sort, kNN)
-S3method(sort, frNN)
-S3method(sort, sNN)

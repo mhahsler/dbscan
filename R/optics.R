@@ -155,20 +155,6 @@ plot.optics <- function(x, cluster = TRUE, predecessor = FALSE, ...) {
   }
 }
 
-predict.optics <- function (object, newdata = NULL, data, ...) {
-  if (is.null(newdata)) return(object$cluster)
-  if (is.null(object$cluster)) stop("no extracted clustering available in object! run extractDBSCAN or extractXi first.")
-
-  nn <- frNN(rbind(data, newdata), eps = object$eps_cl,
-    sort = TRUE, ...)$id[-(1:nrow(data))]
-  sapply(nn, function(x) {
-    x <- x[x<=nrow(data)]
-    x <- object$cluster[x][x>0][1]
-    x[is.na(x)] <- 0L
-    x
-  })
-}
-
 # Simple conversion between OPTICS objects and reachability objects
 as.reachability.optics <- function(object, ...) {
   structure(list(reachdist=object$reachdist, order=object$order), class="reachability")

@@ -45,7 +45,7 @@ Additional, related algorithms including the "Global-Local Outlier Score from Hi
 
 Note that \code{minPts} not only acts as a minimum cluster size to detect, but also as a "smoothing" factor of the density estimates implicitly computed from HDBSCAN.
 
-\code{predict} can be used to predict cluster membership for new data points. A point is considered a member of a cluster if TODO
+\code{predict} can be used to predict cluster membership for new data points. A point is considered a member of a cluster if the closest data point (by mutual rechability distance) is member of the cluster. Points which cannot be assigned to a cluster will be reported as members of the noise cluster 0.
 }
 \value{
   A object of class 'hdbscan' with the following components:

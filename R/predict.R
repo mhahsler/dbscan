@@ -20,25 +20,7 @@ predict.optics <- function (object, newdata = NULL, data, ...) {
   .predict_frNN(newdata, data, object$cluster, object$eps_cl, ...)
 }
 
-
-.predict_kNN <- function(newdata, data, cluster, k, ...) {
-  
-  # get the nearest neighbors
-  nn <- kNN(rbind(data, newdata), k = 2 * hc$minPts, sort = TRUE)$id[-(1:nrow(data)),]
-  
-  # now select closest cluster
-  apply(nn, 1, function(x) {
-    x <- x[x <= nrow(data)]
-    x <- cluster[x][x > 0][1]
-    x[is.na(x)] <- 0L
-    x
-  })
-  
-}
-
-
 predict.hdbscan <- function(object, newdata = NULL, data, ...) {
-  #.predict_kNN(newdata, data, object$cluster, 2 * object$minPts, ...)
   
   k = 2 * object$minPts
   
@@ -55,7 +37,6 @@ predict.hdbscan <- function(object, newdata = NULL, data, ...) {
   
   # get the cluster indices
   sapply(1:nrow(nn), function(x) {
-    
     # reorder the neighbors by size
     x <- nn[x, nn_order[x,]]
     

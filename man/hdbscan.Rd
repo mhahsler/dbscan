@@ -19,6 +19,7 @@ hdbscan(x, minPts, xdist = NULL,
 \method{plot}{hdbscan}(x, scale="suggest",
     gradient=c("yellow", "red"), show_flat = FALSE, ...)
 }
+\method{predict}{hdbscan}(object, newdata = NULL, data, ...)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix or a dist object. }
@@ -32,7 +33,9 @@ hdbscan(x, minPts, xdist = NULL,
   \item{scale}{ integer; used to scale condensed tree based on the graphics device. Lower scale results in wider trees. }
   \item{gradient}{ character vector; the colors to build the condensed tree coloring with. }
   \item{show_flat}{ logical; whether to draw boxes indicating the most stable clusters. }
-
+  \item{object}{ a HDBSCAN clustering object.}
+  \item{data}{ the data set used to create the HDBSCAN clustering object.}
+  \item{newdata}{ new data set for which the cluster membership should be predicted.}
 }
 \details{
 Computes the hierarchical cluster tree representing density estimates along with the stability-based flat cluster extraction
@@ -41,6 +44,8 @@ proposed by Campello et al. (2013). HDBSCAN essentially computes the hierarchy o
 Additional, related algorithms including the "Global-Local Outlier Score from Hierarchies" (GLOSH) (see section 6 of Campello et al. 2015) outlier scores and ability to cluster based on instance-level constraints (see section 5.3 of Campello et al. 2015) are supported. The algorithms only need the parameter \code{minPts}.
 
 Note that \code{minPts} not only acts as a minimum cluster size to detect, but also as a "smoothing" factor of the density estimates implicitly computed from HDBSCAN.
+
+\code{predict} can be used to predict cluster membership for new data points. A point is considered a member of a cluster if TODO
 }
 \value{
   A object of class 'hdbscan' with the following components:

@@ -40,6 +40,7 @@ S3method(as.reachability, optics)
 
 S3method(print, hdbscan)
 S3method(plot, hdbscan)
+S3method(predict, hdbscan)
 
 S3method(as.reachability, dendrogram)
 

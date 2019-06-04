@@ -3,6 +3,7 @@
 \alias{HDBSCAN}
 \alias{print.hdbscan}
 \alias{plot.hdbscan}
+\alias{predict.hdbscan}
 \title{
   HDBSCAN
 }
@@ -18,8 +19,8 @@ hdbscan(x, minPts, xdist = NULL,
 \method{print}{hdbscan}(x, ...)
 \method{plot}{hdbscan}(x, scale="suggest",
     gradient=c("yellow", "red"), show_flat = FALSE, ...)
-}
 \method{predict}{hdbscan}(object, newdata = NULL, data, ...)
+}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix or a dist object. }

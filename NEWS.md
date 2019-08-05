@@ -2,7 +2,8 @@
 
 ## Bugfixes
 * kNNdist now correctly returns the distances to the kth neighbor 
-  (reported by zschuster). 
+  (reported by zschuster).
+* dbscan: check eps and minPts parameters to avoid undefined results (reported by ArthurPERE).
 
 ## New Features
 * kNNdist gained parameter all to indicate if a matrix with the distance to all 

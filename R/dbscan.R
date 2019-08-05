@@ -20,6 +20,7 @@
 dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
   ...) {
 
+
   if(is(x, "frNN") && missing(eps)) eps <- x$eps
 
   ### extra contains settings for frNN
@@ -86,6 +87,10 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
   ## add self match and use C numbering if frNN is used
   if(length(frNN) > 0)
     frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
+
+  if(length(minPts) !=1 || ! is.finite(minPts) || minPts < 0) stop("minPts need to be a single integer >=0.")
+
+  if(is.null(eps) || is.na(eps) || eps < 0) stop("eps needs to be >=0.")
 
   ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
     as.double(weights), as.integer(borderPoints),

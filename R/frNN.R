@@ -20,6 +20,8 @@
 frNN <- function(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
+  if(is.null(eps) || is.na(eps) || eps < 0) stop("eps needs to be >=0.")
+
   if(is(x, "frNN")) {
     if(x$eps < eps) stop("frNN in x has not a sufficient eps radius.")
 

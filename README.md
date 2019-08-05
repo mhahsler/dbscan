@@ -1,6 +1,7 @@
 # dbscan - Density Based Clustering of Applications with Noise (DBSCAN) and Related Algorithms - R package
 
 [![CRAN version](http://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
+[![Rdoc](http://www.rdocumentation.org/badges/version/dbscan)](http://www.rdocumentation.org/packages/dbscan)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
 [![Travis-CI Build Status](https://travis-ci.org/mhahsler/dbscan.svg?branch=master)](https://travis-ci.org/mhahsler/dbscan)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
@@ -142,11 +143,5 @@ The dbscan package is licensed under the [GNU General Public License (GPL) Versi
 
 
 ## Further Information
-
-* Development version of [dbscan on github](https://github.com/mhahsler/dbscan).
 * List of changes from [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)
-* [dbscan reference manual](https://cran.r-project.org/package=dbscan/dbscan.pdf)
-
-_Maintainer:_ [Michael Hahsler](http://michael.hahsler.net)
-
 

@@ -1,6 +1,6 @@
 Package: dbscan
-Version: 1.1-3.1
-Date: 20xx-xx-xx
+Version: 1.1-4
+Date: 2019-08-05
 Title: Density Based Clustering of Applications with Noise (DBSCAN) and Related
     Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),

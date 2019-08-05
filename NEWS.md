@@ -1,4 +1,4 @@
-# dbscan 1.1-3.1 (20xx-xx-x)
+# dbscan 1.1-4 (2019-08-05)
 
 ## Bugfixes
 * kNNdist now correctly returns the distances to the kth neighbor 

@@ -110,6 +110,7 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
     return(x)
   }
 
+  ## sort first by dist and break ties using id
   o <- sapply(1:nrow(x$dist), FUN =
       function(i) order(x$dist[i,], x$id[i,], decreasing=decreasing))
   for(i in 1:ncol(o)) {

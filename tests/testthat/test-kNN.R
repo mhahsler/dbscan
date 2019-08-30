@@ -30,7 +30,7 @@ expect_equal(dim(nn$id), c(nrow(x), k))
 #points(x[nn$id[2,],], col="green", lwd=5)
 
 ## compare with kNN found using distances
-nn_d <- kNN(dist(x), k)
+nn_d <- dbscan::kNN(dist(x), k, sort = TRUE)
 
 ## check visually
 #plot(x)
@@ -41,7 +41,7 @@ nn_d <- kNN(dist(x), k)
 expect_equal(nn, nn_d)
 
 ## calculate dist internally
-nn_d2 <- kNN(x, k, search = "dist")
+nn_d2 <- dbscan::kNN(x, k, search = "dist", sort = TRUE)
 expect_equal(nn, nn_d2)
 
 ## without sorting
@@ -50,18 +50,18 @@ expect_equal(t(apply(nn$id, MARGIN = 1, sort)),
   t(apply(nn2$id, MARGIN = 1, sort)))
 
 ## search options
-nn_linear <- dbscan::kNN(x, k=k, search = "linear")
+nn_linear <- dbscan::kNN(x, k=k, search = "linear", sort = TRUE)
 expect_equal(nn, nn_linear)
 
 ## split options
 for(so in c("STD", "MIDPT", "FAIR", "SL_FAIR")) {
-  nn3 <- dbscan::kNN(x, k=k, splitRule = so)
+  nn3 <- dbscan::kNN(x, k=k, splitRule = so, sort = TRUE)
   expect_equal(nn, nn3)
 }
 
 ## bucket size
 for(bs in c(5, 10, 15, 100)) {
-  nn3 <- dbscan::kNN(x, k=k, bucketSize = bs)
+  nn3 <- dbscan::kNN(x, k=k, bucketSize = bs, sort = TRUE)
   expect_equal(nn, nn3)
 }
 
@@ -75,7 +75,7 @@ k <- 5L
 nn <- dbscan::kNN(x, k=k, sort = TRUE)
 
 ## compare with manually found NNs
-nn_d <- dbscan::kNN(x, k=k, search = "dist")
+nn_d <- dbscan::kNN(x, k=k, search = "dist", sort = TRUE)
 
 expect_equal(nn$dist, nn_d$dist)
 ## This is expected to fail: expect_equal(nn$id, ids)
@@ -89,24 +89,32 @@ expect_false(any(rowSums(ms[,-k]) !=4))
 ## missing values, but distances are fine
 x_na <- x
 x_na[c(1,3,5), 1] <- NA
-expect_error(kNN(x_na, k = 3), regexp = "NA")
-res_d1 <- kNN(x_na, k = 3, search = "dist")
-res_d2 <- kNN(dist(x_na), k = 3)
+expect_error(dbscan::kNN(x_na, k = 3), regexp = "NA")
+res_d1 <- dbscan::kNN(x_na, k = 3, search = "dist")
+res_d2 <- dbscan::kNN(dist(x_na), k = 3)
 expect_equal(res_d1, res_d2)
 
 ## introduce NAs into dist
 x_na[c(1,3,5),] <- NA
-expect_error(kNN(x_na, k = 3), regexp = "NA")
-expect_error(kNN(x_na, k = 3, search = "dist"), regexp = "NA")
-expect_error(kNN(dist(x_na), k = 3), regexp = "NA")
+expect_error(dbscan::kNN(x_na, k = 3), regexp = "NA")
+expect_error(dbscan::kNN(x_na, k = 3, search = "dist"), regexp = "NA")
+expect_error(dbscan::kNN(dist(x_na), k = 3), regexp = "NA")
 
 
 ## sort and kNN to reduce k
-nn10 <- kNN(x, k = 10, sort = FALSE)
+nn10 <- dbscan::kNN(x, k = 10, sort = FALSE)
 expect_equal(nn10$sort, FALSE)
-expect_error(kNN(nn10, k = 11))
-nn5 <- kNN(nn10, k = 5)
+expect_error(dbscan::kNN(nn10, k = 11))
+nn5 <- dbscan::kNN(nn10, k = 5)
 expect_equal(nn5$sort, TRUE)
 expect_equal(ncol(nn5$id), 5L)
 expect_equal(ncol(nn5$dist), 5L)
+
+
+## test with simple data
+x <- data.frame(x=1:10)
+nn <- dbscan::kNN(x, k = 5)
+expect_equivalent(nn$id[1,], c(2,3,4,5,6))
+expect_equivalent(nn$id[5,], c(4,6,3,7,2))
+expect_equivalent(nn$id[10,], c(9,8,7,6,5))
 

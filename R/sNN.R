@@ -22,53 +22,62 @@ sNN <- function(x, k, kt = NULL, sort = TRUE,
   search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0){
 
+  if(missing(k)) k <- x$k
+
   if(is(x, "kNN")) {
-    nn <- x
-    if(missing(k)) k <- nn$k
-    if(ncol(nn$id) < k) stop("kNN object does not contain enough neighbors!")
-    if(ncol(nn$id) < k) {
-      if(!nn$sort) nn <- sort(nn)
-      nn$id <- nn$id[,1:k]
-      nn$dist <- nn$dist[,1:k]
+    if(k != x$k) {
+      if(ncol(x$id) < k) stop("kNN object does not contain enough neighbors!")
+      if(!x$sort) x <- sort.kNN(x)
+      x$id <- x$id[,1:k]
+      x$dist <- x$dist[,1:k]
+      x$k <- k
     }
-    nn$sort <- FALSE ### not sorted for sNN
-  } else nn <- kNN(x, k, sort = FALSE, search = search, bucketSize = bucketSize,
+
+  } else x <- kNN(x, k, sort = FALSE, search = search, bucketSize = bucketSize,
     splitRule = splitRule, approx = approx)
 
-  nn$shared <- SNN_sim_int(nn$id)
-  class(nn) <- c("sNN", "kNN", "NN")
+  x$shared <- SNN_sim_int(x$id)
+  x$sort_shared <- FALSE
 
-  if(sort) nn <- sort(nn)
+  class(x) <- c("sNN", "kNN", "NN")
 
-  nn$kt <- kt
+  if(sort) x <- sort.sNN(x)
+
+  x$kt <- kt
 
   if(!is.null(kt)) {
     if(kt > k) stop("kt needs to be less than k.")
-    rem <- nn$shared < kt
-    nn$id[rem] <- NA
-    nn$dist[rem] <- NA
-    nn$shared[rem] <- NA
+    rem <- x$shared < kt
+    x$id[rem] <- NA
+    x$dist[rem] <- NA
+    x$shared[rem] <- NA
   }
 
-  nn
+  x
 }
 
 
 sort.sNN <- function(x, decreasing = TRUE, ...) {
-  if(!is.null(x$sort) && x$sort) return(x)
+  if(!is.null(x$sort_shared) && x$sort_shared) return(x)
   if(is.null(x$shared)) stop("Unable to sort. Number of shared neighbors is missing.")
   if(ncol(x$id)<2) {
     x$sort <- TRUE
+    x$sort_shared <- TRUE
     return(x)
   }
 
+  ## sort first by number of shared points (decreasing) and break ties by id (increasing)
+  k <- ncol(x$shared)
   o <- sapply(1:nrow(x$shared), FUN =
-      function(i) order(x$shared[i,], x$id[i,], decreasing=decreasing))
+      function(i) order(k-x$shared[i,], x$id[i,], decreasing=!decreasing))
   for(i in 1:ncol(o)) {
     x$shared[i,] <- x$shared[i,][o[,i]]
+    x$dist[i,] <- x$dist[i,][o[,i]]
     x$id[i,] <- x$id[i,][o[,i]]
   }
-  x$sort <- TRUE
+
+  x$sort <- FALSE
+  x$sort_shared <- TRUE
 
   x
 }

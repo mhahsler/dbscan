@@ -106,18 +106,17 @@ IntegerMatrix SNN_sim_int(IntegerMatrix nn) {
       // edge was already checked
       //if(j<i) continue;
 
-      // check if points are in each others snn list (i is already in j)
-      if(nn_set[j].find(i+1) != nn_set[j].end()) {
+      // calculate link strength as the number of shared points
+      z.clear();
+      std::set_intersection(nn_set[i].begin(), nn_set[i].end(),
+        nn_set[j].begin(), nn_set[j].end(),
+        std::back_inserter(z));
 
-        // calculate link strength as the number of shared points
-        z.clear();
-        std::set_intersection(nn_set[i].begin(), nn_set[i].end(),
-          nn_set[j].begin(), nn_set[j].end(),
-          std::back_inserter(z));
+      snn(i, j_ind) = z.size();
 
-        // +1 for i being in j
-        snn(i, j_ind) = z.size()+1;
-      }
+      // +1 if i is in j
+      if(nn_set[j].find(i+1) != nn_set[j].end()) snn(i, j_ind)++;
+
     }
   }
 

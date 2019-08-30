@@ -19,8 +19,8 @@ sNN(x, k, kt = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
     are only preserved if \code{kt} or more neighbors are shared. }
   \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
-  \item{sort}{ sort the neighbors by distance? Note that this is expensive and
-      \code{sort = FALSE} is much faster. kNN objects can be sorted using
+  \item{sort}{ sort by the number of shared nearest neighbors? Note that this is expensive and
+      \code{sort = FALSE} is much faster. sNN objects can be sorted using
       \code{sort()}.}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",

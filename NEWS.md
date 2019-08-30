@@ -1,3 +1,9 @@
+# dbscan 1.1-4.1 (2019-xx-xx)
+
+## Bugfixes
+* fixed bug in shared NN computation reported by ZhenyiWangTHU.
+
+
 # dbscan 1.1-4 (2019-08-05)
 
 ## Bugfixes
@@ -8,6 +14,7 @@
 ## New Features
 * kNNdist gained parameter all to indicate if a matrix with the distance to all 
   nearest neighbors up to k should be returned.
+
 
 # dbscan 1.1-3 (2018-11-12)
 

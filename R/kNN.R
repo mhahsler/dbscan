@@ -17,7 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
+
+### FIXME: add query...
+
+kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
   if(is(x, "kNN")) {
@@ -46,6 +49,8 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   ### get kNN from a dist object
   if(is(x, "dist")) {
 
+    if(!is.null(query)) stop("query can only be used if x contains the data.")
+
     if(any(is.na(x))) stop("distances cannot be NAs for kNN!")
 
     x <- as.matrix(x)
@@ -70,8 +75,14 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   if(storage.mode(x) == "integer") storage.mode(x) <- "double"
   if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
 
-  if(k >= nrow(x)) stop("Not enough neighbors in data set!")
+  if(!is.null(query)) {
+    query <- as.matrix(query)
+    if(storage.mode(query) == "integer") storage.mode(query) <- "double"
+    if(storage.mode(query) != "double") stop("query has to be NULL or a numeric matrix.")
+    if(ncol(x) != ncol(query)) stop("x and query need to have the same number of columns!")
+  }
 
+  if(k >= nrow(x)) stop("Not enough neighbors in data set!")
 
   splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
   if(is.na(splitRule)) stop("Unknown splitRule!")
@@ -79,26 +90,27 @@ kNN <- function(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
   if(any(is.na(x))) stop("data/distances cannot contain NAs for kNN (with kd-tree)!")
 
   ## returns NO self matches
-  ret <- kNN_int(as.matrix(x), as.integer(k),
-    as.integer(search), as.integer(bucketSize),
-    as.integer(splitRule), as.double(approx))
+  if(!is.null(query)) {
+    ret <- kNN_query_int(as.matrix(x), as.matrix(query), as.integer(k),
+      as.integer(search), as.integer(bucketSize),
+      as.integer(splitRule), as.double(approx))
+    dimnames(ret$dist) <- list(rownames(query), 1:k)
+    dimnames(ret$id) <- list(rownames(query), 1:k)
+  }else{
+    ret <- kNN_int(as.matrix(x), as.integer(k),
+      as.integer(search), as.integer(bucketSize),
+      as.integer(splitRule), as.double(approx))
+    dimnames(ret$dist) <- list(rownames(x), 1:k)
+    dimnames(ret$id) <- list(rownames(x), 1:k)
+  }
+
+  ret$sort <- FALSE
+  class(ret) <- c("kNN", "NN")
 
   ### sort entries (by dist and id)?
   ### FIXME: This is expensive! We should do this in C++
-  if(sort && k>1) {
-    o <- sapply(1:nrow(ret$dist), FUN =
-        function(i) order(ret$dist[i,], ret$id[i,], decreasing=FALSE))
-    for(i in 1:ncol(o)) {
-      ret$dist[i,] <- ret$dist[i,][o[,i]]
-      ret$id[i,] <- ret$id[i,][o[,i]]
-      }
-  }
+  if(sort) ret <- sort(ret)
 
-  dimnames(ret$dist) <- list(rownames(x), 1:k)
-  dimnames(ret$id) <- list(rownames(x), 1:k)
-  ret$sort <- sort
-
-  class(ret) <- c("kNN", "NN")
   ret
 }
 

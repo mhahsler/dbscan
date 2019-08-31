@@ -80,6 +80,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// frNN_query_int
+List frNN_query_int(NumericMatrix data, NumericMatrix query, double eps, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP _dbscan_frNN_query_int(SEXP dataSEXP, SEXP querySEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type query(querySEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
+    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
+    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
+    rcpp_result_gen = Rcpp::wrap(frNN_query_int(data, query, eps, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // kNN_int
 List kNN_int(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
 RcppExport SEXP _dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
@@ -93,6 +110,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
     Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
     rcpp_result_gen = Rcpp::wrap(kNN_int(data, k, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// kNN_query_int
+List kNN_query_int(NumericMatrix data, NumericMatrix query, int k, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP _dbscan_kNN_query_int(SEXP dataSEXP, SEXP querySEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type query(querySEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
+    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
+    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
+    rcpp_result_gen = Rcpp::wrap(kNN_query_int(data, query, k, type, bucketSize, splitRule, approx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -395,4 +429,45 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(concat_int(container));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_dbscan_JP_int", (DL_FUNC) &_dbscan_JP_int, 2},
+    {"_dbscan_SNN_sim_int", (DL_FUNC) &_dbscan_SNN_sim_int, 1},
+    {"_dbscan_dbscan_int", (DL_FUNC) &_dbscan_dbscan_int, 10},
+    {"_dbscan_dbscan_density_int", (DL_FUNC) &_dbscan_dbscan_density_int, 6},
+    {"_dbscan_frNN_int", (DL_FUNC) &_dbscan_frNN_int, 6},
+    {"_dbscan_frNN_query_int", (DL_FUNC) &_dbscan_frNN_query_int, 7},
+    {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 6},
+    {"_dbscan_kNN_query_int", (DL_FUNC) &_dbscan_kNN_query_int, 7},
+    {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},
+    {"_dbscan_distToAdjacency", (DL_FUNC) &_dbscan_distToAdjacency, 2},
+    {"_dbscan_buildDendrogram", (DL_FUNC) &_dbscan_buildDendrogram, 1},
+    {"_dbscan_all_children", (DL_FUNC) &_dbscan_all_children, 3},
+    {"_dbscan_node_xy", (DL_FUNC) &_dbscan_node_xy, 3},
+    {"_dbscan_simplifiedTree", (DL_FUNC) &_dbscan_simplifiedTree, 1},
+    {"_dbscan_computeStability", (DL_FUNC) &_dbscan_computeStability, 3},
+    {"_dbscan_validateConstraintList", (DL_FUNC) &_dbscan_validateConstraintList, 2},
+    {"_dbscan_computeVirtualNode", (DL_FUNC) &_dbscan_computeVirtualNode, 2},
+    {"_dbscan_fosc", (DL_FUNC) &_dbscan_fosc, 9},
+    {"_dbscan_extractUnsupervised", (DL_FUNC) &_dbscan_extractUnsupervised, 2},
+    {"_dbscan_extractSemiSupervised", (DL_FUNC) &_dbscan_extractSemiSupervised, 4},
+    {"_dbscan_reach_to_dendrogram", (DL_FUNC) &_dbscan_reach_to_dendrogram, 2},
+    {"_dbscan_dendrogram_to_reach", (DL_FUNC) &_dbscan_dendrogram_to_reach, 1},
+    {"_dbscan_mst_to_dendrogram", (DL_FUNC) &_dbscan_mst_to_dendrogram, 1},
+    {"_dbscan_mrd", (DL_FUNC) &_dbscan_mrd, 2},
+    {"_dbscan_mrd_m", (DL_FUNC) &_dbscan_mrd_m, 2},
+    {"_dbscan_coreFromDist", (DL_FUNC) &_dbscan_coreFromDist, 3},
+    {"_dbscan_prims", (DL_FUNC) &_dbscan_prims, 2},
+    {"_dbscan_order_", (DL_FUNC) &_dbscan_order_, 1},
+    {"_dbscan_hclustMergeOrder", (DL_FUNC) &_dbscan_hclustMergeOrder, 2},
+    {"_dbscan_lowerTri", (DL_FUNC) &_dbscan_lowerTri, 1},
+    {"_dbscan_combine", (DL_FUNC) &_dbscan_combine, 2},
+    {"_dbscan_concat_int", (DL_FUNC) &_dbscan_concat_int, 1},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_dbscan(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

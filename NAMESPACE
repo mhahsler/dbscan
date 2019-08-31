@@ -1,7 +1,6 @@
-useDynLib("dbscan")
-
+useDynLib("dbscan", .registration=TRUE)
 import("Rcpp")
-importFrom("graphics", "plot", "par", "segments", "lines", "polygon", "text")
+importFrom("graphics", "plot", "points", "par", "segments", "lines", "polygon", "text")
 importFrom("grDevices", "palette", "chull", "adjustcolor")
 importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
   "is.leaf", "prcomp")

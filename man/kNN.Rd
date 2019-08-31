@@ -9,14 +9,15 @@ This function uses a kd-tree to find all k nearest neighbors
 in a data matrix (including distances) fast.
 }
 \usage{
-kNN(x, k, sort = TRUE, search = "kdtree", bucketSize = 10,
+kNN(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix, a dist object or a kNN object. }
   \item{k}{ number of neighbors to find. }
-    \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
+  \item{query}{ a data matrix with the points to query. If query is not specified, the NN for all the points in \code{x} is returned. If query is specified then \code{x} needs to be a data matrix. }
+  \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
   \item{sort}{ sort the neighbors by distance? Note that this is expensive and
       \code{sort = FALSE} is much faster. kNN objects can be sorted using
@@ -43,7 +44,7 @@ will be considered and all with a distance greater than \code{eps} will not
 be considered. The other points might be considered. Note that this results in
 some actual nearest neighbors being omitted leading to spurious clusters and noise points. However, the algorithm will enjoy a significant speedup. For more details see Mount and Arya (2010).
 
-\emph{Note:} self-matches are removed!
+\emph{Note:} self-matches are removed (only an issue if no query is specified).
 }
 \value{
 %%  ~Describe the value returned
@@ -68,7 +69,7 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Nei
 data(iris)
 x <- iris[, -5]
 
-# finding kNN directly in data (using a kd-tree)
+# Example 1: finding kNN for all points in a data matrix (using a kd-tree)
 nn <- kNN(x, k=5)
 nn
 
@@ -77,11 +78,24 @@ i <- 10
 nn$id[i,]
 plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
 
-# Visualize the 5 nearest neighbors
+# visualize the 5 nearest neighbors
 plot(nn, x)
 
-# Visualize a reduced 2-NN graph
+# visualize a reduced 2-NN graph
 plot(kNN(nn, k = 2), x)
+
+# Example 2: find kNN for query points
+q <- x[c(1,100),]
+nn <- kNN(x, k=10, query = q)
+
+plot(nn, x, col = "grey")
+points(q, pch = 3, lwd = 2)
+
+# Example 3: find kNN using distances
+d <- dist(x, method = "manhattan")
+nn <- kNN(d, k=1)
+
+plot(nn, x)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

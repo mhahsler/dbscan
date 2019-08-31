@@ -2,122 +2,130 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 JP_int <- function(nn, kt) {
-    .Call('_dbscan_JP_int', PACKAGE = 'dbscan', nn, kt)
+    .Call(`_dbscan_JP_int`, nn, kt)
 }
 
 SNN_sim_int <- function(nn) {
-    .Call('_dbscan_SNN_sim_int', PACKAGE = 'dbscan', nn)
+    .Call(`_dbscan_SNN_sim_int`, nn)
 }
 
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
-    .Call('_dbscan_dbscan_int', PACKAGE = 'dbscan', data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
+    .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
 }
 
 dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
-    .Call('_dbscan_dbscan_density_int', PACKAGE = 'dbscan', data, eps, type, bucketSize, splitRule, approx)
+    .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, approx)
 }
 
 frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
-    .Call('_dbscan_frNN_int', PACKAGE = 'dbscan', data, eps, type, bucketSize, splitRule, approx)
+    .Call(`_dbscan_frNN_int`, data, eps, type, bucketSize, splitRule, approx)
+}
+
+frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, approx)
 }
 
 kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
-    .Call('_dbscan_kNN_int', PACKAGE = 'dbscan', data, k, type, bucketSize, splitRule, approx)
+    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, approx)
+}
+
+kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, approx)
 }
 
 optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
-    .Call('_dbscan_optics_int', PACKAGE = 'dbscan', data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
+    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
 }
 
 distToAdjacency <- function(constraints, N) {
-    .Call('_dbscan_distToAdjacency', PACKAGE = 'dbscan', constraints, N)
+    .Call(`_dbscan_distToAdjacency`, constraints, N)
 }
 
 buildDendrogram <- function(hcl) {
-    .Call('_dbscan_buildDendrogram', PACKAGE = 'dbscan', hcl)
+    .Call(`_dbscan_buildDendrogram`, hcl)
 }
 
 all_children <- function(hier, key, leaves_only = FALSE) {
-    .Call('_dbscan_all_children', PACKAGE = 'dbscan', hier, key, leaves_only)
+    .Call(`_dbscan_all_children`, hier, key, leaves_only)
 }
 
 node_xy <- function(cl_tree, cl_hierarchy, cid = 0L) {
-    .Call('_dbscan_node_xy', PACKAGE = 'dbscan', cl_tree, cl_hierarchy, cid)
+    .Call(`_dbscan_node_xy`, cl_tree, cl_hierarchy, cid)
 }
 
 simplifiedTree <- function(cl_tree) {
-    .Call('_dbscan_simplifiedTree', PACKAGE = 'dbscan', cl_tree)
+    .Call(`_dbscan_simplifiedTree`, cl_tree)
 }
 
 computeStability <- function(hcl, minPts, compute_glosh = FALSE) {
-    .Call('_dbscan_computeStability', PACKAGE = 'dbscan', hcl, minPts, compute_glosh)
+    .Call(`_dbscan_computeStability`, hcl, minPts, compute_glosh)
 }
 
 validateConstraintList <- function(constraints, n) {
-    .Call('_dbscan_validateConstraintList', PACKAGE = 'dbscan', constraints, n)
+    .Call(`_dbscan_validateConstraintList`, constraints, n)
 }
 
 computeVirtualNode <- function(noise, constraints) {
-    .Call('_dbscan_computeVirtualNode', PACKAGE = 'dbscan', noise, constraints)
+    .Call(`_dbscan_computeVirtualNode`, noise, constraints)
 }
 
 fosc <- function(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves = FALSE, alpha = 0, useVirtual = FALSE, n_constraints = 0L, constraints = NULL) {
-    .Call('_dbscan_fosc', PACKAGE = 'dbscan', cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints)
+    .Call(`_dbscan_fosc`, cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints)
 }
 
 extractUnsupervised <- function(cl_tree, prune_unstable = FALSE) {
-    .Call('_dbscan_extractUnsupervised', PACKAGE = 'dbscan', cl_tree, prune_unstable)
+    .Call(`_dbscan_extractUnsupervised`, cl_tree, prune_unstable)
 }
 
 extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstable_leaves = FALSE) {
-    .Call('_dbscan_extractSemiSupervised', PACKAGE = 'dbscan', cl_tree, constraints, alpha, prune_unstable_leaves)
+    .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves)
 }
 
 reach_to_dendrogram <- function(reachability, pl_order) {
-    .Call('_dbscan_reach_to_dendrogram', PACKAGE = 'dbscan', reachability, pl_order)
+    .Call(`_dbscan_reach_to_dendrogram`, reachability, pl_order)
 }
 
 dendrogram_to_reach <- function(x) {
-    .Call('_dbscan_dendrogram_to_reach', PACKAGE = 'dbscan', x)
+    .Call(`_dbscan_dendrogram_to_reach`, x)
 }
 
 mst_to_dendrogram <- function(mst) {
-    .Call('_dbscan_mst_to_dendrogram', PACKAGE = 'dbscan', mst)
+    .Call(`_dbscan_mst_to_dendrogram`, mst)
 }
 
 mrd <- function(dm, cd) {
-    .Call('_dbscan_mrd', PACKAGE = 'dbscan', dm, cd)
+    .Call(`_dbscan_mrd`, dm, cd)
 }
 
 mrd_m <- function(dm, cd) {
-    .Call('_dbscan_mrd_m', PACKAGE = 'dbscan', dm, cd)
+    .Call(`_dbscan_mrd_m`, dm, cd)
 }
 
 coreFromDist <- function(dist, n, minPts) {
-    .Call('_dbscan_coreFromDist', PACKAGE = 'dbscan', dist, n, minPts)
+    .Call(`_dbscan_coreFromDist`, dist, n, minPts)
 }
 
 prims <- function(x_dist, n) {
-    .Call('_dbscan_prims', PACKAGE = 'dbscan', x_dist, n)
+    .Call(`_dbscan_prims`, x_dist, n)
 }
 
 order_ <- function(x) {
-    .Call('_dbscan_order_', PACKAGE = 'dbscan', x)
+    .Call(`_dbscan_order_`, x)
 }
 
 hclustMergeOrder <- function(mst, o) {
-    .Call('_dbscan_hclustMergeOrder', PACKAGE = 'dbscan', mst, o)
+    .Call(`_dbscan_hclustMergeOrder`, mst, o)
 }
 
 lowerTri <- function(m) {
-    .Call('_dbscan_lowerTri', PACKAGE = 'dbscan', m)
+    .Call(`_dbscan_lowerTri`, m)
 }
 
 combine <- function(t1, t2) {
-    .Call('_dbscan_combine', PACKAGE = 'dbscan', t1, t2)
+    .Call(`_dbscan_combine`, t1, t2)
 }
 
 concat_int <- function(container) {
-    .Call('_dbscan_concat_int', PACKAGE = 'dbscan', container)
+    .Call(`_dbscan_concat_int`, container)
 }
 

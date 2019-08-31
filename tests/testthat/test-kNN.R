@@ -100,7 +100,6 @@ expect_error(dbscan::kNN(x_na, k = 3), regexp = "NA")
 expect_error(dbscan::kNN(x_na, k = 3, search = "dist"), regexp = "NA")
 expect_error(dbscan::kNN(dist(x_na), k = 3), regexp = "NA")
 
-
 ## sort and kNN to reduce k
 nn10 <- dbscan::kNN(x, k = 10, sort = FALSE)
 expect_equal(nn10$sort, FALSE)
@@ -110,11 +109,18 @@ expect_equal(nn5$sort, TRUE)
 expect_equal(ncol(nn5$id), 5L)
 expect_equal(ncol(nn5$dist), 5L)
 
-
 ## test with simple data
-x <- data.frame(x=1:10)
+x <- data.frame(x=1:10, row.names = LETTERS[1:10])
 nn <- dbscan::kNN(x, k = 5)
 expect_equivalent(nn$id[1,], c(2,3,4,5,6))
 expect_equivalent(nn$id[5,], c(4,6,3,7,2))
 expect_equivalent(nn$id[10,], c(9,8,7,6,5))
 
+## test kNN with query
+x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+nn <- dbscan::kNN(x[1:8, , drop=FALSE], x[9:10, , drop = FALSE], k = 5)
+expect_equivalent(nrow(nn$id), 2L)
+expect_equivalent(nn$id[1,], 8:4)
+expect_equivalent(nn$id[2,], 8:4)
+
+expect_error(nn <- dbscan::kNN(dist(x[1:8, , drop=FALSE]), x[9:10, , drop = FALSE], k = 5))

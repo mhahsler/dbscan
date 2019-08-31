@@ -9,16 +9,17 @@ This function uses a kd-tree to find the fixed radius nearest neighbors
 (including distances) fast.
 }
 \usage{
-frNN(x, eps, sort = TRUE, search = "kdtree", bucketSize = 10,
+frNN(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix, a dist object or a frNN object.}
   \item{eps}{ neighbors radius (dist <= eps). }
-    \item{search}{ nearest neighbor search strategy (one of "kdtree"
-    or "linear", "dist").}
+  \item{query}{ a data matrix with the points to query. If query is not specified, the NN for all the points in \code{x} is returned. If query is specified then \code{x} needs to be a data matrix. }
   \item{sort}{ sort the neighbors by distance? This is expensive and can be done later using \code{sort()}. }
+  \item{search}{ nearest neighbor search strategy (one of "kdtree"
+    or "linear", "dist").}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",
       "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR" or "SUGGEST"
@@ -63,7 +64,7 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate Nearest Nei
 data(iris)
 x <- iris[, -5]
 
-# Find fixed radius nearest neighbors for each point
+# Example 1: Find fixed radius nearest neighbors for each point
 nn <- frNN(x, eps=.5)
 
 # Number of neighbors
@@ -82,13 +83,14 @@ head(adjacencylist(nn))
 
 # plot the fixed radius neighbors (and then reduced to a radius of .3)
 plot(nn, x)
-plot(frNN(nn, .3), x)
+plot(frNN(nn, eps = .3), x)
 
-## manually create a frNN object for dbscan (dbscan only needs ids and eps)
-nn <- list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1)
-class(nn) <- c("NN", "frNN")
-nn
-dbscan(nn, minPts = 2)
+## Example 2: find fixed-radius NN for query points
+q <- x[c(1,100),]
+nn <- frNN(x, eps = .5, query = q)
+
+plot(nn, x, col = "grey")
+points(q, pch = 3, lwd = 2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

@@ -20,7 +20,7 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a data matrix or a dist object. Alternatively, a frNN object
-    with fixed-radius nearest neighbors can also be specified. In this case
+    with fixed-radius nearest neighbors can also be specified (see Example section). In this case
     eps can be missing and will be taken form the frNN object.}
   \item{eps}{ size of the epsilon neighborhood.}
   \item{minPts}{ number of minimum points in the eps region (for core points).
@@ -91,6 +91,7 @@ in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
 }
 
 \examples{
+## Example 1: use dbscan on the iris data set
 data(iris)
 iris <- as.matrix(iris[,1:4])
 
@@ -108,7 +109,7 @@ pairs(iris, col = res$cluster + 1L)
 fr <- frNN(iris, eps = .5)
 dbscan(fr, minPts = 5)
 
-## example data from fpc
+## Example 2: use data from fpc
 set.seed(665544)
 n <- 100
 x <- cbind(
@@ -155,6 +156,12 @@ if (requireNamespace("fpc", quietly = TRUE) &&
   ## speedup of the kd-tree-based version compared to the fpc implementation
   median(t_fpc$time) / median(t_dbscan$time)
 }}
+
+## Example 3: manually create a frNN object for dbscan (dbscan only needs ids and eps)
+nn <- structure(list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1),
+  class =  c("NN", "frNN"))
+nn
+dbscan(nn, minPts = 2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

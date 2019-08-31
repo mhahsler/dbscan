@@ -5,10 +5,11 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Shared Nearest Neighbors}
 \description{
-Calculates the number of shared nearest neighbors.
+Calculates the number of shared nearest neighbors and the shared nearest neighbor similarity defined by
+  Javis and Patrick (1973).
 }
 \usage{
-sNN(x, k, kt = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
+sNN(x, k, kt = NULL, jp = FALSE, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -17,6 +18,7 @@ sNN(x, k, kt = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   \item{k}{ number of neighbors to consider to calculate the shared nearest neighbors. }
   \item{kt}{ threshold on the number of shared nearest neighbors graph. Edges
     are only preserved if \code{kt} or more neighbors are shared. }
+  \item{jp}{ use the definition by Javis and Patrick (1973), where shared neighbors are only counted between points that are in each other's neighborhood, otherwise 0 is returned. If FALSE, then the number of shared neighbors is returned, even if the points are not neighbors. }
   \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
   \item{sort}{ sort by the number of shared nearest neighbors? Note that this is expensive and
@@ -51,6 +53,10 @@ An object of class sNN (subclass of kNN and NN) containing a list with the follo
 
 \author{
     Michael Hahsler
+}
+
+\references{
+R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput. 22,} 11 (November 1973), 1025-1034.
 }
 
 \examples{

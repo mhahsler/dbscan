@@ -78,8 +78,12 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
   return wrap(label);
 }
 
+
+// jp == true: use the definition by Jarvis-Patrick: A link is created between a pair of
+// points, p and q, if and only if p and q have each other  in their k-nearest neighbor lists.
+// jp == false: just count the shared NNs
 // [[Rcpp::export]]
-IntegerMatrix SNN_sim_int(IntegerMatrix nn) {
+IntegerMatrix SNN_sim_int(IntegerMatrix nn, LogicalVector jp) {
   int n = nn.nrow();
   int k = nn.ncol();
 
@@ -103,19 +107,19 @@ IntegerMatrix SNN_sim_int(IntegerMatrix nn) {
     for (int j_ind = 0; j_ind < k; ++j_ind) {
       j = nn(i, j_ind)-1;
 
-      // edge was already checked
-      //if(j<i) continue;
+      bool i_in_j = (nn_set[j].find(i+1) != nn_set[j].end());
 
-      // calculate link strength as the number of shared points
-      z.clear();
-      std::set_intersection(nn_set[i].begin(), nn_set[i].end(),
-        nn_set[j].begin(), nn_set[j].end(),
-        std::back_inserter(z));
+      if(is_false(all(jp)) || i_in_j) {
+        // calculate link strength as the number of shared points
+        z.clear();
+        std::set_intersection(nn_set[i].begin(), nn_set[i].end(),
+          nn_set[j].begin(), nn_set[j].end(),
+          std::back_inserter(z));
+        snn(i, j_ind) = z.size();
+        // +1 if i is in j
+        if(i_in_j) snn(i, j_ind)++;
 
-      snn(i, j_ind) = z.size();
-
-      // +1 if i is in j
-      if(nn_set[j].find(i+1) != nn_set[j].end()) snn(i, j_ind)++;
+      }else snn(i, j_ind) = 0;
 
     }
   }

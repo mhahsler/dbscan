@@ -1,8 +1,7 @@
 # dbscan 1.1-4.1 (2019-xx-xx)
 
-## Bugfixes
-* fixed bug in shared NN computation reported by ZhenyiWangTHU.
-
+## New Features
+* sNN gained parameter jp to decide if the shared NN should be counted using the definition by Jarvis and Patrick.
 
 # dbscan 1.1-4 (2019-08-05)
 

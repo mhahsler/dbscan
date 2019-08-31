@@ -5,8 +5,8 @@ JP_int <- function(nn, kt) {
     .Call('_dbscan_JP_int', PACKAGE = 'dbscan', nn, kt)
 }
 
-SNN_sim_int <- function(nn) {
-    .Call('_dbscan_SNN_sim_int', PACKAGE = 'dbscan', nn)
+SNN_sim_int <- function(nn, jp) {
+    .Call('_dbscan_SNN_sim_int', PACKAGE = 'dbscan', nn, jp)
 }
 
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {

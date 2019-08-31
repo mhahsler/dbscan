@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # number of shared nearest neighbors including the point itself.
-sNN <- function(x, k, kt = NULL, sort = TRUE,
+sNN <- function(x, k, kt = NULL, jp = FALSE, sort = TRUE,
   search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0){
 
@@ -36,7 +36,7 @@ sNN <- function(x, k, kt = NULL, sort = TRUE,
   } else x <- kNN(x, k, sort = FALSE, search = search, bucketSize = bucketSize,
     splitRule = splitRule, approx = approx)
 
-  x$shared <- SNN_sim_int(x$id)
+  x$shared <- SNN_sim_int(x$id, as.logical(jp[1]))
   x$sort_shared <- FALSE
 
   class(x) <- c("sNN", "kNN", "NN")

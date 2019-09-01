@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 sNNclust <- function(x, k, eps, minPts, borderPoints = TRUE, ...) {
-  nn <- sNN(x, k=k, ...)
+  nn <- sNN(x, k=k, jp = TRUE, ...)
 
   # convert into a frNN object which already enforces eps
   nn_list <- lapply(seq(nrow(nn$id)),

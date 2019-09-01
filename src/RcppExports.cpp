@@ -18,13 +18,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // SNN_sim_int
-IntegerMatrix SNN_sim_int(IntegerMatrix nn);
-RcppExport SEXP _dbscan_SNN_sim_int(SEXP nnSEXP) {
+IntegerMatrix SNN_sim_int(IntegerMatrix nn, LogicalVector jp);
+RcppExport SEXP _dbscan_SNN_sim_int(SEXP nnSEXP, SEXP jpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerMatrix >::type nn(nnSEXP);
-    rcpp_result_gen = Rcpp::wrap(SNN_sim_int(nn));
+    Rcpp::traits::input_parameter< LogicalVector >::type jp(jpSEXP);
+    rcpp_result_gen = Rcpp::wrap(SNN_sim_int(nn, jp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -433,7 +434,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_JP_int", (DL_FUNC) &_dbscan_JP_int, 2},
-    {"_dbscan_SNN_sim_int", (DL_FUNC) &_dbscan_SNN_sim_int, 1},
+    {"_dbscan_SNN_sim_int", (DL_FUNC) &_dbscan_SNN_sim_int, 2},
     {"_dbscan_dbscan_int", (DL_FUNC) &_dbscan_dbscan_int, 10},
     {"_dbscan_dbscan_density_int", (DL_FUNC) &_dbscan_dbscan_density_int, 6},
     {"_dbscan_frNN_int", (DL_FUNC) &_dbscan_frNN_int, 6},

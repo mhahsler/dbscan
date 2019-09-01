@@ -2,9 +2,7 @@
 
 ## New Features
 * kNN and frNN gained parameter query to query distances not in the data.
-
-## Bugfixes
-* fixed bug in shared NN computation reported by ZhenyiWangTHU.
+* sNN gained parameter jp to decide if the shared NN should be counted using the definition by Jarvis and Patrick.
 
 
 # dbscan 1.1-4 (2019-08-05)

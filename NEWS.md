@@ -1,7 +1,7 @@
 # dbscan 1.1-4.1 (2019-xx-xx)
 
 ## New Features
-* kNN and frNN gained parameter query to query distances not in the data.
+* kNN and frNN gained parameter query to query neighbors for points not in the data.
 * sNN gained parameter jp to decide if the shared NN should be counted using the definition by Jarvis and Patrick.
 
 

@@ -127,6 +127,13 @@ This article presents an overview of the \proglang{R} package~\pkg{dbscan}
 focusing on DBSCAN and OPTICS, outlining its operation and experimentally
 compares its performance with implementations in other open-source implementations. We first review the concept of density-based clustering and present the DBSCAN and OPTICS algorithms in Section~\ref{sec:dbc}. This section concludes with a short review of existing software packages that implement these algorithms. Details about \pkg{dbscan}, with examples of its use, are presented in Section~\ref{sec:dbscan}. A performance evaluation is presented in Section~\ref{sec:eval}. Concluding remarks are offered in Section~\ref{sec:conc}.
 
+A version of this article describing the package \pkg{dbscan} was published as \cite{hahsler2019dbscan} and should be cited.
+
+<<echo=FALSE>>=
+options(useFancyQuotes = FALSE)
+citation("dbscan")
+@
+
 \section{Density-based clustering}\label{sec:dbc}
 Density-based clustering is now a well-studied field. Conceptually, the idea behind density-based clustering is simple: given a set of data points, define a structure that accurately reflects the underlying density~\citep{sander2011density}. An important distinction between density-based clustering and alternative approaches to cluster analysis, such as the use of \emph{(Gaussian) mixture models}~\citep[see][]{jain1999review}, is that the latter represents a \emph{parametric} approach in which the observed data are assumed to have been produced by mixture of either Gaussian or other parametric families of distributions.
 While certainly useful in many applications, parametric approaches naturally assume clusters will exhibit some type convex (generally hyper-spherical or hyper-elliptical) shape. Other approaches, such as $k$-means clustering (where the $k$ parameter signifies the user-specified number of clusters to find), share this common theme of `minimum variance', where the underlying assumption is made that ideal clusters are found by minimizing some measure of intra-cluster variance (often referred to as cluster cohesion) and maximizing the inter-cluster variance (cluster separation)~\citep{arbelaitz2013extensive}. Conversely, the label density-based clustering is used for methods which do not assume parametric distributions, are capable of finding arbitrarily-shaped clusters, handle varying amounts of noise, and require no prior knowledge regarding how to set the number of clusters $k$. This methodology is best expressed in the DBSCAN algorithm, which we discuss next.

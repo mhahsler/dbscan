@@ -8,7 +8,7 @@ vignette: >
 header-includes: \usepackage{animation}
 output: html_document
 ---
-The dbscan package includes a fast implementation of Hierarchical DBSCAN (HDBSCAN) and its related algorithm(s) for the 
+The dbscan package [6] includes a fast implementation of Hierarchical DBSCAN (HDBSCAN) and its related algorithm(s) for the 
 R platform. This vignette introduces how to interface with these features. To understand how HDBSCAN works, we refer to an excellent Python Notebook resource that goes over the basic concepts of the algorithm (see [ the SciKit-learn docs](http://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)). For the sake of simplicity, consider the same sample 
 dataset from the notebook:
 ```{r}
@@ -162,5 +162,6 @@ One of the primary computational bottleneck with using HDBSCAN is the computatio
 3. Campello, Ricardo JGB, Davoud Moulavi, and Joerg Sander. "Density-based clustering based on hierarchical density estimates." In Pacific-Asia Conference on Knowledge Discovery and Data Mining, pp. 160-172. Springer Berlin Heidelberg, 2013.
 4. Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Jörg Sander. "Hierarchical density estimates for data clustering, visualization, and outlier detection." ACM Transactions on Knowledge Discovery from Data (TKDD) 10, no. 1 (2015): 5.
 5. Karypis, George, Eui-Hong Han, and Vipin Kumar. "Chameleon: Hierarchical clustering using dynamic modeling." Computer 32, no. 8 (1999): 68-75.
+6. Hahsler M, Piekenbrock M, Doran D (2019). "dbscan: Fast Density-Based Clustering with R." Journal of Statistical Software, 91(1), 1-30. doi: [10.18637/jss.v091.i01](https://doi.org/10.18637/jss.v091.i01)
 
 

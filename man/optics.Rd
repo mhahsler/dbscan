@@ -45,7 +45,7 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
     details on how to control the search strategy.}
 }
 \details{
-This implementation of OPTICS implements the original algorithm as described by
+This implementation of OPTICS (Hahsler et al, 2019) implements the original algorithm as described by
 Ankerst et al (1999). OPTICS is an ordering algorithm using similar concepts
 to DBSCAN. However, for OPTICS
 \code{eps} is only an upper limit for the neighborhood size used to reduce
@@ -101,9 +101,12 @@ See \code{\link{frNN}} for more information on the parameters related to nearest
     \item{clusters_xi }{ data.frame containing the start and end of each cluster found in the OPTICS ordering. }
 }
 \references{
-Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49--60.
+Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R.
+  \emph{Journal of Statistical Software}, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
 
-Erich Schubert, Michael Gertz (2018). Improving the Cluster Structure Extracted from OPTICS Plots. Lernen, Wissen, Daten, Analysen (LWDA 2018). pp. 318--329.
+Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49-60.
+
+Erich Schubert, Michael Gertz (2018). Improving the Cluster Structure Extracted from OPTICS Plots. Lernen, Wissen, Daten, Analysen (LWDA 2018). pp. 318-329.
 }
 
 \author{

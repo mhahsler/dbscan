@@ -1,0 +1,19 @@
+bibentry(bibtype = "Article",
+  title        = "{dbscan}: Fast Density-Based Clustering with {R}",
+  author       = c(person(given = "Michael",
+                          family = "Hahsler",
+                          email = "mhahsler@lyle.smu.edu"),
+                   person(given = "Matthew",
+                          family = "Piekenbrock"),
+                   person(given = "Derek",
+                          family = "Doran",
+                          email = "derek.doran@wright.edu")),
+  journal      = "Journal of Statistical Software",
+  year         = "2019",
+  volume       = "91",
+  number       = "1",
+  pages        = "1--30",
+  doi          = "10.18637/jss.v091.i01",
+  header       = "To cite dbscan in publications use:"
+)
+

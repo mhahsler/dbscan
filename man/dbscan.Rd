@@ -42,7 +42,7 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 \emph{Note:} use \code{dbscan::dbscan} to call this
 implementation when you also use package \pkg{fpc}.
 
-This implementation of DBSCAN implements the original algorithm as described by
+This implementation of DBSCAN (Hahsler et al, 2019) implements the original algorithm as described by
 Ester et al (1996). DBSCAN estimates the density around each data point by counting the number of points in a user-specified eps-neighborhood and applies a used-specified minPts thresholds to identify core, border and noise points. In a second step, core points are joined into a cluster if they are density-reachable (i.e., there is a chain of core points where one falls inside the eps-neighborhood of the next). Finally, border points are assigned to clusters. The algorithm only needs
 parameters \code{eps} and \code{minPts}.
 
@@ -72,7 +72,10 @@ cluster will be reported as members of the noise cluster 0.
     \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}
 }
 \references{
-Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. \emph{Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96).}
+Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R.
+  \emph{Journal of Statistical Software}, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
+
+Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. \emph{Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96)}, 226-231.
 
 Campello, R. J. G. B.; Moulavi, D.; Sander, J. (2013). Density-Based Clustering
 Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th

@@ -1,4 +1,4 @@
-# dbscan 1.1-4.1 (2019-xx-xx)
+# dbscan 1.1-5 (2019-10-22)
 
 ## New Features
 * kNN and frNN gained parameter query to query neighbors for points not in the data.

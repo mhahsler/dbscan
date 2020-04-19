@@ -5,8 +5,8 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Shared Nearest Neighbors}
 \description{
-Calculates the number of shared nearest neighbors and the shared nearest neighbor similarity defined by
-  Javis and Patrick (1973).
+Calculates the number of shared nearest neighbors, the shared nearest neighbor similarity and
+creates a shared nearest neighbors graph.
 }
 \usage{
 sNN(x, k, kt = NULL, jp = FALSE, sort = TRUE, search = "kdtree", bucketSize = 10,
@@ -16,7 +16,8 @@ sNN(x, k, kt = NULL, jp = FALSE, sort = TRUE, search = "kdtree", bucketSize = 10
 \arguments{
   \item{x}{ a data matrix, a dist object or a kNN object. }
   \item{k}{ number of neighbors to consider to calculate the shared nearest neighbors. }
-  \item{kt}{ threshold on the number of shared nearest neighbors graph. Edges
+  \item{kt}{ minimum threshold on the number of shared nearest neighbors to build the shared
+    nearest neighbor graph. Edges
     are only preserved if \code{kt} or more neighbors are shared. }
   \item{jp}{ use the definition by Javis and Patrick (1973), where shared neighbors are only counted between points that are in each other's neighborhood, otherwise 0 is returned. If FALSE, then the number of shared neighbors is returned, even if the points are not neighbors. }
   \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
@@ -38,6 +39,8 @@ The number of shared nearest neighbors is the intersection of the
 kNN neighborhood of two points. Note: that each point is considered to be part
 of its own kNN neighborhood. The range for the shared nearest neighbors is
 [0,k].
+
+Javis and Patrick (1973) use the shared nearest neighbor graph for clustering. They only count shared neighbors between points that are in each other's kNN neighborhood.
 }
 \value{
 An object of class sNN (subclass of kNN and NN) containing a list with the following components:
@@ -79,7 +82,11 @@ plot(nn, x)
 
 # apply a threshold to create a sNN graph with edges
 # if more than 3 neighbors are shared.
-plot(sNN(nn, kt = 3), x)
+nn_3 <- sNN(nn, kt = 3)
+plot(nn_3, x)
+
+# get an adjacency list for the shared nearest neighbor graph
+adjacencylist(nn_3)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

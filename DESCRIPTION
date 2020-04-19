@@ -1,6 +1,6 @@
 Package: dbscan
-Version: 1.1-5
-Date: 2019-10-22
+Version: 1.1-5.1
+Date: 2020-xx-xx
 Title: Density Based Clustering of Applications with Noise (DBSCAN) and Related
     Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
@@ -16,11 +16,11 @@ Description: A fast reimplementation of several density-based algorithms of
     library ANN) for faster k-nearest neighbor search. An R interface to fast kNN
     and fixed-radius NN search is also provided. 
     See Hahsler M, Piekenbrock M and Doran D (2019) <doi:10.18637/jss.v091.i01>.
+SystemRequirements: C++11
 Imports:
     Rcpp (>= 1.0.0),
     graphics,
-    stats,
-    methods
+    stats
 LinkingTo: Rcpp
 Suggests:
     fpc,
@@ -36,4 +36,3 @@ BugReports: https://github.com/mhahsler/dbscan/issues
 License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and
     David Mount. All other code is copyright by Michael Hahsler and Matthew Piekenbrock.
-SystemRequirements: C++11

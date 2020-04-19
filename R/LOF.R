@@ -20,7 +20,7 @@
 lof <- function(x, k = 4, ...) {
 
   # get n
-  if(is(x, "dist")) n <- attr(x, "Size")
+  if(inherits(x, "dist")) n <- attr(x, "Size")
   else n <- nrow(x)
 
   if(is.null(n)) stop("x needs to be a matrix or a dist object!")

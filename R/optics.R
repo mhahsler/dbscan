@@ -46,14 +46,14 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
 
   ### dist search
   if(search == 3) {
-    if(!is(x, "dist"))
+    if(!inherits(x, "dist"))
       if(.matrixlike(x)) x <- dist(x)
       else stop("x needs to be a matrix to calculate distances")
   }
 
   ## for dist we provide the R code with a frNN list and no x
   frNN <- list()
-  if(is(x, "dist")) {
+  if(inherits(x, "dist")) {
     frNN <- frNN(x, eps, ...)
     ## add self match and use C numbering
     frNN$id <- lapply(1:length(frNN$id),
@@ -120,7 +120,7 @@ print.optics <- function(x, ...) {
 
 plot.optics <- function(x, cluster = TRUE, predecessor = FALSE, ...) {
   # OPTICS cluster extraction methods
-  if (is(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
+  if (inherits(x$cluster, "xics") || all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
 
     # Sort clusters by size
     hclusters <- x$clusters_xi[order(x$clusters_xi$end - x$clusters_xi$start),]

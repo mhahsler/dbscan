@@ -21,7 +21,7 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
   ...) {
 
 
-  if(is(x, "frNN") && missing(eps)) eps <- x$eps
+  if(inherits(x, "frNN") && missing(eps)) eps <- x$eps
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
@@ -55,17 +55,17 @@ dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
 
   ### do dist search
   if(search == 3) {
-    if(!is(x, "dist"))
+    if(!inherits(x, "dist"))
       if(.matrixlike(x)) x <- dist(x)
       else stop("x needs to be a matrix to calculate distances")
   }
 
   ## for dist we provide the R code with a frNN list and no x
   frNN <- list()
-  if(is(x, "dist")) {
+  if(inherits(x, "dist")) {
     frNN <- frNN(x, eps, ...)$id
     x <- matrix(0.0, nrow=0, ncol=0)
-  }else if(is(x, "frNN")) {
+  }else if(inherits(x, "frNN")) {
     if(x$eps != eps) {
       eps <- x$eps
       warning("Using the eps of ", eps, " provided in the fixed-radius NN object.")

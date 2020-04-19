@@ -21,7 +21,7 @@
 jpclust <- function(x, k, kt, ...) {
 
   # Create NN graph
-  if(is(x, "kNN")) {
+  if(inherits(x, "kNN")) {
     if(missing(k)) k <- nn$k
     nn <- x$id[,1:k]
   } else {

@@ -22,7 +22,7 @@ frNN <- function(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSiz
 
   if(is.null(eps) || is.na(eps) || eps < 0) stop("eps needs to be >=0.")
 
-  if(is(x, "frNN")) {
+  if(inherits(x, "frNN")) {
     if(x$eps < eps) stop("frNN in x has not a sufficient eps radius.")
 
     for(i in 1:length(x$dist)) {
@@ -40,13 +40,13 @@ frNN <- function(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSiz
 
   ### dist search
   if(search == 3) {
-    if(!is(x, "dist"))
+    if(!inherits(x, "dist"))
       if(.matrixlike(x)) x <- dist(x)
       else stop("x needs to be a matrix to calculate distances")
   }
 
   ### get kNN from a dist object in R
-  if(is(x, "dist")) {
+  if(inherits(x, "dist")) {
 
     if(!is.null(query)) stop("query can only be used if x contains the data.")
 

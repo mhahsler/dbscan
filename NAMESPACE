@@ -4,7 +4,6 @@ importFrom("graphics", "plot", "points", "par", "segments", "lines", "polygon", 
 importFrom("grDevices", "palette", "chull", "adjustcolor")
 importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
   "is.leaf", "prcomp")
-importFrom("methods", "is")
 
 export(
   adjacencylist,

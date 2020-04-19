@@ -24,7 +24,7 @@ sNN <- function(x, k, kt = NULL, jp = FALSE, sort = TRUE,
 
   if(missing(k)) k <- x$k
 
-  if(is(x, "kNN")) {
+  if(inherits(x, "kNN")) {
     if(k != x$k) {
       if(ncol(x$id) < k) stop("kNN object does not contain enough neighbors!")
       if(!x$sort) x <- sort.kNN(x)

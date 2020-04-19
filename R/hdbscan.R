@@ -20,7 +20,7 @@
 hdbscan <- function(x, minPts, xdist = NULL,
   gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
 
-  if(.matrixlike(x) && !is(x, "dist")) {
+  if(.matrixlike(x) && !inherits(x, "dist")) {
     x <- as.matrix(x)
     if (!storage.mode(x) %in% c("integer", "double")) stop("hdbscan expects numerical data")
 
@@ -28,10 +28,10 @@ hdbscan <- function(x, minPts, xdist = NULL,
     if (missing(xdist)){ 
       core_dist <- kNNdist(x, k = minPts - 1)
       xdist <- dist(x, method = "euclidean") 
-    } else if (is(xdist, "dist")) {
+    } else if (inherits(xdist, "dist")) {
       core_dist <- kNNdist(xdist, k = minPts - 1) 
     }
-  } else if (is(x, "dist") && missing(xdist)) {
+  } else if (inherits(x, "dist") && missing(xdist)) {
     ## let kNNdist handle the any non-euclidean knn-queries
     xdist <- x
     core_dist <- kNNdist(xdist, k = minPts - 1) 

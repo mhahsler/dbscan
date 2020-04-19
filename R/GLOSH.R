@@ -20,18 +20,18 @@
 glosh <- function(x, k = 4, ...) {
   
   # get n
-  if (is(x, "dist") || is(x, "matrix")){
-    if(is(x, "dist")) n <- attr(x, "Size")
+  if (inherits(x, "dist") || inherits(x, "matrix")){
+    if(inherits(x, "dist")) n <- attr(x, "Size")
     else n <- nrow(x)
     # get k nearest neighbors + distances
     d <- kNN(x, k - 1, ...)
-    x_dist <-  if(is(x, "dist")) x else dist(x, method = "euclidean") # copy since mrd changes by reference!
+    x_dist <-  if(inherits(x, "dist")) x else dist(x, method = "euclidean") # copy since mrd changes by reference!
     mrd <- mrd(x_dist, d$dist[, k - 1])
     
     # need to assemble hclust object manually
     mst <- prims(mrd, n)
     hc <- hclustMergeOrder(mst, order(mst[, 3]))
-  } else if (is(x, "hclust")){
+  } else if (inherits(x, "hclust")){
     hc <- x
     n <- nrow(hc$merge) + 1
   }

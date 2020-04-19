@@ -29,9 +29,9 @@ adjacencylist.kNN <- function(x, ...)
 
 plot.NN <- function(x, data, main = NULL, ...) {
   if(is.null(main)) {
-    if(is(x, "frNN")) main <- paste0("frNN graph (eps = ", x$eps, ")")
-    if(is(x, "kNN")) main <- paste0(x$k, "-NN graph")
-    if(is(x, "sNN")) main <- paste0("Shared NN graph (k=", x$k,
+    if(inherits(x, "frNN")) main <- paste0("frNN graph (eps = ", x$eps, ")")
+    if(inherits(x, "kNN")) main <- paste0(x$k, "-NN graph")
+    if(inherits(x, "sNN")) main <- paste0("Shared NN graph (k=", x$k,
       ifelse(is.null(x$kt), "", paste0(", kt=", x$kt)), ")")
   }
   plot(data[,1:2], main = main, ...)

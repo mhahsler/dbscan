@@ -23,7 +23,7 @@
 kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
 
-  if(is(x, "kNN")) {
+  if(inherits(x, "kNN")) {
     if(x$k < k) stop("kNN in x has not enough nearest neighbors.")
     if(!x$sort) x <- sort(x)
     x$id <- x$id[,1:k]
@@ -41,13 +41,13 @@ kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize =
 
   ### dist search
   if(search == 3) {
-    if(!is(x, "dist"))
+    if(!inherits(x, "dist"))
       if(.matrixlike(x)) x <- dist(x)
       else stop("x needs to be a matrix to calculate distances")
   }
 
   ### get kNN from a dist object
-  if(is(x, "dist")) {
+  if(inherits(x, "dist")) {
 
     if(!is.null(query)) stop("query can only be used if x contains the data.")
 

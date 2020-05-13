@@ -15,7 +15,7 @@ Description: A fast reimplementation of several density-based algorithms of
     factor) algorithm. The implementations use the kd-tree data structure (from
     library ANN) for faster k-nearest neighbor search. An R interface to fast kNN
     and fixed-radius NN search is also provided. 
-    See Hahsler M, Piekenbrock M and Doran D (2019) <doi:10.18637/jss.v091.i01>.
+    Hahsler, Piekenbrock and Doran (2019) <doi:10.18637/jss.v091.i01>.
 SystemRequirements: C++11
 Imports:
     Rcpp (>= 1.0.0),

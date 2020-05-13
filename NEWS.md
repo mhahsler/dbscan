@@ -1,5 +1,6 @@
 # dbscan 1.1-5.1 (2020-xx-xx)
-
+* removed dependence on methods.
+* fixed problem in hullplot for singleton clusters (reported by Fernando Archuby).
 
 # dbscan 1.1-5 (2019-10-22)
 

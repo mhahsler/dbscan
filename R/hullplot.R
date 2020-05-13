@@ -56,8 +56,8 @@ hullplot <- function(x, cl, col = NULL,
   for(i in 1:length(ci_order)) {
 
     ### use all the points for xICSXi's hierarchical structure
-    if(is.null(clusters_xi)) { d <- x[cl==i,]
-    } else { d <- x[cl_order[clusters_xi$start[i] : clusters_xi$end[i]],] }
+    if(is.null(clusters_xi)) { d <- x[cl == i, , drop = FALSE]
+    } else { d <- x[cl_order[clusters_xi$start[i] : clusters_xi$end[i]], , drop = FALSE] }
 
     ch <- chull(d)
     ch <- c(ch, ch[1])

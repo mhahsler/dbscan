@@ -1,15 +1,14 @@
 .predict_frNN <- function(newdata, data, clusters, eps, ...) {
   if (is.null(newdata)) return(clusters)
 
+  # calculate the frNN between newdata and data (only keep entries for newdata)
   nn <- frNN(rbind(data, newdata), eps = eps,
     sort = TRUE, ...)$id[-(1:nrow(data))]
 
-  sapply(nn, function(x) {
-    x <- x[x<=nrow(data)]
-    x <- clusters[x][x>0][1]
-    x[is.na(x)] <- 0L
-    x
-  })
+  # get rid of indices of newdata and pick first neighbor
+  cl <- sapply(nn, function(x) clusters[x[x<=nrow(data) & x>0][1]])
+  cl[is.na(cl)] <- 0L
+  cl
 }
 
 predict.dbscan_fast <- function (object, newdata = NULL, data, ...)

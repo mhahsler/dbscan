@@ -31,7 +31,7 @@ A numeric vector of length equal to the size of the original data set containing
 all data points.
 }
 \references{
-Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander. "Hierarchical density estimates for data clustering, visualization, and outlier detection." ACM Transactions on Knowledge Discovery from Data (TKDD) 10, no. 1 (2015): 5.
+Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander. "Hierarchical density estimates for data clustering, visualization, and outlier detection." ACM Transactions on Knowledge Discovery from Data (TKDD) 10, no. 1 (2015): 5. \doi{10.1145/2733381}
 }
 
 \author{

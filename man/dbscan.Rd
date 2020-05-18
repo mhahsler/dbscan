@@ -75,7 +75,7 @@ cluster will be reported as members of the noise cluster 0.
 Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R.
   \emph{Journal of Statistical Software}, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
 
-Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. \emph{Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96)}, 226-231.
+Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise. Institute for Computer Science, University of Munich. \emph{Proceedings of 2nd International Conference on Knowledge Discovery and Data Mining (KDD-96)}, 226-231. \url{https://dl.acm.org/doi/10.5555/3001460.3001507}
 
 Campello, R. J. G. B.; Moulavi, D.; Sander, J. (2013). Density-Based Clustering
 Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th

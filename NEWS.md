@@ -1,6 +1,10 @@
 # dbscan 1.1-5.1 (2020-xx-xx)
+
+## Bugfixes
 * removed dependence on methods.
 * fixed problem in hullplot for singleton clusters (reported by Fernando Archuby).
+* GLOSH now also accepts data.frames.
+* GLOSH returns now 0 instead of NaN if we have k duplicate points in the data.
 
 # dbscan 1.1-5 (2019-10-22)
 

@@ -18,7 +18,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 glosh <- function(x, k = 4, ...) {
-  
+
+  if(inherits(x, "data.frame")) x <- as.matrix(x)
+
   # get n
   if (inherits(x, "dist") || inherits(x, "matrix")){
     if(inherits(x, "dist")) n <- attr(x, "Size")
@@ -27,7 +29,7 @@ glosh <- function(x, k = 4, ...) {
     d <- kNN(x, k - 1, ...)
     x_dist <-  if(inherits(x, "dist")) x else dist(x, method = "euclidean") # copy since mrd changes by reference!
     mrd <- mrd(x_dist, d$dist[, k - 1])
-    
+
     # need to assemble hclust object manually
     mst <- prims(mrd, n)
     hc <- hclustMergeOrder(mst, order(mst[, 3]))
@@ -36,12 +38,12 @@ glosh <- function(x, k = 4, ...) {
     n <- nrow(hc$merge) + 1
   }
   else stop("x needs to be a matrix, dist, or hclust object!")
-  
+
   if(k < 2 || k >= n)
     stop("k has to be larger than 1 and smaller than the number of points")
-  
+
   res <- computeStability(hc, k, compute_glosh = TRUE)
-  
-  # return 
+
+  # return
   attr(res, "glosh")
 }

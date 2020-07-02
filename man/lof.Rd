@@ -17,16 +17,17 @@ lof(x, k = 4, ...)
   \item{\dots}{ further arguments are passed on to \code{kNN}. }
 }
 \details{
-LOF compares the local density of an point to the local densities
-of its neighbors. Points that have a substantially lower density than
-their neighbors are considered outliers.
-A LOF score of approximately 1 indicates that density around the point
-is comparable to its neighbors. Scores significantly larger than
-1 indicate outliers.
+LOF compares the local reachability density (lrd) of an point to the lrd of its neighbors. A LOF score of approximately 1 indicates that the lrd around the point
+is comparable to the lrd of its neighbors and that the point is not an outlier.
+Points that have a substantially lower lrd than
+their neighbors are considered outliers and produce scores significantly larger than
+1.
 
-Note: If there are more than \code{k} duplicate points in the data, then lof
-can become \code{NaN} caused by an infinite local density.
-In this case we set lof to 1. The paper by Breunig et al (2000) suggests a different method of removing all duplicate points first.
+\bold{Note on duplicate points:} If there are more than \code{k} duplicates of a point in the data, then LOF
+can become \code{NaN} caused by an lrd of 0 restulting leading to LOF of0/0.
+For some applications, the duplicate points should be in the data (e.g., they are the result of rounding the values for several points).
+We set LOF to 1 in this case since there is already enought density from the points in the same location to make them not outliers.
+The original paper by Breunig et al (2000) assumes that the points are real duplicates and suggests to remove the duplicates before computing LOF. If duplicate points are removed first, then this LOF implementation in \pkg{dbscan} behaves like the one described by Breunig et al.
 }
 \value{
 A numeric vector of length \code{ncol(x)} containing LOF values for

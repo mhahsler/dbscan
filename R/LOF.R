@@ -33,10 +33,12 @@ lof <- function(x, k = 4, ...) {
 
   # calculate local reachability density
   lrd <- numeric(n)
-  for(i in 1:n) lrd[i] <- 1/(sum(apply(
-    cbind(d$dist[d$id[i,], k], d$dist[i,]),
-    1, max)) / k)
-
+  for (i in 1:n) {
+    dists <- cbind(d$dist[d$id[i, ], k], d$dist[i, ])
+    max_idx <- max.col(dists)
+    max_dists <- dists[(max_idx - 1) * nrow(dists) + seq_along(max_idx)]
+    lrd[i] <- 1 / (sum(max_dists)/k)
+  }
   # calculate lof
   lof <- numeric(n)
   for (i in 1:n) lof[i] <- sum(lrd[d$id[i,]])/k / lrd[i]

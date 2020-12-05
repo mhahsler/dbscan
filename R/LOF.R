@@ -29,15 +29,18 @@ lof <- function(x, k = 4, ...) {
     stop("k has to be larger than 1 and smaller than the number of points")
 
   # get k nearest neighbors + distances
-  d <- kNN(x, k, ...)
+  d <- kNN(x, k, sort = TRUE, ...)
 
   # calculate local reachability density
+  # reachability-distance_k(A,B)=max{k-distance(B), d(A,B)}
+  # lrdk(A)=1/(sum_B \in N_k(A) reachability-distance_k(A, B)/|N_k(A)|)
   lrd <- numeric(n)
-  for(i in 1:n) lrd[i] <- 1/(sum(apply(
-    cbind(d$dist[d$id[i,], k], d$dist[i,]),
-    1, max)) / k)
+  for(i in 1:n) lrd[i] <- 1/(sum(
+    pmax.int(d$dist[d$id[i,], k], d$dist[i,])) / k
+  )
 
   # calculate lof
+  # LOF_k(A) = sum_B \in N_k(A) lrd_k(B)/(|N_k(A)| lrdk(A))
   lof <- numeric(n)
   for (i in 1:n) lof[i] <- sum(lrd[d$id[i,]])/k / lrd[i]
 

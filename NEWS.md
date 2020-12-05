@@ -1,5 +1,8 @@
 # dbscan 1.1-5.1 (2020-xx-xx)
 
+## Improvements 
+* Improved speed of LOF for large ks (following suggestions by tomverlaine). 
+
 ## Bugfixes
 * removed dependence on methods.
 * fixed problem in hullplot for singleton clusters (reported by Fernando Archuby).

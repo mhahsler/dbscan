@@ -1,7 +1,7 @@
 # dbscan 1.1-5.1 (2020-xx-xx)
 
 ## Improvements 
-* Improved speed of LOF for large ks (following suggestions by tomverlaine). 
+* Improved speed of LOF for large ks (following suggestions by eduardokapp). 
 
 ## Bugfixes
 * removed dependence on methods.

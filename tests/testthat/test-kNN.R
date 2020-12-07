@@ -11,7 +11,7 @@ x <- cbind(
   z = runif(10, 0, 10) + rnorm(n, sd = 0.2)
 )
 
-## no duplicates first!
+## no duplicates first! All distances should be unique
 x <- x[!duplicated(x),]
 
 rownames(x) <- paste("Object_", 1:nrow(x), sep="")
@@ -37,7 +37,7 @@ nn_d <- dbscan::kNN(dist(x), k, sort = TRUE)
 #points(x[nn_d$id[1,],], col="red", lwd=5)
 #points(x[nn_d$id[2,],], col="green", lwd=5)
 
-### will aggree minus some tries
+### will agree minus some tries
 expect_equal(nn, nn_d)
 
 ## calculate dist internally
@@ -66,7 +66,7 @@ for(bs in c(5, 10, 15, 100)) {
 }
 
 ## the order is not stable with matching distances which means that the
-## k-NN are not stable. add 100 copied points to check if self match
+## k-NN are not stable. We add 100 copied points to check if self match
 ## filtering and sort works
 x <- rbind(x, x[sample(1:nrow(x), 100),])
 rownames(x) <- paste("Object_", 1:nrow(x), sep="")
@@ -78,13 +78,10 @@ nn <- dbscan::kNN(x, k=k, sort = TRUE)
 nn_d <- dbscan::kNN(x, k=k, search = "dist", sort = TRUE)
 
 expect_equal(nn$dist, nn_d$dist)
-## This is expected to fail: expect_equal(nn$id, ids)
+## This is expected to fail: because the ids are not stable for matching distances
+## expect_equal(nn$id, nn_d$id)
+## FIXME: write some code to check this!
 
-## only compare the ids which do not have unique distances
-ms <- nn$id == nn_d$id
-cos <- diff(nn_d$dist)==0; cos[,1] <- FALSE
-ms[cos] <- TRUE
-expect_false(any(rowSums(ms[,-k]) !=4))
 
 ## missing values, but distances are fine
 x_na <- x
@@ -101,8 +98,10 @@ expect_error(dbscan::kNN(x_na, k = 3, search = "dist"), regexp = "NA")
 expect_error(dbscan::kNN(dist(x_na), k = 3), regexp = "NA")
 
 ## sort and kNN to reduce k
-nn10 <- dbscan::kNN(x, k = 10, sort = FALSE)
-expect_equal(nn10$sort, FALSE)
+nn10 <- dbscan::kNN(x, k = 10)
+#nn10 <- dbscan::kNN(x, k = 10, sort = FALSE)
+## knn now returns sorted lists
+#expect_equal(nn10$sort, FALSE)
 expect_error(dbscan::kNN(nn10, k = 11))
 nn5 <- dbscan::kNN(nn10, k = 5)
 expect_equal(nn5$sort, TRUE)
@@ -124,3 +123,4 @@ expect_equivalent(nn$id[1,], 8:4)
 expect_equivalent(nn$id[2,], 8:4)
 
 expect_error(nn <- dbscan::kNN(dist(x[1:8, , drop=FALSE]), x[9:10, , drop = FALSE], k = 5))
+

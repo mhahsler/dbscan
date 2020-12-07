@@ -19,8 +19,8 @@ kNN(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   \item{query}{ a data matrix with the points to query. If query is not specified, the NN for all the points in \code{x} is returned. If query is specified then \code{x} needs to be a data matrix. }
   \item{search}{ nearest neighbor search strategy (one of "kdtree", "linear"
       or "dist").}
-  \item{sort}{ sort the neighbors by distance? Note that this is expensive and
-      \code{sort = FALSE} is much faster. kNN objects can be sorted using
+  \item{sort}{ sort the neighbors by distance? Note that some search methods already sort the results. Sorting is expensive and
+      \code{sort = FALSE} may be much faster for some search methods. kNN objects can be sorted using
       \code{sort()}.}
   \item{bucketSize}{ max size of the kd-tree leafs. }
   \item{splitRule}{ rule to split the kd-tree. One of "STD",

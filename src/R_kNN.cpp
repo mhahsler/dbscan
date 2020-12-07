@@ -79,6 +79,7 @@ List kNN_int(NumericMatrix data, int k,
   ret["dist"] = d;
   ret["id"] = id;
   ret["k"] = k;
+  ret["sort"] = true;
   return ret;
 }
 
@@ -151,11 +152,11 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   annDeallocPts(queryPts);
   annClose();
 
-  // prepare results
+  // prepare results (ANN returns points sorted by distance)
   List ret;
   ret["dist"] = d;
   ret["id"] = id;
   ret["k"] = k;
-  ret["sort"] = false;
+  ret["sort"] = true;
   return ret;
 }

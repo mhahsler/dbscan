@@ -2,6 +2,7 @@
 
 ## Improvements 
 * Improved speed of LOF for large ks (following suggestions by eduardokapp). 
+* kNN: results is now not sorted again for kd-tree queries which is much faster (by a factor of 10).
 
 ## Bugfixes
 * removed dependence on methods.

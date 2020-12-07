@@ -104,16 +104,16 @@ kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize =
     dimnames(ret$id) <- list(rownames(x), 1:k)
   }
 
-  ret$sort <- FALSE
   class(ret) <- c("kNN", "NN")
 
-  ### sort entries (by dist and id)?
-  ### FIXME: This is expensive! We should do this in C++
+  ### ANN already returns them sorted (by dist but not by ID)
   if(sort) ret <- sort(ret)
 
   ret
 }
 
+
+### FIXME: This is expensive! We should do this in C++
 sort.kNN <- function(x, decreasing = FALSE, ...) {
   if(!is.null(x$sort) && x$sort) return(x)
   if(is.null(x$dist)) stop("Unable to sort. Distances are missing.")

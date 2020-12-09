@@ -3,6 +3,7 @@
 ## Improvements 
 * Improved speed of LOF for large ks (following suggestions by eduardokapp). 
 * kNN: results is now not sorted again for kd-tree queries which is much faster (by a factor of 10).
+* ANN library: annclose() is now only called once when the package is unloaded.
 
 ## Bugfixes
 * removed dependence on methods.

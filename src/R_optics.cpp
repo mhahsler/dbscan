@@ -179,11 +179,9 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   }
 
   // cleanup
-  if(kdTree != NULL) {
-    delete kdTree;
-    annDeallocPts(dataPts);
-    annClose();
-  }
+  if (kdTree != NULL) delete kdTree;
+  if (dataPts != NULL)  annDeallocPts(dataPts);
+  // annClose(); is now done globaly in the package
 
   // prepare results (R index starts with 1)
   List ret;

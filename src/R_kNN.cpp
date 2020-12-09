@@ -72,7 +72,8 @@ List kNN_int(NumericMatrix data, int k,
   delete [] dists;
   delete [] nnIdx;
   annDeallocPts(dataPts);
-  annClose();
+  // annClose(); is now done globaly in the package
+
 
   // prepare results
   List ret;
@@ -150,7 +151,7 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   delete [] nnIdx;
   annDeallocPts(dataPts);
   annDeallocPts(queryPts);
-  annClose();
+  // annClose(); is now done globaly in the package
 
   // prepare results (ANN returns points sorted by distance)
   List ret;

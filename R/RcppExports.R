@@ -9,6 +9,10 @@ SNN_sim_int <- function(nn, jp) {
     .Call(`_dbscan_SNN_sim_int`, nn, jp)
 }
 
+ANN_cleanup <- function() {
+    invisible(.Call(`_dbscan_ANN_cleanup`))
+}
+
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
     .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
 }

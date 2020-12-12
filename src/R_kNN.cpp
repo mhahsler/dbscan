@@ -72,7 +72,7 @@ List kNN_int(NumericMatrix data, int k,
   delete [] dists;
   delete [] nnIdx;
   annDeallocPts(dataPts);
-  // annClose(); is now done globaly in the package
+  // annClose(); is now done globally in the package
 
 
   // prepare results
@@ -125,10 +125,9 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   NumericMatrix d(nrow_q, k);
   IntegerMatrix id(nrow_q, k);
 
-  // Note: the search also returns the point itself (as the first hit)!
-  // So we have to look for k+1 points.
-  ANNdistArray dists = new ANNdist[k+1];
-  ANNidxArray nnIdx = new ANNidx[k+1];
+  // Note: does not return itself with query
+  ANNdistArray dists = new ANNdist[k];
+  ANNidxArray nnIdx = new ANNidx[k];
 
   for (int i=0; i<nrow_q; i++) {
     if (!(i % 100)) Rcpp::checkUserInterrupt();
@@ -151,7 +150,7 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   delete [] nnIdx;
   annDeallocPts(dataPts);
   annDeallocPts(queryPts);
-  // annClose(); is now done globaly in the package
+  // annClose(); is now done globally in the package
 
   // prepare results (ANN returns points sorted by distance)
   List ret;

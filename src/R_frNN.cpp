@@ -80,7 +80,7 @@ List frNN_int(NumericMatrix data, double eps, int type,
   // cleanup
   delete kdTree;
   annDeallocPts(dataPts);
-  // annClose(); is now done globaly in the package
+  // annClose(); is now done globally in the package
 
   // prepare results
   List ret;
@@ -165,7 +165,7 @@ List frNN_query_int(NumericMatrix data, NumericMatrix query, double eps, int typ
   delete kdTree;
   annDeallocPts(dataPts);
   annDeallocPts(queryPts);
-  // annClose(); is now done globaly in the package
+  // annClose(); is now done globally in the package
 
   // prepare results
   List ret;

@@ -80,7 +80,7 @@ Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A Density-Bas
 Campello, R. J. G. B.; Moulavi, D.; Sander, J. (2013). Density-Based Clustering
 Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th
 Pacific-Asia Conference on Knowledge Discovery
-in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
+in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160. \doi{10.1007/978-3-642-37456-2_14}
 }
 
 \seealso{

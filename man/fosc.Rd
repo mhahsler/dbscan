@@ -102,7 +102,7 @@ branches.
   encoded in the 'stability', 'constraint', and 'total' named members.}
 }
 \references{
-Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander (2013). "A framework for semi-supervised and unsupervised optimal extraction of clusters from hierarchies." \emph{Data Mining and Knowledge Discovery} 27(3): 344-371.
+Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander (2013). "A framework for semi-supervised and unsupervised optimal extraction of clusters from hierarchies." \emph{Data Mining and Knowledge Discovery} 27(3): 344-371. \doi{10.1007/s10618-013-0311-4}
 }
 
 \seealso{

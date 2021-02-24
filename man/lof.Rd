@@ -36,7 +36,7 @@ all data points.
 \references{
 Breunig, M., Kriegel, H., Ng, R., and Sander, J. (2000). LOF: identifying
    density-based local outliers. In \emph{ACM Int. Conf. on Management of Data,}
-   pages 93-104.
+   pages 93-104. \doi{10.1145/335191.335388}
 }
 
 \author{

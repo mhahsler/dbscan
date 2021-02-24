@@ -101,10 +101,10 @@ See \code{\link{frNN}} for more information on the parameters related to nearest
     \item{clusters_xi }{ data.frame containing the start and end of each cluster found in the OPTICS ordering. }
 }
 \references{
+Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49-60. \doi{10.1145/304181.304187}
+
 Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R.
   \emph{Journal of Statistical Software}, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
-
-Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure. ACM SIGMOD international conference on Management of data. ACM Press. pp. 49-60.
 
 Erich Schubert, Michael Gertz (2018). Improving the Cluster Structure Extracted from OPTICS Plots. Lernen, Wissen, Daten, Analysen (LWDA 2018). pp. 318-329.
 }

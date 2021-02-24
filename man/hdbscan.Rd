@@ -57,7 +57,7 @@ Note that \code{minPts} not only acts as a minimum cluster size to detect, but a
 Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R.
   \emph{Journal of Statistical Software}, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
 
-Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th Pacific-Asia Conference on Knowledge Discovery in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160.
+Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on Hierarchical Density Estimates. \emph{Proceedings of the 17th Pacific-Asia Conference on Knowledge Discovery in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160. \doi{10.1007/978-3-642-37456-2_14}
 
 Campello RJGB, Moulavi D, Zimek A, Sander J (2015). Hierarchical density estimates for data clustering, visualization, and outlier detection. \emph{ACM Transactions on Knowledge Discovery from Data (TKDD),} 10(5):1-51. \doi{10.1145/2733381}
 }

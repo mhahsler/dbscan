@@ -59,7 +59,7 @@ An object of class sNN (subclass of kNN and NN) containing a list with the follo
 }
 
 \references{
-R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput. 22,} 11 (November 1973), 1025-1034.
+R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput. 22,} 11 (November 1973), 1025-1034. \doi{10.1109/T-C.1973.223640}
 }
 
 \examples{

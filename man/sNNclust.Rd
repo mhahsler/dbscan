@@ -46,7 +46,7 @@ Note that steps 2-4 are DBSCAN and that \code{eps} is used on a similarity (the 
   \item{param }{ list of used clustering parameters. }
 }
 \references{
-Levent Ertoz, Michael Steinbach, Vipin Kumar, Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data, \emph{SIAM International Conference on Data Mining,} 2003, 47-59.
+Levent Ertoz, Michael Steinbach, Vipin Kumar, Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data, \emph{SIAM International Conference on Data Mining,} 2003, 47-59. \doi{10.1137/1.9781611972733.5}
 }
 
 \seealso{

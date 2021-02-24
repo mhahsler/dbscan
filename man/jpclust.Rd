@@ -40,7 +40,7 @@ Fast nearest neighbors search with \code{kNN()} is only used if
   \item{param }{ list of used clustering parameters. }
 }
 \references{
-R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput. 22,} 11 (November 1973), 1025-1034.
+R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput. 22,} 11 (November 1973), 1025-1034. \doi{10.1109/T-C.1973.223640}
 }
 
 \seealso{

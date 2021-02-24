@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// Computes the mutual reachability distance from the the distance vector 'dm' and the core distance 
+// Computes the mutual reachability distance from the distance vector 'dm' and the core distance 
 // [[Rcpp::export]]
 NumericVector mrd(NumericVector dm, NumericVector cd) {
   NumericVector res = NumericVector(dm.length());

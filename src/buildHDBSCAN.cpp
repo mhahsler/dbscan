@@ -580,8 +580,10 @@ List validateConstraintList(List& constraints, int n){
       }
     }
   }
-  // Print warning if asymmetric constraints detected; return attempt at fixing constraints.
-  if (!is_valid){ Rprintf("Warning: Incomplete (asymmetric) constraints detected. Populating constraint list.\n"); }
+  // Produce warning if asymmetric constraints detected; return attempt at fixing constraints.
+  if (!is_valid){ 
+      warning("Incomplete (asymmetric) constraints detected. Populating constraint list.");
+  }
   return(constraints);
 }
 

@@ -26,14 +26,13 @@ expect_error(extractFOSC(x_sl, constraints = matrix(c(1, 2), nrow=1)))
 expect_error(extractFOSC(x_sl, constraints = matrix(-2, nrow=nrow(x), ncol=nrow(x))))
 
 ## Valid constraints
-# MFH: expect_warnings gives error now!
-#expect_warning(extractFOSC(x_sl, constraints = matrix(1, nrow=nrow(x), ncol=nrow(x))))
+expect_warning(extractFOSC(x_sl, constraints = matrix(1, nrow=nrow(x), ncol=nrow(x))))
 expect_silent(extractFOSC(x_sl, constraints = list("1" = 2, "2" = 1)))
 expect_silent(extractFOSC(x_sl, constraints = ifelse(dist(x) > 2, -1, 1)))
 
 ## Constraints should be symmetric, but symmetry test is only done if specified. Asymmetric
 ## constraints through warning, but proceeds with manual warning
-expect_output(extractFOSC(x_sl, constraints = list("1" = 2), validate_constraints = T), regexp = "Warning.*")
+expect_warning(extractFOSC(x_sl, constraints = list("1" = 2), validate_constraints = T))
 
 ## Make sure that's whats returned
 res <- extractFOSC(x_sl)
@@ -74,3 +73,4 @@ expect_equal(res3$hc$method, "single (w/ mixed-objective extraction)")
 
 ## Test unstable pruning
 expect_silent(extractFOSC(x_sl, constraints = il_constraints2, prune_unstable = T))
+

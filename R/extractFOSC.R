@@ -18,11 +18,16 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 ## Framework for Optimal Selection of Clusters
-extractFOSC <- function(x, constraints = NA, alpha = 0, minPts = 2L, prune_unstable = FALSE, validate_constraints = FALSE){
-  if (!class(x) %in% c("hclust")) stop("extractFOSC expects 'x' to be a valid hclust object.")
-  if (!missing(constraints) && !class(constraints) %in% c("list", "integer", "numeric", "matrix")) {
-    stop("extractFOSC expects constraints to be either an adjacency list or adjacency matrix of constraints.")
-  }
+extractFOSC <- function(x, constraints, alpha = 0, minPts = 2L, prune_unstable = FALSE, validate_constraints = FALSE){
+  if (!inherits(x, "hclust")) stop("extractFOSC expects 'x' to be a valid hclust object.")
+
+  # if constraints are given then they need to be a list, a matrix or a vector
+  if (!(missing(constraints) ||
+      is.list(constraints) ||
+      is.matrix(constraints) ||
+      is.numeric(constraints)))
+    stop("extractFOSC expects constraints to be either an adjacency list or adjacency matrix.")
+
   if (!minPts >= 2) stop("minPts must be at least 2.")
   if (alpha < 0 || alpha > 1) stop("alpha can only takes values between [0, 1].")
   n <- nrow(x$merge) + 1L

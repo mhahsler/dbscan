@@ -11,7 +11,7 @@
   algorithms using Rcpp.
 }
 \usage{
-hdbscan(x, minPts, xdist = NULL,
+hdbscan(x, minPts, xdist,
     gen_hdbscan_tree = FALSE,
     gen_simplified_tree = FALSE)
 

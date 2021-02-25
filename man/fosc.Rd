@@ -11,14 +11,14 @@
   constraint and stability-based objective extraction.
 }
 \usage{
-extractFOSC(x, constraints = NA, alpha = 0, minPts = 2L,
+extractFOSC(x, constraints, alpha = 0, minPts = 2L,
             prune_unstable = FALSE,
             validate_constraints = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{a valid hclust object.}
-  \item{constraints}{ Either a list or matrix of pairwise constraints. If not supplied, an unsupervised measure of stability is used to make local cuts and extract the optimal clusters. See details. }
+  \item{constraints}{ Either a list or matrix of pairwise constraints. If missing, an unsupervised measure of stability is used to make local cuts and extract the optimal clusters. See details. }
   \item{alpha}{ numeric; weight between [0, 1] for mixed-objective semi-supervised extraction. Defaults to 0. }
   \item{minPts}{ numeric; Defaults to 2. Only needed if class-less noise is a valid label in the model. }
   \item{prune_unstable}{ logical; should significantly unstable subtrees be pruned? The default

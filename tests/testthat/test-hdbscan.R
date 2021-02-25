@@ -26,10 +26,6 @@ data("moons")
 res <- dbscan::hdbscan(moons, minPts = 5)
 expect_identical(length(res$cluster), nrow(moons))
 
-## compare with dist-based versions; note hclust won't be the same call
-res_d <- dbscan::hdbscan(moons, minPts = 5, xdist = dist(moons))
-expect_equivalent(res[!names(res) %in% c("hc")], res_d[!names(res_d) %in% c("hc")])
-
 ## Check hierarchy matches dbscan* at every value
 check <- rep(F, nrow(moons)-1)
 core_dist <- kNNdist(moons, k=5-1)
@@ -65,10 +61,3 @@ expect_equal(hc_dend, res$hdbscan_tree)
 dist_moons <- dist(moons, method = "canberra")
 res <- dbscan::hdbscan(dist_moons, minPts = 5)
 expect_s3_class(res, "hdbscan")
-
-## Should work if given as xdist object as well
-res <- dbscan::hdbscan(moons, minPts = 5, xdist = dist_moons, gen_hdbscan_tree = TRUE, gen_simplified_tree = TRUE)
-expect_s3_class(res, "hdbscan")
-
-## However this should fail 
-expect_error(dbscan::hdbscan(dist_moons, minPts = 5, xdist = dist_moons))

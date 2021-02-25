@@ -17,23 +17,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-hdbscan <- function(x, minPts, xdist,
+hdbscan <- function(x, minPts,
   gen_hdbscan_tree = FALSE, gen_simplified_tree=FALSE) {
 
   if(.matrixlike(x) && !inherits(x, "dist")) {
     x <- as.matrix(x)
     if (!is.numeric(x)) stop("hdbscan expects numerical data")
-
-    ## x is a point cloud. Whether xdist is given or not, need all the distances.
-    if (missing(xdist)) xdist <- dist(x, method = "euclidean")
-    if (!inherits(xdist, "dist")) stop("xdist needs to be of class dist")
-
-  } else if (inherits(x, "dist") && missing(xdist)) {
-    ## let kNNdist handle the any non-euclidean knn-queries
+    xdist <- dist(x, method = "euclidean")
+  } else if (inherits(x, "dist")) {
+    ## this is for non-euclidean distances (note: this is slower for kNNdist)
     xdist <- x
   } else{ stop("hdbscan expects a matrix-coercible object of numerical data, and xdist to be a 'dist' object (or not supplied).") }
 
-  core_dist <- kNNdist(xdist, k = minPts - 1)
+  core_dist <- kNNdist(x, k = minPts - 1)
 
   ## At this point, xdist should be a dist object.
   n <- attr(xdist, "Size")

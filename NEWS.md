@@ -1,9 +1,10 @@
-# dbscan 1.1-5.1 (2020-xx-xx)
+# dbscan 1.1-6 (2021-02-24)
 
 ## Improvements 
 * Improved speed of LOF for large ks (following suggestions by eduardokapp). 
 * kNN: results is now not sorted again for kd-tree queries which is much faster (by a factor of 10).
 * ANN library: annclose() is now only called once when the package is unloaded. This is in preparation to support persistent kd-trees using external pointers.
+* hdbscan lost parameter xdist.
 
 ## Bugfixes
 * removed dependence on methods.

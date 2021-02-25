@@ -11,7 +11,7 @@
   algorithms using Rcpp.
 }
 \usage{
-hdbscan(x, minPts, xdist,
+hdbscan(x, minPts,
     gen_hdbscan_tree = FALSE,
     gen_simplified_tree = FALSE)
 
@@ -21,9 +21,8 @@ hdbscan(x, minPts, xdist,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix or a dist object. }
+  \item{x}{a data matrix (Euclidean distances are used) or a dist object calculated with an arbitrary distance metric. }
   \item{minPts}{ integer; Minimum size of clusters. See details. }
-  \item{xdist}{ an optional precomputed dist object. May reduce computation time if supplied. }
   \item{gen_hdbscan_tree}{ logical; should the robust single linkage tree be
   explicitly computed. (see cluster tree in Chaudhuri et al, 2010).}
   \item{gen_simplified_tree}{ logical; should the simplified hierarchy be
@@ -78,7 +77,11 @@ res <- hdbscan(moons, minPts = 5)
 res
 
 plot(res)
+plot(moons, col = res$cluster + 1L)
 
+## cluster the moons data set with HDBSCAN using Manhattan distances
+res <- hdbscan(dist(moons, method = "manhattan"), minPts = 5)
+plot(res)
 plot(moons, col = res$cluster + 1L)
 
 ## DS3 from Chameleon

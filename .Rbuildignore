@@ -1,6 +1,5 @@
 proj$
 ^\.Rproj\.user$
-^\.travis\.yml$
 ^cran-comments\.md$
 ^appveyor\.yml$
 ^revdep$
@@ -10,3 +9,4 @@ proj$
 Work
 jss
 ignore
+^\.github$

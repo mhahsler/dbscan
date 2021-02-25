@@ -3,7 +3,7 @@
 [![CRAN version](https://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
 [![Rdoc](https://www.rdocumentation.org/badges/version/dbscan)](https://www.rdocumentation.org/packages/dbscan)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
-[![Travis-CI Build Status](https://travis-ci.org/mhahsler/dbscan.svg?branch=master)](https://travis-ci.org/mhahsler/dbscan)
+[![R build status](https://github.com/mhahsler/dbscan/workflows/R-CMD-check/badge.svg)](https://github.com/mhahsler/dbscan/actions)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
 
 This R package provides a fast C++ (re)implementation of several density-based algorithms with a focus on the DBSCAN family for clustering spatial data.

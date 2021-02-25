@@ -1,8 +1,8 @@
 # dbscan - Density Based Clustering of Applications with Noise (DBSCAN) and Related Algorithms - R package
 
-[![CRAN version](http://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
-[![Rdoc](http://www.rdocumentation.org/badges/version/dbscan)](http://www.rdocumentation.org/packages/dbscan)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
+[![CRAN version](https://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
+[![Rdoc](https://www.rdocumentation.org/badges/version/dbscan)](https://www.rdocumentation.org/packages/dbscan)
+[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
 [![Travis-CI Build Status](https://travis-ci.org/mhahsler/dbscan.svg?branch=master)](https://travis-ci.org/mhahsler/dbscan)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
 
@@ -29,7 +29,7 @@ __Fast Nearest-Neighbor Search (using kd-trees)__
 - __Fixed-radius NN search__
 
 The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
-implementations in [WEKA](http://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](http://scikit-learn.org/).
+implementations in [WEKA](https://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
 
 ## Installation
 
@@ -139,7 +139,7 @@ See how well each point corresponds to the clusters found by the model used
 ```
 
 ## License 
-The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](http://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the [ELKI](http://elki.dbs.ifi.lmu.de/) framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  
+The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  
 
 
 ## Further Information

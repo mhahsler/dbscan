@@ -19,11 +19,12 @@ system.time(lof_d <- lof(dist(x), k=4))
 expect_equal(lof, lof_d)
 
 ## compare with lofactor from DMwR
-if(requireNamespace("DMwR", quietly = TRUE)) {
-  system.time(lof_DMwr <- DMwR::lofactor(x, k=4))
-
-  expect_equal(lof, lof_DMwr)
-}
+# DMwR is now retired
+#if(requireNamespace("DMwR", quietly = TRUE)) {
+#  system.time(lof_DMwr <- DMwR::lofactor(x, k=4))
+#
+#  expect_equal(lof, lof_DMwr)
+#}
 
 ## missing values, but distances are fine
 x_na <- x

@@ -14,7 +14,7 @@ lof(x, k = 4, ...)
 \arguments{
   \item{x}{ a data matrix or a dist object. }
   \item{k}{ size of the neighborhood. }
-  \item{\dots}{ further arguments are passed on to \code{kNN}. }
+  \item{\dots}{ further arguments are passed on to \code{kNN}. Note: \code{lof} uses \code{sort = TRUE} and \code{sort} cannot be specified here. }
 }
 \details{
 LOF compares the local reachability density (lrd) of an point to the lrd of its neighbors. A LOF score of approximately 1 indicates that the lrd around the point

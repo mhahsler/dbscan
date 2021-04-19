@@ -1,5 +1,10 @@
 # dbscan 1.1-6.1 (2021-xx-xx)
 
+## Bugfixes
+* Fixed description of k in knndistplot and added minPts argument.
+
+## Changes
+* kNNdistplot and lof lost the default for k.
 
 # dbscan 1.1-6 (2021-02-24)
 

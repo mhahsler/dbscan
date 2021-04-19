@@ -2,7 +2,6 @@
 \alias{kNN}
 \alias{knn}
 \alias{sort.kNN}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Find the k Nearest Neighbors}
 \description{
 This function uses a kd-tree to find all k nearest neighbors
@@ -32,19 +31,24 @@ kNN(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
     However, the algorithm will enjoy a significant speedup. }
 }
 \details{
-\code{search} controls if a kd-tree or linear search (both implemented in
+\emph{Ties:} If the kth and the (k+1)th nearest neighbor are tied, then the neighbor found first is returned and the other one is ignored.
+
+\emph{Self-matches:} If no query is specified, then self-matches are removed.
+
+Details on the search parameters:
+\itemize{
+\item \code{search} controls if a kd-tree or linear search (both implemented in
 the ANN library; see Mount and Arya, 2010). Note, that these implementations cannot handle NAs. \code{search="dist"} precomputes Euclidean distances first using R.
 NAs are handled, but the resulting distance matrix cannot contain NAs. To use other distance measures, a precomputed distance matrix can be
 provided as \code{x} (\code{search} is ignored).
 
-\code{bucketSize} and \code{splitRule} influence how the kd-tree is built.
+\item \code{bucketSize} and \code{splitRule} influence how the kd-tree is built.
 \code{approx} uses the approximate nearest neighbor search implemented in ANN.
 All nearest neighbors up to a distance of \code{eps}/(1+\code{approx})
 will be considered and all with a distance greater than \code{eps} will not
 be considered. The other points might be considered. Note that this results in
 some actual nearest neighbors being omitted leading to spurious clusters and noise points. However, the algorithm will enjoy a significant speedup. For more details see Mount and Arya (2010).
-
-\emph{Note:} self-matches are removed (only an issue if no query is specified).
+}
 }
 \value{
 %%  ~Describe the value returned
@@ -70,7 +74,7 @@ data(iris)
 x <- iris[, -5]
 
 # Example 1: finding kNN for all points in a data matrix (using a kd-tree)
-nn <- kNN(x, k=5)
+nn <- kNN(x, k = 5)
 nn
 
 # explore neighborhood of point 10
@@ -86,17 +90,15 @@ plot(kNN(nn, k = 2), x)
 
 # Example 2: find kNN for query points
 q <- x[c(1,100),]
-nn <- kNN(x, k=10, query = q)
+nn <- kNN(x, k = 10, query = q)
 
 plot(nn, x, col = "grey")
 points(q, pch = 3, lwd = 2)
 
 # Example 3: find kNN using distances
 d <- dist(x, method = "manhattan")
-nn <- kNN(d, k=1)
+nn <- kNN(d, k = 1)
 
 plot(nn, x)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{model}

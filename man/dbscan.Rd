@@ -19,39 +19,33 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix or a dist object. Alternatively, a frNN object
+  \item{x}{a data matrix, data.frame or a dist object. Alternatively, a frNN object
     with fixed-radius nearest neighbors can also be specified (see Example section). In this case
     eps can be missing and will be taken form the frNN object.}
-  \item{eps}{ size of the epsilon neighborhood.}
-  \item{minPts}{ number of minimum points in the eps region (for core points).
-      Default is 5 points.}
+  \item{eps}{ size (radius) of the epsilon neighborhood.}
+  \item{minPts}{ number of minimum points required in the eps neighborhood for core points (including the point itself). The default value is 5 points.}
   \item{weights}{ numeric; weights for the data points. Only needed to perform
     weighted clustering. }
-  \item{borderPoints}{ logical; should border points be assigned. The default
+  \item{borderPoints}{ logical; should border points be assigned to clusters. The default
     is \code{TRUE} for regular DBSCAN. If
     \code{FALSE} then border points are considered noise
     (see DBSCAN* in Campello et al, 2013).}
-  \item{object}{ a DBSCAN clustering object. }
-  \item{data}{ the data set used to create the DBSCAN clustering object. }
-  \item{newdata}{ new data set for which cluster membership should be predicted. }
-  \item{...}{ additional arguments are passed on to fixed-radius
+  \item{...}{ additional arguments are passed on to the fixed-radius
   nearest neighbor search algorithm. See \code{\link{frNN}} for
   details on how to control the search strategy.}
+  \item{object}{ a DBSCAN clustering object for prediction. }
+  \item{data}{ the data set used to create the DBSCAN clustering object. }
+  \item{newdata}{ new data points for which the cluster membership should be predicted. }
 }
 \details{
 \emph{Note:} use \code{dbscan::dbscan} to call this
 implementation when you also use package \pkg{fpc}.
 
 This implementation of DBSCAN (Hahsler et al, 2019) implements the original algorithm as described by
-Ester et al (1996). DBSCAN estimates the density around each data point by counting the number of points in a user-specified eps-neighborhood and applies a used-specified minPts thresholds to identify core, border and noise points. In a second step, core points are joined into a cluster if they are density-reachable (i.e., there is a chain of core points where one falls inside the eps-neighborhood of the next). Finally, border points are assigned to clusters. The algorithm only needs
-parameters \code{eps} and \code{minPts}.
+Ester et al (1996). DBSCAN estimates the density around each data point by counting the number of points in a user-specified eps-neighborhood and applies a used-specified minPts thresholds to identify core, border and noise points. In a second step, core points are joined into a cluster if they are density-reachable (i.e., there is a chain of core points where one falls inside the eps-neighborhood of the next). Finally, border points are assigned to clusters. The algorithm needs parameters \code{eps} (the radius of the epsilon neighborhood) and \code{minPts} (the density threshold).
 
 Border points are arbitrarily assigned to clusters in the original algorithm.
 DBSCAN* (see Campello et al 2013) treats all border points as noise points. This is implemented with \code{borderPoints = FALSE}.
-
-Setting parameters for DBSCAN:
-\code{minPts} is often set to be dimensionality of the data plus one or higher.
-The knee in \code{\link{kNNdistplot}} can be used to find suitable values for \code{eps}.
 
 See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
 
@@ -59,6 +53,17 @@ A precomputed frNN object can be supplied as \code{x}. In this case
 \code{eps} does not need to be specified. This option us useful
 for large data sets, where a sparse distance matrix is available.
 See \code{\link{frNN}} how to create frNN objects.
+
+\bold{Setting parameters for DBSCAN}
+
+The parameters \code{minPts} and \code{eps} depend on each other and changing one typically requires changing the other one as well.
+The original DBSCAN paper suggests to start by setting \code{minPts} to the dimensionality of the data plus one or higher. \code{minPts} defines the minimum density for non-noise area. Increase the parameter to suppress more noise in the data.
+A suitable neighborhood size parameter \code{eps} can be found visually by inspecting
+the \code{\link{kNNdistplot}} of the data using \code{k = minPts - 1} (\code{minPts} includes the point itself, white the k-nearest neighbors distance does not).
+The k-nearest neighbor distance plot sorts all data points by their k-nearest neighbor distance. A sudden increase of the kNN distance (a knee) indicates that the points to the
+right are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
+
+\bold{Predict cluster memberships}
 
 \code{predict} can be used to predict cluster memberships for new data points.
 A point is considered a member of a cluster if it is within the eps
@@ -98,18 +103,22 @@ in Databases, PAKDD 2013,} Lecture Notes in Computer Science 7819, p. 160. \doi{
 data(iris)
 iris <- as.matrix(iris[,1:4])
 
-## find suitable eps parameter using a k-NN plot for k = dim + 1
-## Look for the knee!
-kNNdistplot(iris, k = 5)
-abline(h=.5, col = "red", lty=2)
+## Find suitable DBSCAN parameters:
+## 1. We use minPts = dim + 1 = 5 for iris. A larger value can also be used.
+## 2. We inspect the  k-NN distance plot for k = minPts - 1 = 4
+kNNdistplot(iris, k = 5 - 1)
 
-res <- dbscan(iris, eps = .5, minPts = 5)
+## Noise seems to start around a 4-NN distance of .7
+abline(h=.7, col = "red", lty=2)
+
+## Cluster with the chosen parameters
+res <- dbscan(iris, eps = .7, minPts = 5)
 res
 
 pairs(iris, col = res$cluster + 1L)
 
-## use precomputed frNN
-fr <- frNN(iris, eps = .5)
+## Use a precomputed frNN object
+fr <- frNN(iris, eps = .7)
 dbscan(fr, minPts = 5)
 
 ## Example 2: use data from fpc
@@ -129,12 +138,16 @@ points(x[res$cluster==0,], pch = 3, col = "grey")
 
 hullplot(x, res)
 
-## predict cluster membership for new data points
+## Predict cluster membership for new data points
 ## (Note: 0 means it is predicted as noise)
-newdata <- x[1:5,] + rnorm(10, 0, .2)
+newdata <- x[1:5,] + rnorm(10, 0, .3)
+hullplot(x, res)
+points(newdata, pch = 3 , col = "red", lwd = 3)
+text(newdata, pos = 1)
+
 predict(res, newdata, data = x)
 
-## compare speed against fpc version (if microbenchmark is installed)
+## Compare speed against fpc version (if microbenchmark is installed)
 ## Note: we use dbscan::dbscan to make sure that we do now run the
 ## implementation in fpc.
 \dontrun{
@@ -166,8 +179,6 @@ nn <- structure(list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps =
 nn
 dbscan(nn, minPts = 2)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ model }
 \keyword{ clustering }
 

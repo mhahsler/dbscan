@@ -1,16 +1,14 @@
 \name{lof}
 \alias{lof}
 \alias{LOF}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Local Outlier Factor Score}
 \description{
 Calculate the Local Outlier Factor (LOF) score for each data point
 using a kd-tree to speed up kNN search.
 }
 \usage{
-lof(x, k = 4, ...)
+lof(x, k, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix or a dist object. }
   \item{k}{ size of the neighborhood. }
@@ -28,6 +26,9 @@ can become \code{NaN} caused by an lrd of 0 restulting leading to LOF of0/0.
 For some applications, the duplicate points should be in the data (e.g., they are the result of rounding the values for several points).
 We set LOF to 1 in this case since there is already enought density from the points in the same location to make them not outliers.
 The original paper by Breunig et al (2000) assumes that the points are real duplicates and suggests to remove the duplicates before computing LOF. If duplicate points are removed first, then this LOF implementation in \pkg{dbscan} behaves like the one described by Breunig et al.
+
+\bold{Note on tied distances:} If the distance to the \eqn{k}th and the \eqn{k+1}th nearest neighbor are tied, then the LOF calcuation is slightly off because the kd tree
+does not return ties.
 }
 \value{
 A numeric vector of length \code{ncol(x)} containing LOF values for
@@ -65,7 +66,5 @@ plot(x, pch = ".", main = "LOF (k=3)")
 points(x, cex = (lof-1)*3, pch = 1, col="red")
 text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 3)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{model}
 

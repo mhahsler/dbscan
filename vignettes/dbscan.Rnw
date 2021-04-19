@@ -621,11 +621,11 @@ plot(x, col = true_clusters, pch = true_clusters)
 The resulting data set is shown in Figure~\ref{fig:sampleData}.
 
 To apply DBSCAN, we need to decide on the neighborhood radius~\code{eps} and
-the density threshold~\code{minPts}. The rule of thumb for minPts is to use at least the number of dimensions of the data set plus one. In our case, this is 3. For eps, we can plot the points' kNN distances (i.e., the distance to the $k$th nearest neighbor) in decreasing order and look for a knee in the plot. The idea behind this heuristic is that points located inside of clusters will have a small $k$-nearest neighbor distance, because they are close to other points in the same cluster, while noise points are isolated and will have a rather large kNN distance. \pkg{dbscan} provides a function called \code{kNNdistplot()} to make this easier. For $k$ we use the \code{minPts} value of 3.
+the density threshold~\code{minPts}. The rule of thumb for minPts is to use at least the number of dimensions of the data set plus one. In our case, this is 3. For eps, we can plot the points' kNN distances (i.e., the distance to the $k$th nearest neighbor) in decreasing order and look for a knee in the plot. The idea behind this heuristic is that points located inside of clusters will have a small $k$-nearest neighbor distance, because they are close to other points in the same cluster, while noise points are isolated and will have a rather large kNN distance. \pkg{dbscan} provides a function called \code{kNNdistplot()} to make this easier. For $k$ we use \code{minPts} - 1 since DBSCAN's  \code{minPts} include the actual data point and the $k$th nearest neighbors distance does not.
 
 <<fig=TRUE, include=FALSE, label=kNNdistplot, width=7, height=4>>=
-kNNdistplot(x, k = 3)
-abline(h=.05, col = "red", lty=2)
+kNNdistplot(x, k = 2)
+abline(h=.06, col = "red", lty=2)
 @
 \begin{figure}
 \centering
@@ -634,18 +634,17 @@ abline(h=.05, col = "red", lty=2)
 \label{fig:kNNdistplot}
 \end{figure}
 
-The kNN distance plot is shown in Figure~\ref{fig:kNNdistplot}. A knee is visible at around a 3-NN distance of 0.05. We have manually added a horizontal
+The kNN distance plot is shown in Figure~\ref{fig:kNNdistplot}. A knee is visible at around a 2-NN distance of 0.06. We have manually added a horizontal
 line for reference.
 
 Now we can perform the clustering with the chosen parameters.
 <<>>=
-res <- dbscan(x, eps = 0.05, minPts = 3)
+res <- dbscan(x, eps = 0.06, minPts = 3)
 res
 @
 
-The resulting clustering identified one large cluster with 185 member points
-and 2 medium size clusters of between 87 and 89 points, three very small
-clusters and 30 noise points (represented by cluster id 0). The available
+The resulting clustering identified one large cluster with 191 member points, two medium clusters with around 90 points, several very small
+clusters and 15 noise points (represented by cluster id 0). The available
 fields can be directly accessed using the list extraction operator \code{$}.
 For example, the cluster assignment information can be used to plot the data
 with the clusters identified by different labels and colors.
@@ -664,7 +663,9 @@ The scatter plot in Figure~\ref{fig:dbscanPlot} shows that the clustering
 algorithm correctly identified the upper two clusters, but merged the lower two
 clusters because the region between them has a high enough density. The small
 clusters are isolated groups of 3 points (passing $\mathit{minPts}$) and the
-noise points isolated points. \pkg{dbscan} also provides a plot that adds
+noise points isolated points. These small clusters can be suppressed by using a larger number for \code{minPts}.
+
+\pkg{dbscan} also provides a plot that adds
 convex cluster hulls to the scatter plot shown in Figure~\ref{fig:dbscanHullPlot}.
 
 <<fig=TRUE, include=FALSE, label=dbscanHullPlot, width=5, height=5>>=

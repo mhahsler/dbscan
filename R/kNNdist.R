@@ -23,7 +23,7 @@ kNNdist <- function(x, k, all = FALSE, ...) {
   kNNd
 }
 
-kNNdistplot <- function(x, k = 4, ...) {
+kNNdistplot <- function(x, k, ...) {
   kNNdist <- sort(kNNdist(x, k ,...))
   plot(sort(kNNdist), type="l", ylab=paste(k, "-NN distance", sep=""),
     xlab = "Points (sample) sorted by distance")

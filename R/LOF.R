@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-lof <- function(x, k = 4, ...) {
+lof <- function(x, k, ...) {
 
   # get n
   if(inherits(x, "dist")) n <- attr(x, "Size")
@@ -35,14 +35,14 @@ lof <- function(x, k = 4, ...) {
   # reachability-distance_k(A,B)=max{k-distance(B), d(A,B)}
   # lrdk(A)=1/(sum_B \in N_k(A) reachability-distance_k(A, B)/|N_k(A)|)
   lrd <- numeric(n)
-  for(i in 1:n) lrd[i] <- 1/(sum(
+  for(i in seq_len(n)) lrd[i] <- 1/(sum(
     pmax.int(d$dist[d$id[i,], k], d$dist[i,])) / k
   )
 
   # calculate lof
   # LOF_k(A) = sum_B \in N_k(A) lrd_k(B)/(|N_k(A)| lrdk(A))
   lof <- numeric(n)
-  for (i in 1:n) lof[i] <- sum(lrd[d$id[i,]])/k / lrd[i]
+  for (i in seq_len(n)) lof[i] <- sum(lrd[d$id[i,]])/k / lrd[i]
 
   # with more than MinPts duplicates lrd can become infinity
   # we define them not to be outliers

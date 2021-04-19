@@ -1,32 +1,29 @@
 \name{kNNdist}
 \alias{kNNdist}
 \alias{kNNdistplot}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Calculate and plot the k-Nearest Neighbor Distance
+Calculate and Plot k-Nearest Neighbor Distances
 }
 \description{
-Fast calculation of the k-nearest neighbor distances in a matrix of points.
-The plot can be used to help find a suitable value for the
-\code{eps} neighborhood for DBSCAN. Look for the knee in the plot.
+Fast calculation of the k-nearest neighbor distances for a dataset represented as a matrix of points. The kNN distance is defined as the distance from a point to its k nearest neighbor.
+The kNN distance plot displays the kNN distance of all points sorted from smallest to largest.
+The plot can be used to help find suitable parameter values for the for DBSCAN.
 }
 \usage{
 kNNdist(x, k, all = FALSE, ...)
-kNNdistplot(x, k = 4, ...)
+kNNdistplot(x, k, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{ the data set as a matrix or a dist object. }
-  \item{k}{ number of nearest neighbors used (use minPoints). }
-  \item{all}{ should a matrix with all used neighbors be returned? }
-  \item{...}{further arguments are passed on to \code{kNN}.}
+  \item{x}{ the data set as a matrix of points (Euclidean distance is used) or a precalculated dist object. }
+  \item{k}{ number of nearest neighbors used for the distance calculation. }
+  \item{all}{ should a matrix with the distances to all k nearest neighbors be returned? }
+  \item{...}{further arguments (e.g., kd-tree related parameters) are passed on to \code{\link{kNN}}.}
   }
-\details{
-See \code{\link{kNN}} for a discussion of the kd-tree related parameters.
-}
+%\details{
+%}
 \value{
 \code{kNNdist} returns a numeric vector with the distance to its k nearest
-neighbor. If \code{all = TRUE} then a matrix with k columns containing the distances to all 1st, 2nd, ..., k nearest neighbors is returned instead.
+neighbor. If \code{all = TRUE} then a matrix with k columns containing the distances to all 1st, 2nd, ..., kth nearest neighbors is returned instead.
 }
 
 \author{
@@ -35,7 +32,7 @@ neighbor. If \code{all = TRUE} then a matrix with k columns containing the dista
 
 \seealso{
 \code{\link{kNN}}.
-}% ~Make other sections like Warning with \section{Warning }{....} ~
+}
 
 \examples{
 data(iris)
@@ -43,20 +40,19 @@ iris <- as.matrix(iris[,1:4])
 
 ## Find the 4-NN distance for each observation (see ?kNN
 ## for different search strategies)
-kNNdist(iris, k=4)
+kNNdist(iris, k = 4)
 
 ## Get a matrix with distances to the 1st, 2nd, ..., 4th NN.
-kNNdist(iris, k=4, all = TRUE)
+kNNdist(iris, k = 4, all = TRUE)
 
 ## Produce a k-NN distance plot to determine a suitable eps for
-## DBSCAN (the knee is around a distance of .5)
-kNNdistplot(iris, k=4)
+## DBSCAN with MinPts = 5. Use k = 4 (= MinPts -1).
+## The knee is visible around a distance of .7
+kNNdistplot(iris, k = 4)
 
-cl <- dbscan(iris, eps = .5, minPts = 4)
+cl <- dbscan(iris, eps = .7, minPts = 5)
 pairs(iris, col = cl$cluster+1L)
-## Note: black are noise points
+## Note: black points are noise points
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
 \keyword{ model }
 \keyword{ plot }

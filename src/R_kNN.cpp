@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //                  Find the k Nearest Neighbors
-// File:                    kNNdist.cpp
+// File:                    R_kNNdist.cpp
 //----------------------------------------------------------------------
 // Copyright (c) 2015 Michael Hahsler. All Rights Reserved.
 //

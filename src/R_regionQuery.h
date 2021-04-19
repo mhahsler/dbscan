@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //                              Region Query
-// File:                        regionQuery.h
+// File:                        R_regionQuery.h
 //----------------------------------------------------------------------
 // Copyright (c) 2015 Michael Hahsler. All Rights Reserved.
 //

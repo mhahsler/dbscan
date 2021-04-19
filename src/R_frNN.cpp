@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //                   Fixed Radius Nearest Neighbors
-// File:                        frNN.cpp
+// File:                        R_frNN.cpp
 //----------------------------------------------------------------------
 // Copyright (c) 2015 Michael Hahsler. All Rights Reserved.
 //

@@ -40,3 +40,11 @@ expect_error(lof(x_na, k=4, search = "dist"),
   regexp = "NA")
 expect_error(lof(dist(x_na), k =4), regexp = "NA")
 
+## test with tied distances
+x <- rbind(1,2,3,4,5,6,7)
+expect_equal(round(lof(x, k = 3), 7),
+  c(1.0679012, 1.0679012, 1.0133929, 0.8730159, 1.0133929, 1.0679012, 1.0679012))
+
+expect_equal(round(lof(dist(x), k = 3),7),
+  c(1.0679012, 1.0679012, 1.0133929, 0.8730159, 1.0133929, 1.0679012, 1.0679012))
+

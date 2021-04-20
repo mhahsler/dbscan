@@ -2,6 +2,7 @@
 
 ## Bugfixes
 * Fixed description of k in knndistplot and added minPts argument.
+* Fixed bug for tied distances in lof (reported by sverchkov).
 
 ## Changes
 * kNNdistplot and lof lost the default for k.

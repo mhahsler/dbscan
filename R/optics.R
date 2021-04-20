@@ -32,15 +32,13 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   names(extra) <- args[m]
 
   search <- if(is.null(extra$search)) "kdtree" else extra$search
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
-  if(is.na(search)) stop("Unknown NN search type!")
+  splitRule <- if(is.null(extra$splitRule)) "suggest" else extra$splitRule
+  search <- .parse_search(search)
+  splitRule <- .parse_splitRule(splitRule)
+
 
   bucketSize <- if(is.null(extra$bucketSize)) 10L else
     as.integer(extra$bucketSize)
-
-  splitRule <- if(is.null(extra$splitRule)) "suggest" else extra$splitRule
-  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
-  if(is.na(splitRule)) stop("Unknown splitRule!")
 
   approx <- if(is.null(extra$approx)) 0L else as.integer(extra$approx)
 

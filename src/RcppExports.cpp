@@ -140,6 +140,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// lof_kNN
+List lof_kNN(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP _dbscan_lof_kNN(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
+    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
+    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
+    rcpp_result_gen = Rcpp::wrap(lof_kNN(data, k, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // optics_int
 List optics_int(NumericMatrix data, double eps, int minPts, int type, int bucketSize, int splitRule, double approx, List frNN);
 RcppExport SEXP _dbscan_optics_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {
@@ -451,6 +467,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_frNN_query_int", (DL_FUNC) &_dbscan_frNN_query_int, 7},
     {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 6},
     {"_dbscan_kNN_query_int", (DL_FUNC) &_dbscan_kNN_query_int, 7},
+    {"_dbscan_lof_kNN", (DL_FUNC) &_dbscan_lof_kNN, 6},
     {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},
     {"_dbscan_distToAdjacency", (DL_FUNC) &_dbscan_distToAdjacency, 2},
     {"_dbscan_buildDendrogram", (DL_FUNC) &_dbscan_buildDendrogram, 1},

@@ -24,11 +24,8 @@ pointdensity <- function(x, eps, type = "frequency",
 
   type <- match.arg(type, choices = c("frequency", "density"))
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
-  if(is.na(search)) stop("Unknown NN search type!")
-
-  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
-  if(is.na(splitRule)) stop("Unknown splitRule!")
+  search <- .parse_search(search)
+  splitRule <- .parse_splitRule(splitRule)
 
   d <- dbscan_density_int(as.matrix(x), as.double(eps),
   as.integer(search), as.integer(bucketSize),

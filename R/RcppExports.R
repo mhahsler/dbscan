@@ -37,6 +37,10 @@ kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, approx)
 }
 
+lof_kNN <- function(data, k, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_lof_kNN`, data, k, type, bucketSize, splitRule, approx)
+}
+
 optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
     .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
 }

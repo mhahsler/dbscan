@@ -35,8 +35,9 @@ frNN <- function(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSiz
     return(x)
   }
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
-  if(is.na(search)) stop("Unknown NN search type!")
+
+  search <- .parse_search(search)
+  splitRule <- .parse_splitRule(splitRule)
 
   ### dist search
   if(search == 3) {
@@ -88,9 +89,6 @@ frNN <- function(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSiz
     if(storage.mode(query) != "double") stop("query has to be NULL or a numeric matrix.")
     if(ncol(x) != ncol(query)) stop("x and query need to have the same number of columns!")
   }
-
-  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
-  if(is.na(splitRule)) stop("Unknown splitRule!")
 
   if(any(is.na(x))) stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 

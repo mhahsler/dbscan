@@ -18,7 +18,18 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-### FIXME: add query...
+# Convert names to integers for C++
+.parse_search <- function(search) {
+  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  if(is.na(search)) stop("Unknown NN search type!")
+  search
+}
+
+.parse_splitRule <- function(splitRule) {
+  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
+  if(is.na(splitRule)) stop("Unknown splitRule!")
+  splitRule
+}
 
 kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
   splitRule = "suggest", approx = 0) {
@@ -33,8 +44,8 @@ kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize =
     return(x)
   }
 
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
-  if(is.na(search)) stop("Unknown NN search type!")
+  search <- .parse_search(search)
+  splitRule <- .parse_splitRule(splitRule)
 
   k <- as.integer(k)
   if(k < 1) stop("Illegal k: needs to be k>=1!")
@@ -84,8 +95,6 @@ kNN <- function(x, k, query = NULL, sort = TRUE, search = "kdtree", bucketSize =
 
   if(k >= nrow(x)) stop("Not enough neighbors in data set!")
 
-  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule)-1L
-  if(is.na(splitRule)) stop("Unknown splitRule!")
 
   if(any(is.na(x))) stop("data/distances cannot contain NAs for kNN (with kd-tree)!")
 

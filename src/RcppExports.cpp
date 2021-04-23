@@ -141,18 +141,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // lof_kNN
-List lof_kNN(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
-RcppExport SEXP _dbscan_lof_kNN(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+List lof_kNN(NumericMatrix data, int minPts, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP _dbscan_lof_kNN(SEXP dataSEXP, SEXP minPtsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type minPts(minPtsSEXP);
     Rcpp::traits::input_parameter< int >::type type(typeSEXP);
     Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
     Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
     Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
-    rcpp_result_gen = Rcpp::wrap(lof_kNN(data, k, type, bucketSize, splitRule, approx));
+    rcpp_result_gen = Rcpp::wrap(lof_kNN(data, minPts, type, bucketSize, splitRule, approx));
     return rcpp_result_gen;
 END_RCPP
 }

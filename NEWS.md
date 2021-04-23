@@ -1,11 +1,11 @@
-# dbscan 1.1-6.1 (2021-xx-xx)
+# dbscan 1.1-7 (2021-04-21)
 
 ## Bugfixes
 * Fixed description of k in knndistplot and added minPts argument.
 * Fixed bug for tied distances in lof (reported by sverchkov).
 
 ## Changes
-* kNNdistplot and lof lost the default for k.
+* lof: the density parameter was changes to minPts to be consistent with the original paper and dbscan. Note that minPts = k + 1.
 
 # dbscan 1.1-6 (2021-02-24)
 

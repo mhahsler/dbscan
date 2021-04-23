@@ -77,7 +77,9 @@ The used algorithm was originally contributed by the ELKI framework
 and is explained in Schubert et al (2018),
 but contains a set of fixes.
 
-See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
+If \code{x} is specified as a data matrix, then Euclidean distances an
+fast nearest neighbor lookup using a kd-tree are used.
+See \code{\link{kNN}} for details on the parameters for the kd-tree.
 }
 \value{
   An object of class 'optics' with components:

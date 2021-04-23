@@ -15,7 +15,7 @@ frNN(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ a data matrix, a dist object or a frNN object.}
-  \item{eps}{ neighbors radius (dist <= eps). }
+  \item{eps}{ neighbors radius. }
   \item{query}{ a data matrix with the points to query. If query is not specified, the NN for all the points in \code{x} is returned. If query is specified then \code{x} needs to be a data matrix. }
   \item{sort}{ sort the neighbors by distance? This is expensive and can be done later using \code{sort()}. }
   \item{search}{ nearest neighbor search strategy (one of "kdtree"
@@ -30,10 +30,11 @@ frNN(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
     However, the algorithm will enjoy a significant speedup. }
 }
 \details{
-For details on the parameters see \code{\link{kNN}}.
+\emph{Note:} self-matches are not returned!
 
-Note: self-matches are not returned!
-%%  ~~ If necessary, more details than the description above ~~
+If \code{x} is specified as a data matrix, then Euclidean distances an
+fast nearest neighbor lookup using a kd-tree are used.
+See \code{\link{kNN}} for details on the parameters for the kd-tree.
 
 To create a frNN object from scratch, you need to supply at least the
 elements \code{id} with a list of integer vectors with

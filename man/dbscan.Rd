@@ -19,10 +19,9 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{a data matrix, data.frame or a dist object. Alternatively, a frNN object
-    with fixed-radius nearest neighbors can also be specified (see Example section). In this case
-    eps can be missing and will be taken form the frNN object.}
-  \item{eps}{ size (radius) of the epsilon neighborhood.}
+  \item{x}{a data matrix, a data.frame, a dist object or a frNN object
+    with fixed-radius nearest neighbors.}
+  \item{eps}{size (radius) of the epsilon neighborhood. Can be omitted if \code{x} is a frNN object. }
   \item{minPts}{ number of minimum points required in the eps neighborhood for core points (including the point itself). The default value is 5 points.}
   \item{weights}{ numeric; weights for the data points. Only needed to perform
     weighted clustering. }
@@ -41,13 +40,20 @@ dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 \emph{Note:} use \code{dbscan::dbscan} to call this
 implementation when you also use package \pkg{fpc}.
 
+
+\bold{The algorithm}
+
 This implementation of DBSCAN (Hahsler et al, 2019) implements the original algorithm as described by
 Ester et al (1996). DBSCAN estimates the density around each data point by counting the number of points in a user-specified eps-neighborhood and applies a used-specified minPts thresholds to identify core, border and noise points. In a second step, core points are joined into a cluster if they are density-reachable (i.e., there is a chain of core points where one falls inside the eps-neighborhood of the next). Finally, border points are assigned to clusters. The algorithm needs parameters \code{eps} (the radius of the epsilon neighborhood) and \code{minPts} (the density threshold).
 
 Border points are arbitrarily assigned to clusters in the original algorithm.
 DBSCAN* (see Campello et al 2013) treats all border points as noise points. This is implemented with \code{borderPoints = FALSE}.
 
-See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
+\bold{Specifying the data}
+
+If \code{x} is a matrix or a data.frame, then fast fixed-radius nearest neighbor computation using a kd-tree is performed using Euclidean distance. See \code{\link{frNN}} for more information on the parameters related to nearest neighbor search.
+
+Any precomputed distance matrix (dist object) can be specified as \code{x}. You may run into memory issues since distance matrices are large.
 
 A precomputed frNN object can be supplied as \code{x}. In this case
 \code{eps} does not need to be specified. This option us useful
@@ -57,9 +63,10 @@ See \code{\link{frNN}} how to create frNN objects.
 \bold{Setting parameters for DBSCAN}
 
 The parameters \code{minPts} and \code{eps} depend on each other and changing one typically requires changing the other one as well.
-The original DBSCAN paper suggests to start by setting \code{minPts} to the dimensionality of the data plus one or higher. \code{minPts} defines the minimum density for non-noise area. Increase the parameter to suppress more noise in the data.
-A suitable neighborhood size parameter \code{eps} can be found visually by inspecting
-the \code{\link{kNNdistplot}} of the data using \code{k = minPts - 1} (\code{minPts} includes the point itself, white the k-nearest neighbors distance does not).
+The original DBSCAN paper suggests to start by setting \code{minPts} to the dimensionality of the data plus one or higher. \code{minPts} defines the minimum density around a core point (i.e., the minimum density for non-noise areas). Increase the parameter to suppress more noise in the data and require more points to form a cluster.
+A suitable neighborhood size parameter \code{eps} given a fixed value for \code{minPts}
+can be found visually by inspecting
+the \code{\link{kNNdistplot}} of the data using \code{k = minPts - 1} (\code{minPts} includes the point itself, while the k-nearest neighbors distance does not).
 The k-nearest neighbor distance plot sorts all data points by their k-nearest neighbor distance. A sudden increase of the kNN distance (a knee) indicates that the points to the
 right are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
 
@@ -67,7 +74,8 @@ right are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
 
 \code{predict} can be used to predict cluster memberships for new data points.
 A point is considered a member of a cluster if it is within the eps
-neighborhood of a member of the cluster. Points which cannot be assigned to a
+neighborhood of a member of the cluster (Euclidean distance is used).
+Points which cannot be assigned to a
 cluster will be reported as members of the noise cluster 0.
 }
 \value{

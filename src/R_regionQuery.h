@@ -22,16 +22,16 @@ typedef std::pair< std::vector<int>, std::vector<double> > nn ;
 
 // these function takes an id for the points in the k-d tree
 nn regionQueryDist(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
-  double eps2, double approx);
+  double eps2, double approx = 0.0);
 
 std::vector<int> regionQuery(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
-  double eps2, double approx);
+  double eps2, double approx = 0.0);
 
 // these function takes an query point not in the tree
 nn regionQueryDist_point(ANNpoint queryPt, ANNpointArray dataPts, ANNpointSet* kdTree,
-  double eps2, double approx);
+  double eps2, double approx = 0.0);
 
 std::vector<int> regionQuery_point(ANNpoint queryPt, ANNpointArray dataPts, ANNpointSet* kdTree,
-  double eps2, double approx);
+  double eps2, double approx = 0.0);
 
 #endif

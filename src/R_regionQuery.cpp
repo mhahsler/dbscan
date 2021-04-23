@@ -31,7 +31,7 @@ nn regionQueryDist(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
 }
 
 std::vector<int> regionQuery(int id, ANNpointArray dataPts, ANNpointSet* kdTree,
-  double eps2, double approx = 0) {
+  double eps2, double approx) {
 
   // find fixed radius nearest neighbors
   ANNpoint queryPt = dataPts[id];
@@ -56,7 +56,7 @@ nn regionQueryDist_point(ANNpoint queryPt, ANNpointArray dataPts,
 }
 
 std::vector<int> regionQuery_point(ANNpoint queryPt, ANNpointArray dataPts,
-	ANNpointSet* kdTree, double eps2, double approx = 0) {
+	ANNpointSet* kdTree, double eps2, double approx) {
 
   // find fixed radius nearest neighbors
   std::pair< std::vector<int>, std::vector<double> > ret =

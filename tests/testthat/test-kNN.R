@@ -37,7 +37,7 @@ nn_d <- dbscan::kNN(dist(x), k, sort = TRUE)
 #points(x[nn_d$id[1,],], col="red", lwd=5)
 #points(x[nn_d$id[2,],], col="green", lwd=5)
 
-### will agree minus some tries
+### will agree since we use sorting
 expect_equal(nn, nn_d)
 
 ## calculate dist internally

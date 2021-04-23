@@ -8,8 +8,8 @@
 // GNU General Public License (GPL) Version 3
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
-// LOF needs to find the k-NN distance and then how many points are withing this
-// neighbourhood.
+// LOF needs to find the k-NN distance and then how many points are within this
+// neighborhood.
 
 #include <Rcpp.h>
 #include "R_regionQuery.h"
@@ -19,8 +19,11 @@ using namespace Rcpp;
 
 // returns knn-dist and the neighborhood size as a matrix
 // [[Rcpp::export]]
-List lof_kNN(NumericMatrix data, int k,
+List lof_kNN(NumericMatrix data, int minPts,
   int type, int bucketSize, int splitRule, double approx) {
+
+  // minPts includes the point itself; k does not!
+  int k = minPts - 1;
 
   // copy data
   int nrow = data.nrow();
@@ -66,10 +69,10 @@ List lof_kNN(NumericMatrix data, int k,
 
     // find k-NN distance
     kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
-    k_dist[i] = dists[k]; // this is squared
+    k_dist[i] = dists[k]; // this is a squared distance!
 
     // find k-NN neighborhood which can be larger than k with tied distances
-    nn N = regionQueryDist_point(queryPt, dataPts, kdTree, k_dist[i] , approx);
+    nn N = regionQueryDist_point(queryPt, dataPts, kdTree, dists[k], approx);
 
     IntegerVector ids = IntegerVector(N.first.begin(), N.first.end());
     NumericVector dists = NumericVector(N.second.begin(), N.second.end());
@@ -83,8 +86,6 @@ List lof_kNN(NumericMatrix data, int k,
     dist[i] = sqrt(dists);
   }
 
-  k_dist = sqrt(k_dist);
-
   // cleanup
   delete kdTree;
   delete [] dists;
@@ -92,11 +93,13 @@ List lof_kNN(NumericMatrix data, int k,
   annDeallocPts(dataPts);
   // annClose(); is now done globally in the package
 
+  // all k_dists are squared
+  k_dist = sqrt(k_dist);
 
   // prepare results
   List ret;
-  ret["dist"] = dist;
-  ret["ids"] = id;
   ret["k_dist"] = k_dist;
+  ret["ids"] = id;
+  ret["dist"] = dist;
   return ret;
 }

@@ -1,3 +1,8 @@
+# dbscan 1.1-8 (2021-04-26)
+
+## Bugfixes
+* LOF: fixed numerical issues with k-nearest neighbor distance on Solaris.
+
 # dbscan 1.1-7 (2021-04-21)
 
 ## Bugfixes

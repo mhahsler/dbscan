@@ -63,7 +63,8 @@ int				ANNkdFRPtsInRange;		// number of points in the range
 //	annkFRSearch - fixed radius search for k nearest neighbors
 //----------------------------------------------------------------------
 
-// defunct!!!
+// defunct we use ANNkd_tree::annkFRSearch2 which stores all neighbors in the new structures
+// closest and dist.
 int ANNkd_tree::annkFRSearch(
 	ANNpoint			q,				// the query point
 	ANNdist				sqRad,			// squared radius search bound
@@ -204,7 +205,11 @@ void ANNkd_leaf::ann_FR_search(ANNdist box_dist)
 
 			t = *(qq++) - *(pp++);		// compute length and adv coordinate
 										// exceeds dist to k-th smallest?
+
+			// MFH: Fix numeric problem
 			if( (dist = ANN_SUM(dist, ANN_POW(t))) > ANNkdFRSqRad) {
+			//dist = ANN_SUM(dist, ANN_POW(t));
+			//if((dist - ANNkdFRSqRad) > DBL_EPSILON) {
 				break;
 			}
 		}

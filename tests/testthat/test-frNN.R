@@ -12,8 +12,7 @@ x <- cbind(
 )
 
 ## no duplicates first!
-x <- x[!duplicated(x),]
-
+#x <- x[!duplicated(x),]
 
 rownames(x) <- paste("Object_", 1:nrow(x), sep="")
 

@@ -54,8 +54,7 @@ List kNN_int(NumericMatrix data, int k,
 
     ANNpoint queryPt = dataPts[i];
 
-    if(type==1) kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
-    else kdTree->annkSearch(queryPt, k+1, nnIdx, dists);
+    kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
 
     // remove self match
     IntegerVector ids = IntegerVector(nnIdx, nnIdx+k+1);
@@ -133,9 +132,7 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
     if (!(i % 100)) Rcpp::checkUserInterrupt();
 
     ANNpoint queryPt = queryPts[i];
-
-    if(type==1) kdTree->annkSearch(queryPt, k, nnIdx, dists, approx);
-    else kdTree->annkSearch(queryPt, k, nnIdx, dists);
+    kdTree->annkSearch(queryPt, k, nnIdx, dists, approx);
 
     IntegerVector ids = IntegerVector(nnIdx, nnIdx+k);
     id(i, _) = ids + 1;

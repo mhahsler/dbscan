@@ -12,11 +12,11 @@ x <- cbind(
 )
 
 ### calculate LOF score
-system.time(lof <- lof(x, minPts = 5))
-expect_identical(length(lof), nrow(x))
+system.time(lof_kd <- lof(x, minPts = 5))
+expect_identical(length(lof_kd), nrow(x))
 
 system.time(lof_d <- lof(dist(x), minPts = 5))
-#expect_equal(lof, lof_d)
+#expect_equal(lof_kd, lof_d)
 
 ## compare with lofactor from DMwR (k = minPts - 1)
 #if(requireNamespace("DMwR", quietly = TRUE)) {
@@ -126,7 +126,7 @@ lof_DMwr <- c(1.0386817, 1.0725475, 1.1440822, 0.9448794, 1.1387918, 2.285202,
   1.1257174, 0.9772498, 0.9539389, 0.9537187, 1.3452872, 0.9888146
 )
 
-expect_equal(round(lof, 7), lof_DMwr)
+expect_equal(round(lof_kd, 7), lof_DMwr)
 expect_equal(round(lof_d, 7), lof_DMwr)
 #}
 

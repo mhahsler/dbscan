@@ -206,13 +206,9 @@ void ANNkd_leaf::ann_FR_search(ANNdist box_dist)
 			t = *(qq++) - *(pp++);		// compute length and adv coordinate
 										// exceeds dist to k-th smallest?
 
-<<<<<<< HEAD
-=======
-			// MFH: Fix numeric problem
->>>>>>> a8134c6e4ba4e5e66c45a3bbd2fd5afb330bd0a5
+
+
 			if( (dist = ANN_SUM(dist, ANN_POW(t))) > ANNkdFRSqRad) {
-			//dist = ANN_SUM(dist, ANN_POW(t));
-			//if((dist - ANNkdFRSqRad) > DBL_EPSILON) {
 				break;
 			}
 		}

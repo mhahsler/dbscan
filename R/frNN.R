@@ -54,7 +54,7 @@ frNN <- function(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSiz
     if(any(is.na(x))) stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
     x <- as.matrix(x)
-    diag(x) <- Inf
+    diag(x) <- Inf           ### no self-matches
 
     id <- lapply(1:nrow(x), FUN = function(i) {
           y <- x[i, ]

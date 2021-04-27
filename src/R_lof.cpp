@@ -51,7 +51,6 @@ List lof_kNN(NumericMatrix data, int minPts,
   ANNdistArray dists = new ANNdist[k+1];
   ANNidxArray nnIdx = new ANNidx[k+1];
   nn N;
-  ANNpoint queryPt;
 
   // results
   List id(nrow);
@@ -62,17 +61,21 @@ List lof_kNN(NumericMatrix data, int minPts,
     //Rprintf("processing point %d\n", p+1);
     if (!(i % 100)) Rcpp::checkUserInterrupt();
 
-    queryPt = dataPts[i];
-
-    //if(type==1) kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
-    //else kdTree->annkSearch(queryPt, k+1, nnIdx, dists);
+    ANNpoint queryPt = dataPts[i];
 
     // find k-NN distance
     kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
-    k_dist[i] = dists[k]; // this is a squared distance!
+    k_dist[i] = ANN_ROOT(dists[k]); // this is a squared distance!
 
     // find k-NN neighborhood which can be larger than k with tied distances
-    nn N = regionQueryDist_point(queryPt, dataPts, kdTree, dists[k], approx);
+    // This works under Linux and Windows, but not under Solaris: The points at the
+    // k_distance may not be included.
+    //nn N = regionQueryDist_point(queryPt, dataPts, kdTree, dists[k], approx);
+
+    // Make the comparison robust.
+    // Compare doubles: http://c-faq.com/fp/fpequal.html
+    double minPts_dist = dists[k] + DBL_EPSILON * dists[k];
+    nn N = regionQueryDist_point(queryPt, dataPts, kdTree, minPts_dist, approx);
 
     IntegerVector ids = IntegerVector(N.first.begin(), N.first.end());
     NumericVector dists = NumericVector(N.second.begin(), N.second.end());
@@ -94,7 +97,7 @@ List lof_kNN(NumericMatrix data, int minPts,
   // annClose(); is now done globally in the package
 
   // all k_dists are squared
-  k_dist = sqrt(k_dist);
+  //k_dist = sqrt(k_dist);
 
   // prepare results
   List ret;

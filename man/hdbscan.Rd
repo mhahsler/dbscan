@@ -3,6 +3,7 @@
 \alias{HDBSCAN}
 \alias{print.hdbscan}
 \alias{plot.hdbscan}
+\alias{predict.hdbscan}
 \title{
   HDBSCAN
 }
@@ -16,8 +17,11 @@ hdbscan(x, minPts,
     gen_simplified_tree = FALSE)
 
 \method{print}{hdbscan}(x, ...)
+
 \method{plot}{hdbscan}(x, scale="suggest",
     gradient=c("yellow", "red"), show_flat = FALSE, ...)
+
+\method{predict}{hdbscan}(object, newdata, data, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -31,7 +35,9 @@ hdbscan(x, minPts,
   \item{scale}{ integer; used to scale condensed tree based on the graphics device. Lower scale results in wider trees. }
   \item{gradient}{ character vector; the colors to build the condensed tree coloring with. }
   \item{show_flat}{ logical; whether to draw boxes indicating the most stable clusters. }
-
+  \item{object}{ a HDBSCAN clustering object for prediction. }
+  \item{data}{ the data set used to create the clustering. }
+  \item{newdata}{ new data points for which the cluster membership should be predicted. }
 }
 \details{
 This fast implementation of HDBSCAN (Hahsler et al, 2019) computes the hierarchical cluster tree representing density estimates along with the stability-based flat cluster extraction
@@ -40,6 +46,9 @@ proposed by Campello et al. (2013). HDBSCAN essentially computes the hierarchy o
 Additional, related algorithms including the "Global-Local Outlier Score from Hierarchies" (GLOSH) (see section 6 of Campello et al., 2015) outlier scores and ability to cluster based on instance-level constraints (see section 5.3 of Campello et al. 2015) are supported. The algorithms only need the parameter \code{minPts}.
 
 Note that \code{minPts} not only acts as a minimum cluster size to detect, but also as a "smoothing" factor of the density estimates implicitly computed from HDBSCAN.
+
+\code{predict} assigns each new data point to the same cluster as the point in the original data
+that has the smallest mutual rachability distance.
 }
 \value{
   A object of class 'hdbscan' with the following components:
@@ -93,8 +102,22 @@ res
 ## Plot the simplified tree, highlight the most stable clusters
 plot(res, show_flat = TRUE)
 
-## Plot the actual clusters
-plot(DS3, col=res$cluster+1L, cex = .5)
+## Plot the actual clusters (noise has cluster id 0 and is shown in black)
+plot(DS3, col = res$cluster + 1L, cex = .5)
+
+## Predict cluster for new data points.
+newdata <- data.frame(
+  X = runif(n = 10, min(DS3[, 1]), max(DS3[, 1])),
+  Y = runif(n = 10, min(DS3[, 2]), max(DS3[, 2]))
+  )
+
+plot(DS3, col = res$cluster + 1L, pch = ".")
+points(newdata, col = "red", pch = 4, lwd = 2)
+
+pred_label <- predict(res, newdata, data = DS3)
+pred_label
+
+points(newdata, col = pred_label + 1L, pch = 1, lwd = 2, cex = 2)
 }
 \keyword{ model }
 \keyword{ clustering }

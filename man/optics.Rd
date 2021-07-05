@@ -19,7 +19,7 @@ optics(x, eps = NULL, minPts = 5, ...)
 extractDBSCAN(object, eps_cl)
 extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 
-\method{predict}{optics}(object, newdata = NULL, data, ...)
+\method{predict}{optics}(object, newdata, data, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

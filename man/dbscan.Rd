@@ -15,7 +15,7 @@
 \usage{
 dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 
-\method{predict}{dbscan_fast}(object, newdata = NULL, data, ...)
+\method{predict}{dbscan_fast}(object, newdata, data, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -141,8 +141,8 @@ res <- dbscan(x, eps = .3, minPts = 3)
 res
 
 ## plot clusters and add noise (cluster 0) as crosses.
-plot(x, col=res$cluster)
-points(x[res$cluster==0,], pch = 3, col = "grey")
+plot(x, col = res$cluster)
+points(x[res$cluster == 0, ], pch = 3, col = "grey")
 
 hullplot(x, res)
 
@@ -153,7 +153,9 @@ hullplot(x, res)
 points(newdata, pch = 3 , col = "red", lwd = 3)
 text(newdata, pos = 1)
 
-predict(res, newdata, data = x)
+pred_label <- predict(res, newdata, data = x)
+pred_label
+points(newdata, col = pred_label + 1L,  cex = 2, lwd = 2)
 
 ## Compare speed against fpc version (if microbenchmark is installed)
 ## Note: we use dbscan::dbscan to make sure that we do now run the

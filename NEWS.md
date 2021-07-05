@@ -1,3 +1,9 @@
+# dbscan 1.1-8.1 (2021-xx-xx)
+
+## New Features
+* Added predict for hdbscan (as suggested by moredatapls)
+
+
 # dbscan 1.1-8 (2021-04-26)
 
 ## Bugfixes

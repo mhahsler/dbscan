@@ -145,10 +145,10 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       for (std::vector<int>::iterator it = seeds.begin();
         it!=seeds.end(); ++it) {
         // Note: The second part of the if statement ensures that ties are
-        // always broken consistenty (higher ID wins to produce the same
+        // always broken consistenty (lower ID wins to produce the same
         // results as the elki implementation)!
         if (reachdist[*it] < reachdist[*q_it] ||
-          (reachdist[*it] == reachdist[*q_it] && *q_it < *it)) q_it = it;
+          (reachdist[*it] == reachdist[*q_it] && *it < *q_it)) q_it = it;
       }
       q = *q_it;
       seeds.erase(q_it);

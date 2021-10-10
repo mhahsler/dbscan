@@ -1,7 +1,6 @@
 # dbscan - Density Based Clustering of Applications with Noise (DBSCAN) and Related Algorithms - R package
 
 [![CRAN version](https://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
-[![Rdoc](https://www.rdocumentation.org/badges/version/dbscan)](https://www.rdocumentation.org/packages/dbscan)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
 [![R build status](https://github.com/mhahsler/dbscan/workflows/R-CMD-check/badge.svg)](https://github.com/mhahsler/dbscan/actions)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
@@ -141,7 +140,10 @@ See how well each point corresponds to the clusters found by the model used
 ## License 
 The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  
 
-
-## Further Information
+## Changes
 * List of changes from [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)
+
+## References
+
+- Hahsler M, Piekenbrock M, Doran D (2019). [dbscan: Fast Density-Based Clustering with R](https://doi.org/10.18637/jss.v091.i01). _Journal of Statistical Software_, *91*(1), 1-30. doi: 10.18637/jss.v091.i01.
 

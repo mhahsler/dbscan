@@ -97,6 +97,14 @@ expect_error(dbscan::kNN(x_na, k = 3), regexp = "NA")
 expect_error(dbscan::kNN(x_na, k = 3, search = "dist"), regexp = "NA")
 expect_error(dbscan::kNN(dist(x_na), k = 3), regexp = "NA")
 
+## inf
+x_inf <- x
+x_inf[c(1,3,5), 2] <- Inf
+dbscan::kNN(x_inf, k = 3)
+dbscan::kNN(x_inf, k = 3, search = "dist")
+dbscan::kNN(dist(x_inf), k = 3)
+
+
 ## sort and kNN to reduce k
 nn10 <- dbscan::kNN(x, k = 10)
 #nn10 <- dbscan::kNN(x, k = 10, sort = FALSE)

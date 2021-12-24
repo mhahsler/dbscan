@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // JP_int
 IntegerVector JP_int(IntegerMatrix nn, unsigned int kt);
 RcppExport SEXP _dbscan_JP_int(SEXP nnSEXP, SEXP ktSEXP) {

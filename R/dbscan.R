@@ -2,7 +2,7 @@
 # dbscan - Density Based Clustering of Applications with Noise
 #          and Related Algorithms
 # Copyright (C) 2015 Michael Hahsler
-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -17,102 +17,354 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-dbscan <- function(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE,
-  ...) {
 
-
-  if(inherits(x, "frNN") && missing(eps)) eps <- x$eps
-
-  ### extra contains settings for frNN
-  ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
-  ### also check for MinPts for fpc compartibility (does not work for
-  ### search method dist)
-  extra <- list(...)
-  args <- c("MinPts", "search", "bucketSize", "splitRule", "approx")
-  m <- pmatch(names(extra), args)
-  if(any(is.na(m))) stop("Unknown parameter: ",
-    paste(names(extra)[is.na(m)], collapse = ", "))
-  names(extra) <- args[m]
-
-  if(!is.null(extra$MinPts)) {
-    warning("converting argument MinPts (fpc) to minPts (dbscan)!")
-    minPts <- extra$MinPts
-  }
-  extra$MinPts <- NULL
-
-  search <- if(is.null(extra$search)) "kdtree" else extra$search
-  splitRule <- if(is.null(extra$splitRule)) "suggest" else extra$splitRule
-  search <- .parse_search(search)
-  splitRule <- .parse_splitRule(splitRule)
-
-  bucketSize <- if(is.null(extra$bucketSize)) 10L else
-    as.integer(extra$bucketSize)
-
-  approx <- if(is.null(extra$approx)) 0L else as.integer(extra$approx)
-
-  ### do dist search
-  if(search == 3) {
-    if(!inherits(x, "dist"))
-      if(.matrixlike(x)) x <- dist(x)
-      else stop("x needs to be a matrix to calculate distances")
-  }
-
-  ## for dist we provide the R code with a frNN list and no x
-  frNN <- list()
-  if(inherits(x, "dist")) {
-    frNN <- frNN(x, eps, ...)$id
-    x <- matrix(0.0, nrow=0, ncol=0)
-  }else if(inherits(x, "frNN")) {
-    if(x$eps != eps) {
+#' DBSCAN
+#'
+#' Fast reimplementation of the DBSCAN (Density-based spatial clustering of
+#' applications with noise) clustering algorithm using a kd-tree. The
+#' implementation is significantly faster and can work with larger data sets
+#' then dbscan in \pkg{fpc}.
+#'
+#' _Note:_ use \code{dbscan::dbscan()} (with specifying the package) to
+#' call this implementation when you also use package \pkg{fpc}.
+#'
+#' **The algorithm**
+#'
+#' This implementation of DBSCAN (Hahsler et al, 2019) implements the original
+#' algorithm as described by Ester et al (1996). DBSCAN estimates the density
+#' around each data point by counting the number of points in a user-specified
+#' eps-neighborhood and applies a used-specified minPts thresholds to identify
+#' core, border and noise points. In a second step, core points are joined into
+#' a cluster if they are density-reachable (i.e., there is a chain of core
+#' points where one falls inside the eps-neighborhood of the next). Finally,
+#' border points are assigned to clusters. The algorithm needs parameters
+#' \code{eps} (the radius of the epsilon neighborhood) and \code{minPts} (the
+#' density threshold).
+#'
+#' Border points are arbitrarily assigned to clusters in the original
+#' algorithm. DBSCAN* (see Campello et al 2013) treats all border points as
+#' noise points. This is implemented with \code{borderPoints = FALSE}.
+#'
+#' **Specifying the data**
+#'
+#' If \code{x} is a matrix or a data.frame, then fast fixed-radius nearest
+#' neighbor computation using a kd-tree is performed using Euclidean distance.
+#' See [frNN()] for more information on the parameters related to
+#' nearest neighbor search.
+#'
+#' Any precomputed distance matrix (dist object) can be specified as \code{x}.
+#' You may run into memory issues since distance matrices are large.
+#'
+#' A precomputed frNN object can be supplied as \code{x}. In this case
+#' \code{eps} does not need to be specified. This option us useful for large
+#' data sets, where a sparse distance matrix is available. See
+#' [frNN()] how to create frNN objects.
+#'
+#' **Setting parameters for DBSCAN**
+#'
+#' The parameters \code{minPts} and \code{eps} depend on each other and
+#' changing one typically requires changing the other one as well. The original
+#' DBSCAN paper suggests to start by setting \code{minPts} to the
+#' dimensionality of the data plus one or higher. \code{minPts} defines the
+#' minimum density around a core point (i.e., the minimum density for non-noise
+#' areas). Increase the parameter to suppress more noise in the data and
+#' require more points to form a cluster. A suitable neighborhood size
+#' parameter \code{eps} given a fixed value for \code{minPts} can be found
+#' visually by inspecting the[kNNdistplot()] of the data using
+#' \code{k = minPts - 1} (\code{minPts} includes the point itself, while the
+#' k-nearest neighbors distance does not). The k-nearest neighbor distance plot
+#' sorts all data points by their k-nearest neighbor distance. A sudden
+#' increase of the kNN distance (a knee) indicates that the points to the right
+#' are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
+#'
+#' **Predict cluster memberships**
+#'
+#' `predict()` can be used to predict cluster memberships for new data
+#' points. A point is considered a member of a cluster if it is within the eps
+#' neighborhood of a member of the cluster (Euclidean distance is used). Points
+#' which cannot be assigned to a cluster will be reported as members of the
+#' noise cluster 0.
+#'
+#' @aliases dbscan DBSCAN print.dbscan_fast
+#'
+#' @param x a data matrix, a data.frame, a dist object or a frNN object with
+#' fixed-radius nearest neighbors.
+#' @param eps size (radius) of the epsilon neighborhood. Can be omitted if
+#' \code{x} is a frNN object.
+#' @param minPts number of minimum points required in the eps neighborhood for
+#' core points (including the point itself). The default value is 5 points.
+#' @param weights numeric; weights for the data points. Only needed to perform
+#' weighted clustering.
+#' @param borderPoints logical; should border points be assigned to clusters.
+#' The default is \code{TRUE} for regular DBSCAN. If \code{FALSE} then border
+#' points are considered noise (see DBSCAN* in Campello et al, 2013).
+#' @param ...  additional arguments are passed on to the fixed-radius nearest
+#' neighbor search algorithm. See [frNN()] for details on how to
+#' control the search strategy.
+#'
+#' @return An object of class `dbscan_fast` with the following components:
+#'
+#' \item{eps }{ value of the eps parameter.}
+#' \item{minPts }{ value of the
+#' minPts parameter.}
+#' \item{cluster }{A integer vector with cluster
+#' assignments. Zero indicates noise points.}
+#'
+#' @author Michael Hahsler
+#' @seealso [kNNdistplot()], [frNN()],
+#' [fpc::dbscan()].
+#' @references Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast
+#' Density-Based Clustering with R.  _Journal of Statistical Software,_
+#' 91(1), 1-30.
+#' \doi{10.18637/jss.v091.i01}
+#'
+#' Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A
+#' Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
+#' with Noise. Institute for Computer Science, University of Munich.
+#' _Proceedings of 2nd International Conference on Knowledge Discovery and
+#' Data Mining (KDD-96),_ 226-231.
+#' \url{https://dl.acm.org/doi/10.5555/3001460.3001507}
+#'
+#' Campello, R. J. G. B.; Moulavi, D.; Sander, J. (2013). Density-Based
+#' Clustering Based on Hierarchical Density Estimates. Proceedings of the
+#' 17th Pacific-Asia Conference on Knowledge Discovery in Databases, PAKDD
+#' 2013, _Lecture Notes in Computer Science_ 7819, p. 160.
+#' \doi{10.1007/978-3-642-37456-2_14}
+#' @keywords model clustering
+#' @examples
+#' ## Example 1: use dbscan on the iris data set
+#' data(iris)
+#' iris <- as.matrix(iris[, 1:4])
+#'
+#' ## Find suitable DBSCAN parameters:
+#' ## 1. We use minPts = dim + 1 = 5 for iris. A larger value can also be used.
+#' ## 2. We inspect the  k-NN distance plot for k = minPts - 1 = 4
+#' kNNdistplot(iris, k = 5 - 1)
+#'
+#' ## Noise seems to start around a 4-NN distance of .7
+#' abline(h=.7, col = "red", lty = 2)
+#'
+#' ## Cluster with the chosen parameters
+#' res <- dbscan(iris, eps = .7, minPts = 5)
+#' res
+#'
+#' pairs(iris, col = res$cluster + 1L)
+#'
+#' ## Use a precomputed frNN object
+#' fr <- frNN(iris, eps = .7)
+#' dbscan(fr, minPts = 5)
+#'
+#' ## Example 2: use data from fpc
+#' set.seed(665544)
+#' n <- 100
+#' x <- cbind(
+#'   x = runif(10, 0, 10) + rnorm(n, sd = 0.2),
+#'   y = runif(10, 0, 10) + rnorm(n, sd = 0.2)
+#'   )
+#'
+#' res <- dbscan(x, eps = .3, minPts = 3)
+#' res
+#'
+#' ## plot clusters and add noise (cluster 0) as crosses.
+#' plot(x, col = res$cluster)
+#' points(x[res$cluster == 0, ], pch = 3, col = "grey")
+#'
+#' hullplot(x, res)
+#'
+#' ## Predict cluster membership for new data points
+#' ## (Note: 0 means it is predicted as noise)
+#' newdata <- x[1:5,] + rnorm(10, 0, .3)
+#' hullplot(x, res)
+#' points(newdata, pch = 3 , col = "red", lwd = 3)
+#' text(newdata, pos = 1)
+#'
+#' pred_label <- predict(res, newdata, data = x)
+#' pred_label
+#' points(newdata, col = pred_label + 1L,  cex = 2, lwd = 2)
+#'
+#' ## Compare speed against fpc version (if microbenchmark is installed)
+#' ## Note: we use dbscan::dbscan to make sure that we do now run the
+#' ## implementation in fpc.
+#' \dontrun{
+#' if (requireNamespace("fpc", quietly = TRUE) &&
+#'     requireNamespace("microbenchmark", quietly = TRUE)) {
+#'   t_dbscan <- microbenchmark::microbenchmark(
+#'     dbscan::dbscan(x, .3, 3), times = 10, unit = "ms")
+#'   t_dbscan_linear <- microbenchmark::microbenchmark(
+#'     dbscan::dbscan(x, .3, 3, search = "linear"), times = 10, unit = "ms")
+#'   t_dbscan_dist <- microbenchmark::microbenchmark(
+#'     dbscan::dbscan(x, .3, 3, search = "dist"), times = 10, unit = "ms")
+#'   t_fpc <- microbenchmark::microbenchmark(
+#'     fpc::dbscan(x, .3, 3), times = 10, unit = "ms")
+#'
+#'   r <- rbind(t_fpc, t_dbscan_dist, t_dbscan_linear, t_dbscan)
+#'   r
+#'
+#'   boxplot(r,
+#'     names = c('fpc', 'dbscan (dist)', 'dbscan (linear)', 'dbscan (kdtree)'),
+#'     main = "Runtime comparison in ms")
+#'
+#'   ## speedup of the kd-tree-based version compared to the fpc implementation
+#'   median(t_fpc$time) / median(t_dbscan$time)
+#' }}
+#'
+#' ## Example 3: manually create a frNN object for dbscan (dbscan only needs ids and eps)
+#' nn <- structure(list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1),
+#'   class =  c("NN", "frNN"))
+#' nn
+#' dbscan(nn, minPts = 2)
+#'
+#' @export dbscan
+dbscan <-
+  function(x,
+    eps,
+    minPts = 5,
+    weights = NULL,
+    borderPoints = TRUE,
+    ...) {
+    if (inherits(x, "frNN") && missing(eps))
       eps <- x$eps
-      warning("Using the eps of ", eps, " provided in the fixed-radius NN object.")
+
+    ### extra contains settings for frNN
+    ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
+    ### also check for MinPts for fpc compartibility (does not work for
+    ### search method dist)
+    extra <- list(...)
+    args <- c("MinPts", "search", "bucketSize", "splitRule", "approx")
+    m <- pmatch(names(extra), args)
+    if (any(is.na(m)))
+      stop("Unknown parameter: ",
+        paste(names(extra)[is.na(m)], collapse = ", "))
+    names(extra) <- args[m]
+
+    if (!is.null(extra$MinPts)) {
+      warning("converting argument MinPts (fpc) to minPts (dbscan)!")
+      minPts <- extra$MinPts
     }
-    frNN <- x$id
-    x <- matrix(0.0, nrow=0, ncol=0)
+    extra$MinPts <- NULL
 
-  }else{
-    if(!.matrixlike(x)) stop("x needs to be a matrix")
-    ## make sure x is numeric
-    x <- as.matrix(x)
-    if(storage.mode(x) == "integer") storage.mode(x) <- "double"
-    if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
+    search <- if (is.null(extra$search))
+      "kdtree"
+    else
+      extra$search
+    splitRule <-
+      if (is.null(extra$splitRule))
+        "suggest"
+    else
+      extra$splitRule
+    search <- .parse_search(search)
+    splitRule <- .parse_splitRule(splitRule)
+
+    bucketSize <- if (is.null(extra$bucketSize))
+      10L
+    else
+      as.integer(extra$bucketSize)
+
+    approx <-
+      if (is.null(extra$approx))
+        0L
+    else
+      as.integer(extra$approx)
+
+    ### do dist search
+    if (search == 3) {
+      if (!inherits(x, "dist"))
+        if (.matrixlike(x))
+          x <- dist(x)
+      else
+        stop("x needs to be a matrix to calculate distances")
+    }
+
+    ## for dist we provide the R code with a frNN list and no x
+    frNN <- list()
+    if (inherits(x, "dist")) {
+      frNN <- frNN(x, eps, ...)$id
+      x <- matrix(0.0, nrow = 0, ncol = 0)
+    } else if (inherits(x, "frNN")) {
+      if (x$eps != eps) {
+        eps <- x$eps
+        warning("Using the eps of ",
+          eps,
+          " provided in the fixed-radius NN object.")
+      }
+      frNN <- x$id
+      x <- matrix(0.0, nrow = 0, ncol = 0)
+
+    } else{
+      if (!.matrixlike(x))
+        stop("x needs to be a matrix")
+      ## make sure x is numeric
+      x <- as.matrix(x)
+      if (storage.mode(x) == "integer")
+        storage.mode(x) <- "double"
+      if (storage.mode(x) != "double")
+        stop("x has to be a numeric matrix.")
+    }
+
+    if (length(frNN) == 0 && any(is.na(x)))
+      stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
+
+    ## add self match and use C numbering if frNN is used
+    if (length(frNN) > 0)
+      frNN <-
+      lapply(
+        1:length(frNN),
+        FUN = function(i)
+          c(i - 1L, frNN[[i]] - 1L)
+      )
+
+    if (length(minPts) != 1 ||
+        !is.finite(minPts) ||
+        minPts < 0)
+      stop("minPts need to be a single integer >=0.")
+
+    if (is.null(eps) ||
+        is.na(eps) || eps < 0)
+      stop("eps needs to be >=0.")
+
+    ret <- dbscan_int(
+      x,
+      as.double(eps),
+      as.integer(minPts),
+      as.double(weights),
+      as.integer(borderPoints),
+      as.integer(search),
+      as.integer(bucketSize),
+      as.integer(splitRule),
+      as.double(approx),
+      frNN
+    )
+
+    structure(list(
+      cluster = ret,
+      eps = eps,
+      minPts = minPts
+    ),
+      class = c("dbscan_fast", "dbscan"))
   }
-
-  if(length(frNN) == 0 && any(is.na(x)))
-    stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
-
-  ## add self match and use C numbering if frNN is used
-  if(length(frNN) > 0)
-    frNN <- lapply(1:length(frNN), FUN = function(i) c(i-1L, frNN[[i]]-1L))
-
-  if(length(minPts) !=1 || ! is.finite(minPts) || minPts < 0) stop("minPts need to be a single integer >=0.")
-
-  if(is.null(eps) || is.na(eps) || eps < 0) stop("eps needs to be >=0.")
-
-  ret <- dbscan_int(x, as.double(eps), as.integer(minPts),
-    as.double(weights), as.integer(borderPoints),
-    as.integer(search), as.integer(bucketSize),
-    as.integer(splitRule), as.double(approx), frNN)
-
-  structure(list(cluster = ret, eps = eps, minPts = minPts),
-    class = c("dbscan_fast", "dbscan"))
-}
 
 
 print.dbscan_fast <- function(x, ...) {
   cl <- unique(x$cluster)
-  cl <- length(cl[cl!=0L])
+  cl <- length(cl[cl != 0L])
 
   writeLines(c(
     paste0("DBSCAN clustering for ", length(x$cluster), " objects."),
     paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
-    paste0("The clustering contains ", cl, " cluster(s) and ",
-      sum(x$cluster==0L), " noise points.")
-    ))
+    paste0(
+      "The clustering contains ",
+      cl,
+      " cluster(s) and ",
+      sum(x$cluster == 0L),
+      " noise points."
+    )
+  ))
 
   print(table(x$cluster))
   cat("\n")
 
-  writeLines(strwrap(paste0("Available fields: ",
-    paste(names(x), collapse = ", ")), exdent = 18))
+  writeLines(strwrap(paste0(
+    "Available fields: ",
+    paste(names(x), collapse = ", ")
+  ), exdent = 18))
 }

@@ -1,14 +1,60 @@
-## Faster version of dendrogram conversion from hclust objects 
+#######################################################################
+# dbscan - Density Based Clustering of Applications with Noise
+#          and Related Algorithms
+# Copyright (C) 2015 Michael Hahsler, Matt Piekenbrock
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+#' Dendrogram Coersions
+#'
+#' Coerce [dendrogram] objects to [hclust], [hdbscan] and [reachability] objects.
+#'
+#' Notes:
+#' *  the coersion to hclust is a faster reimplementation of
+#' [stats::as.dendrogram()].
+#'
+#' * the coersion to hdbscan builds the non-simplified HDBSCAN hierarchy as a
+#' dendrogram object.
+#'
+#' @name dendrogram
+#' @aliases dendrogram
+#'
+#' @param object the object
+#' @param ... further arguments
+NULL
+
+#' @rdname dendrogram
 as.dendrogram.hclust <- function(object, ...){
   return(buildDendrogram(object))
 }
 
-## Builds the non-simplified HDBSCAN hierarchy as a dendrogram object using the hclust object 
+#' @rdname dendrogram
 as.dendrogram.hdbscan <- function(object, ...){
   return(buildDendrogram(object$hc))
 }
 
-# Dendrogram --> Reachability conversion
+#' @rdname dendrogram
+#' @name reachability-coersion
+#' @aliases as.reachability
+NULL
+
+as.reachability <-
+  function(object, ...)
+    UseMethod("as.reachability")
+
+#' @rdname dendrogram
 as.dendrogram.reachability <- function(object, ...) {
   if(length(which(object$reachdist == Inf)) > 1) stop("Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain
                                                       enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value
@@ -19,10 +65,10 @@ as.dendrogram.reachability <- function(object, ...) {
   #q_order <- sapply(c_order, function(i) which(dup_x$order == i))
   res <- reach_to_dendrogram(object, c_order)
   # res <- dendrapply(res, function(leaf) { new_leaf <- leaf[[1]]; attributes(new_leaf) <- attributes(leaf); new_leaf })
-  
+
   # add mid points for plotting
   res <- .midcache.dendrogram(res)
-  
+
   res
 }
 

@@ -17,116 +17,260 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-frNN <- function(x, eps, query = NULL, sort = TRUE, search = "kdtree", bucketSize = 10,
-  splitRule = "suggest", approx = 0) {
 
-  if(is.null(eps) || is.na(eps) || eps < 0) stop("eps needs to be >=0.")
+#' Find the Fixed Radius Nearest Neighbors
+#'
+#' This function uses a kd-tree to find the fixed radius nearest neighbors
+#' (including distances) fast.
+#'
+#' If \code{x} is specified as a data matrix, then Euclidean distances an fast
+#' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
+#' details on the parameters for the kd-tree.
+#'
+#' To create a frNN object from scratch, you need to supply at least the
+#' elements \code{id} with a list of integer vectors with the nearest neighbor
+#' ids for each point and \code{eps} (see below).
+#'
+#' **Self-matches are not returned!**
+#'
+#' @aliases frNN frnn print.frnn
+#'
+#' @param x a data matrix, a dist object or a frNN object.
+#' @param eps neighbors radius.
+#' @param query a data matrix with the points to query. If query is not
+#' specified, the NN for all the points in \code{x} is returned. If query is
+#' specified then \code{x} needs to be a data matrix.
+#' @param sort sort the neighbors by distance? This is expensive and can be
+#' done later using `sort()`.
+#' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
+#' `"dist"`).
+#' @param bucketSize max size of the kd-tree leafs.
+#' @param splitRule rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+#' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
+#' ANNs best guess.
+#' @param approx use approximate nearest neighbors. All NN up to a distance of
+#' a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+#' leading to spurious clusters and noise points.  However, the algorithm will
+#' enjoy a significant speedup.
+#' @param decreasing sort in decreasing order?
+#' @param ... further arguments
+#'
+#' @return An object of class [frNN] (subclass of
+#' [NN]) containing a list with the following components:
+#' \item{id }{a list of
+#' integer vectors. Each vector contains the ids of the fixed radius nearest
+#' neighbors. }
+#' \item{dist }{a list with distances (same structure as
+#' \code{ids}). }
+#' \item{eps }{ eps used. }
+#'
+#' @author Michael Hahsler
+#' @seealso [kNN()] and [NN]
+#'
+#' @references David M. Mount and Sunil Arya (2010). ANN: A Library for
+#' Approximate Nearest Neighbor Searching,
+#' \url{http://www.cs.umd.edu/~mount/ANN/}.
+#' @keywords model
+#' @examples
+#' data(iris)
+#' x <- iris[, -5]
+#'
+#' # Example 1: Find fixed radius nearest neighbors for each point
+#' nn <- frNN(x, eps = .5)
+#'
+#' # Number of neighbors
+#' hist(sapply(adjacencylist(nn), length),
+#'   xlab = "k", main="Number of Neighbors",
+#'   sub = paste("Neighborhood size eps =", nn$eps))
+#'
+#' # Explore neighbors of point i = 10
+#' i <- 10
+#' nn$id[[i]]
+#' nn$dist[[i]]
+#' plot(x, col = ifelse(1:nrow(iris) %in% nn$id[[i]], "red", "black"))
+#'
+#' # get an adjacency list
+#' head(adjacencylist(nn))
+#'
+#' # plot the fixed radius neighbors (and then reduced to a radius of .3)
+#' plot(nn, x)
+#' plot(frNN(nn, eps = .3), x)
+#'
+#' ## Example 2: find fixed-radius NN for query points
+#' q <- x[c(1,100),]
+#' nn <- frNN(x, eps = .5, query = q)
+#'
+#' plot(nn, x, col = "grey")
+#' points(q, pch = 3, lwd = 2)
+#' @export frNN
+frNN <-
+  function(x,
+    eps,
+    query = NULL,
+    sort = TRUE,
+    search = "kdtree",
+    bucketSize = 10,
+    splitRule = "suggest",
+    approx = 0) {
+    if (is.null(eps) ||
+        is.na(eps) || eps < 0)
+      stop("eps needs to be >=0.")
 
-  if(inherits(x, "frNN")) {
-    if(x$eps < eps) stop("frNN in x has not a sufficient eps radius.")
+    if (inherits(x, "frNN")) {
+      if (x$eps < eps)
+        stop("frNN in x has not a sufficient eps radius.")
 
-    for(i in 1:length(x$dist)) {
-      take <- x$dist[[i]] <= eps
-      x$dist[[i]] <- x$dist[[i]][take]
-      x$id[[i]] <- x$id[[i]][take]
+      for (i in 1:length(x$dist)) {
+        take <- x$dist[[i]] <= eps
+        x$dist[[i]] <- x$dist[[i]][take]
+        x$id[[i]] <- x$id[[i]][take]
+      }
+      x$eps <- eps
+
+      return(x)
     }
-    x$eps <- eps
-
-    return(x)
-  }
 
 
-  search <- .parse_search(search)
-  splitRule <- .parse_splitRule(splitRule)
+    search <- .parse_search(search)
+    splitRule <- .parse_splitRule(splitRule)
 
-  ### dist search
-  if(search == 3) {
-    if(!inherits(x, "dist"))
-      if(.matrixlike(x)) x <- dist(x)
-      else stop("x needs to be a matrix to calculate distances")
-  }
+    ### dist search
+    if (search == 3) {
+      if (!inherits(x, "dist"))
+        if (.matrixlike(x))
+          x <- dist(x)
+      else
+        stop("x needs to be a matrix to calculate distances")
+    }
 
-  ### get kNN from a dist object in R
-  if(inherits(x, "dist")) {
+    ### get kNN from a dist object in R
+    if (inherits(x, "dist")) {
+      if (!is.null(query))
+        stop("query can only be used if x contains the data.")
 
-    if(!is.null(query)) stop("query can only be used if x contains the data.")
+      if (any(is.na(x)))
+        stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
-    if(any(is.na(x))) stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
+      x <- as.matrix(x)
+      diag(x) <- Inf           ### no self-matches
 
-    x <- as.matrix(x)
-    diag(x) <- Inf           ### no self-matches
-
-    id <- lapply(1:nrow(x), FUN = function(i) {
-          y <- x[i, ]
+      id <- lapply(
+        1:nrow(x),
+        FUN = function(i) {
+          y <- x[i,]
           o <- order(y, decreasing = FALSE)
           o[y[o] <= eps]
 
-      }
-    )
-    names(id) <- rownames(x)
-
-    d <- lapply(1:nrow(x), FUN = function(i) {
-          unname(x[i,id[[i]]])
         }
-    )
-    names(d) <- rownames(x)
+      )
+      names(id) <- rownames(x)
 
-    ret <- structure(list(dist = d, id = id, eps = eps, sort = TRUE),
-      class = c("frNN", "NN"))
+      d <- lapply(
+        1:nrow(x),
+        FUN = function(i) {
+          unname(x[i, id[[i]]])
+        }
+      )
+      names(d) <- rownames(x)
 
-    return(ret)
+      ret <-
+        structure(list(
+          dist = d,
+          id = id,
+          eps = eps,
+          sort = TRUE
+        ),
+          class = c("frNN", "NN"))
+
+      return(ret)
+    }
+
+    ## make sure x is numeric
+    if (!.matrixlike(x))
+      stop("x needs to be a matrix to calculate distances")
+    x <- as.matrix(x)
+    if (storage.mode(x) == "integer")
+      storage.mode(x) <- "double"
+    if (storage.mode(x) != "double")
+      stop("x has to be a numeric matrix.")
+
+    if (!is.null(query)) {
+      query <- as.matrix(query)
+      if (storage.mode(query) == "integer")
+        storage.mode(query) <- "double"
+      if (storage.mode(query) != "double")
+        stop("query has to be NULL or a numeric matrix.")
+      if (ncol(x) != ncol(query))
+        stop("x and query need to have the same number of columns!")
+    }
+
+    if (any(is.na(x)))
+      stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
+
+    ## returns NO self matches
+    if (!is.null(query)) {
+      ret <-
+        frNN_query_int(
+          as.matrix(x),
+          as.matrix(query),
+          as.double(eps),
+          as.integer(search),
+          as.integer(bucketSize),
+          as.integer(splitRule),
+          as.double(approx)
+        )
+      names(ret$dist) <- rownames(query)
+      names(ret$id) <- rownames(query)
+    } else{
+      ret <- frNN_int(
+        as.matrix(x),
+        as.double(eps),
+        as.integer(search),
+        as.integer(bucketSize),
+        as.integer(splitRule),
+        as.double(approx)
+      )
+      names(ret$dist) <- rownames(x)
+      names(ret$id) <- rownames(x)
+    }
+
+    ret$eps <- eps
+    ret$sort <- FALSE
+    class(ret) <- c("frNN", "NN")
+
+    if (sort)
+      ret <- sort.frNN(ret)
+
+    ret
   }
 
-  ## make sure x is numeric
-  if(!.matrixlike(x)) stop("x needs to be a matrix to calculate distances")
-  x <- as.matrix(x)
-  if(storage.mode(x) == "integer") storage.mode(x) <- "double"
-  if(storage.mode(x) != "double") stop("x has to be a numeric matrix.")
-
-  if(!is.null(query)) {
-    query <- as.matrix(query)
-    if(storage.mode(query) == "integer") storage.mode(query) <- "double"
-    if(storage.mode(query) != "double") stop("query has to be NULL or a numeric matrix.")
-    if(ncol(x) != ncol(query)) stop("x and query need to have the same number of columns!")
-  }
-
-  if(any(is.na(x))) stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
-
-  ## returns NO self matches
-  if(!is.null(query)) {
-    ret <- frNN_query_int(as.matrix(x), as.matrix(query), as.double(eps),
-      as.integer(search), as.integer(bucketSize),
-      as.integer(splitRule), as.double(approx))
-    names(ret$dist) <- rownames(query)
-    names(ret$id) <- rownames(query)
-  }else{
-    ret <- frNN_int(as.matrix(x), as.double(eps),
-      as.integer(search), as.integer(bucketSize),
-      as.integer(splitRule), as.double(approx))
-    names(ret$dist) <- rownames(x)
-    names(ret$id) <- rownames(x)
-  }
-
-  ret$eps <- eps
-  ret$sort <- FALSE
-  class(ret) <- c("frNN", "NN")
-
-  if(sort) ret <- sort.frNN(ret)
-
-  ret
-}
-
+#' @rdname frNN
 sort.frNN <- function(x, decreasing = FALSE, ...) {
-  if(!is.null(x$sort) && x$sort) return(x)
-  if(is.null(x$dist)) stop("Unable to sort. Distances are missing.")
+  if (!is.null(x$sort) && x$sort)
+    return(x)
+  if (is.null(x$dist))
+    stop("Unable to sort. Distances are missing.")
 
   ## FIXME: This is slow do this in C++
   n <- names(x$id)
 
-  o <- lapply(1:length(x$dist), FUN =
-      function(i) order(x$dist[[i]], x$id[[i]], decreasing=decreasing))
-  x$dist <- lapply(1:length(o), FUN = function(p) x$dist[[p]][o[[p]]])
-  x$id <- lapply(1:length(o), FUN = function(p) x$id[[p]][o[[p]]])
+  o <- lapply(
+    1:length(x$dist),
+    FUN =
+      function(i)
+        order(x$dist[[i]], x$id[[i]], decreasing = decreasing)
+  )
+  x$dist <-
+    lapply(
+      1:length(o),
+      FUN = function(p)
+        x$dist[[p]][o[[p]]]
+    )
+  x$id <- lapply(
+    1:length(o),
+    FUN = function(p)
+      x$id[[p]][o[[p]]]
+  )
 
   names(x$dist) <- n
   names(x$id) <- n
@@ -136,8 +280,19 @@ sort.frNN <- function(x, decreasing = FALSE, ...) {
   x
 }
 
+#' @rdname frNN
+adjacencylist.frNN <- function(x, ...)
+  x$id
+
 print.frNN <- function(x, ...) {
-  cat("fixed radius nearest neighbors for ", length(x$id),
-    " objects (eps=", x$eps,").", "\n", sep = "")
+  cat(
+    "fixed radius nearest neighbors for ",
+    length(x$id),
+    " objects (eps=",
+    x$eps,
+    ").",
+    "\n",
+    sep = ""
+  )
   cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
 }

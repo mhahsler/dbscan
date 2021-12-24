@@ -1,5 +1,8 @@
 # dbscan 1.1-8.1 (2021-xx-xx)
 
+## Changes
+* We use now roxygen2.
+
 ## New Features
 * Added predict for hdbscan (as suggested by moredatapls)
 

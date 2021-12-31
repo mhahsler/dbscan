@@ -23,38 +23,39 @@
 #' Implements the shared nearest neighbor clustering algorithm by Ertoz,
 #' Steinbach and Kumar (2003).
 #'
-#' Algorithm:
+#' **Algorithm:**
 #'
-#' 1 Constructs a shared nearest neighbor graph for a given k. The edge
+#' 1. Constructs a shared nearest neighbor graph for a given k. The edge
 #' weights are the number of shared k nearest neighbors (in the range of
 #' \eqn{[0, k]}).
 #'
-#' 2 Find each points SNN density, i.e., the number of points which have a
-#' similarity of eps or greater.
+#' 2. Find each points SNN density, i.e., the number of points which have a
+#' similarity of `eps` or greater.
 #'
-#' 3 Find the core points, i.e., all points that have an SNN density greater
-#' than MinPts.
+#' 3. Find the core points, i.e., all points that have an SNN density greater
+#' than `MinPts`.
 #'
-#' 4 Form clusters from the core points and assign border points (i.e.,
-#' non-core points which share at least eps neighbors with a core point).
+#' 4. Form clusters from the core points and assign border points (i.e.,
+#' non-core points which share at least `eps` neighbors with a core point).
 #'
 #' Note that steps 2-4 are equivalent to the DBSCAN algorithm (see [dbscan()])
-#' and that \code{eps} has a different meaning than for DBSCAN. Here it is
+#' and that `eps` has a different meaning than for DBSCAN. Here it is
 #' a threshold on the number of shared neighbors (see [sNN()])
 #' which defines a similarity.
 #'
 #' @aliases sNNclust snnclust
+#' @family clustering functions
 #'
 #' @param x a data matrix/data.frame (Euclidean distance is used), a
 #' precomputed [dist] object or a kNN object created with [kNN()].
 #' @param k Neighborhood size for nearest neighbor sparsification to create the
 #' shared NN graph.
 #' @param eps Two objects are only reachable from each other if they share at
-#' least \code{eps} nearest neighbors.
-#' @param minPts minimum number of points that share at least \code{eps}
+#' least `eps` nearest neighbors. Note: this is different from the `eps` in DBSCAN!
+#' @param minPts minimum number of points that share at least `eps`
 #' nearest neighbors for a point to be considered a core points.
-#' @param borderPoints should borderPoints be assigned to clusters like in
-#' DBSCAN?
+#' @param borderPoints should border points be assigned to clusters like in
+#' [DBSCAN]?
 #' @param ...  additional arguments are passed on to the k nearest neighbor
 #' search algorithm. See [kNN()] for details on how to control the
 #' search strategy.
@@ -67,7 +68,6 @@
 #' \item{param }{ list of used clustering parameters. }
 #'
 #' @author Michael Hahsler
-#' @seealso [dbscan()], [jpclust()]
 #'
 #' @references Levent Ertoz, Michael Steinbach, Vipin Kumar, Finding Clusters
 #' of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data,
@@ -75,7 +75,6 @@
 #' \doi{10.1137/1.9781611972733.5}
 #' @keywords model clustering
 #' @examples
-#'
 #' data("DS3")
 #'
 #' # Out of k = 20 NN 7 (eps) have to be shared to create a link in the sNN graph.

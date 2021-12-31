@@ -5,7 +5,7 @@
 \alias{HDBSCAN}
 \alias{print.hdbscan}
 \alias{plot.hdbscan}
-\title{HDBSCAN}
+\title{Hierarchical DBSCAN (HDBSCAN)}
 \usage{
 hdbscan(x, minPts, gen_hdbscan_tree = FALSE, gen_simplified_tree = FALSE)
 
@@ -18,16 +18,16 @@ hdbscan(x, minPts, gen_hdbscan_tree = FALSE, gen_simplified_tree = FALSE)
 )
 }
 \arguments{
-\item{x}{a data matrix (Euclidean distances are used) or a dist object
+\item{x}{a data matrix (Euclidean distances are used) or a \link{dist} object
 calculated with an arbitrary distance metric.}
 
 \item{minPts}{integer; Minimum size of clusters. See details.}
 
 \item{gen_hdbscan_tree}{logical; should the robust single linkage tree be
-explicitly computed. (see cluster tree in Chaudhuri et al, 2010).}
+explicitly computed (see cluster tree in Chaudhuri et al, 2010).}
 
 \item{gen_simplified_tree}{logical; should the simplified hierarchy be
-explicitly computed. (see Campello et al, 2013).}
+explicitly computed (see Campello et al, 2013).}
 
 \item{scale}{integer; used to scale condensed tree based on the graphics
 device. Lower scale results in wider trees.}
@@ -38,27 +38,24 @@ coloring with.}
 \item{show_flat}{logical; whether to draw boxes indicating the most stable
 clusters.}
 
-\item{...}{additional arguments are passed on to the appropriate S3 methods
-(such as plotting parameters).}
+\item{...}{additional arguments are passed on.}
 }
 \value{
-A object of class 'hdbscan' with the following components:
+A object of class \code{hdbscan} with the following components:
 \item{cluster }{A integer vector with cluster assignments. Zero indicates
 noise points.}
-\item{minPts }{ value of the minPts parameter.}
+\item{minPts }{ value of the \code{minPts} parameter.}
 \item{cluster_scores }{The sum of the stability scores for each salient
-('flat') cluster. Corresponds to cluster ids given the in 'cluster' member.
+(flat) cluster. Corresponds to cluster IDs given the in \code{"cluster"} element.
 }
-\item{membership_prob }{The 'probability' or individual stability of a
+\item{membership_prob }{The probability or individual stability of a
 point within its clusters. Between 0 and 1.}
-\item{outlier_scores }{The
-outlier score (GLOSH) of each point. }
-\item{hc }{An \link{hclust} object of the
-HDBSCAN hierarchy. }
+\item{outlier_scores }{The GLOSH outlier score of each point. }
+\item{hc }{An \link{hclust} object of the HDBSCAN hierarchy. }
 }
 \description{
-Fast implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
-algorithms using Rcpp.
+Fast C++ implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
+algorithms.
 }
 \details{
 This fast implementation of HDBSCAN (Hahsler et al, 2019) computes the
@@ -69,8 +66,9 @@ then uses a stability-based extraction method to find optimal cuts in the
 hierarchy, thus producing a flat solution.
 
 Additional, related algorithms including the "Global-Local Outlier Score
-from Hierarchies" (GLOSH) (see section 6 of Campello et al., 2015) outlier
-scores and ability to cluster based on instance-level constraints (see
+from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015)
+is available in function \code{\link[=glosh]{glosh()}}
+and the ability to cluster based on instance-level constraints (see
 section 5.3 of Campello et al. 2015) are supported. The algorithms only need
 the parameter \code{minPts}.
 
@@ -79,7 +77,7 @@ but also as a "smoothing" factor of the density estimates implicitly
 computed from HDBSCAN.
 
 \code{\link[=predict]{predict()}} assigns each new data point to the same cluster as the point
-in the original data that has the smallest mutual rachability distance.
+in the original data that has the smallest mutual reachability distance.
 }
 \examples{
 ## cluster the moons data set with HDBSCAN
@@ -140,11 +138,19 @@ estimates for data clustering, visualization, and outlier detection.
 \doi{10.1145/2733381}
 }
 \seealso{
-\code{\link[=dbscan]{dbscan()}}
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{extractFOSC}()},
+\code{\link{jpclust}()},
+\code{\link{optics}()},
+\code{\link{predict}()},
+\code{\link{sNNclust}()}
 }
 \author{
 Matt Piekenbrock
 }
+\concept{HDBSCAN functions}
+\concept{clustering functions}
 \keyword{clustering}
 \keyword{hierarchical}
 \keyword{model}

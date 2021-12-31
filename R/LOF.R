@@ -33,7 +33,7 @@
 #' If a data matrix is specified, then Euclidean distances and fast nearest
 #' neighbor search using a kd-tree is used.
 #'
-#' **Note on duplicate points:** If there are more than \code{minPts}
+#' **Note on duplicate points:** If there are more than `minPts`
 #' duplicates of a point in the data, then LOF the local readability distance
 #' will be 0 resulting in an undefined LOF score of 0/0. We set LOF in this
 #' case to 1 since there is already enough density from the points in the same
@@ -44,19 +44,19 @@
 #' by Breunig et al.
 #'
 #' @aliases lof LOF
+#' @family Outlier Detection Functions
 #'
-#' @param x a data matrix or a dist object.
+#' @param x a data matrix or a [dist] object.
 #' @param minPts number of nearest neighbors used in defining the local
 #' neighborhood of a point (includes the point itself).
-#' @param \dots further arguments are passed on to [kNN()].
-#' Note: \code{sort} cannot be specified here since `lof()`
-#' uses always \code{sort = TRUE}.
+#' @param ... further arguments are passed on to [kNN()].
+#' Note: `sort` cannot be specified here since `lof()`
+#' uses always `sort = TRUE`.
 #'
 #' @return A numeric vector of length `ncol(x)` containing LOF values for
 #' all data points.
 #'
 #' @author Michael Hahsler
-#' @seealso [kNN()], [pointdensity()], [glosh()].
 #' @references Breunig, M., Kriegel, H., Ng, R., and Sander, J. (2000). LOF:
 #' identifying density-based local outliers. In _ACM Int. Conf. on
 #' Management of Data,_ pages 93-104.

@@ -10,25 +10,25 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FiITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' OPTICS
+#' Ordering Points to Identify the Clustering Structure (OPTICS)
 #'
 #' Implementation of the OPTICS (Ordering points to identify the clustering
-#' structure) clustering algorithm using a kd-tree.
+#' structure) point ordering algorithm using a kd-tree.
 #'
 #' This implementation of OPTICS (Hahsler et al, 2019) implements the original
 #' algorithm as described by Ankerst et al (1999). OPTICS is an ordering
-#' algorithm using similar concepts to DBSCAN. However, for OPTICS \code{eps}
+#' algorithm using similar concepts to DBSCAN. However, for OPTICS `eps`
 #' is only an upper limit for the neighborhood size used to reduce
-#' computational complexity. Note that \code{minPts} in OPTICS has a different
+#' computational complexity. Note that `minPts` in OPTICS has a different
 #' effect then in DBSCAN. It is used to define dense neighborhoods, but since
-#' \code{eps} is typically set rather high, this does not effect the ordering
+#' `eps` is typically set rather high, this does not effect the ordering
 #' much. However, it is also used to calculate the reachability distance and
 #' larger values will make the reachability distance plot smoother.
 #'
@@ -41,24 +41,25 @@
 #' deeper the valley, the more dense the cluster) and high points indicate
 #' points between clusters.
 #'
-#' \code{extractDBSCAN} extracts a clustering from an OPTICS ordering that is
-#' similar to what DBSCAN would produce with an eps set to \code{eps_cl} (see
+#' `extractDBSCAN` extracts a clustering from an OPTICS ordering that is
+#' similar to what DBSCAN would produce with an eps set to `eps_cl` (see
 #' Ankerst et al, 1999). The only difference to a DBSCAN clustering is that
 #' OPTICS is not able to assign some border points and reports them instead as
 #' noise.
 #'
-#' \code{extractXi} extract clusters hiearchically specified in Ankerst et al
+#' `extractXi` extract clusters hiearchically specified in Ankerst et al
 #' (1999) based on the steepness of the reachability plot. One interpretation
-#' of the \code{xi} parameter is that it classifies clusters by change in
+#' of the `xi` parameter is that it classifies clusters by change in
 #' relative cluster density. The used algorithm was originally contributed by
 #' the ELKI framework and is explained in Schubert et al (2018), but contains a
 #' set of fixes.
 #'
-#' If \code{x} is specified as a data matrix, then Euclidean distances an fast
+#' If `x` is specified as a data matrix, then Euclidean distances an fast
 #' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
 #' details on the parameters for the kd-tree.
 #'
 #' @aliases optics OPTICS
+#' @family clustering functions
 #'
 #' @param x a data matrix or a [dist] object.
 #' @param eps upper limit of the size of the epsilon neighborhood. Limiting the
@@ -70,7 +71,7 @@
 #' reachability distance is calculated as the distance to the minPts nearest
 #' neighbor. Controls the smoothness of the reachability distribution. Default
 #' is 5 points.
-#' @param eps_cl Threshold to identify clusters (eps_cl <= eps).
+#' @param eps_cl Threshold to identify clusters (`eps_cl <= eps`).
 #' @param xi Steepness threshold to identify clusters hierarchically using the
 #' Xi method.
 #' @param object an object of class `optics`.
@@ -84,26 +85,26 @@
 #' control the search strategy.
 #'
 #' @return An object of class `optics` with components:
-#' \item{eps }{ value of eps parameter. }
-#' \item{minPts }{ value of minPts parameter. }
-#' \item{order }{ optics order for the data points in \code{x}. }
-#' \item{reachdist }{ reachability distance for each data point in \code{x}. }
-#' \item{coredist }{ core distance for each data point in \code{x}. }
+#' \item{eps }{ value of `eps` parameter. }
+#' \item{minPts }{ value of `minPts` parameter. }
+#' \item{order }{ optics order for the data points in `x`. }
+#' \item{reachdist }{ [reachability] distance for each data point in `x`. }
+#' \item{coredist }{ core distance for each data point in `x`. }
 #'
 #' For `extractDBSCAN()`, in addition the following
 #' components are available:
-#' \item{eps_cl }{ reachability distance for each point in \code{x}. }
-#' \item{cluster }{ assigned cluster labels in the order of the data points in \code{x}. }
+#' \item{eps_cl }{ the value of the `eps_cl` parameter. }
+#' \item{cluster }{ assigned cluster labels in the order of the data points in `x`. }
 #'
 #' For `extractXi()`, in addition the following components
 #' are available:
-#' \item{xi}{ Steepness threshold\code{x}. }
-#' \item{cluster }{ assigned cluster labels in the order of the data points in \code{x}.}
+#' \item{xi}{ Steepness threshold`x`. }
+#' \item{cluster }{ assigned cluster labels in the order of the data points in `x`.}
 #' \item{clusters_xi }{ data.frame containing the start and end of each cluster
 #' found in the OPTICS ordering. }
 #'
 #' @author Michael Hahsler and Matthew Piekenbrock
-#' @seealso [frNN()], [as.reachability()].
+#' @seealso Density [reachability].
 #'
 #' @references Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg
 #' Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure.
@@ -443,7 +444,6 @@ extractDBSCAN <- function(object, eps_cl) {
 
 
 #' @rdname optics
-
 extractXi <-
   function(object,
     xi,

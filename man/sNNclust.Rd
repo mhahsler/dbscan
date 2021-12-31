@@ -15,13 +15,13 @@ precomputed \link{dist} object or a kNN object created with \code{\link[=kNN]{kN
 shared NN graph.}
 
 \item{eps}{Two objects are only reachable from each other if they share at
-least \code{eps} nearest neighbors.}
+least \code{eps} nearest neighbors. Note: this is different from the \code{eps} in DBSCAN!}
 
 \item{minPts}{minimum number of points that share at least \code{eps}
 nearest neighbors for a point to be considered a core points.}
 
-\item{borderPoints}{should borderPoints be assigned to clusters like in
-DBSCAN?}
+\item{borderPoints}{should border points be assigned to clusters like in
+\link{DBSCAN}?}
 
 \item{...}{additional arguments are passed on to the k nearest neighbor
 search algorithm. See \code{\link[=kNN]{kNN()}} for details on how to control the
@@ -40,20 +40,18 @@ Implements the shared nearest neighbor clustering algorithm by Ertoz,
 Steinbach and Kumar (2003).
 }
 \details{
-Algorithm:
-
-1 Constructs a shared nearest neighbor graph for a given k. The edge
+\strong{Algorithm:}
+\enumerate{
+\item Constructs a shared nearest neighbor graph for a given k. The edge
 weights are the number of shared k nearest neighbors (in the range of
 \eqn{[0, k]}).
-
-2 Find each points SNN density, i.e., the number of points which have a
-similarity of eps or greater.
-
-3 Find the core points, i.e., all points that have an SNN density greater
-than MinPts.
-
-4 Form clusters from the core points and assign border points (i.e.,
-non-core points which share at least eps neighbors with a core point).
+\item Find each points SNN density, i.e., the number of points which have a
+similarity of \code{eps} or greater.
+\item Find the core points, i.e., all points that have an SNN density greater
+than \code{MinPts}.
+\item Form clusters from the core points and assign border points (i.e.,
+non-core points which share at least \code{eps} neighbors with a core point).
+}
 
 Note that steps 2-4 are equivalent to the DBSCAN algorithm (see \code{\link[=dbscan]{dbscan()}})
 and that \code{eps} has a different meaning than for DBSCAN. Here it is
@@ -61,7 +59,6 @@ a threshold on the number of shared neighbors (see \code{\link[=sNN]{sNN()}})
 which defines a similarity.
 }
 \examples{
-
 data("DS3")
 
 # Out of k = 20 NN 7 (eps) have to be shared to create a link in the sNN graph.
@@ -78,10 +75,17 @@ of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data,
 \doi{10.1137/1.9781611972733.5}
 }
 \seealso{
-\code{\link[=dbscan]{dbscan()}}, \code{\link[=jpclust]{jpclust()}}
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{extractFOSC}()},
+\code{\link{hdbscan}()},
+\code{\link{jpclust}()},
+\code{\link{optics}()},
+\code{\link{predict}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{clustering functions}
 \keyword{clustering}
 \keyword{model}

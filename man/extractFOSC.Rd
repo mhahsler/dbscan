@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractFOSC.R
 \name{extractFOSC}
 \alias{extractFOSC}
-\title{Framework for Optimal Selection of Clusters}
+\title{Framework for the Optimal Extraction of Clusters from Hierarchies}
 \usage{
 extractFOSC(
   x,
@@ -14,7 +14,7 @@ extractFOSC(
 )
 }
 \arguments{
-\item{x}{a valid \link{hclust} object.}
+\item{x}{a valid \link{hclust} object created via \code{\link[=hclust]{hclust()}} or \code{\link[=hdbscan]{hdbscan()}}.}
 
 \item{constraints}{Either a list or matrix of pairwise constraints. If
 missing, an unsupervised measure of stability is used to make local cuts and
@@ -39,27 +39,30 @@ A list with the elements:
 
 \item{cluster }{A integer vector with cluster assignments. Zero
 indicates noise points (if any).}
-\item{hc }{The original \link{hclust} object
-augmented with the n-1 cluster-wide objective scores from the extraction
-encoded in the 'stability', 'constraint', and 'total' named members.}
+\item{hc }{The original \link{hclust} object with additional list elements
+\code{"stability"}, \code{"constraint"}, and \code{"total"}
+for the \eqn{n - 1} cluster-wide objective scores from the extraction.}
 }
 \description{
-Generic reimplementation of the Framework for Optimal Selection of Clusters
-(FOSC; Campello et al, 2013). Can be parameterized to perform unsupervised
+Generic reimplementation of the \emph{Framework for Optimal Selection of Clusters}
+(FOSC; Campello et al, 2013) to extract clusterings from hierarchical clustering (i.e.,
+\link{hclust} objects).
+Can be parameterized to perform unsupervised
 cluster extraction through a stability-based measure, or semisupervised
 cluster extraction through either a constraint-based extraction (with a
 stability-based tiebreaker) or a mixed (weighted) constraint and
 stability-based objective extraction.
 }
 \details{
-Campello et al (2013) suggested a 'Framework for Optimal Selection of
-Clusters' (FOSC) as a framework to make local (non-horizontal) cuts to any
+Campello et al (2013) suggested a \emph{Framework for Optimal Selection of
+Clusters} (FOSC) as a framework to make local (non-horizontal) cuts to any
 cluster tree hierarchy. This function implements the original extraction
 algorithms as described by the framework for hclust objects. Traditional
 cluster extraction methods from hierarchical representations (such as
-'hclust' objects) generally rely on global parameters or cutting values
+\link{hclust} objects) generally rely on global parameters or cutting values
 which are used to partition a cluster hierarchy into a set of disjoint, flat
-clusters. Although such methods are widespread, using global parameter
+clusters. This is implemented in R in function \code{\link[=cutree]{cutree()}}.
+Although such methods are widespread, using global parameter
 settings are inherently limited in that they cannot capture patterns within
 the cluster hierarchy at varying \emph{local} levels of granularity.
 
@@ -148,8 +151,8 @@ significantly greater than sibling and parent branches, and thus sibling
 branches should be considered as noise if their scores are cumulatively
 lower than the parents. This can happen in extremely nonhomogeneous data
 sets, where there exists locally very stable branches surrounded by unstable
-branches that contain more than \code{minPts} points. \code{prune_unstable =
-TRUE} will remove the unstable branches.
+branches that contain more than \code{minPts} points.
+\code{prune_unstable = TRUE} will remove the unstable branches.
 }
 \examples{
 data("moons")
@@ -172,20 +175,28 @@ cl_con2 <- extractFOSC(cl$hc, minPts = 5,
                 ifelse(dist_moons > 1, -1L, 0L)))
 
 cl_con2$cluster # same as the second example
-
 }
 \references{
 Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg
-Sander (2013). "A framework for semi-supervised and unsupervised optimal
-extraction of clusters from hierarchies." \emph{Data Mining and Knowledge
+Sander (2013). A framework for semi-supervised and unsupervised optimal
+extraction of clusters from hierarchies. \emph{Data Mining and Knowledge
 Discovery} 27(3): 344-371.
 \doi{10.1007/s10618-013-0311-4}
 }
 \seealso{
-\code{\link[=hdbscan]{hdbscan()}}, \code{\link[stats:cutree]{stats::cutree()}}
+\code{\link[=hclust]{hclust()}}, \code{\link[=hdbscan]{hdbscan()}}, \code{\link[stats:cutree]{stats::cutree()}}
+
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{hdbscan}()},
+\code{\link{jpclust}()},
+\code{\link{optics}()},
+\code{\link{predict}()},
+\code{\link{sNNclust}()}
 }
 \author{
 Matt Piekenbrock
 }
+\concept{clustering functions}
 \keyword{clustering}
 \keyword{model}

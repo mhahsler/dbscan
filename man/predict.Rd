@@ -5,7 +5,7 @@
 \alias{predict.dbscan_fast}
 \alias{predict.optics}
 \alias{predict.hdbscan}
-\title{Model Predictions for DBSCAN Clusterings}
+\title{Assigning New Points to a Clustering}
 \usage{
 \method{predict}{dbscan_fast}(object, newdata, data, ...)
 
@@ -27,11 +27,21 @@ predicted.}
 Predict the membership of a new point given a clustering.
 }
 \details{
-For DBSCAN: If a new point is in the eps neighborhood of a point in the clustering, the
+\strong{For DBSCAN:} If a new point is in the eps neighborhood of a point in the clustering, the
 the label of that point is predicted, otherwise the prediction is \code{0} (noise).
 
-For OPTICS: Extracts a DBSCAN clustering and use predict for DBSCAN.
+\strong{For OPTICS:} Extracts a DBSCAN clustering and use predict for DBSCAN.
 
-For HDBSCAN: Find the k-nearest neighbors with the smallest mutual
+\strong{For HDBSCAN:} Find the k-nearest neighbors with the smallest mutual
 reachability distance to predict the label
 }
+\seealso{
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{extractFOSC}()},
+\code{\link{hdbscan}()},
+\code{\link{jpclust}()},
+\code{\link{optics}()},
+\code{\link{sNNclust}()}
+}
+\concept{clustering functions}

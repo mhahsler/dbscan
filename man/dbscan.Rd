@@ -4,19 +4,19 @@
 \alias{dbscan}
 \alias{DBSCAN}
 \alias{print.dbscan_fast}
-\title{DBSCAN}
+\title{Density-based Spatial Clustering of Applications with Noise (DBSCAN)}
 \usage{
 dbscan(x, eps, minPts = 5, weights = NULL, borderPoints = TRUE, ...)
 }
 \arguments{
-\item{x}{a data matrix, a data.frame, a dist object or a frNN object with
+\item{x}{a data matrix, a data.frame, a \link{dist} object or a \link{frNN} object with
 fixed-radius nearest neighbors.}
 
 \item{eps}{size (radius) of the epsilon neighborhood. Can be omitted if
 \code{x} is a frNN object.}
 
 \item{minPts}{number of minimum points required in the eps neighborhood for
-core points (including the point itself). The default value is 5 points.}
+core points (including the point itself).}
 
 \item{weights}{numeric; weights for the data points. Only needed to perform
 weighted clustering.}
@@ -32,25 +32,21 @@ control the search strategy.}
 \value{
 An object of class \code{dbscan_fast} with the following components:
 
-\item{eps }{ value of the eps parameter.}
-\item{minPts }{ value of the
-minPts parameter.}
-\item{cluster }{A integer vector with cluster
-assignments. Zero indicates noise points.}
+\item{eps }{ value of the \code{eps} parameter.}
+\item{minPts }{ value of the \code{minPts} parameter.}
+\item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}
 }
 \description{
 Fast reimplementation of the DBSCAN (Density-based spatial clustering of
 applications with noise) clustering algorithm using a kd-tree. The
 implementation is significantly faster and can work with larger data sets
-then dbscan in \pkg{fpc}.
+then \code{\link[fpc:dbscan]{fpc::dbscan()}} in \pkg{fpc}. Use \code{dbscan::dbscan()} (with specifying the package) to
+call this implementation when you also use package \pkg{fpc}.
 }
 \details{
-\emph{Note:} use \code{dbscan::dbscan()} (with specifying the package) to
-call this implementation when you also use package \pkg{fpc}.
-
 \strong{The algorithm}
 
-This implementation of DBSCAN (Hahsler et al, 2019) implements the original
+This implementation of DBSCAN (Hahsler et al, 2019) follows the original
 algorithm as described by Ester et al (1996). DBSCAN estimates the density
 around each data point by counting the number of points in a user-specified
 eps-neighborhood and applies a used-specified minPts thresholds to identify
@@ -90,7 +86,7 @@ minimum density around a core point (i.e., the minimum density for non-noise
 areas). Increase the parameter to suppress more noise in the data and
 require more points to form a cluster. A suitable neighborhood size
 parameter \code{eps} given a fixed value for \code{minPts} can be found
-visually by inspecting the\code{\link[=kNNdistplot]{kNNdistplot()}} of the data using
+visually by inspecting the \code{\link[=kNNdistplot]{kNNdistplot()}} of the data using
 \code{k = minPts - 1} (\code{minPts} includes the point itself, while the
 k-nearest neighbors distance does not). The k-nearest neighbor distance plot
 sorts all data points by their k-nearest neighbor distance. A sudden
@@ -99,7 +95,7 @@ are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
 
 \strong{Predict cluster memberships}
 
-\code{predict()} can be used to predict cluster memberships for new data
+\code{\link[=predict]{predict()}} can be used to predict cluster memberships for new data
 points. A point is considered a member of a cluster if it is within the eps
 neighborhood of a member of the cluster (Euclidean distance is used). Points
 which cannot be assigned to a cluster will be reported as members of the
@@ -112,7 +108,7 @@ iris <- as.matrix(iris[, 1:4])
 
 ## Find suitable DBSCAN parameters:
 ## 1. We use minPts = dim + 1 = 5 for iris. A larger value can also be used.
-## 2. We inspect the  k-NN distance plot for k = minPts - 1 = 4
+## 2. We inspect the k-NN distance plot for k = minPts - 1 = 4
 kNNdistplot(iris, k = 5 - 1)
 
 ## Noise seems to start around a 4-NN distance of .7
@@ -209,11 +205,17 @@ Clustering Based on Hierarchical Density Estimates. Proceedings of the
 \doi{10.1007/978-3-642-37456-2_14}
 }
 \seealso{
-\code{\link[=kNNdistplot]{kNNdistplot()}}, \code{\link[=frNN]{frNN()}},
-\code{\link[fpc:dbscan]{fpc::dbscan()}} in \pkg{fpc}.
+Other clustering functions: 
+\code{\link{extractFOSC}()},
+\code{\link{hdbscan}()},
+\code{\link{jpclust}()},
+\code{\link{optics}()},
+\code{\link{predict}()},
+\code{\link{sNNclust}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{clustering functions}
 \keyword{clustering}
 \keyword{model}

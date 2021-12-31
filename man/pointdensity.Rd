@@ -40,7 +40,7 @@ fixed-radius nearest neighbor search.
 \details{
 DBSCAN estimates the density around a point as the number of points in the
 eps-neighborhood of the point (including the query point itself). The kde
-using a uniform kernel is just this count divided by \eqn{2 eps n}, where
+using a uniform kernel is just this count divided by \eqn{(2\,eps\,n)}{(2 eps n)}, where
 \eqn{n} is the number of points in \code{x}.
 
 Points with low local density often indicate noise (see e.g., Wishart (1969)
@@ -76,17 +76,23 @@ plot(x, pch = 19, cex = .5)
 points(x_nonoise, pch = 19, col= cutree(hc, k = 4) + 1L)
 }
 \references{
-WISHART, D. (1969), Mode Analysis: A Generalization of Nearest
+Wishart, D. (1969), Mode Analysis: A Generalization of Nearest
 Neighbor which Reduces Chaining Effects, in \emph{Numerical Taxonomy,} Ed., A.J.
 Cole, Academic Press, 282-311.
 
-John A. Hartigan (1975), \emph{Clustering Algorithms,} John Wiley \& Sons, Inc.,
+John A. Hartigan (1975), \emph{Clustering Algorithms,} John Wiley & Sons, Inc.,
 New York, NY, USA.
 }
 \seealso{
 \code{\link[=frNN]{frNN()}}, \code{\link[stats:density]{stats::density()}}.
+
+Other Outlier Detection Functions: 
+\code{\link{glosh}()},
+\code{\link{kNNdist}()},
+\code{\link{lof}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{Outlier Detection Functions}
 \keyword{model}

@@ -45,7 +45,7 @@ done later using \code{sort()}.}
 ANNs best guess.}
 
 \item{approx}{use approximate nearest neighbors. All NN up to a distance of
-a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+a factor of \code{1 + approx} eps may be used. Some actual NN may be omitted
 leading to spurious clusters and noise points.  However, the algorithm will
 enjoy a significant speedup.}
 
@@ -54,14 +54,17 @@ enjoy a significant speedup.}
 \item{...}{further arguments}
 }
 \value{
-An object of class \link{frNN} (subclass of
+\code{frNN()} returns an object of class \link{frNN} (subclass of
 \link{NN}) containing a list with the following components:
 \item{id }{a list of
 integer vectors. Each vector contains the ids of the fixed radius nearest
 neighbors. }
 \item{dist }{a list with distances (same structure as
-\code{ids}). }
-\item{eps }{ eps used. }
+\code{id}). }
+\item{eps }{ neighborhood radius \code{eps} that was used. }
+
+\code{adjacencylist()} returns a list with one entry per data point in \code{x}. Each entry
+contains the id of the nearest neighbors.
 }
 \description{
 This function uses a kd-tree to find the fixed radius nearest neighbors
@@ -69,14 +72,13 @@ This function uses a kd-tree to find the fixed radius nearest neighbors
 }
 \details{
 If \code{x} is specified as a data matrix, then Euclidean distances an fast
-nearest neighbor lookup using a kd-tree are used. See \code{\link[=kNN]{kNN()}} for
-details on the parameters for the kd-tree.
+nearest neighbor lookup using a kd-tree are used.
 
 To create a frNN object from scratch, you need to supply at least the
 elements \code{id} with a list of integer vectors with the nearest neighbor
 ids for each point and \code{eps} (see below).
 
-\strong{Self-matches are not returned!}
+\strong{Self-matches:} Self-matches are not returned!
 }
 \examples{
 data(iris)
@@ -116,9 +118,14 @@ Approximate Nearest Neighbor Searching,
 \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
-\code{\link[=kNN]{kNN()}} and \link{NN}
+Other NN functions: 
+\code{\link{NN}},
+\code{\link{kNNdist}()},
+\code{\link{kNN}()},
+\code{\link{sNN}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{NN functions}
 \keyword{model}

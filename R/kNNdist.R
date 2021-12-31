@@ -25,6 +25,9 @@
 #' displays the kNN distance of all points sorted from smallest to largest. The
 #' plot can be used to help find suitable parameter values for the for DBSCAN.
 #'
+#' @family Outlier Detection Functions
+#' @family NN functions
+#'
 #' @param x the data set as a matrix of points (Euclidean distance is used) or
 #' a precalculated [dist] object.
 #' @param k number of nearest neighbors used for the distance calculation.
@@ -34,12 +37,11 @@
 #' on to [kNN()].
 #'
 #' @return `kNNdist()` returns a numeric vector with the distance to its k
-#' nearest neighbor. If \code{all = TRUE} then a matrix with k columns
+#' nearest neighbor. If `all = TRUE` then a matrix with k columns
 #' containing the distances to all 1st, 2nd, ..., kth nearest neighbors is
 #' returned instead.
 #'
 #' @author Michael Hahsler
-#' @seealso [kNN()].
 #' @keywords model plot
 #' @examples
 #' data(iris)

@@ -29,12 +29,12 @@ adjacencylist(x, ...)
 }
 \description{
 NN is an abstract S3 superclass for the classes of the objects returned
-by \code{\link[=kNN]{kNN()}} and \code{\link[=frNN]{frNN()}}. Methods for sorting, plotting and getting an
+by \code{\link[=kNN]{kNN()}}, \code{\link[=frNN]{frNN()}} and \code{\link[=sNN]{sNN()}}. Methods for sorting, plotting and getting an
 adjacency list are defined.
 }
 \section{Subclasses}{
 
-\link{kNN} and \link{frNN}
+\link{kNN}, \link{frNN} and \link{sNN}
 }
 
 \examples{
@@ -63,7 +63,15 @@ if("igraph" \%in\% installed.packages()){
   plot(x, col = cl)
 }
 }
+\seealso{
+Other NN functions: 
+\code{\link{frNN}()},
+\code{\link{kNNdist}()},
+\code{\link{kNN}()},
+\code{\link{sNN}()}
+}
 \author{
 Michael Hahsler
 }
+\concept{NN functions}
 \keyword{model}

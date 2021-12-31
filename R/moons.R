@@ -26,10 +26,12 @@
 #' This data was generated with the following Python commands using the
 #' SciKit-Learn library:
 #'
-#' `> import sklearn.datasets as data moons`
-#' `> data.make_moons(n_samples=50, noise=0.05) blobs`
-#' `> data.make_blobs(n_samples=50, centers=[(-0.75,2.25), (1.0, 2.0)],
-#' cluster_std=0.25)`
+#' `> import sklearn.datasets as data`
+#'
+#' `> moons = data.make_moons(n_samples=50, noise=0.05)`
+#'
+#' `> blobs = data.make_blobs(n_samples=50, centers=[(-0.75,2.25), (1.0, 2.0)], cluster_std=0.25)`
+#'
 #' `> test_data = np.vstack([moons, blobs])`
 #'
 #' @name moons
@@ -40,7 +42,7 @@
 #' \item{Y}{a numeric vector} }
 #' @references Pedregosa, Fabian, Gael Varoquaux, Alexandre Gramfort,
 #' Vincent Michel, Bertrand Thirion, Olivier Grisel, Mathieu Blondel et al.
-#' "Scikit-learn: Machine learning in Python." _Journal of Machine Learning
+#' Scikit-learn: Machine learning in Python. _Journal of Machine Learning
 #' Research_ 12, no. Oct (2011): 2825-2830.
 #' @source See the HDBSCAN notebook from github documentation:
 #' \url{http://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html}

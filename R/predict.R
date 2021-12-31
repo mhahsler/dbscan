@@ -17,20 +17,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' Model Predictions for DBSCAN Clusterings
+#' Assigning New Points to a Clustering
 #'
 #' Predict the membership of a new point given a clustering.
 #'
-#' For DBSCAN: If a new point is in the eps neighborhood of a point in the clustering, the
+#' **For DBSCAN:** If a new point is in the eps neighborhood of a point in the clustering, the
 #' the label of that point is predicted, otherwise the prediction is `0` (noise).
 #'
-#' For OPTICS: Extracts a DBSCAN clustering and use predict for DBSCAN.
+#' **For OPTICS:** Extracts a DBSCAN clustering and use predict for DBSCAN.
 #'
-#' For HDBSCAN: Find the k-nearest neighbors with the smallest mutual
+#' **For HDBSCAN:** Find the k-nearest neighbors with the smallest mutual
 #' reachability distance to predict the label
 #'
 #' @name predict
 #' @aliases predict
+#' @family clustering functions
 #'
 #' @param object clustering object.
 #' @param data the data set used to create the clustering object.

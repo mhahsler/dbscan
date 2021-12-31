@@ -8,12 +8,12 @@
 lof(x, minPts = 5, ...)
 }
 \arguments{
-\item{x}{a data matrix or a dist object.}
+\item{x}{a data matrix or a \link{dist} object.}
 
 \item{minPts}{number of nearest neighbors used in defining the local
 neighborhood of a point (includes the point itself).}
 
-\item{\dots}{further arguments are passed on to \code{\link[=kNN]{kNN()}}.
+\item{...}{further arguments are passed on to \code{\link[=kNN]{kNN()}}.
 Note: \code{sort} cannot be specified here since \code{lof()}
 uses always \code{sort = TRUE}.}
 }
@@ -77,9 +77,13 @@ Management of Data,} pages 93-104.
 \doi{10.1145/335191.335388}
 }
 \seealso{
-\code{\link[=kNN]{kNN()}}, \code{\link[=pointdensity]{pointdensity()}}, \code{\link[=glosh]{glosh()}}.
+Other Outlier Detection Functions: 
+\code{\link{glosh}()},
+\code{\link{kNNdist}()},
+\code{\link{pointdensity}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{Outlier Detection Functions}
 \keyword{model}

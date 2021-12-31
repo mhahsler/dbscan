@@ -55,10 +55,21 @@ pairs(iris, col = cl$cluster + 1L)
 ## Note: black points are noise points
 }
 \seealso{
-\code{\link[=kNN]{kNN()}}.
+Other Outlier Detection Functions: 
+\code{\link{glosh}()},
+\code{\link{lof}()},
+\code{\link{pointdensity}()}
+
+Other NN functions: 
+\code{\link{NN}},
+\code{\link{frNN}()},
+\code{\link{kNN}()},
+\code{\link{sNN}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{NN functions}
+\concept{Outlier Detection Functions}
 \keyword{model}
 \keyword{plot}

@@ -25,7 +25,7 @@
 #' @param x a data matrix. If more than 2 columns are provided, then the data
 #' is plotted using the first two principal components.
 #' @param cl a clustering. Either a numeric cluster assignment vector or a
-#' clustering object (a list with an element named \code{cluster}).
+#' clustering object (a list with an element named `cluster`).
 #' @param col colors used for clusters. Defaults to the standard palette.  The
 #' first color (default is black) is used for noise/unassigned points (cluster
 #' id 0).

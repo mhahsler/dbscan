@@ -3,7 +3,6 @@
 \name{sNN}
 \alias{sNN}
 \alias{snn}
-\alias{sort.sNN}
 \title{Shared Nearest Neighbors}
 \usage{
 sNN(
@@ -19,7 +18,7 @@ sNN(
 )
 }
 \arguments{
-\item{x}{a data matrix, a dist object or a kNN object.}
+\item{x}{a data matrix, a \link{dist} object or a \link{kNN} object.}
 
 \item{k}{number of neighbors to consider to calculate the shared nearest
 neighbors.}
@@ -30,24 +29,24 @@ build the shared nearest neighbor graph. Edges are only preserved if
 
 \item{jp}{use the definition by Javis and Patrick (1973), where shared
 neighbors are only counted between points that are in each other's
-neighborhood, otherwise 0 is returned. If FALSE, then the number of shared
+neighborhood, otherwise 0 is returned. If \code{FALSE}, then the number of shared
 neighbors is returned, even if the points are not neighbors.}
 
 \item{sort}{sort by the number of shared nearest neighbors? Note that this
 is expensive and \code{sort = FALSE} is much faster. sNN objects can be
 sorted using \code{sort()}.}
 
-\item{search}{nearest neighbor search strategy (one of "kdtree", "linear" or
-"dist").}
+\item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"} or
+\code{"dist"}).}
 
 \item{bucketSize}{max size of the kd-tree leafs.}
 
-\item{splitRule}{rule to split the kd-tree. One of "STD", "MIDPT", "FAIR",
-"SL_MIDPT", "SL_FAIR" or "SUGGEST" (SL stands for sliding). "SUGGEST" uses
+\item{splitRule}{rule to split the kd-tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
+\code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
 ANNs best guess.}
 
 \item{approx}{use approximate nearest neighbors. All NN up to a distance of
-a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+a factor of \verb{(1 + approx) eps} may be used. Some actual NN may be omitted
 leading to spurious clusters and noise points.  However, the algorithm will
 enjoy a significant speedup.}
 }
@@ -56,8 +55,8 @@ An object of class \code{sNN} (subclass of \link{kNN} and \link{NN}) containing 
 with the following components:
 \item{id }{a matrix with ids. }
 \item{dist}{a matrix with the distances. }
-\item{shared }{a matrix with the number of  shared nearest neighbors. }
-\item{k }{number of k used. }
+\item{shared }{a matrix with the number of shared nearest neighbors. }
+\item{k }{number of \code{k} used. }
 }
 \description{
 Calculates the number of shared nearest neighbors, the shared nearest
@@ -106,9 +105,14 @@ Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput.}
 \doi{10.1109/T-C.1973.223640}
 }
 \seealso{
-\code{\link[=kNN]{kNN()}} for k nearest neighbors.
+Other NN functions: 
+\code{\link{NN}},
+\code{\link{frNN}()},
+\code{\link{kNNdist}()},
+\code{\link{kNN}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{NN functions}
 \keyword{model}

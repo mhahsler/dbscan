@@ -17,23 +17,26 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' Framework for Optimal Selection of Clusters
+#' Framework for the Optimal Extraction of Clusters from Hierarchies
 #'
-#' Generic reimplementation of the Framework for Optimal Selection of Clusters
-#' (FOSC; Campello et al, 2013). Can be parameterized to perform unsupervised
+#' Generic reimplementation of the _Framework for Optimal Selection of Clusters_
+#' (FOSC; Campello et al, 2013) to extract clusterings from hierarchical clustering (i.e.,
+#' [hclust] objects).
+#' Can be parameterized to perform unsupervised
 #' cluster extraction through a stability-based measure, or semisupervised
 #' cluster extraction through either a constraint-based extraction (with a
 #' stability-based tiebreaker) or a mixed (weighted) constraint and
 #' stability-based objective extraction.
 #'
-#' Campello et al (2013) suggested a 'Framework for Optimal Selection of
-#' Clusters' (FOSC) as a framework to make local (non-horizontal) cuts to any
+#' Campello et al (2013) suggested a _Framework for Optimal Selection of
+#' Clusters_ (FOSC) as a framework to make local (non-horizontal) cuts to any
 #' cluster tree hierarchy. This function implements the original extraction
 #' algorithms as described by the framework for hclust objects. Traditional
 #' cluster extraction methods from hierarchical representations (such as
-#' 'hclust' objects) generally rely on global parameters or cutting values
+#' [hclust] objects) generally rely on global parameters or cutting values
 #' which are used to partition a cluster hierarchy into a set of disjoint, flat
-#' clusters. Although such methods are widespread, using global parameter
+#' clusters. This is implemented in R in function [cutree()].
+#' Although such methods are widespread, using global parameter
 #' settings are inherently limited in that they cannot capture patterns within
 #' the cluster hierarchy at varying _local_ levels of granularity.
 #'
@@ -107,11 +110,11 @@
 #' section for a demonstration of this.
 #'
 #' The parameters to the input function correspond to the concepts discussed
-#' above. The \code{minPts} parameter to represent the minimum cluster size to
-#' extract. The optional \code{constraints} parameter contains the pairwise,
-#' instance-level constraints of the data. The optional \code{alpha} parameters
-#' controls whether the mixed objective function is used (if \code{alpha} is
-#' greater than 0). If the \code{validate_constraints} parameter is set to
+#' above. The `minPts` parameter to represent the minimum cluster size to
+#' extract. The optional `constraints` parameter contains the pairwise,
+#' instance-level constraints of the data. The optional `alpha` parameters
+#' controls whether the mixed objective function is used (if `alpha` is
+#' greater than 0). If the `validate_constraints` parameter is set to
 #' true, the constraints are checked (and fixed) for symmetry (if point A has a
 #' should-link constraint with point B, point B should also have the same
 #' constraint). Asymmetric constraints are not supported.
@@ -122,10 +125,12 @@
 #' branches should be considered as noise if their scores are cumulatively
 #' lower than the parents. This can happen in extremely nonhomogeneous data
 #' sets, where there exists locally very stable branches surrounded by unstable
-#' branches that contain more than `minPts` points. \code{prune_unstable =
-#' TRUE} will remove the unstable branches.
+#' branches that contain more than `minPts` points.
+#' `prune_unstable = TRUE` will remove the unstable branches.
 #'
-#' @param x a valid [hclust] object.
+#' @family clustering functions
+#'
+#' @param x a valid [hclust] object created via [hclust()] or [hdbscan()].
 #' @param constraints Either a list or matrix of pairwise constraints. If
 #' missing, an unsupervised measure of stability is used to make local cuts and
 #' extract the optimal clusters. See details.
@@ -134,24 +139,25 @@
 #' @param minPts numeric; Defaults to 2. Only needed if class-less noise is a
 #' valid label in the model.
 #' @param prune_unstable logical; should significantly unstable subtrees be
-#' pruned? The default is \code{FALSE} for the original optimal extraction
-#' framework (see Campello et al, 2013). See details for what \code{TRUE}
+#' pruned? The default is `FALSE` for the original optimal extraction
+#' framework (see Campello et al, 2013). See details for what `TRUE`
 #' implies.
 #' @param validate_constraints logical; should constraints be checked for
 #' validity? See details for what are considered valid constraints.
-#' @return A list with the elements:
+#'
+#' @returns A list with the elements:
 #'
 #' \item{cluster }{A integer vector with cluster assignments. Zero
 #' indicates noise points (if any).}
-#' \item{hc }{The original [hclust] object
-#' augmented with the n-1 cluster-wide objective scores from the extraction
-#' encoded in the 'stability', 'constraint', and 'total' named members.}
+#' \item{hc }{The original [hclust] object with additional list elements
+#' `"stability"`, `"constraint"`, and `"total"`
+#' for the \eqn{n - 1} cluster-wide objective scores from the extraction.}
 #'
 #' @author Matt Piekenbrock
-#' @seealso [hdbscan()], [stats::cutree()]
+#' @seealso [hclust()], [hdbscan()], [stats::cutree()]
 #' @references Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg
-#' Sander (2013). "A framework for semi-supervised and unsupervised optimal
-#' extraction of clusters from hierarchies." _Data Mining and Knowledge
+#' Sander (2013). A framework for semi-supervised and unsupervised optimal
+#' extraction of clusters from hierarchies. _Data Mining and Knowledge
 #' Discovery_ 27(3): 344-371.
 #' \doi{10.1007/s10618-013-0311-4}
 #' @keywords model clustering
@@ -176,7 +182,6 @@
 #'                 ifelse(dist_moons > 1, -1L, 0L)))
 #'
 #' cl_con2$cluster # same as the second example
-#'
 #' @export extractFOSC
 extractFOSC <-
   function(x,

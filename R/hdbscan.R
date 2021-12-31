@@ -17,10 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' HDBSCAN
+#' Hierarchical DBSCAN (HDBSCAN)
 #'
-#' Fast implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
-#' algorithms using Rcpp.
+#' Fast C++ implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
+#' algorithms.
 #'
 #' This fast implementation of HDBSCAN (Hahsler et al, 2019) computes the
 #' hierarchical cluster tree representing density estimates along with the
@@ -30,29 +30,32 @@
 #' hierarchy, thus producing a flat solution.
 #'
 #' Additional, related algorithms including the "Global-Local Outlier Score
-#' from Hierarchies" (GLOSH) (see section 6 of Campello et al., 2015) outlier
-#' scores and ability to cluster based on instance-level constraints (see
+#' from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015)
+#' is available in function [glosh()]
+#' and the ability to cluster based on instance-level constraints (see
 #' section 5.3 of Campello et al. 2015) are supported. The algorithms only need
-#' the parameter \code{minPts}.
+#' the parameter `minPts`.
 #'
-#' Note that \code{minPts} not only acts as a minimum cluster size to detect,
+#' Note that `minPts` not only acts as a minimum cluster size to detect,
 #' but also as a "smoothing" factor of the density estimates implicitly
 #' computed from HDBSCAN.
 #'
 #' [predict()] assigns each new data point to the same cluster as the point
-#' in the original data that has the smallest mutual rachability distance.
+#' in the original data that has the smallest mutual reachability distance.
 #'
-#' @aliases hdbscan HDBSCAN print.hdbscan plot.hdbscan
+#' @aliases hdbscan HDBSCAN print.hdbscan
 #'
-#' @param x a data matrix (Euclidean distances are used) or a dist object
+#' @family HDBSCAN functions
+#' @family clustering functions
+#'
+#' @param x a data matrix (Euclidean distances are used) or a [dist] object
 #' calculated with an arbitrary distance metric.
 #' @param minPts integer; Minimum size of clusters. See details.
 #' @param gen_hdbscan_tree logical; should the robust single linkage tree be
-#' explicitly computed. (see cluster tree in Chaudhuri et al, 2010).
+#' explicitly computed (see cluster tree in Chaudhuri et al, 2010).
 #' @param gen_simplified_tree logical; should the simplified hierarchy be
-#' explicitly computed. (see Campello et al, 2013).
-#' @param ...  additional arguments are passed on to the appropriate S3 methods
-#' (such as plotting parameters).
+#' explicitly computed (see Campello et al, 2013).
+#' @param ...  additional arguments are passed on.
 #' @param scale integer; used to scale condensed tree based on the graphics
 #' device. Lower scale results in wider trees.
 #' @param gradient character vector; the colors to build the condensed tree
@@ -60,22 +63,19 @@
 #' @param show_flat logical; whether to draw boxes indicating the most stable
 #' clusters.
 #'
-#' @return A object of class 'hdbscan' with the following components:
+#' @return A object of class `hdbscan` with the following components:
 #' \item{cluster }{A integer vector with cluster assignments. Zero indicates
 #' noise points.}
-#' \item{minPts }{ value of the minPts parameter.}
+#' \item{minPts }{ value of the `minPts` parameter.}
 #' \item{cluster_scores }{The sum of the stability scores for each salient
-#' ('flat') cluster. Corresponds to cluster ids given the in 'cluster' member.
+#' (flat) cluster. Corresponds to cluster IDs given the in `"cluster"` element.
 #' }
-#' \item{membership_prob }{The 'probability' or individual stability of a
+#' \item{membership_prob }{The probability or individual stability of a
 #' point within its clusters. Between 0 and 1.}
-#' \item{outlier_scores }{The
-#' outlier score (GLOSH) of each point. }
-#' \item{hc }{An [hclust] object of the
-#' HDBSCAN hierarchy. }
+#' \item{outlier_scores }{The GLOSH outlier score of each point. }
+#' \item{hc }{An [hclust] object of the HDBSCAN hierarchy. }
 #'
 #' @author Matt Piekenbrock
-#' @seealso [dbscan()]
 #' @references Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast
 #' Density-Based Clustering with R.  _Journal of Statistical Software_,
 #' 91(1), 1-30.

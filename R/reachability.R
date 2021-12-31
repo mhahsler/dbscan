@@ -18,19 +18,22 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-#' Density Reachability Structures
+#' Density Reachability Structures for OPTICS
 #'
 #' Class `reachability` provides general functions for representing various
 #' hierarchical representations as reachability plots, as originally defined
-#' by Ankerst et al (1999). Methods include fast implementations of the
+#' by Ankerst et al (1999) for [OPTICS]. Methods include fast implementations of the
 #' conversion algorithms introduced by Sanders et al (2003) to convert between
-#' dendrograms and reachability plot objects.
+#' a [dendrogram] and a reachability object.
 #'
 #' Dendrograms are a popular visualization tool for representing hierarchical
 #' relationships. In agglomerative clustering, dendrograms can be constructed
 #' using a variety of linkage criterion (such as single or complete linkage),
-#' many of which are frequently used to 1) visualize the density-based
-#' relationships in the data or 2) extract cluster labels from the data the
+#' many of which are frequently used to
+#'
+#' 1.  visualize the density-based
+#' relationships in the data or
+#' 2.  extract cluster labels from the data the
 #' dendrogram represents.
 #'
 #' The original ordering algorithm OPTICS as described by Ankerst et al (1999)
@@ -61,29 +64,26 @@
 #' Nonetheless, reachability plots can be created directly from other types of
 #' linkage trees, and vice versa.
 #'
-#' See [optics()] for more information on how OPTICS is formulated.
-#' [extractDBSCAN()] and [extractXi()] are the two cluster
-#' extraction methods presented in the original OPTICS publication.
-#'
 #' @name reachability
 #' @aliases reachability print.reachability
 #'
-#' @param object any R object that can be made into one of class
+#' @param object any object that can be coerced to class
 #' `reachability`, such as an object of class [optics] or [stats::dendrogram].
 #' @param x object of class `reachability`.
 #' @param order_labels whether to plot text labels for each points reachability
 #' distance.
-#' @param xlab x-axis label, defaults to "Order".
-#' @param ylab y-axis label, defaults to "Reachability dist.".
-#' @param main Title of the plot, defaults to "Reachability Plot".
-#' @param ...  graphical parameters, or arguments for other methods.
+#' @param xlab x-axis label.
+#' @param ylab y-axis label.
+#' @param main Title of the plot.
+#' @param ...  graphical parameters are passed on to `plot()`,
+#'   or arguments for other methods.
 #'
 #' @return An object of class `reachability` with components:
-#' \item{order }{order to use for the data points in \code{x}. }
-#' \item{reachdist }{reachability distance for each data point in \code{x}. }
+#' \item{order }{order to use for the data points in `x`. }
+#' \item{reachdist }{reachability distance for each data point in `x`. }
 #'
 #' @author Matthew Piekenbrock
-#' @seealso [stats::dendrogram], [optics()], [stats::hclust()].
+#' @seealso [optics()], [stats::hclust()].
 #' @references Ankerst, M., M. M. Breunig, H.-P. Kriegel, J. Sander (1999).
 #' OPTICS: Ordering Points To Identify the Clustering Structure. _ACM
 #' SIGMOD international conference on Management of data._ ACM Press. pp.

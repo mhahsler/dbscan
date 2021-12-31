@@ -24,21 +24,22 @@
 #' places two points in the same cluster if they are in each other's nearest
 #' neighbor list and they share at least kt nearest neighbors.
 #'
-#' Note: Following the original paper, the shared nearest neighbor list is
+#' Following the original paper, the shared nearest neighbor list is
 #' constructed as the k neighbors plus the point itself (as neighbor zero).
-#' Therefore, the threshold \code{kt} can be in the range \eqn{[1, k]}.
+#' Therefore, the threshold `kt` needs to be in the range \eqn{[1, k]}.
 #'
-#' Fast nearest neighbors search with [kNN()] is only used if \code{x} is
+#' Fast nearest neighbors search with [kNN()] is only used if `x` is
 #' a matrix. In this case Euclidean distance is used.
 #'
 #' @aliases jpclust print.general_clustering
+#' @family clustering functions
 #'
 #' @param x a data matrix/data.frame (Euclidean distance is used), a
-#' precomputed dist object or a kNN object created with [kNN()].
-#' @param k Neighborhood size for nearest neighbor sparsification. If \code{x}
-#' is a kNN object then \code{k} may be missing.
+#' precomputed [dist] object or a kNN object created with [kNN()].
+#' @param k Neighborhood size for nearest neighbor sparsification. If `x`
+#' is a kNN object then `k` may be missing.
 #' @param kt threshold on the number of shared nearest neighbors (including the
-#' points themselves) to form clusters.
+#' points themselves) to form clusters. Range: \eqn{[1, k]}
 #' @param ...  additional arguments are passed on to the k nearest neighbor
 #' search algorithm. See [kNN()] for details on how to control the
 #' search strategy.
@@ -51,7 +52,6 @@
 #' \item{param }{ list of used clustering parameters. }
 #'
 #' @author Michael Hahsler
-#' @seealso [dbscan()], [sNNclust()]
 #' @references R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a
 #' Similarity Measure Based on Shared Near Neighbors. _IEEE Trans. Comput.
 #' 22,_ 11 (November 1973), 1025-1034.

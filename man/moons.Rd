@@ -23,9 +23,12 @@ crescent shapes. The three shapes are all linearly separable.
 This data was generated with the following Python commands using the
 SciKit-Learn library:
 
-\verb{> import sklearn.datasets as data moons}
-\verb{> data.make_moons(n_samples=50, noise=0.05) blobs}
-\verb{> data.make_blobs(n_samples=50, centers=[(-0.75,2.25), (1.0, 2.0)], cluster_std=0.25)}
+\verb{> import sklearn.datasets as data}
+
+\verb{> moons = data.make_moons(n_samples=50, noise=0.05)}
+
+\verb{> blobs = data.make_blobs(n_samples=50, centers=[(-0.75,2.25), (1.0, 2.0)], cluster_std=0.25)}
+
 \verb{> test_data = np.vstack([moons, blobs])}
 }
 \examples{
@@ -35,7 +38,7 @@ plot(moons, pch=20)
 \references{
 Pedregosa, Fabian, Gael Varoquaux, Alexandre Gramfort,
 Vincent Michel, Bertrand Thirion, Olivier Grisel, Mathieu Blondel et al.
-"Scikit-learn: Machine learning in Python." \emph{Journal of Machine Learning
+Scikit-learn: Machine learning in Python. \emph{Journal of Machine Learning
 Research} 12, no. Oct (2011): 2825-2830.
 }
 \keyword{datasets}

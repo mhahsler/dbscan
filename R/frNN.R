@@ -23,23 +23,23 @@
 #' This function uses a kd-tree to find the fixed radius nearest neighbors
 #' (including distances) fast.
 #'
-#' If \code{x} is specified as a data matrix, then Euclidean distances an fast
-#' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
-#' details on the parameters for the kd-tree.
+#' If `x` is specified as a data matrix, then Euclidean distances an fast
+#' nearest neighbor lookup using a kd-tree are used.
 #'
 #' To create a frNN object from scratch, you need to supply at least the
-#' elements \code{id} with a list of integer vectors with the nearest neighbor
-#' ids for each point and \code{eps} (see below).
+#' elements `id` with a list of integer vectors with the nearest neighbor
+#' ids for each point and `eps` (see below).
 #'
-#' **Self-matches are not returned!**
+#' **Self-matches:** Self-matches are not returned!
 #'
 #' @aliases frNN frnn print.frnn
+#' @family NN functions
 #'
 #' @param x a data matrix, a dist object or a frNN object.
 #' @param eps neighbors radius.
 #' @param query a data matrix with the points to query. If query is not
-#' specified, the NN for all the points in \code{x} is returned. If query is
-#' specified then \code{x} needs to be a data matrix.
+#' specified, the NN for all the points in `x` is returned. If query is
+#' specified then `x` needs to be a data matrix.
 #' @param sort sort the neighbors by distance? This is expensive and can be
 #' done later using `sort()`.
 #' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
@@ -49,23 +49,27 @@
 #' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
 #' ANNs best guess.
 #' @param approx use approximate nearest neighbors. All NN up to a distance of
-#' a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+#' a factor of `1 + approx` eps may be used. Some actual NN may be omitted
 #' leading to spurious clusters and noise points.  However, the algorithm will
 #' enjoy a significant speedup.
 #' @param decreasing sort in decreasing order?
 #' @param ... further arguments
 #'
-#' @return An object of class [frNN] (subclass of
+#' @returns
+#'
+#' `frNN()` returns an object of class [frNN] (subclass of
 #' [NN]) containing a list with the following components:
 #' \item{id }{a list of
 #' integer vectors. Each vector contains the ids of the fixed radius nearest
 #' neighbors. }
 #' \item{dist }{a list with distances (same structure as
-#' \code{ids}). }
-#' \item{eps }{ eps used. }
+#' `id`). }
+#' \item{eps }{ neighborhood radius `eps` that was used. }
+#'
+#' `adjacencylist()` returns a list with one entry per data point in `x`. Each entry
+#' contains the id of the nearest neighbors.
 #'
 #' @author Michael Hahsler
-#' @seealso [kNN()] and [NN]
 #'
 #' @references David M. Mount and Sunil Arya (2010). ANN: A Library for
 #' Approximate Nearest Neighbor Searching,

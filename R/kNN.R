@@ -31,35 +31,36 @@
 #'
 #' Details on the search parameters:
 #'
-#' * \code{search} controls if
+#' * `search` controls if
 #' a kd-tree or linear search (both implemented in the ANN library; see Mount
 #' and Arya, 2010). Note, that these implementations cannot handle NAs.
-#' \code{search="dist"} precomputes Euclidean distances first using R. NAs are
+#' `search = "dist"` precomputes Euclidean distances first using R. NAs are
 #' handled, but the resulting distance matrix cannot contain NAs. To use other
-#' distance measures, a precomputed distance matrix can be provided as \code{x}
-#' (\code{search} is ignored).
+#' distance measures, a precomputed distance matrix can be provided as `x`
+#' (`search` is ignored).
 #'
-#' * \code{bucketSize} and \code{splitRule} influence how the kd-tree is
-#' built. \code{approx} uses the approximate nearest neighbor search
+#' * `bucketSize` and `splitRule` influence how the kd-tree is
+#' built. `approx` uses the approximate nearest neighbor search
 #' implemented in ANN. All nearest neighbors up to a distance of
-#' \code{eps}/(1+\code{approx}) will be considered and all with a distance
-#' greater than \code{eps} will not be considered. The other points might be
+#' `eps / (1 + approx)` will be considered and all with a distance
+#' greater than `eps` will not be considered. The other points might be
 #' considered. Note that this results in some actual nearest neighbors being
 #' omitted leading to spurious clusters and noise points. However, the
 #' algorithm will enjoy a significant speedup. For more details see Mount and
 #' Arya (2010).
 #'
 #' @aliases kNN knn
+#' @family NN functions
 #'
-#' @param x a data matrix, a dist object or a [kNN] object.
+#' @param x a data matrix, a [dist] object or a [kNN] object.
 #' @param k number of neighbors to find.
 #' @param query a data matrix with the points to query. If query is not
-#' specified, the NN for all the points in \code{x} is returned. If query is
-#' specified then \code{x} needs to be a data matrix.
+#' specified, the NN for all the points in `x` is returned. If query is
+#' specified then `x` needs to be a data matrix.
 #' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
 #' `"dist"`).
 #' @param sort sort the neighbors by distance? Note that some search methods
-#' already sort the results. Sorting is expensive and \code{sort = FALSE} may
+#' already sort the results. Sorting is expensive and `sort = FALSE` may
 #' be much faster for some search methods. kNN objects can be sorted using
 #' `sort()`.
 #' @param bucketSize max size of the kd-tree leafs.
@@ -67,7 +68,7 @@
 #' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
 #' ANNs best guess.
 #' @param approx use approximate nearest neighbors. All NN up to a distance of
-#' a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+#' a factor of `1 + approx` eps may be used. Some actual NN may be omitted
 #' leading to spurious clusters and noise points.  However, the algorithm will
 #' enjoy a significant speedup.
 #' @param decreasing sort in decreasing order?
@@ -76,11 +77,10 @@
 #' @return An object of class `kNN` (subclass of [NN]) containing a
 #' list with the following components:
 #' \item{dist }{a matrix with distances. }
-#' \item{id }{a matrix with ids. }
-#' \item{k }{number of k used. }
+#' \item{id }{a matrix with `ids`. }
+#' \item{k }{number `k` used. }
 #'
 #' @author Michael Hahsler
-#' @seealso [frNN()] and [NN]
 #' @references David M. Mount and Sunil Arya (2010). ANN: A Library for
 #' Approximate Nearest Neighbor Searching,
 #' \url{http://www.cs.umd.edu/~mount/ANN/}.

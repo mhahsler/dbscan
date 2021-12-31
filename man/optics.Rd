@@ -5,7 +5,7 @@
 \alias{OPTICS}
 \alias{extractDBSCAN}
 \alias{extractXi}
-\title{OPTICS}
+\title{Ordering Points to Identify the Clustering Structure (OPTICS)}
 \usage{
 optics(x, eps = NULL, minPts = 5, ...)
 
@@ -33,7 +33,7 @@ control the search strategy.}
 
 \item{object}{an object of class \code{optics}.}
 
-\item{eps_cl}{Threshold to identify clusters (eps_cl <= eps).}
+\item{eps_cl}{Threshold to identify clusters (\code{eps_cl <= eps}).}
 
 \item{xi}{Steepness threshold to identify clusters hierarchically using the
 Xi method.}
@@ -47,15 +47,15 @@ cluster--found by the ELKI framework, see details below.}
 }
 \value{
 An object of class \code{optics} with components:
-\item{eps }{ value of eps parameter. }
-\item{minPts }{ value of minPts parameter. }
+\item{eps }{ value of \code{eps} parameter. }
+\item{minPts }{ value of \code{minPts} parameter. }
 \item{order }{ optics order for the data points in \code{x}. }
-\item{reachdist }{ reachability distance for each data point in \code{x}. }
+\item{reachdist }{ \link{reachability} distance for each data point in \code{x}. }
 \item{coredist }{ core distance for each data point in \code{x}. }
 
 For \code{extractDBSCAN()}, in addition the following
 components are available:
-\item{eps_cl }{ reachability distance for each point in \code{x}. }
+\item{eps_cl }{ the value of the \code{eps_cl} parameter. }
 \item{cluster }{ assigned cluster labels in the order of the data points in \code{x}. }
 
 For \code{extractXi()}, in addition the following components
@@ -67,7 +67,7 @@ found in the OPTICS ordering. }
 }
 \description{
 Implementation of the OPTICS (Ordering points to identify the clustering
-structure) clustering algorithm using a kd-tree.
+structure) point ordering algorithm using a kd-tree.
 }
 \details{
 This implementation of OPTICS (Hahsler et al, 2019) implements the original
@@ -174,10 +174,19 @@ Extracted from OPTICS Plots. In \emph{Lernen, Wissen, Daten, Analysen (LWDA 2018
 pp. 318-329.
 }
 \seealso{
-\code{\link[=frNN]{frNN()}}, \code{\link[=as.reachability]{as.reachability()}}.
+Density \link{reachability}.
+
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{extractFOSC}()},
+\code{\link{hdbscan}()},
+\code{\link{jpclust}()},
+\code{\link{predict}()},
+\code{\link{sNNclust}()}
 }
 \author{
 Michael Hahsler and Matthew Piekenbrock
 }
+\concept{clustering functions}
 \keyword{clustering}
 \keyword{model}

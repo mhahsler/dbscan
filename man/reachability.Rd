@@ -5,7 +5,7 @@
 \alias{print.reachability}
 \alias{as.reachability.dendrogram}
 \alias{plot.reachability}
-\title{Density Reachability Structures}
+\title{Density Reachability Structures for OPTICS}
 \usage{
 \method{as.reachability}{dendrogram}(object, ...)
 
@@ -19,21 +19,22 @@
 )
 }
 \arguments{
-\item{object}{any R object that can be made into one of class
+\item{object}{any object that can be coerced to class
 \code{reachability}, such as an object of class \link{optics} or \link[stats:dendrogram]{stats::dendrogram}.}
 
-\item{...}{graphical parameters, or arguments for other methods.}
+\item{...}{graphical parameters are passed on to \code{plot()},
+or arguments for other methods.}
 
 \item{x}{object of class \code{reachability}.}
 
 \item{order_labels}{whether to plot text labels for each points reachability
 distance.}
 
-\item{xlab}{x-axis label, defaults to "Order".}
+\item{xlab}{x-axis label.}
 
-\item{ylab}{y-axis label, defaults to "Reachability dist.".}
+\item{ylab}{y-axis label.}
 
-\item{main}{Title of the plot, defaults to "Reachability Plot".}
+\item{main}{Title of the plot.}
 }
 \value{
 An object of class \code{reachability} with components:
@@ -43,17 +44,21 @@ An object of class \code{reachability} with components:
 \description{
 Class \code{reachability} provides general functions for representing various
 hierarchical representations as reachability plots, as originally defined
-by Ankerst et al (1999). Methods include fast implementations of the
+by Ankerst et al (1999) for \link{OPTICS}. Methods include fast implementations of the
 conversion algorithms introduced by Sanders et al (2003) to convert between
-dendrograms and reachability plot objects.
+a \link{dendrogram} and a reachability object.
 }
 \details{
 Dendrograms are a popular visualization tool for representing hierarchical
 relationships. In agglomerative clustering, dendrograms can be constructed
 using a variety of linkage criterion (such as single or complete linkage),
-many of which are frequently used to 1) visualize the density-based
-relationships in the data or 2) extract cluster labels from the data the
+many of which are frequently used to
+\enumerate{
+\item visualize the density-based
+relationships in the data or
+\item extract cluster labels from the data the
 dendrogram represents.
+}
 
 The original ordering algorithm OPTICS as described by Ankerst et al (1999)
 introduced the notion of 2-dimensional representation of so-called
@@ -82,10 +87,6 @@ reachability plots. Because both cluster extraction depend directly on the
 ordering OPTICS produces, they are part of the optics interface.
 Nonetheless, reachability plots can be created directly from other types of
 linkage trees, and vice versa.
-
-See \code{\link[=optics]{optics()}} for more information on how OPTICS is formulated.
-\code{\link[=extractDBSCAN]{extractDBSCAN()}} and \code{\link[=extractXi]{extractXi()}} are the two cluster
-extraction methods presented in the original OPTICS publication.
 }
 \examples{
 set.seed(2)
@@ -134,7 +135,7 @@ extraction of clusters from hierarchical clustering representations.
 Springer Berlin Heidelberg.
 }
 \seealso{
-\link[stats:dendrogram]{stats::dendrogram}, \code{\link[=optics]{optics()}}, \code{\link[stats:hclust]{stats::hclust()}}.
+\code{\link[=optics]{optics()}}, \code{\link[stats:hclust]{stats::hclust()}}.
 }
 \author{
 Matthew Piekenbrock

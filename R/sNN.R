@@ -34,40 +34,40 @@
 #' clustering. They only count shared neighbors between points that are in each
 #' other's kNN neighborhood.
 #'
-#' @aliases sNN snn sort.sNN
+#' @aliases sNN snn
+#' @family NN functions
 #'
-#' @param x a data matrix, a dist object or a kNN object.
+#' @param x a data matrix, a [dist] object or a [kNN] object.
 #' @param k number of neighbors to consider to calculate the shared nearest
 #' neighbors.
 #' @param kt minimum threshold on the number of shared nearest neighbors to
 #' build the shared nearest neighbor graph. Edges are only preserved if
-#' \code{kt} or more neighbors are shared.
+#' `kt` or more neighbors are shared.
 #' @param jp use the definition by Javis and Patrick (1973), where shared
 #' neighbors are only counted between points that are in each other's
-#' neighborhood, otherwise 0 is returned. If FALSE, then the number of shared
+#' neighborhood, otherwise 0 is returned. If `FALSE`, then the number of shared
 #' neighbors is returned, even if the points are not neighbors.
-#' @param search nearest neighbor search strategy (one of "kdtree", "linear" or
-#' "dist").
+#' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
+#' `"dist"`).
 #' @param sort sort by the number of shared nearest neighbors? Note that this
-#' is expensive and \code{sort = FALSE} is much faster. sNN objects can be
+#' is expensive and `sort = FALSE` is much faster. sNN objects can be
 #' sorted using `sort()`.
 #' @param bucketSize max size of the kd-tree leafs.
-#' @param splitRule rule to split the kd-tree. One of "STD", "MIDPT", "FAIR",
-#' "SL_MIDPT", "SL_FAIR" or "SUGGEST" (SL stands for sliding). "SUGGEST" uses
+#' @param splitRule rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+#' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
 #' ANNs best guess.
 #' @param approx use approximate nearest neighbors. All NN up to a distance of
-#' a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+#' a factor of `(1 + approx) eps` may be used. Some actual NN may be omitted
 #' leading to spurious clusters and noise points.  However, the algorithm will
 #' enjoy a significant speedup.
 #' @return An object of class `sNN` (subclass of [kNN] and [NN]) containing a list
 #' with the following components:
 #' \item{id }{a matrix with ids. }
 #' \item{dist}{a matrix with the distances. }
-#' \item{shared }{a matrix with the number of  shared nearest neighbors. }
-#' \item{k }{number of k used. }
+#' \item{shared }{a matrix with the number of shared nearest neighbors. }
+#' \item{k }{number of `k` used. }
 #'
 #' @author Michael Hahsler
-#' @seealso [kNN()] for k nearest neighbors.
 #' @references R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a
 #' Similarity Measure Based on Shared Near Neighbors. _IEEE Trans. Comput._
 #' 22, 11 (November 1973), 1025-1034.

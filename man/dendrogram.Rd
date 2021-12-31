@@ -7,7 +7,7 @@
 \alias{reachability-coersion}
 \alias{as.reachability}
 \alias{as.dendrogram.reachability}
-\title{Dendrogram Coersions}
+\title{Coersions to Dendrogram}
 \usage{
 \method{as.dendrogram}{hclust}(object, ...)
 
@@ -21,14 +21,11 @@
 \item{...}{further arguments}
 }
 \description{
-Coerce \link{dendrogram} objects to \link{hclust}, \link{hdbscan} and \link{reachability} objects.
+Coerce \link{hclust}, \link{hdbscan} or \link{reachability} objects to \link{dendrogram}.
 }
 \details{
-Notes:
-\itemize{
-\item the coersion to hclust is a faster reimplementation of
-\code{\link[stats:dendrogram]{stats::as.dendrogram()}}.
-\item the coersion to hdbscan builds the non-simplified HDBSCAN hierarchy as a
+The coersion from hclust is a faster reimplementation of \code{\link[stats:dendrogram]{stats::as.dendrogram()}}.
+
+The coersion from \link{hdbscan} builds the non-simplified HDBSCAN hierarchy as a
 dendrogram object.
-}
 }

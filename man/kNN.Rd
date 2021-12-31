@@ -23,7 +23,7 @@ kNN(
 \method{adjacencylist}{kNN}(x, ...)
 }
 \arguments{
-\item{x}{a data matrix, a dist object or a \link{kNN} object.}
+\item{x}{a data matrix, a \link{dist} object or a \link{kNN} object.}
 
 \item{k}{number of neighbors to find.}
 
@@ -46,7 +46,7 @@ be much faster for some search methods. kNN objects can be sorted using
 ANNs best guess.}
 
 \item{approx}{use approximate nearest neighbors. All NN up to a distance of
-a factor of 1+\code{approx} eps may be used. Some actual NN may be omitted
+a factor of \code{1 + approx} eps may be used. Some actual NN may be omitted
 leading to spurious clusters and noise points.  However, the algorithm will
 enjoy a significant speedup.}
 
@@ -58,8 +58,8 @@ enjoy a significant speedup.}
 An object of class \code{kNN} (subclass of \link{NN}) containing a
 list with the following components:
 \item{dist }{a matrix with distances. }
-\item{id }{a matrix with ids. }
-\item{k }{number of k used. }
+\item{id }{a matrix with \code{ids}. }
+\item{k }{number \code{k} used. }
 }
 \description{
 This function uses a kd-tree to find all k nearest neighbors in a data
@@ -77,14 +77,14 @@ Details on the search parameters:
 \item \code{search} controls if
 a kd-tree or linear search (both implemented in the ANN library; see Mount
 and Arya, 2010). Note, that these implementations cannot handle NAs.
-\code{search="dist"} precomputes Euclidean distances first using R. NAs are
+\code{search = "dist"} precomputes Euclidean distances first using R. NAs are
 handled, but the resulting distance matrix cannot contain NAs. To use other
 distance measures, a precomputed distance matrix can be provided as \code{x}
 (\code{search} is ignored).
 \item \code{bucketSize} and \code{splitRule} influence how the kd-tree is
 built. \code{approx} uses the approximate nearest neighbor search
 implemented in ANN. All nearest neighbors up to a distance of
-\code{eps}/(1+\code{approx}) will be considered and all with a distance
+\code{eps / (1 + approx)} will be considered and all with a distance
 greater than \code{eps} will not be considered. The other points might be
 considered. Note that this results in some actual nearest neighbors being
 omitted leading to spurious clusters and noise points. However, the
@@ -129,9 +129,14 @@ Approximate Nearest Neighbor Searching,
 \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
-\code{\link[=frNN]{frNN()}} and \link{NN}
+Other NN functions: 
+\code{\link{NN}},
+\code{\link{frNN}()},
+\code{\link{kNNdist}()},
+\code{\link{sNN}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{NN functions}
 \keyword{model}

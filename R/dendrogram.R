@@ -17,15 +17,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' Dendrogram Coersions
+#' Coersions to Dendrogram
 #'
-#' Coerce [dendrogram] objects to [hclust], [hdbscan] and [reachability] objects.
+#' Coerce [hclust], [hdbscan] or [reachability] objects to [dendrogram].
 #'
-#' Notes:
-#' *  the coersion to hclust is a faster reimplementation of
-#' [stats::as.dendrogram()].
+#' The coersion from hclust is a faster reimplementation of [stats::as.dendrogram()].
 #'
-#' * the coersion to hdbscan builds the non-simplified HDBSCAN hierarchy as a
+#' The coersion from [hdbscan] builds the non-simplified HDBSCAN hierarchy as a
 #' dendrogram object.
 #'
 #' @name dendrogram

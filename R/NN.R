@@ -25,6 +25,7 @@
 #'
 #' @name NN
 #' @aliases NN
+#' @family NN functions
 #'
 #' @param x a `NN` object
 #' @param ... further parameters

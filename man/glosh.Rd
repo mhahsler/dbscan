@@ -8,11 +8,11 @@
 glosh(x, k = 4, ...)
 }
 \arguments{
-\item{x}{an hclust object, data matrix, or dist object.}
+\item{x}{an \link{hclust} object, data matrix, or \link{dist} object.}
 
 \item{k}{size of the neighborhood.}
 
-\item{...}{further arguments are passed on to \code{kNN}.}
+\item{...}{further arguments are passed on to \code{\link[=kNN]{kNN()}}.}
 }
 \value{
 A numeric vector of length equal to the size of the original data
@@ -45,7 +45,7 @@ x <- cbind(
   y=runif(10, 0, 5) + rnorm(n, sd = 0.4)
   )
 
-### calculate LOF score
+### calculate GLOSH score
 glosh <- glosh(x, k = 3)
 
 ### distribution of outlier scores
@@ -78,7 +78,6 @@ plot_glosh(x, glosh_ward)
 
 ## GLOSH is automatically computed with HDBSCAN
 all(hdbscan(x, minPts = 3)$outlier_scores == glosh(x, k = 3))
-
 }
 \references{
 Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg
@@ -88,9 +87,13 @@ and outlier detection. \emph{ACM Transactions on Knowledge Discovery from Data
 \doi{10.1145/2733381}
 }
 \seealso{
-\code{\link[=kNN]{kNN()}}, \code{\link[=pointdensity]{pointdensity()}}, \code{\link[=lof]{lof()}}.
+Other Outlier Detection Functions: 
+\code{\link{kNNdist}()},
+\code{\link{lof}()},
+\code{\link{pointdensity}()}
 }
 \author{
 Matt Piekenbrock
 }
+\concept{Outlier Detection Functions}
 \keyword{model}

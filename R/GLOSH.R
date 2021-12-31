@@ -37,13 +37,15 @@
 #' this calculation, see Campello et al (2015).
 #'
 #' @aliases glosh GLOSH
-#' @param x an hclust object, data matrix, or dist object.
+#' @family Outlier Detection Functions
+#'
+#' @param x an [hclust] object, data matrix, or [dist] object.
 #' @param k size of the neighborhood.
-#' @param ... further arguments are passed on to \code{kNN}.
+#' @param ... further arguments are passed on to [kNN()].
 #' @return A numeric vector of length equal to the size of the original data
 #' set containing GLOSH values for all data points.
 #' @author Matt Piekenbrock
-#' @seealso [kNN()], [pointdensity()], [lof()].
+#'
 #' @references Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg
 #' Sander. Hierarchical density estimates for data clustering, visualization,
 #' and outlier detection. _ACM Transactions on Knowledge Discovery from Data
@@ -58,7 +60,7 @@
 #'   y=runif(10, 0, 5) + rnorm(n, sd = 0.4)
 #'   )
 #'
-#' ### calculate LOF score
+#' ### calculate GLOSH score
 #' glosh <- glosh(x, k = 3)
 #'
 #' ### distribution of outlier scores
@@ -91,7 +93,6 @@
 #'
 #' ## GLOSH is automatically computed with HDBSCAN
 #' all(hdbscan(x, minPts = 3)$outlier_scores == glosh(x, k = 3))
-#'
 #' @export glosh
 glosh <- function(x, k = 4, ...) {
   if (inherits(x, "data.frame"))

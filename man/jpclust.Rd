@@ -9,13 +9,13 @@ jpclust(x, k, kt, ...)
 }
 \arguments{
 \item{x}{a data matrix/data.frame (Euclidean distance is used), a
-precomputed dist object or a kNN object created with \code{\link[=kNN]{kNN()}}.}
+precomputed \link{dist} object or a kNN object created with \code{\link[=kNN]{kNN()}}.}
 
 \item{k}{Neighborhood size for nearest neighbor sparsification. If \code{x}
 is a kNN object then \code{k} may be missing.}
 
 \item{kt}{threshold on the number of shared nearest neighbors (including the
-points themselves) to form clusters.}
+points themselves) to form clusters. Range: \eqn{[1, k]}}
 
 \item{...}{additional arguments are passed on to the k nearest neighbor
 search algorithm. See \code{\link[=kNN]{kNN()}} for details on how to control the
@@ -36,9 +36,9 @@ places two points in the same cluster if they are in each other's nearest
 neighbor list and they share at least kt nearest neighbors.
 }
 \details{
-Note: Following the original paper, the shared nearest neighbor list is
+Following the original paper, the shared nearest neighbor list is
 constructed as the k neighbors plus the point itself (as neighbor zero).
-Therefore, the threshold \code{kt} can be in the range \eqn{[1, k]}.
+Therefore, the threshold \code{kt} needs to be in the range \eqn{[1, k]}.
 
 Fast nearest neighbors search with \code{\link[=kNN]{kNN()}} is only used if \code{x} is
 a matrix. In this case Euclidean distance is used.
@@ -79,10 +79,17 @@ Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput.
 \doi{10.1109/T-C.1973.223640}
 }
 \seealso{
-\code{\link[=dbscan]{dbscan()}}, \code{\link[=sNNclust]{sNNclust()}}
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{extractFOSC}()},
+\code{\link{hdbscan}()},
+\code{\link{optics}()},
+\code{\link{predict}()},
+\code{\link{sNNclust}()}
 }
 \author{
 Michael Hahsler
 }
+\concept{clustering functions}
 \keyword{clustering}
 \keyword{model}

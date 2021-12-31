@@ -26,32 +26,33 @@
 #'
 #' DBSCAN estimates the density around a point as the number of points in the
 #' eps-neighborhood of the point (including the query point itself). The kde
-#' using a uniform kernel is just this count divided by \eqn{2 eps n}, where
-#' \eqn{n} is the number of points in \code{x}.
+#' using a uniform kernel is just this count divided by \eqn{(2\,eps\,n)}{(2 eps n)}, where
+#' \eqn{n} is the number of points in `x`.
 #'
 #' Points with low local density often indicate noise (see e.g., Wishart (1969)
 #' and Hartigan (1975)).
 #'
 #' @aliases pointdensity density
+#' @family Outlier Detection Functions
 #'
 #' @param x a data matrix.
 #' @param eps radius of the eps-neighborhood, i.e., bandwidth of the uniform
 #' kernel).
-#' @param type \code{"frequency"} or \code{"density"}. should the raw count of
+#' @param type `"frequency"` or `"density"`. should the raw count of
 #' points inside the eps-neighborhood or the kde be returned.
 #' @param search,bucketSize,splitRule,approx algorithmic parameters for
 #' [frNN()].
 #'
-#' @return A vector of the same length as data points (rows) in \code{x} with
+#' @return A vector of the same length as data points (rows) in `x` with
 #' the count or density values for each data point.
 #'
 #' @author Michael Hahsler
 #' @seealso [frNN()], [stats::density()].
-#' @references WISHART, D. (1969), Mode Analysis: A Generalization of Nearest
+#' @references Wishart, D. (1969), Mode Analysis: A Generalization of Nearest
 #' Neighbor which Reduces Chaining Effects, in _Numerical Taxonomy,_ Ed., A.J.
 #' Cole, Academic Press, 282-311.
 #'
-#' John A. Hartigan (1975), _Clustering Algorithms,_ John Wiley \& Sons, Inc.,
+#' John A. Hartigan (1975), _Clustering Algorithms,_ John Wiley & Sons, Inc.,
 #' New York, NY, USA.
 #' @keywords model
 #' @examples

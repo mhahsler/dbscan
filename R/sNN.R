@@ -20,7 +20,7 @@
 # number of shared nearest neighbors including the point itself.
 
 
-#' Shared Nearest Neighbors
+#' Find Shared Nearest Neighbors
 #'
 #' Calculates the number of shared nearest neighbors, the shared nearest
 #' neighbor similarity and creates a shared nearest neighbors graph.

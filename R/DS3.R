@@ -38,7 +38,7 @@
 #' @references Karypis, George, Eui-Hong Han, and Vipin Kumar (1999).
 #' Chameleon: Hierarchical clustering using dynamic modeling. _Computer_
 #' 32(8): 68-75.
-#' @source Obtained from \url{https://cs.joensuu.fi/sipu/datasets/}
+#' @source Obtained from \url{http://cs.joensuu.fi/sipu/datasets/}
 #' @keywords datasets
 #' @examples
 #' data(DS3)

@@ -33,14 +33,15 @@ the count or density values for each data point.
 }
 \description{
 Calculate the local density at each data point as either the number of
-points in the eps-neighborhood (as used in DBSCAN) or the kernel density
-estimate (kde) of a uniform kernel. The function uses a kd-tree for fast
+points in the eps-neighborhood (as used in \code{dbscan()}) or perform kernel density
+estimation (KDE) using a uniform kernel. The function uses a kd-tree for fast
 fixed-radius nearest neighbor search.
 }
 \details{
-DBSCAN estimates the density around a point as the number of points in the
-eps-neighborhood of the point (including the query point itself). The kde
-using a uniform kernel is just this count divided by \eqn{(2\,eps\,n)}{(2 eps n)}, where
+\code{dbscan()} estimates the density around a point as the number of points in the
+eps-neighborhood of the point (including the query point itself).
+Kernel density estimation (KDE) using a uniform kernel, which is just this point
+count in the eps-neighborhood divided by \eqn{(2\,eps\,n)}{(2 eps n)}, where
 \eqn{n} is the number of points in \code{x}.
 
 Points with low local density often indicate noise (see e.g., Wishart (1969)
@@ -62,10 +63,10 @@ d <- pointdensity(x, eps = .5, type = "density")
 summary(d)
 hist(d, breaks = 10)
 
-### point size is proportional to Density
+### plot with point size is proportional to Density
 plot(x, pch = 19, main = "Density (eps = .5)", cex = d*5)
 
-### Wishart (1969) single link clustering method
+### Wishart (1969) single link clustering after removing low-density noise
 # 1. remove noise with low density
 f <- pointdensity(x, eps = .5, type = "frequency")
 x_nonoise <- x[f >= 5,]

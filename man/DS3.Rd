@@ -12,7 +12,7 @@ A data.frame with 8000 observations on the following 2 columns:
 }
 }
 \source{
-Obtained from \url{https://cs.joensuu.fi/sipu/datasets/}
+Obtained from \url{http://cs.joensuu.fi/sipu/datasets/}
 }
 \description{
 Contains 8000 2-d points, with 6 "natural" looking shapes, all of which have

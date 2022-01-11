@@ -52,16 +52,16 @@
 #' # show the first few elements of the adjacency list
 #' head(adjacencylist(nn))
 #'
+#' \dontrun{
 #' # create a graph and find connected components (if igraph is installed)
-#' if("igraph" %in% installed.packages()){
-#'   library("igraph")
-#'   g <- graph_from_adj_list(adjacencylist(nn))
-#'   comp <- components(g)
-#'   plot(x, col = comp$membership)
+#' library("igraph")
+#' g <- graph_from_adj_list(adjacencylist(nn))
+#' comp <- components(g)
+#' plot(x, col = comp$membership)
 #'
-#'   # detect clusters (communities) with the label propagation algorithm
-#'   cl <- membership(cluster_label_prop(g))
-#'   plot(x, col = cl)
+#' # detect clusters (communities) with the label propagation algorithm
+#' cl <- membership(cluster_label_prop(g))
+#' plot(x, col = cl)
 #' }
 NULL
 

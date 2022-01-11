@@ -38,12 +38,14 @@ An object of class \code{dbscan_fast} with the following components:
 }
 \description{
 Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-applications with noise) clustering algorithm using a kd-tree. The
-implementation is significantly faster and can work with larger data sets
-then \code{\link[fpc:dbscan]{fpc::dbscan()}} in \pkg{fpc}. Use \code{dbscan::dbscan()} (with specifying the package) to
-call this implementation when you also use package \pkg{fpc}.
+applications with noise) clustering algorithm using a kd-tree.
 }
 \details{
+The
+implementation is significantly faster and can work with larger data sets
+than \code{\link[fpc:dbscan]{fpc::dbscan()}} in \pkg{fpc}. Use \code{dbscan::dbscan()} (with specifying the package) to
+call this implementation when you also load package \pkg{fpc}.
+
 \strong{The algorithm}
 
 This implementation of DBSCAN (Hahsler et al, 2019) follows the original

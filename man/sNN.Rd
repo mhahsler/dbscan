@@ -3,7 +3,7 @@
 \name{sNN}
 \alias{sNN}
 \alias{snn}
-\title{Shared Nearest Neighbors}
+\title{Find Shared Nearest Neighbors}
 \usage{
 sNN(
   x,

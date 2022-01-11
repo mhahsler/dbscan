@@ -21,10 +21,12 @@
 #' Density-based Spatial Clustering of Applications with Noise (DBSCAN)
 #'
 #' Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-#' applications with noise) clustering algorithm using a kd-tree. The
+#' applications with noise) clustering algorithm using a kd-tree.
+#'
+#' The
 #' implementation is significantly faster and can work with larger data sets
-#' then [fpc::dbscan()] in \pkg{fpc}. Use `dbscan::dbscan()` (with specifying the package) to
-#' call this implementation when you also use package \pkg{fpc}.
+#' than [fpc::dbscan()] in \pkg{fpc}. Use `dbscan::dbscan()` (with specifying the package) to
+#' call this implementation when you also load package \pkg{fpc}.
 #'
 #' **The algorithm**
 #'

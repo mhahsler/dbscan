@@ -1,31 +1,45 @@
 useDynLib("dbscan", .registration = TRUE)
 import("Rcpp")
 importFrom("graphics", "plot", "points", "par", "segments",
-  "lines", "polygon", "text")
+  "lines", "polygon", "text", "abline")
 importFrom("grDevices", "palette", "chull", "adjustcolor")
 importFrom("stats", "dist", "hclust", "dendrapply", "as.dendrogram",
   "is.leaf", "prcomp")
+importFrom("utils", "tail")
+
 
 export(
-  adjacencylist,
   kNN,
   kNNdistplot,
   kNNdist,
   frNN,
   sNN,
+  adjacencylist,
+
   dbscan,
+  is.corepoint,
+
   optics,
   extractDBSCAN,
   extractXi,
+
   hdbscan,
   extractFOSC,
+  as.reachability,
+  coredist,
+  mrdist,
+
   sNNclust,
+
   jpclust,
+
   lof,
   glosh,
   pointdensity,
+
   hullplot,
-  as.reachability
+
+  comps
 )
 
 S3method(print, dbscan_fast)
@@ -59,3 +73,8 @@ S3method(sort, sNN)
 S3method(print, sNN)
 
 S3method(plot, NN)
+
+S3method(comps, dist)
+S3method(comps, kNN)
+S3method(comps, sNN)
+S3method(comps, frNN)

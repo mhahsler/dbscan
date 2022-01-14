@@ -84,7 +84,6 @@ Other clustering functions:
 \code{\link{extractFOSC}()},
 \code{\link{hdbscan}()},
 \code{\link{optics}()},
-\code{\link{predict}()},
 \code{\link{sNNclust}()}
 }
 \author{

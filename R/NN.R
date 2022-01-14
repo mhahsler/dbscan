@@ -28,7 +28,10 @@
 #' @family NN functions
 #'
 #' @param x a `NN` object
-#' @param ... further parameters
+#' @param pch plotting character.
+#' @param col color used for the data points (nodes).
+#' @param linecol color used for edges.
+#' @param ... further parameters past on to [plot()].
 #' @param decreasing sort in decreasing order?
 #' @param data that was used to create `x`
 #' @param main title
@@ -81,7 +84,7 @@ sort.NN <- function(x, decreasing = FALSE, ...) {
 
 
 #' @rdname NN
-plot.NN <- function(x, data, main = NULL, ...) {
+plot.NN <- function(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...) {
   if (is.null(main)) {
     if (inherits(x, "frNN"))
       main <- paste0("frNN graph (eps = ", x$eps, ")")
@@ -91,7 +94,9 @@ plot.NN <- function(x, data, main = NULL, ...) {
       main <- paste0("Shared NN graph (k=", x$k,
         ifelse(is.null(x$kt), "", paste0(", kt=", x$kt)), ")")
   }
-  plot(data[, 1:2], main = main, ...)
+
+  ## create an empty plot
+  plot(data[, 1:2], main = main, type = "n", pch = pch, col = col, ...)
 
   id <- adjacencylist(x)
 
@@ -101,13 +106,19 @@ plot.NN <- function(x, data, main = NULL, ...) {
     for (i in 1:length(id)) {
       for (j in 1:length(id[[i]]))
         lines(x = c(data[i, 1], data[id[[i]][j], 1]),
-          y = c(data[i, 2], data[id[[i]][j], 2]),
+          y = c(data[i, 2], data[id[[i]][j], 2]), col = linecol,
           ...)
     }
+
+    ## ad vertices
+    points(data[, 1:2], main = main, pch = pch, col = col, ...)
+
   } else {
+    ## ad vertices
+    points(data[, 1:2], main = main, pch = pch, ...)
     ## use colors if it was from a query
     for (i in 1:length(id)) {
-      points(data[id[[i]], ], col = i + 1L)
+      points(data[id[[i]], ], pch = pch, col = i + 1L)
     }
   }
 }

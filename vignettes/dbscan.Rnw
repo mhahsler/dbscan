@@ -1,5 +1,4 @@
 % !Rnw weave = Sweave
-%\documentclass[article]{jss}
 \documentclass[nojss]{jss}
 
 % Package includes
@@ -33,7 +32,7 @@
 \mathchardef\mhyphen="2D % Define a "math hyphen"
 \newcommand{\cmark}{\ding{51}} % checkmark
 
-%% \VignetteIndexEntry{Fast Density-based Clustering}
+%% \VignetteIndexEntry{Fast Density-based Clustering (DBSCAN and OPTICS)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%

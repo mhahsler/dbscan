@@ -62,6 +62,7 @@ Other Outlier Detection Functions:
 
 Other NN functions: 
 \code{\link{NN}},
+\code{\link{comps}()},
 \code{\link{frNN}()},
 \code{\link{kNN}()},
 \code{\link{sNN}()}

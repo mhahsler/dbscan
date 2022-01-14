@@ -191,7 +191,6 @@ Other clustering functions:
 \code{\link{hdbscan}()},
 \code{\link{jpclust}()},
 \code{\link{optics}()},
-\code{\link{predict}()},
 \code{\link{sNNclust}()}
 }
 \author{

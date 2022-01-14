@@ -80,8 +80,7 @@ Other clustering functions:
 \code{\link{extractFOSC}()},
 \code{\link{hdbscan}()},
 \code{\link{jpclust}()},
-\code{\link{optics}()},
-\code{\link{predict}()}
+\code{\link{optics}()}
 }
 \author{
 Michael Hahsler

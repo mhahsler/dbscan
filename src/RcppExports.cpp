@@ -43,6 +43,30 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// comps_kNN
+IntegerVector comps_kNN(IntegerMatrix nn, bool mutual);
+RcppExport SEXP _dbscan_comps_kNN(SEXP nnSEXP, SEXP mutualSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type nn(nnSEXP);
+    Rcpp::traits::input_parameter< bool >::type mutual(mutualSEXP);
+    rcpp_result_gen = Rcpp::wrap(comps_kNN(nn, mutual));
+    return rcpp_result_gen;
+END_RCPP
+}
+// comps_frNN
+IntegerVector comps_frNN(List nn, bool mutual);
+RcppExport SEXP _dbscan_comps_frNN(SEXP nnSEXP, SEXP mutualSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type nn(nnSEXP);
+    Rcpp::traits::input_parameter< bool >::type mutual(mutualSEXP);
+    rcpp_result_gen = Rcpp::wrap(comps_frNN(nn, mutual));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dbscan_int
 IntegerVector dbscan_int(NumericMatrix data, double eps, int minPts, NumericVector weights, int borderPoints, int type, int bucketSize, int splitRule, double approx, List frNN);
 RcppExport SEXP _dbscan_dbscan_int(SEXP dataSEXP, SEXP epsSEXP, SEXP minPtsSEXP, SEXP weightsSEXP, SEXP borderPointsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP, SEXP frNNSEXP) {
@@ -158,6 +182,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
     Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
     rcpp_result_gen = Rcpp::wrap(lof_kNN(data, minPts, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mrd
+NumericVector mrd(NumericVector dm, NumericVector cd);
+RcppExport SEXP _dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type dm(dmSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
+    rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -355,30 +391,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mrd
-NumericVector mrd(NumericVector dm, NumericVector cd);
-RcppExport SEXP _dbscan_mrd(SEXP dmSEXP, SEXP cdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type dm(dmSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
-    rcpp_result_gen = Rcpp::wrap(mrd(dm, cd));
-    return rcpp_result_gen;
-END_RCPP
-}
-// mrd_m
-NumericMatrix mrd_m(NumericMatrix dm, NumericVector cd);
-RcppExport SEXP _dbscan_mrd_m(SEXP dmSEXP, SEXP cdSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type cd(cdSEXP);
-    rcpp_result_gen = Rcpp::wrap(mrd_m(dm, cd));
-    return rcpp_result_gen;
-END_RCPP
-}
 // coreFromDist
 NumericVector coreFromDist(const NumericVector dist, const int n, const int minPts);
 RcppExport SEXP _dbscan_coreFromDist(SEXP distSEXP, SEXP nSEXP, SEXP minPtsSEXP) {
@@ -466,6 +478,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_JP_int", (DL_FUNC) &_dbscan_JP_int, 2},
     {"_dbscan_SNN_sim_int", (DL_FUNC) &_dbscan_SNN_sim_int, 2},
     {"_dbscan_ANN_cleanup", (DL_FUNC) &_dbscan_ANN_cleanup, 0},
+    {"_dbscan_comps_kNN", (DL_FUNC) &_dbscan_comps_kNN, 2},
+    {"_dbscan_comps_frNN", (DL_FUNC) &_dbscan_comps_frNN, 2},
     {"_dbscan_dbscan_int", (DL_FUNC) &_dbscan_dbscan_int, 10},
     {"_dbscan_dbscan_density_int", (DL_FUNC) &_dbscan_dbscan_density_int, 6},
     {"_dbscan_frNN_int", (DL_FUNC) &_dbscan_frNN_int, 6},
@@ -473,6 +487,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 6},
     {"_dbscan_kNN_query_int", (DL_FUNC) &_dbscan_kNN_query_int, 7},
     {"_dbscan_lof_kNN", (DL_FUNC) &_dbscan_lof_kNN, 6},
+    {"_dbscan_mrd", (DL_FUNC) &_dbscan_mrd, 2},
     {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},
     {"_dbscan_distToAdjacency", (DL_FUNC) &_dbscan_distToAdjacency, 2},
     {"_dbscan_buildDendrogram", (DL_FUNC) &_dbscan_buildDendrogram, 1},
@@ -488,8 +503,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_reach_to_dendrogram", (DL_FUNC) &_dbscan_reach_to_dendrogram, 2},
     {"_dbscan_dendrogram_to_reach", (DL_FUNC) &_dbscan_dendrogram_to_reach, 1},
     {"_dbscan_mst_to_dendrogram", (DL_FUNC) &_dbscan_mst_to_dendrogram, 1},
-    {"_dbscan_mrd", (DL_FUNC) &_dbscan_mrd, 2},
-    {"_dbscan_mrd_m", (DL_FUNC) &_dbscan_mrd_m, 2},
     {"_dbscan_coreFromDist", (DL_FUNC) &_dbscan_coreFromDist, 3},
     {"_dbscan_prims", (DL_FUNC) &_dbscan_prims, 2},
     {"_dbscan_order_", (DL_FUNC) &_dbscan_order_, 1},

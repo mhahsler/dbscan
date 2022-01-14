@@ -18,29 +18,32 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-#' Density Reachability Structures for OPTICS
+#' Reachability Plots
 #'
-#' Class `reachability` provides general functions for representing various
-#' hierarchical representations as reachability plots, as originally defined
-#' by Ankerst et al (1999) for [OPTICS]. Methods include fast implementations of the
-#' conversion algorithms introduced by Sanders et al (2003) to convert between
-#' a [dendrogram] and a reachability object.
+#' Reachability plots can be used to show hierarchical relationships between data points.
+#' The idea was originally introduced by Ankerst et al (1999) for [OPTICS]. Later,
+#' Sanders et al (2003) showed that the visualization is useful for other hierarchical
+#' structures and introduced an algorithm to convert [dendrogram] representation to
+#' reachability plots.
 #'
-#' Dendrograms are a popular visualization tool for representing hierarchical
-#' relationships. In agglomerative clustering, dendrograms can be constructed
-#' using a variety of linkage criterion (such as single or complete linkage),
-#' many of which are frequently used to
-#'
-#' 1.  visualize the density-based
-#' relationships in the data or
-#' 2.  extract cluster labels from the data the
-#' dendrogram represents.
-#'
+#' A reachability plot displays the points as vertical bars, were the height is the
+#' reachability distance between two consecutive points.
+#' The central idea behind reachability plots is that the ordering in which
+#' points are plotted identifies underlying hierarchical density
+#' representation as mountains and valleys of high and low reachability distance.
 #' The original ordering algorithm OPTICS as described by Ankerst et al (1999)
-#' introduced the notion of 2-dimensional representation of so-called
-#' _density-reachability_ that was shown to be useful for data visualization.
-#' This representation was shown to essentially convey the same information as
-#' the more traditional dendrogram structure by Sanders et al (2003).
+#' introduced the notion of reachability plots.
+#'
+#' OPTICS linearly orders the data points such that points
+#' which are spatially closest become neighbors in the ordering. Valleys
+#' represent clusters, which can be represented hierarchically. Although the
+#' ordering is crucial to the structure of the reachability plot, its important
+#' to note that OPTICS, like DBSCAN, is not entirely deterministic and, just
+#' like the dendrogram, isomorphisms may exist
+#'
+#' Reachability plots were shown to essentially convey the same information as
+#' the more traditional dendrogram structure by Sanders et al (2003). An dendrograms
+#' can be converted into reachability plots.
 #'
 #' Different hierarchical representations, such as dendrograms or reachability
 #' plots, may be preferable depending on the context. In smaller datasets,
@@ -49,23 +52,20 @@
 #' representations. For larger datasets however, a reachability plot may be
 #' preferred for visualizing macro-level density relationships.
 #'
-#' The central idea behind a reachability plot is that the ordering in which
-#' points are plotted identifies underlying hierarchical density
-#' representation. OPTICS linearly orders the data points such that points
-#' which are spatially closest become neighbors in the ordering. Valleys
-#' represent clusters, which can be represented hierarchically. Although the
-#' ordering is crucial to the structure of the reachability plot, its important
-#' to note that OPTICS, like DBSCAN, is not entirely deterministic and, just
-#' like the dendrogram, isomorphisms may exist
-#'
 #' A variety of cluster extraction methods have been proposed using
 #' reachability plots. Because both cluster extraction depend directly on the
-#' ordering OPTICS produces, they are part of the optics interface.
+#' ordering OPTICS produces, they are part of the [optics()] interface.
 #' Nonetheless, reachability plots can be created directly from other types of
 #' linkage trees, and vice versa.
 #'
-#' @name reachability
-#' @aliases reachability print.reachability
+#' _Note:_ The reachability distance for the first point is by definition not defined
+#' (it has no preceeding point).
+#' Also, the reachability distances can be undefined when a point does not have enough
+#' neighbors in the epsilon neighborhood. We represent these undefined cases as `Inf`
+#' and represent them in the plot as a dashed line.
+#'
+#' @name reachability_plot
+#' @aliases reachability reachability_plot print.reachability
 #'
 #' @param object any object that can be coerced to class
 #' `reachability`, such as an object of class [optics] or [stats::dendrogram].
@@ -110,10 +110,10 @@
 #' res <- optics(x, eps = 10,  minPts = 2)
 #' res
 #'
-#' ### plot produces a reachability plot
+#' ### plot produces a reachability plot.
 #' plot(res)
 #'
-#' ### Extract reachability components from OPTICS
+#' ### Manually extract reachability components from OPTICS
 #' reach <- as.reachability(res)
 #' reach
 #'
@@ -130,11 +130,10 @@
 #' plot(as.reachability(dend))
 NULL
 
-
 print.reachability <- function(x, ...) {
   avg_reach <- mean(x$reachdist[which(x$reachdist != Inf)], na.rm = T)
   cat(
-    "Reachability collection for ",
+    "Reachability plot collection for ",
     length(x$order),
     " objects.\n",
     "Avg minimum reachability distance: ",
@@ -145,25 +144,7 @@ print.reachability <- function(x, ...) {
   )
 }
 
-#' @rdname reachability
-as.reachability.dendrogram <- function(object, ...) {
-  if (!inherits(object, "dendrogram"))
-    stop("The as.reachability method requires a dendrogram object.")
-  # Rcpp doesn't seem to import attributes well for vectors
-  fix_x <- dendrapply(object, function(leaf) {
-    new_leaf <-
-      as.list(leaf)
-    attributes(new_leaf) <- attributes(leaf)
-    new_leaf
-  })
-  res <- dendrogram_to_reach(fix_x)
-  # Refix the ordering
-  res$reachdist <- res$reachdist[order(res$order)]
-
-  return(res)
-}
-
-#' @rdname reachability
+#' @rdname reachability_plot
 plot.reachability <- function(x,
   order_labels = FALSE,
   xlab = "Order",
@@ -173,21 +154,22 @@ plot.reachability <- function(x,
   if (is.null(x$order) ||
       is.null(x$reachdist))
     stop("reachability objects need 'reachdist' and 'order' fields")
+  reachdist <- x$reachdist[x$order]
+
   plot(
-    x$reachdist[x$order],
+    reachdist,
     xlab = xlab,
     ylab = ylab,
     main = main,
     type = "h",
     ...
   )
-  lines(x = c(1, 1),
-    y = c(0, max(x$reachdist[x$reachdist != Inf])),
+  abline(v = which(is.infinite(reachdist)),
     lty = 3)
   if (order_labels) {
     text(
       x = 1:length(x$order),
-      y = x$reachdist[x$order],
+      y = reachdist,
       labels = x$order,
       pos = 3
     )
@@ -269,4 +251,22 @@ plot.reachability <- function(x,
       r <- 1L
   }
   r
+}
+
+#' @rdname reachability_plot
+as.reachability.dendrogram <- function(object, ...) {
+  if (!inherits(object, "dendrogram"))
+    stop("The as.reachability method requires a dendrogram object.")
+  # Rcpp doesn't seem to import attributes well for vectors
+  fix_x <- dendrapply(object, function(leaf) {
+    new_leaf <-
+      as.list(leaf)
+    attributes(new_leaf) <- attributes(leaf)
+    new_leaf
+  })
+  res <- dendrogram_to_reach(fix_x)
+  # Refix the ordering
+  res$reachdist <- res$reachdist[order(res$order)]
+
+  return(res)
 }

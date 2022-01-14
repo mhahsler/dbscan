@@ -23,6 +23,9 @@ if (requireNamespace("fpc", quietly = TRUE)) {
     res2 <- fpc::dbscan(iris, eps = .4, MinPts = 4)
 
     expect_equivalent(res$cluster, res2$cluster)
+
+    ## test is.corepoint
+    all(res2$isseed == is.corepoint(iris, eps = .4, minPts = 4))
 }
 
 ## compare with precomputed frNN

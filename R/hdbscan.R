@@ -22,12 +22,20 @@
 #' Fast C++ implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
 #' algorithms.
 #'
-#' This fast implementation of HDBSCAN (Hahsler et al, 2019) computes the
+#' This fast implementation of HDBSCAN (Campello et al., 2013) computes the
 #' hierarchical cluster tree representing density estimates along with the
-#' stability-based flat cluster extraction proposed by Campello et al. (2013).
-#' HDBSCAN essentially computes the hierarchy of all DBSCAN* clusterings, and
+#' stability-based flat cluster extraction. HDBSCAN essentially computes the
+#' hierarchy of all DBSCAN* clusterings, and
 #' then uses a stability-based extraction method to find optimal cuts in the
 #' hierarchy, thus producing a flat solution.
+#'
+#' HDBSCAN performs the following steps:
+#'
+#' 1. Compute mutual reachability distance mrd between points
+#'    (based on distances and core distances).
+#' 2. Use mdr as a distance measure to construct a minimum spanning tree.
+#' 3. Prune the tree using stability.
+#' 4. Extract the clusters.
 #'
 #' Additional, related algorithms including the "Global-Local Outlier Score
 #' from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015)
@@ -40,9 +48,16 @@
 #' but also as a "smoothing" factor of the density estimates implicitly
 #' computed from HDBSCAN.
 #'
-#' [predict()] assigns each new data point to the same cluster as the point
-#' in the original data that has the smallest mutual reachability distance.
+#' `coredist()`: The core distance is defined for each point as
+#' the distance to the `MinPts`'s neighbor. It is a density estimate.
 #'
+#' `mrdist()`: The mutual reachability distance is defined between two points as
+#' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This distance metric is used by
+#' HDBSCAN. It has the effect of increasing distances in low density areas.
+#'
+#' `predict()` assigns each new data point to the same cluster as the nearest point
+#' if it is not more than that points core distance away. Otherwise the new point
+#' is classified as a noise point (i.e., cluster ID 0).
 #' @aliases hdbscan HDBSCAN print.hdbscan
 #'
 #' @family HDBSCAN functions
@@ -62,8 +77,9 @@
 #' coloring with.
 #' @param show_flat logical; whether to draw boxes indicating the most stable
 #' clusters.
+#' @param coredist numeric vector with precomputed core distances (optional).
 #'
-#' @return A object of class `hdbscan` with the following components:
+#' @return `hdbscan()` returns object of class `hdbscan` with the following components:
 #' \item{cluster }{A integer vector with cluster assignments. Zero indicates
 #' noise points.}
 #' \item{minPts }{ value of the `minPts` parameter.}
@@ -75,12 +91,11 @@
 #' \item{outlier_scores }{The GLOSH outlier score of each point. }
 #' \item{hc }{An [hclust] object of the HDBSCAN hierarchy. }
 #'
-#' @author Matt Piekenbrock
-#' @references Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast
-#' Density-Based Clustering with R.  _Journal of Statistical Software_,
-#' 91(1), 1-30.
-#' \doi{10.18637/jss.v091.i01}
+#' `coredist()` returns a vector with the core distance for each data point.
 #'
+#' `mrdist()` returns a [dist] object containing pairwise mutual reachability distances.
+#'
+#' @author Matt Piekenbrock
 #' Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on
 #' Hierarchical Density Estimates. Proceedings of the 17th Pacific-Asia
 #' Conference on Knowledge Discovery in Databases, PAKDD 2013, _Lecture Notes
@@ -118,64 +133,40 @@
 #'
 #' ## Plot the actual clusters (noise has cluster id 0 and is shown in black)
 #' plot(DS3, col = res$cluster + 1L, cex = .5)
-#'
-#' ## Predict cluster for new data points.
-#' newdata <- data.frame(
-#'   X = runif(n = 10, min(DS3[, 1]), max(DS3[, 1])),
-#'   Y = runif(n = 10, min(DS3[, 2]), max(DS3[, 2]))
-#'   )
-#'
-#' plot(DS3, col = res$cluster + 1L, pch = ".")
-#' points(newdata, col = "red", pch = 4, lwd = 2)
-#'
-#' pred_label <- predict(res, newdata, data = DS3)
-#' pred_label
-#'
-#' points(newdata, col = pred_label + 1L, pch = 1, lwd = 2, cex = 2)
 #' @export hdbscan
 hdbscan <- function(x,
   minPts,
   gen_hdbscan_tree = FALSE,
   gen_simplified_tree = FALSE) {
-  if (.matrixlike(x) && !inherits(x, "dist")) {
-    x <- as.matrix(x)
-    if (!is.numeric(x))
-      stop("hdbscan expects numerical data")
-    xdist <- dist(x, method = "euclidean")
-  } else if (inherits(x, "dist")) {
-    ## this is for non-euclidean distances (note: this is slower for kNNdist)
-    xdist <- x
-  } else{
-    stop(
-      "hdbscan expects a matrix-coercible object of numerical data, and xdist to be a 'dist' object (or not supplied)."
-    )
-  }
+  if (!inherits(x, "dist") && !.matrixlike(x))
+    stop("hdbscan expects a numeric matrix or a dist object.")
 
-  core_dist <- kNNdist(x, k = minPts - 1)
 
-  ## At this point, xdist should be a dist object.
-  n <- attr(xdist, "Size")
+  ## 1. Calculate the mutual reachability between points
+  coredist <- coredist(x, minPts)
+  mrd <- mrdist(x, minPts, coredist = coredist)
+  n <- attr(mrd, "Size")
 
-  ## Mutual reachability matrix
-  mrd <- mrd(xdist, core_dist)
-
-  ## Get MST, convert to RSL representation
+  ## 2. Construct a minimum spanning tree and convert to RSL representation
   mst <- prims(mrd, n)
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
   hc$call <- match.call()
 
+  ## 3. Prune the tree
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
   res <- extractUnsupervised(res)
   cl <- attr(res, "cluster")
+
+  ## 4. Extract the clusters
   sl <- attr(res, "salient_clusters")
 
   ## Generate membership 'probabilities' using core distance as the measure of density
   prob <- rep(0, length(cl))
   for (cid in sl) {
     ccl <- res[[as.character(cid)]]
-    max_f <- max(core_dist[which(cl == cid)])
-    pr <- (max_f - core_dist[which(cl == cid)]) / max_f
+    max_f <- max(coredist[which(cl == cid)])
+    pr <- (max_f - coredist[which(cl == cid)]) / max_f
     prob[cl == cid] <- pr
   }
 
@@ -202,6 +193,7 @@ hdbscan <- function(x,
     list(
       cluster = cluster,
       minPts = minPts,
+      coredist = coredist,
       cluster_scores = cluster_scores,
       # (Cluster-wide cumulative) Stability Scores
       membership_prob = prob,
@@ -281,13 +273,14 @@ plot.hdbscan <-
       ifelse(scale == "suggest", nclusters, nclusters / as.numeric(scale))
 
     ## Color variables
-    col_breaks <- seq(0, length(x$cluster) + nclusters, by = nclusters)
+    col_breaks <-
+      seq(0, length(x$cluster) + nclusters, by = nclusters)
     gcolors <-
       grDevices::colorRampPalette(gradient)(length(col_breaks))
 
     ## Depth-first search to recursively plot rectangles
     eps_dfs <- function(dend, index, parent_height, scale) {
-      coord <- coords[index, ]
+      coord <- coords[index,]
       cl_key <- as.character(attr(dend, "label"))
 
       ## widths == number of points in the cluster at each eps it was alive
@@ -404,3 +397,36 @@ plot.hdbscan <-
       scale = scale)
     return(invisible(x))
   }
+
+#' @rdname hdbscan
+coredist <- function(x, minPts) {
+  k <- minPts - 1
+  kNN(x, k = k , sort = TRUE)$dist[, k]
+}
+
+#' @rdname hdbscan
+mrdist <- function(x, minPts, coredist = NULL) {
+  if (inherits(x, "dist")) {
+    if (attr(x, "Diag") || attr(x, "Upper"))
+      stop(
+        "if x is a dist object then it needs to be created with dist(..., diag = FALSE, upper = FALSE)"
+      )
+    x_dist <- x
+  } else{
+    x_dist <- dist(x,
+      method = "euclidean",
+      diag = FALSE,
+      upper = FALSE)
+  }
+
+  if (is.null(coredist))
+    coredist <- coredist(x, minPts)
+  mr_dist <- mrd(x_dist, coredist)
+
+  class(mr_dist) <- "dist"
+  attr(mr_dist, "Size") <- attr(x_dist, "Size")
+  attr(mr_dist, "Diag") <- FALSE
+  attr(mr_dist, "Upper") <- FALSE
+  attr(mr_dist, "method") <- "mutual reachability"
+  mr_dist
+}

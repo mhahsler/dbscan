@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FiITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License along
@@ -22,9 +22,12 @@
 #' Implementation of the OPTICS (Ordering points to identify the clustering
 #' structure) point ordering algorithm using a kd-tree.
 #'
-#' This implementation of OPTICS (Hahsler et al, 2019) implements the original
+#' **The algorithm**
+#'
+#' This implementation of OPTICS implements the original
 #' algorithm as described by Ankerst et al (1999). OPTICS is an ordering
-#' algorithm using similar concepts to DBSCAN. However, for OPTICS `eps`
+#' algorithm with methods to extract a clustering from the ordering.
+#' While using similar concepts as DBSCAN, for OPTICS `eps`
 #' is only an upper limit for the neighborhood size used to reduce
 #' computational complexity. Note that `minPts` in OPTICS has a different
 #' effect then in DBSCAN. It is used to define dense neighborhoods, but since
@@ -35,28 +38,42 @@
 #' OPTICS linearly orders the data points such that points which are spatially
 #' closest become neighbors in the ordering. The closest analog to this
 #' ordering is dendrogram in single-link hierarchical clustering. The algorithm
-#' also calculates the reachability distance for each point. `plot()`
-#' produces a reachability-plot which shows each points reachability distance
+#' also calculates the reachability distance for each point.
+#' `plot()` (see [reachability_plot])
+#' produces a reachability plot which shows each points reachability distance
+#' between two consecutive points
 #' where the points are sorted by OPTICS. Valleys represent clusters (the
 #' deeper the valley, the more dense the cluster) and high points indicate
 #' points between clusters.
 #'
-#' `extractDBSCAN` extracts a clustering from an OPTICS ordering that is
-#' similar to what DBSCAN would produce with an eps set to `eps_cl` (see
-#' Ankerst et al, 1999). The only difference to a DBSCAN clustering is that
-#' OPTICS is not able to assign some border points and reports them instead as
-#' noise.
+#' **Specifying the data**
 #'
-#' `extractXi` extract clusters hiearchically specified in Ankerst et al
-#' (1999) based on the steepness of the reachability plot. One interpretation
-#' of the `xi` parameter is that it classifies clusters by change in
-#' relative cluster density. The used algorithm was originally contributed by
-#' the ELKI framework and is explained in Schubert et al (2018), but contains a
-#' set of fixes.
-#'
-#' If `x` is specified as a data matrix, then Euclidean distances an fast
+#' If `x` is specified as a data matrix, then Euclidean distances and fast
 #' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
 #' details on the parameters for the kd-tree.
+#'
+#' **Extracting a clustering**
+#'
+#' Several methods to extract a clustering from the order returned by OPTICS are
+#' implemented:
+#'
+#' * `extractDBSCAN()` extracts a clustering from an OPTICS ordering that is
+#'   similar to what DBSCAN would produce with an eps set to `eps_cl` (see
+#'   Ankerst et al, 1999). The only difference to a DBSCAN clustering is that
+#'   OPTICS is not able to assign some border points and reports them instead as
+#'   noise.
+#'
+#' * `extractXi()` extract clusters hierarchically specified in Ankerst et al
+#'   (1999) based on the steepness of the reachability plot. One interpretation
+#'   of the `xi` parameter is that it classifies clusters by change in
+#'   relative cluster density. The used algorithm was originally contributed by
+#'   the ELKI framework and is explained in Schubert et al (2018), but contains a
+#'   set of fixes.
+#'
+#' **Predict cluster memberships**
+#'
+#' `predict()` requires an extracted DBSCAN clustering with `extractDBSCAN()` and then
+#' uses predict for `dbscan()`.
 #'
 #' @aliases optics OPTICS
 #' @family clustering functions
@@ -152,13 +169,13 @@
 #' hullplot(x, res)
 #'
 #' ### re-cut at a higher eps threshold
-#' res <- extractDBSCAN(res, eps_cl = .1)
+#' res <- extractDBSCAN(res, eps_cl = .07)
 #' res
 #' plot(res)
 #' hullplot(x, res)
 #'
 #' ### extract hierarchical clustering of varying density using the Xi method
-#' res <- extractXi(res, xi = 0.05)
+#' res <- extractXi(res, xi = 0.01)
 #' res
 #'
 #' plot(res)

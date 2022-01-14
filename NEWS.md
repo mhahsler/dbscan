@@ -1,3 +1,16 @@
+# dbscan 1.1-10 (2022-01-14)
+
+## New Features
+* is.corepoint() for DBSCAN.
+* coredist() and mrdist() for HDBSCAN.
+* find connected components with comps().
+
+# Changes
+* reachability plot now shows all undefined distances as a dashed line.
+
+## Bugfix
+* memory leak in mrd calculation fixed.
+
 # dbscan 1.1-9 (2022-01-10)
 
 ## Changes

@@ -30,16 +30,19 @@
 #'
 #' **The algorithm**
 #'
-#' This implementation of DBSCAN (Hahsler et al, 2019) follows the original
-#' algorithm as described by Ester et al (1996). DBSCAN estimates the density
-#' around each data point by counting the number of points in a user-specified
-#' eps-neighborhood and applies a used-specified minPts thresholds to identify
-#' core, border and noise points. In a second step, core points are joined into
-#' a cluster if they are density-reachable (i.e., there is a chain of core
-#' points where one falls inside the eps-neighborhood of the next). Finally,
-#' border points are assigned to clusters. The algorithm needs parameters
-#' `eps` (the radius of the epsilon neighborhood) and `minPts` (the
-#' density threshold).
+#' This implementation of DBSCAN follows the original
+#' algorithm as described by Ester et al (1996). DBSCAN performs the following steps:
+#'
+#' 1. Estimate the density
+#'   around each data point by counting the number of points in a user-specified
+#'   eps-neighborhood and applies a used-specified minPts thresholds to identify
+#'   core, border and noise points.
+#' 2. Core points are joined into
+#'   a cluster if they are density-reachable (i.e., there is a chain of core
+#'   points where one falls inside the eps-neighborhood of the next).
+#' 3. Border points are assigned to clusters. The algorithm needs parameters
+#'   `eps` (the radius of the epsilon neighborhood) and `minPts` (the
+#'   density threshold).
 #'
 #' Border points are arbitrarily assigned to clusters in the original
 #' algorithm. DBSCAN* (see Campello et al 2013) treats all border points as
@@ -82,8 +85,8 @@
 #' [predict()] can be used to predict cluster memberships for new data
 #' points. A point is considered a member of a cluster if it is within the eps
 #' neighborhood of a member of the cluster (Euclidean distance is used). Points
-#' which cannot be assigned to a cluster will be reported as members of the
-#' noise cluster 0.
+#' which cannot be assigned to a cluster will be reported as
+#' noise points (i.e., cluster ID 0).
 #'
 #' @aliases dbscan DBSCAN print.dbscan_fast
 #' @family clustering functions
@@ -103,11 +106,14 @@
 #' neighbor search algorithm. See [frNN()] for details on how to
 #' control the search strategy.
 #'
-#' @return An object of class `dbscan_fast` with the following components:
+#' @return `dbscan()` returns an object of class `dbscan_fast` with the following components:
 #'
 #' \item{eps }{ value of the `eps` parameter.}
 #' \item{minPts }{ value of the `minPts` parameter.}
 #' \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}
+#'
+#' `is.corepoint()` returns a logical vector indicating for each data point if it is a
+#'   core point.
 #'
 #' @author Michael Hahsler
 #' @references Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast
@@ -365,3 +371,7 @@ print.dbscan_fast <- function(x, ...) {
     paste(names(x), collapse = ", ")
   ), exdent = 18))
 }
+
+#' @rdname dbscan
+is.corepoint <- function(x, eps, minPts = 5, ...)
+  sapply(frNN(x, eps = 0.5, ...)$id, length) >= (minPts - 1)

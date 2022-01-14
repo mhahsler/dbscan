@@ -131,6 +131,7 @@ Approximate Nearest Neighbor Searching,
 \seealso{
 Other NN functions: 
 \code{\link{NN}},
+\code{\link{comps}()},
 \code{\link{frNN}()},
 \code{\link{kNNdist}()},
 \code{\link{sNN}()}

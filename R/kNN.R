@@ -158,7 +158,7 @@ kNN <-
     ### get kNN from a dist object
     if (inherits(x, "dist")) {
       if (!is.null(query))
-        stop("query can only be used if x contains the data.")
+        stop("query can only be used if x contains a data matrix.")
 
       if (any(is.na(x)))
         stop("distances cannot be NAs for kNN!")

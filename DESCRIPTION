@@ -1,21 +1,22 @@
 Package: dbscan
-Version: 1.1-9
-Date: 2022-01-10
-Title: Density Based Clustering of Applications with Noise (DBSCAN) and Related
-    Algorithms
+Version: 1.1-10
+Date: 2022-01-14
+Title: Density-Based Spatial Clustering of Applications with Noise (DBSCAN) 
+    and Related Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
                 email = "mhahsler@lyle.smu.edu"),
 	    person("Matthew", "Piekenbrock", role = c("aut", "cph")),
 	    person("Sunil", "Arya", role = c("ctb", "cph")),
 	    person("David", "Mount", role = c("ctb", "cph")))
 Description: A fast reimplementation of several density-based algorithms of
-    the DBSCAN family for spatial data. Includes the clustering algorithms 
-    DBSCAN (density-based spatial clustering of applications with noise)
-    and HDBSCAN (hierarchical DBSCAN), the ordering algorithm
-    OPTICS (ordering points to identify the clustering structure), 
-    and the outlier detection algorithm LOF (local outlier factor). 
-    The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search. 
-    An R interface to fast kNN and fixed-radius NN search is also provided. 
+    the DBSCAN family. Includes the clustering algorithms DBSCAN (density-based 
+    spatial clustering of applications with noise) and HDBSCAN (hierarchical 
+    DBSCAN), the ordering algorithm OPTICS (ordering points to identify the 
+    clustering structure), shared nearest neighbor clustering, and the outlier 
+    detection algorithms LOF (local outlier factor) and GLOSH (global-local 
+    outlier score from hierarchies). The implementations use the kd-tree data 
+    structure (from library ANN) for faster k-nearest neighbor search. An R 
+    interface to fast kNN and fixed-radius NN search is also provided. 
     Hahsler, Piekenbrock and Doran (2019) <doi:10.18637/jss.v091.i01>.
 SystemRequirements: C++11
 Imports:

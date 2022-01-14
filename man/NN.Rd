@@ -14,18 +14,24 @@ adjacencylist(x, ...)
 
 \method{sort}{NN}(x, decreasing = FALSE, ...)
 
-\method{plot}{NN}(x, data, main = NULL, ...)
+\method{plot}{NN}(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...)
 }
 \arguments{
 \item{x}{a \code{NN} object}
 
-\item{...}{further parameters}
+\item{...}{further parameters past on to \code{\link[=plot]{plot()}}.}
 
 \item{decreasing}{sort in decreasing order?}
 
 \item{data}{that was used to create \code{x}}
 
 \item{main}{title}
+
+\item{pch}{plotting character.}
+
+\item{col}{color used for the data points (nodes).}
+
+\item{linecol}{color used for edges.}
 }
 \description{
 NN is an abstract S3 superclass for the classes of the objects returned
@@ -65,6 +71,7 @@ plot(x, col = cl)
 }
 \seealso{
 Other NN functions: 
+\code{\link{comps}()},
 \code{\link{frNN}()},
 \code{\link{kNNdist}()},
 \code{\link{kNN}()},

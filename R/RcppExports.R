@@ -13,6 +13,14 @@ ANN_cleanup <- function() {
     invisible(.Call(`_dbscan_ANN_cleanup`))
 }
 
+comps_kNN <- function(nn, mutual) {
+    .Call(`_dbscan_comps_kNN`, nn, mutual)
+}
+
+comps_frNN <- function(nn, mutual) {
+    .Call(`_dbscan_comps_frNN`, nn, mutual)
+}
+
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
     .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
 }
@@ -39,6 +47,10 @@ kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
 
 lof_kNN <- function(data, minPts, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_lof_kNN`, data, minPts, type, bucketSize, splitRule, approx)
+}
+
+mrd <- function(dm, cd) {
+    .Call(`_dbscan_mrd`, dm, cd)
 }
 
 optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
@@ -99,14 +111,6 @@ dendrogram_to_reach <- function(x) {
 
 mst_to_dendrogram <- function(mst) {
     .Call(`_dbscan_mst_to_dendrogram`, mst)
-}
-
-mrd <- function(dm, cd) {
-    .Call(`_dbscan_mrd`, dm, cd)
-}
-
-mrd_m <- function(dm, cd) {
-    .Call(`_dbscan_mrd_m`, dm, cd)
 }
 
 coreFromDist <- function(dist, n, minPts) {

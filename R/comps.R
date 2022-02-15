@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' Find Connected Components in a NN Graph
+#' Find Connected Components in a Nearest-neighbor Graph
 #'
 #' Generic function and methods to find connected components in nearest neighbor graphs.
 #'

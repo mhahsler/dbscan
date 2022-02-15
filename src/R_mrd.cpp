@@ -9,7 +9,8 @@ using namespace Rcpp;
 //
 // Input:
 // * dm: distances as a dist object (vector) of size (n*(n-1))/2 where n
-//       is the number of points
+//       is the number of points.
+//       Note: we divide by 2 early to stay within the numb10er range of int.
 // * cd: the core distances as a vector of length n
 //
 // Returns:
@@ -17,7 +18,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector mrd(NumericVector dm, NumericVector cd) {
   int n = cd.length();
-  if (dm.length() != (n*(n-1))/2)
+  if (dm.length() != (n / 2 * (n-1)))
     stop("number of mutual reachability distance values and size of the distances do not agree.");
 
   NumericVector res = NumericVector(dm.length());

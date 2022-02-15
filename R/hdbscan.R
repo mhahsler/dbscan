@@ -141,7 +141,6 @@ hdbscan <- function(x,
   if (!inherits(x, "dist") && !.matrixlike(x))
     stop("hdbscan expects a numeric matrix or a dist object.")
 
-
   ## 1. Calculate the mutual reachability between points
   coredist <- coredist(x, minPts)
   mrd <- mrdist(x, minPts, coredist = coredist)

@@ -1,3 +1,8 @@
+# dbscan 1.1-10-1 (2022-xx-xx)
+
+## Bugfix
+* fixed overflow issue in the parameter check in mrdist.
+
 # dbscan 1.1-10 (2022-01-14)
 
 ## New Features

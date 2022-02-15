@@ -7,7 +7,7 @@
 \alias{comps.kNN}
 \alias{comps.sNN}
 \alias{comps.frNN}
-\title{Find Connected Components in a NN Graph}
+\title{Find Connected Components in a Nearest-neighbor Graph}
 \usage{
 comps(x, ...)
 

@@ -10,7 +10,13 @@
 \alias{predict.hdbscan}
 \title{Hierarchical DBSCAN (HDBSCAN)}
 \usage{
-hdbscan(x, minPts, gen_hdbscan_tree = FALSE, gen_simplified_tree = FALSE)
+hdbscan(
+  x,
+  minPts,
+  gen_hdbscan_tree = FALSE,
+  gen_simplified_tree = FALSE,
+  verbose = FALSE
+)
 
 \method{plot}{hdbscan}(
   x,

@@ -9,54 +9,6 @@ SNN_sim_int <- function(nn, jp) {
     .Call(`_dbscan_SNN_sim_int`, nn, jp)
 }
 
-ANN_cleanup <- function() {
-    invisible(.Call(`_dbscan_ANN_cleanup`))
-}
-
-comps_kNN <- function(nn, mutual) {
-    .Call(`_dbscan_comps_kNN`, nn, mutual)
-}
-
-comps_frNN <- function(nn, mutual) {
-    .Call(`_dbscan_comps_frNN`, nn, mutual)
-}
-
-dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
-    .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
-}
-
-dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, approx)
-}
-
-frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_frNN_int`, data, eps, type, bucketSize, splitRule, approx)
-}
-
-frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, approx)
-}
-
-kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, approx)
-}
-
-kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, approx)
-}
-
-lof_kNN <- function(data, minPts, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_lof_kNN`, data, minPts, type, bucketSize, splitRule, approx)
-}
-
-mrd <- function(dm, cd) {
-    .Call(`_dbscan_mrd`, dm, cd)
-}
-
-optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
-    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
-}
-
 distToAdjacency <- function(constraints, N) {
     .Call(`_dbscan_distToAdjacency`, constraints, N)
 }
@@ -101,6 +53,22 @@ extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstabl
     .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves)
 }
 
+ANN_cleanup <- function() {
+    invisible(.Call(`_dbscan_ANN_cleanup`))
+}
+
+comps_kNN <- function(nn, mutual) {
+    .Call(`_dbscan_comps_kNN`, nn, mutual)
+}
+
+comps_frNN <- function(nn, mutual) {
+    .Call(`_dbscan_comps_frNN`, nn, mutual)
+}
+
+dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
+    .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
+}
+
 reach_to_dendrogram <- function(reachability, pl_order) {
     .Call(`_dbscan_reach_to_dendrogram`, reachability, pl_order)
 }
@@ -111,6 +79,38 @@ dendrogram_to_reach <- function(x) {
 
 mst_to_dendrogram <- function(mst) {
     .Call(`_dbscan_mst_to_dendrogram`, mst)
+}
+
+dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, approx)
+}
+
+frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_frNN_int`, data, eps, type, bucketSize, splitRule, approx)
+}
+
+frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, approx)
+}
+
+kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, approx)
+}
+
+kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, approx)
+}
+
+lof_kNN <- function(data, minPts, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_lof_kNN`, data, minPts, type, bucketSize, splitRule, approx)
+}
+
+mrd <- function(dm, cd) {
+    .Call(`_dbscan_mrd`, dm, cd)
+}
+
+optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
+    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
 }
 
 coreFromDist <- function(dist, n, minPts) {

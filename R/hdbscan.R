@@ -70,6 +70,7 @@
 #' explicitly computed (see cluster tree in Chaudhuri et al, 2010).
 #' @param gen_simplified_tree logical; should the simplified hierarchy be
 #' explicitly computed (see Campello et al, 2013).
+#' @oaram verbose report progress.
 #' @param ...  additional arguments are passed on.
 #' @param scale integer; used to scale condensed tree based on the graphics
 #' device. Lower scale results in wider trees.
@@ -137,27 +138,39 @@
 hdbscan <- function(x,
   minPts,
   gen_hdbscan_tree = FALSE,
-  gen_simplified_tree = FALSE) {
+  gen_simplified_tree = FALSE,
+  verbose = FALSE) {
   if (!inherits(x, "dist") && !.matrixlike(x))
     stop("hdbscan expects a numeric matrix or a dist object.")
 
   ## 1. Calculate the mutual reachability between points
+  if (verbose)
+    cat("Calculating core distances...\n")
   coredist <- coredist(x, minPts)
-  mrd <- mrdist(x, minPts, coredist = coredist)
+  if (verbose)
+    cat("Calculating the mutual reachability matrix distances...\n")
+  mrd <- mrdist(x, minPts, coredist
+    = coredist)
   n <- attr(mrd, "Size")
 
   ## 2. Construct a minimum spanning tree and convert to RSL representation
+  if (verbose)
+    cat("Constructing the minimum spanning tree...\n")
   mst <- prims(mrd, n)
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
   hc$call <- match.call()
 
   ## 3. Prune the tree
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
+  if (verbose)
+    cat("Tree pruning...\n")
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
   res <- extractUnsupervised(res)
   cl <- attr(res, "cluster")
 
   ## 4. Extract the clusters
+  if (verbose)
+    cat("Extract clusters...\n")
   sl <- attr(res, "salient_clusters")
 
   ## Generate membership 'probabilities' using core distance as the measure of density

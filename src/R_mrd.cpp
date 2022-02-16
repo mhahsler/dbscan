@@ -17,13 +17,13 @@ using namespace Rcpp;
 // a vector (dist object) in the same order as dm
 // [[Rcpp::export]]
 NumericVector mrd(NumericVector dm, NumericVector cd) {
-  int n = cd.length();
+  R_xlen_t n = cd.length();
   if (dm.length() != (n / 2 * (n-1)))
     stop("number of mutual reachability distance values and size of the distances do not agree.");
 
   NumericVector res = NumericVector(dm.length());
-  for (int i = 0, idx = 0; i < n; ++i) {
-    for (int j = i+1; j < n; ++j, ++idx) {
+  for (R_xlen_t i = 0, idx = 0; i < n; ++i) {
+    for (R_xlen_t j = i+1; j < n; ++j, ++idx) {
       res[idx] = std::max(dm[idx], std::max(cd[i], cd[j]));
     }
   }

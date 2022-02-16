@@ -13,7 +13,7 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
-  int n = nn.nrow();
+  R_xlen_t n = nn.nrow();
 
   // create label vector
   std::vector<int> label(n);
@@ -27,7 +27,7 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
   std::vector< std::set<int> > nn_set(nn.nrow());
   IntegerVector r;
   std::vector<int> s;
-  for(int i = 0; i < n; ++i) {
+  for(R_xlen_t i = 0; i < n; ++i) {
     r = nn(i,_);
     s =  as<std::vector<int> >(r);
     nn_set[i].insert(s.begin(), s.end());
@@ -35,7 +35,8 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
 
   std::vector<int> z;
   std::set<int>::iterator it;
-  int i, j, newlabel, oldlabel;
+  R_xlen_t i, j;
+  int newlabel, oldlabel;
 
   for(i = 0; i < n; ++i) {
     // check all neighbors of i
@@ -84,8 +85,8 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
 // jp == false: just count the shared NNs
 // [[Rcpp::export]]
 IntegerMatrix SNN_sim_int(IntegerMatrix nn, LogicalVector jp) {
-  int n = nn.nrow();
-  int k = nn.ncol();
+  R_xlen_t n = nn.nrow();
+  R_xlen_t k = nn.ncol();
 
   IntegerMatrix snn(n, k);
 
@@ -93,7 +94,7 @@ IntegerMatrix SNN_sim_int(IntegerMatrix nn, LogicalVector jp) {
   std::vector< std::set<int> > nn_set(n);
   IntegerVector r;
   std::vector<int> s;
-  for(int i = 0; i < n; ++i) {
+  for(R_xlen_t i = 0; i < n; ++i) {
     r = nn(i,_);
     s =  as<std::vector<int> >(r);
     nn_set[i].insert(s.begin(), s.end());
@@ -102,9 +103,9 @@ IntegerMatrix SNN_sim_int(IntegerMatrix nn, LogicalVector jp) {
   std::vector<int> z;
   int j;
 
-  for(int i = 0; i < n; ++i) {
+  for(R_xlen_t i = 0; i < n; ++i) {
     // check all neighbors of i
-    for (int j_ind = 0; j_ind < k; ++j_ind) {
+    for (R_xlen_t j_ind = 0; j_ind < k; ++j_ind) {
       j = nn(i, j_ind)-1;
 
       bool i_in_j = (nn_set[j].find(i+1) != nn_set[j].end());

@@ -44,6 +44,8 @@ explicitly computed (see cluster tree in Chaudhuri et al, 2010).}
 \item{gen_simplified_tree}{logical; should the simplified hierarchy be
 explicitly computed (see Campello et al, 2013).}
 
+\item{verbose}{report progress.}
+
 \item{scale}{integer; used to scale condensed tree based on the graphics
 device. Lower scale results in wider trees.}
 

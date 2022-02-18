@@ -1,5 +1,8 @@
 # dbscan 1.1-10-1 (2022-xx-xx)
 
+## New Features
+* HDBSCAN now supports long vectors to work with large distance matrices. 
+
 ## Bugfix
 * fixed overflow issue in the parameter check in mrdist.
 

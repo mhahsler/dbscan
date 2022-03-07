@@ -6,6 +6,7 @@
 \alias{print.frnn}
 \alias{sort.frNN}
 \alias{adjacencylist.frNN}
+\alias{print.frNN}
 \title{Find the Fixed Radius Nearest Neighbors}
 \usage{
 frNN(
@@ -22,6 +23,8 @@ frNN(
 \method{sort}{frNN}(x, decreasing = FALSE, ...)
 
 \method{adjacencylist}{frNN}(x, ...)
+
+\method{print}{frNN}(x, ...)
 }
 \arguments{
 \item{x}{a data matrix, a dist object or a frNN object.}

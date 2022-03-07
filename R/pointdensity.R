@@ -84,7 +84,7 @@
 #' hc <- hclust(dist(x_nonoise), method = "single")
 #' plot(x, pch = 19, cex = .5)
 #' points(x_nonoise, pch = 19, col= cutree(hc, k = 4) + 1L)
-#' @export pointdensity
+#' @export
 pointdensity <- function(x,
   eps,
   type = "frequency",

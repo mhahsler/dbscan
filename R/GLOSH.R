@@ -93,7 +93,7 @@
 #'
 #' ## GLOSH is automatically computed with HDBSCAN
 #' all(hdbscan(x, minPts = 3)$outlier_scores == glosh(x, k = 3))
-#' @export glosh
+#' @export
 glosh <- function(x, k = 4, ...) {
   if (inherits(x, "data.frame"))
     x <- as.matrix(x)

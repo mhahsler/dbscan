@@ -134,7 +134,6 @@ frNN <-
       return(x)
     }
 
-
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
 
@@ -155,38 +154,7 @@ frNN <-
       if (any(is.na(x)))
         stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
-      x <- as.matrix(x)
-      diag(x) <- Inf           ### no self-matches
-
-      id <- lapply(
-        1:nrow(x),
-        FUN = function(i) {
-          y <- x[i,]
-          o <- order(y, decreasing = FALSE)
-          o[y[o] <= eps]
-
-        }
-      )
-      names(id) <- rownames(x)
-
-      d <- lapply(
-        1:nrow(x),
-        FUN = function(i) {
-          unname(x[i, id[[i]]])
-        }
-      )
-      names(d) <- rownames(x)
-
-      ret <-
-        structure(list(
-          dist = d,
-          id = id,
-          eps = eps,
-          sort = TRUE
-        ),
-          class = c("frNN", "NN"))
-
-      return(ret)
+      return(dist_to_frNN(x, eps = eps))
     }
 
     ## make sure x is numeric
@@ -248,7 +216,65 @@ frNN <-
     ret
   }
 
+# extract a row from a distance matrix without doubling space requirements
+dist_row <- function(x, i, self_val = 0) {
+  if (!inherits(x, "dist") ||
+      attr(x, "Diag") ||
+      attr(x, "Upper"))
+    stop("x needs to be a dist object with attributes Diag and Upper being FALSE.")
+  # check it is lower triangle, etc...
+  n <- attr(x, "Size")
+
+  i <- rep(i, times = n)
+  j <- seq_len(n)
+  swap_idx <- i > j
+  tmp <- i[swap_idx]
+  i[swap_idx] <- j[swap_idx]
+  j[swap_idx] <- tmp
+
+  diag_idx <- i == j
+  idx <- n*(i-1) - i*(i-1)/2 + j-i
+  idx[diag_idx] <- NA
+
+  val <- x[idx]
+  val[diag_idx] <- self_val
+  val
+}
+
+dist_to_frNN <- function(x, eps) {
+
+  n <- attr(x, "Size")
+
+  id <- list()
+  d <- list()
+
+  for (i in seq_len(n)) {
+    ### Inf -> no self-matches
+    y <- dist_row(x, i, self_val = Inf)
+    o <- order(y, decreasing = FALSE)
+    o <- o[y[o] <= eps]
+    id[[i]] <- o
+    d[[i]] <- y[o]
+  }
+  names(id) <- labels(x)
+  names(d) <- labels(x)
+
+  ret <-
+    structure(list(
+      dist = d,
+      id = id,
+      eps = eps,
+      sort = TRUE
+    ),
+      class = c("frNN", "NN"))
+
+  return(ret)
+}
+
+
+
 #' @rdname frNN
+#' @export
 sort.frNN <- function(x, decreasing = FALSE, ...) {
   if (!is.null(x$sort) && x$sort)
     return(x)
@@ -285,9 +311,12 @@ sort.frNN <- function(x, decreasing = FALSE, ...) {
 }
 
 #' @rdname frNN
+#' @export
 adjacencylist.frNN <- function(x, ...)
   x$id
 
+#' @rdname frNN
+#' @export
 print.frNN <- function(x, ...) {
   cat(
     "fixed radius nearest neighbors for ",

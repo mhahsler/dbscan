@@ -115,7 +115,7 @@
 #' d <- dist(x, method = "manhattan")
 #' nn <- kNN(d, k = 1)
 #' plot(nn, x)
-#' @export kNN
+#' @export
 kNN <-
   function(x,
     k,
@@ -163,32 +163,7 @@ kNN <-
       if (any(is.na(x)))
         stop("distances cannot be NAs for kNN!")
 
-      x <- as.matrix(x)
-      diag(x) <- NA
-
-      if (k >= nrow(x))
-        stop("Not enough neighbors in data set!")
-
-      o <- t(apply(x, 1, order, decreasing = FALSE))
-      id <- o[, 1:k, drop = FALSE]
-      dimnames(id) <- list(rownames(x), 1:k)
-      d <-
-        t(sapply(
-          1:nrow(id),
-          FUN = function(i)
-            x[i, id[i, ], drop = FALSE]
-        ))
-      if (k == 1)
-        d <- t(d) ### sapply drops an array with a single column!
-      dimnames(d) <- list(rownames(x), 1:k)
-
-      return(structure(list(
-        dist = d,
-        id = id,
-        k = k,
-        sort = TRUE
-      ),
-        class = c("kNN", "NN")))
+      return(dist_to_kNN(x, k = k))
     }
 
     ## make sure x is numeric
@@ -252,8 +227,37 @@ kNN <-
     ret
   }
 
+dist_to_kNN <- function(x, k) {
+  n <- attr(x, "Size")
+
+  id <- structure(integer(n * k), dim = c(n, k))
+  d <- matrix(NA_real_, nrow = n, ncol = k)
+
+  for (i in seq_len(n)) {
+    ### Inf -> no self-matches
+    y <- dist_row(x, i, self_val = Inf)
+    o <- order(y, decreasing = FALSE)
+    o <- o[seq_len(k)]
+    id[i, ] <- o
+    d[i, ] <- y[o]
+  }
+  dimnames(id) <- list(labels(x), seq_len(k))
+  dimnames(d) <- list(labels(x), seq_len(k))
+
+  ret <-
+    structure(list(
+      dist = d,
+      id = id,
+      k = k,
+      sort = TRUE
+    ),
+      class = c("kNN", "NN"))
+
+  return(ret)
+}
 
 #' @rdname kNN
+#' @export
 sort.kNN <- function(x, decreasing = FALSE, ...) {
   if (!is.null(x$sort) && x$sort)
     return(x)
@@ -269,11 +273,11 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
     1:nrow(x$dist),
     FUN =
       function(i)
-        order(x$dist[i, ], x$id[i, ], decreasing = decreasing)
+        order(x$dist[i,], x$id[i,], decreasing = decreasing)
   )
   for (i in 1:ncol(o)) {
-    x$dist[i, ] <- x$dist[i, ][o[, i]]
-    x$id[i, ] <- x$id[i, ][o[, i]]
+    x$dist[i,] <- x$dist[i,][o[, i]]
+    x$id[i,] <- x$id[i,][o[, i]]
   }
   x$sort <- TRUE
 
@@ -281,16 +285,19 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
 }
 
 #' @rdname kNN
+#' @export
 adjacencylist.kNN <- function(x, ...)
   lapply(
     seq(nrow(x$id)),
     FUN = function(i) {
       ## filter NAs
-      tmp <- x$id[i, ]
+      tmp <- x$id[i,]
       tmp[!is.na(tmp)]
     }
   )
 
+#' @rdname kNN
+#' @export
 print.kNN <- function(x, ...) {
   cat("k-nearest neighbors for ",
     nrow(x$id),

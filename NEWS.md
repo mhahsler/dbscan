@@ -1,7 +1,10 @@
 # dbscan 1.1-10-1 (2022-xx-xx)
 
 ## New Features
-* HDBSCAN now supports long vectors to work with large distance matrices. 
+* HDBSCAN now supports long vectors to work with larger distance matrices. 
+* conversion from dist to kNN and frNN is now more memory efficient. It does no longer 
+  coerce the dist object into a matrix of double the size, but extract the distances directly
+  from the dist object.
 
 ## Bugfix
 * fixed overflow issue in the parameter check in mrdist.

@@ -60,6 +60,8 @@
 #' a factor of `(1 + approx) eps` may be used. Some actual NN may be omitted
 #' leading to spurious clusters and noise points.  However, the algorithm will
 #' enjoy a significant speedup.
+#' @param decreasing logical; sort in decreasing order?
+#' @param ... additional parameters are passed on.
 #' @return An object of class `sNN` (subclass of [kNN] and [NN]) containing a list
 #' with the following components:
 #' \item{id }{a matrix with ids. }
@@ -98,7 +100,7 @@
 #'
 #' # get an adjacency list for the shared nearest neighbor graph
 #' adjacencylist(nn_3)
-#' @export sNN
+#' @export
 sNN <- function(x,
   k,
   kt = NULL,
@@ -156,7 +158,8 @@ sNN <- function(x,
   x
 }
 
-
+#' @rdname sNN
+#' @export
 sort.sNN <- function(x, decreasing = TRUE, ...) {
   if (!is.null(x$sort_shared) && x$sort_shared)
     return(x)
@@ -188,6 +191,8 @@ sort.sNN <- function(x, decreasing = TRUE, ...) {
   x
 }
 
+#' @rdname sNN
+#' @export
 print.sNN <- function(x, ...) {
   cat(
     "shared-nearest neighbors for ",

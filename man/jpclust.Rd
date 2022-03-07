@@ -70,7 +70,6 @@ cl <- jpclust(DS3_noiseless, k = 20, kt = 10)
 cl
 
 plot(DS3_noiseless, col = cl$cluster+1L, cex = .5)
-
 }
 \references{
 R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a

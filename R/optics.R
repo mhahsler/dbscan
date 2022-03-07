@@ -100,6 +100,7 @@
 #' @param ...  additional arguments are passed on to fixed-radius nearest
 #' neighbor search algorithm. See [frNN()] for details on how to
 #' control the search strategy.
+#' @param cluster,predecessor plot clusters and predecessors.
 #'
 #' @return An object of class `optics` with components:
 #' \item{eps }{ value of `eps` parameter. }
@@ -188,7 +189,7 @@
 #' d <- dist(x)
 #' res <- optics(d, minPts = 10)
 #' plot(res)
-#' @export optics
+#' @export
 optics <- function(x, eps = NULL, minPts = 5, ...) {
   ### find eps from minPts
   if (is.null(eps))
@@ -292,8 +293,8 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   ret
 }
 
-
-
+#' @rdname optics
+#' @export
 print.optics <- function(x, ...) {
   writeLines(c(
     paste0(
@@ -347,6 +348,8 @@ print.optics <- function(x, ...) {
   ), exdent = 18))
 }
 
+#' @rdname optics
+#' @export
 plot.optics <-
   function(x,
     cluster = TRUE,
@@ -409,12 +412,16 @@ plot.optics <-
   }
 
 # Simple conversion between OPTICS objects and reachability objects
+#' @rdname optics
+#' @export
 as.reachability.optics <- function(object, ...) {
   structure(list(reachdist = object$reachdist, order = object$order),
     class = "reachability")
 }
 
 # Conversion between OPTICS objects and dendrograms
+#' @rdname optics
+#' @export
 as.dendrogram.optics <- function(object, ...) {
   if (object$minPts > length(object$order)) {
     stop("'minPts' should be less or equal to the points in the dataset.")
@@ -427,6 +434,7 @@ as.dendrogram.optics <- function(object, ...) {
 }
 
 #' @rdname optics
+#' @export
 extractDBSCAN <- function(object, eps_cl) {
   if (!"optics" %in% class(object))
     stop("extractDBSCAN only accepts objects resulting from dbscan::optics!")
@@ -461,6 +469,7 @@ extractDBSCAN <- function(object, eps_cl) {
 
 
 #' @rdname optics
+#' @export
 extractXi <-
   function(object,
     xi,

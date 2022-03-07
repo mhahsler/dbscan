@@ -22,6 +22,7 @@
 #' @param data the data set used to create the clustering object.
 #' @param newdata new data points for which the cluster membership should be
 #' predicted.
+#' @export
 predict.dbscan_fast <- function (object, newdata, data, ...)
   .predict_frNN(newdata, data, object$cluster, object$eps, ...)
 
@@ -30,6 +31,7 @@ predict.dbscan_fast <- function (object, newdata, data, ...)
 #' @param data the data set used to create the clustering object.
 #' @param newdata new data points for which the cluster membership should be
 #' predicted.
+#' @export
 predict.optics <- function (object, newdata, data, ...) {
   if (is.null(object$cluster) ||
       is.null(object$eps_cl) || is.na(object$eps_cl))
@@ -42,6 +44,7 @@ predict.optics <- function (object, newdata, data, ...) {
 #' @param data the data set used to create the clustering object.
 #' @param newdata new data points for which the cluster membership should be
 #' predicted.
+#' @export
 predict.hdbscan <- function(object, newdata, data, ...) {
   clusters <- object$cluster
 

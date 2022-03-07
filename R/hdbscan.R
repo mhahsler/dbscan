@@ -134,7 +134,7 @@
 #'
 #' ## Plot the actual clusters (noise has cluster id 0 and is shown in black)
 #' plot(DS3, col = res$cluster + 1L, cex = .5)
-#' @export hdbscan
+#' @export
 hdbscan <- function(x,
   minPts,
   gen_hdbscan_tree = FALSE,
@@ -228,6 +228,8 @@ hdbscan <- function(x,
   return(out)
 }
 
+#' @rdname hdbscan
+#' @export
 print.hdbscan <- function(x, ...) {
   cl <- unique(x$cluster)
   cl <- length(cl[cl != 0L])
@@ -251,6 +253,7 @@ print.hdbscan <- function(x, ...) {
 }
 
 #' @rdname hdbscan
+#' @export
 plot.hdbscan <-
   function(x,
     scale = "suggest",
@@ -411,12 +414,14 @@ plot.hdbscan <-
   }
 
 #' @rdname hdbscan
+#' @export
 coredist <- function(x, minPts) {
   k <- minPts - 1
   kNN(x, k = k , sort = TRUE)$dist[, k]
 }
 
 #' @rdname hdbscan
+#' @export
 mrdist <- function(x, minPts, coredist = NULL) {
   if (inherits(x, "dist")) {
     if (attr(x, "Diag") || attr(x, "Upper"))

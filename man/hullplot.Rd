@@ -83,7 +83,6 @@ hullplot(x, km, main = "k-means")
 
 hc <- cutree(hclust(dist(x)), k = 4)
 hullplot(x, hc, main = "Hierarchical Clustering")
-
 }
 \author{
 Michael Hahsler

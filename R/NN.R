@@ -69,21 +69,25 @@
 NULL
 
 #' @rdname NN
+#' @export
 adjacencylist <- function (x, ...)
   UseMethod("adjacencylist", x)
 
 #' @rdname NN
+#' @export
 adjacencylist.NN <- function (x, ...) {
   stop("needs to be implemented by a subclass")
   }
 
 #' @rdname NN
+#' @export
 sort.NN <- function(x, decreasing = FALSE, ...) {
   stop("needs to be implemented by a subclass")
   }
 
 
 #' @rdname NN
+#' @export
 plot.NN <- function(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...) {
   if (is.null(main)) {
     if (inherits(x, "frNN"))

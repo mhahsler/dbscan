@@ -3,12 +3,24 @@
 \name{optics}
 \alias{optics}
 \alias{OPTICS}
+\alias{print.optics}
+\alias{plot.optics}
+\alias{as.reachability.optics}
+\alias{as.dendrogram.optics}
 \alias{extractDBSCAN}
 \alias{extractXi}
 \alias{predict.optics}
 \title{Ordering Points to Identify the Clustering Structure (OPTICS)}
 \usage{
 optics(x, eps = NULL, minPts = 5, ...)
+
+\method{print}{optics}(x, ...)
+
+\method{plot}{optics}(x, cluster = TRUE, predecessor = FALSE, ...)
+
+\method{as.reachability}{optics}(object, ...)
+
+\method{as.dendrogram}{optics}(object, ...)
 
 extractDBSCAN(object, eps_cl)
 
@@ -33,6 +45,8 @@ is 5 points.}
 \item{...}{additional arguments are passed on to fixed-radius nearest
 neighbor search algorithm. See \code{\link[=frNN]{frNN()}} for details on how to
 control the search strategy.}
+
+\item{cluster, predecessor}{plot clusters and predecessors.}
 
 \item{object}{clustering object.}
 

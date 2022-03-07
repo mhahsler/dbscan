@@ -182,7 +182,7 @@
 #'                 ifelse(dist_moons > 1, -1L, 0L)))
 #'
 #' cl_con2$cluster # same as the second example
-#' @export extractFOSC
+#' @export
 extractFOSC <-
   function(x,
     constraints,

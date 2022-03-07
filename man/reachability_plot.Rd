@@ -8,6 +8,8 @@
 \alias{as.reachability.dendrogram}
 \title{Reachability Plots}
 \usage{
+\method{print}{reachability}(x, ...)
+
 \method{plot}{reachability}(
   x,
   order_labels = FALSE,
@@ -22,6 +24,9 @@
 \arguments{
 \item{x}{object of class \code{reachability}.}
 
+\item{...}{graphical parameters are passed on to \code{plot()},
+or arguments for other methods.}
+
 \item{order_labels}{whether to plot text labels for each points reachability
 distance.}
 
@@ -30,9 +35,6 @@ distance.}
 \item{ylab}{y-axis label.}
 
 \item{main}{Title of the plot.}
-
-\item{...}{graphical parameters are passed on to \code{plot()},
-or arguments for other methods.}
 
 \item{object}{any object that can be coerced to class
 \code{reachability}, such as an object of class \link{optics} or \link[stats:dendrogram]{stats::dendrogram}.}

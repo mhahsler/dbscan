@@ -13,6 +13,8 @@
 
 \method{as.dendrogram}{hdbscan}(object, ...)
 
+as.reachability(object, ...)
+
 \method{as.dendrogram}{reachability}(object, ...)
 }
 \arguments{

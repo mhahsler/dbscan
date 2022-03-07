@@ -11,7 +11,11 @@
 #' @docType package
 #' @name dbscan-package
 #'
-#' @importFrom graphics plot text title
-#' @importFrom stats reorder as.dist hclust runif rnorm dist order.dendrogram prcomp
+#' @import Rcpp
+#' @importFrom graphics plot points lines text abline polygon par segments
+#' @importFrom grDevices palette chull adjustcolor
+#' @importFrom stats dist hclust dendrapply as.dendrogram is.leaf prcomp
+#' @importFrom utils tail
+#'
 #' @useDynLib dbscan, .registration=TRUE
 NULL

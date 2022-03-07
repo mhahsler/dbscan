@@ -66,9 +66,9 @@ plot(sort(lof), type = "l",  main = "LOF (minPts = 3)",
   xlab = "Points sorted by LOF", ylab = "LOF")
 
 ### point size is proportional to LOF and mark points with a LOF > 2
-plot(x, pch = ".", main = "LOF (minPts = 3)", asp =1)
-points(x, cex = (lof-1)*2, pch = 1, col = "red")
-text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 3)
+plot(x, pch = ".", main = "LOF (minPts = 3)", asp = 1)
+points(x, cex = (lof - 1) * 2, pch = 1, col = "red")
+text(x[lof > 2,], labels = round(lof, 1)[lof > 2], pos = 3)
 }
 \references{
 Breunig, M., Kriegel, H., Ng, R., and Sander, J. (2000). LOF:

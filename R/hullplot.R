@@ -77,8 +77,7 @@
 #'
 #' hc <- cutree(hclust(dist(x)), k = 4)
 #' hullplot(x, hc, main = "Hierarchical Clustering")
-#'
-#' @export hullplot
+#' @export
 hullplot <- function(x,
   cl,
   col = NULL,

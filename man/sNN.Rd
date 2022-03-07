@@ -3,6 +3,8 @@
 \name{sNN}
 \alias{sNN}
 \alias{snn}
+\alias{sort.sNN}
+\alias{print.sNN}
 \title{Find Shared Nearest Neighbors}
 \usage{
 sNN(
@@ -16,6 +18,10 @@ sNN(
   splitRule = "suggest",
   approx = 0
 )
+
+\method{sort}{sNN}(x, decreasing = TRUE, ...)
+
+\method{print}{sNN}(x, ...)
 }
 \arguments{
 \item{x}{a data matrix, a \link{dist} object or a \link{kNN} object.}
@@ -49,6 +55,10 @@ ANNs best guess.}
 a factor of \verb{(1 + approx) eps} may be used. Some actual NN may be omitted
 leading to spurious clusters and noise points.  However, the algorithm will
 enjoy a significant speedup.}
+
+\item{decreasing}{logical; sort in decreasing order?}
+
+\item{...}{additional parameters are passed on.}
 }
 \value{
 An object of class \code{sNN} (subclass of \link{kNN} and \link{NN}) containing a list

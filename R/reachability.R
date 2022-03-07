@@ -130,6 +130,8 @@
 #' plot(as.reachability(dend))
 NULL
 
+#' @rdname reachability_plot
+#' @export
 print.reachability <- function(x, ...) {
   avg_reach <- mean(x$reachdist[which(x$reachdist != Inf)], na.rm = T)
   cat(
@@ -145,6 +147,7 @@ print.reachability <- function(x, ...) {
 }
 
 #' @rdname reachability_plot
+#' @export
 plot.reachability <- function(x,
   order_labels = FALSE,
   xlab = "Order",
@@ -254,6 +257,7 @@ plot.reachability <- function(x,
 }
 
 #' @rdname reachability_plot
+#' @export
 as.reachability.dendrogram <- function(object, ...) {
   if (!inherits(object, "dendrogram"))
     stop("The as.reachability method requires a dendrogram object.")

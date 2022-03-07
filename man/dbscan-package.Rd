@@ -20,12 +20,12 @@ Hahsler, Piekenbrock and Doran (2019) \url{doi:10.18637/jss.v091.i01}.
 \section{Key functions}{
 
 \itemize{
-\item Clustering: \code{\link[=dbscan]{dbscan()}}, \code{\link[=hdbscan]{hdbscan()}}, \code{\link[=optics]{optics()}}, \code{\link[=JPclust]{JPclust()}}, \code{\link[=sNNclust]{sNNclust()}}
+\item Clustering: \code{\link[=dbscan]{dbscan()}}, \code{\link[=hdbscan]{hdbscan()}}, \code{\link[=optics]{optics()}}, \code{\link[=jpclust]{jpclust()}}, \code{\link[=sNNclust]{sNNclust()}}
 \item Outliers: \code{\link[=lof]{lof()}}, \code{\link[=glosh]{glosh()}}, \code{\link[=pointdensity]{pointdensity()}}
 \item Nearest Neighbors: \code{\link[=kNN]{kNN()}}, \code{\link[=frNN]{frNN()}}, \code{\link[=sNN]{sNN()}}
 }
 }
 
 \author{
-Michael Hahsler
+Michael Hahsler and Matthew Piekenbrock
 }

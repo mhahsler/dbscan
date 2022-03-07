@@ -82,10 +82,10 @@
 #'   xlab = "Points sorted by LOF", ylab = "LOF")
 #'
 #' ### point size is proportional to LOF and mark points with a LOF > 2
-#' plot(x, pch = ".", main = "LOF (minPts = 3)", asp =1)
-#' points(x, cex = (lof-1)*2, pch = 1, col = "red")
-#' text(x[lof>2,], labels = round(lof, 1)[lof>2], pos = 3)
-#' @export lof
+#' plot(x, pch = ".", main = "LOF (minPts = 3)", asp = 1)
+#' points(x, cex = (lof - 1) * 2, pch = 1, col = "red")
+#' text(x[lof > 2,], labels = round(lof, 1)[lof > 2], pos = 3)
+#' @export
 lof <- function(x, minPts = 5, ...) {
   ### parse extra parameters
   extra <- list(...)

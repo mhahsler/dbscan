@@ -5,6 +5,7 @@
 \alias{knn}
 \alias{sort.kNN}
 \alias{adjacencylist.kNN}
+\alias{print.kNN}
 \title{Find the k Nearest Neighbors}
 \usage{
 kNN(
@@ -21,6 +22,8 @@ kNN(
 \method{sort}{kNN}(x, decreasing = FALSE, ...)
 
 \method{adjacencylist}{kNN}(x, ...)
+
+\method{print}{kNN}(x, ...)
 }
 \arguments{
 \item{x}{a data matrix, a \link{dist} object or a \link{kNN} object.}

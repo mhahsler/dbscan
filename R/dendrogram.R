@@ -34,12 +34,14 @@
 NULL
 
 #' @rdname dendrogram
-as.dendrogram.hclust <- function(object, ...){
+#' @export
+as.dendrogram.hclust <- function(object, ...) {
   return(buildDendrogram(object))
 }
 
 #' @rdname dendrogram
-as.dendrogram.hdbscan <- function(object, ...){
+#' @export
+as.dendrogram.hdbscan <- function(object, ...) {
   return(buildDendrogram(object$hc))
 }
 
@@ -48,15 +50,19 @@ as.dendrogram.hdbscan <- function(object, ...){
 #' @aliases as.reachability
 NULL
 
+#' @rdname dendrogram
+#' @export
 as.reachability <-
   function(object, ...)
     UseMethod("as.reachability")
 
 #' @rdname dendrogram
+#' @export
 as.dendrogram.reachability <- function(object, ...) {
-  if(length(which(object$reachdist == Inf)) > 1) stop("Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain
-                                                      enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value
-                                                      (such as Inf) may be needed in the parameterization.")
+  if (length(which(object$reachdist == Inf)) > 1)
+    stop(
+      "Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value (such as Inf) may be needed in the parameterization."
+    )
   #dup_x <- object
   c_order <- order(object$reachdist) - 1
   # dup_x$order <- dup_x$order - 1
@@ -92,7 +98,7 @@ as.dendrogram.reachability <- function(object, ...) {
         depth <- depth + 1L
         if (verbose)
           cat(sprintf(" depth(+)=%4d, k=%d\n", depth,
-                      k))
+            k))
         kk[depth] <- k
         if (storage.mode(jj) != storage.mode(kk))
           storage.mode(jj) <- storage.mode(kk)
@@ -110,12 +116,12 @@ as.dendrogram.reachability <- function(object, ...) {
         depth <- depth - 1L
         if (verbose)
           cat(sprintf(" depth(-)=%4d, k=%d\n", depth,
-                      k))
+            k))
         midS <- sum(vapply(r, .midDend, 0))
         if (!quiet && type == "hclust" && k != 2)
           warning("midcache() of non-binary dendrograms only partly implemented")
         attr(r, "midpoint") <- (.memberDend(r[[1L]]) +
-                                  midS)/2
+            midS) / 2
         d <- r
       }
       if (!depth)
@@ -129,7 +135,10 @@ as.dendrogram.reachability <- function(object, ...) {
 }
 
 .midDend <- function (x)
-  if (is.null(mp <- attr(x, "midpoint"))) 0 else mp
+  if (is.null(mp <- attr(x, "midpoint")))
+    0
+else
+  mp
 
 .memberDend <- function (x)
 {

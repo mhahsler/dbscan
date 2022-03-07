@@ -62,7 +62,7 @@
 #' cl <- dbscan(iris, eps = .7, minPts = 5)
 #' pairs(iris, col = cl$cluster + 1L)
 #' ## Note: black points are noise points
-#' @export kNNdist
+#' @export
 kNNdist <- function(x, k, all = FALSE, ...) {
   kNNd <- dbscan::kNN(x, k, sort = TRUE, ...)$dist
   if (!all)
@@ -71,6 +71,7 @@ kNNdist <- function(x, k, all = FALSE, ...) {
 }
 
 #' @rdname kNNdist
+#' @export
 kNNdistplot <- function(x, k, ...) {
   kNNdist <- sort(kNNdist(x, k , ...))
   plot(

@@ -217,7 +217,7 @@
 #' nn
 #' dbscan(nn, minPts = 2)
 #'
-#' @export dbscan
+#' @export
 dbscan <-
   function(x,
     eps,
@@ -373,5 +373,6 @@ print.dbscan_fast <- function(x, ...) {
 }
 
 #' @rdname dbscan
+#' @export
 is.corepoint <- function(x, eps, minPts = 5, ...)
   sapply(frNN(x, eps = 0.5, ...)$id, length) >= (minPts - 1)

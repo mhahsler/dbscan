@@ -84,8 +84,7 @@
 #' cl
 #'
 #' plot(DS3_noiseless, col = cl$cluster+1L, cex = .5)
-#'
-#' @export jpclust
+#' @export
 jpclust <- function(x, k, kt, ...) {
   # Create NN graph
   if (inherits(x, "kNN")) {

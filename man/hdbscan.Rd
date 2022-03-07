@@ -18,6 +18,8 @@ hdbscan(
   verbose = FALSE
 )
 
+\method{print}{hdbscan}(x, ...)
+
 \method{plot}{hdbscan}(
   x,
   scale = "suggest",
@@ -46,6 +48,8 @@ explicitly computed (see Campello et al, 2013).}
 
 \item{verbose}{report progress.}
 
+\item{...}{additional arguments are passed on.}
+
 \item{scale}{integer; used to scale condensed tree based on the graphics
 device. Lower scale results in wider trees.}
 
@@ -54,8 +58,6 @@ coloring with.}
 
 \item{show_flat}{logical; whether to draw boxes indicating the most stable
 clusters.}
-
-\item{...}{additional arguments are passed on.}
 
 \item{coredist}{numeric vector with precomputed core distances (optional).}
 

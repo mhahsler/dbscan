@@ -154,7 +154,7 @@ frNN <-
       if (any(is.na(x)))
         stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
-      return(dist_to_frNN(x, eps = eps))
+      return(dist_to_frNN(x, eps = eps, sort = sort))
     }
 
     ## make sure x is numeric
@@ -218,11 +218,6 @@ frNN <-
 
 # extract a row from a distance matrix without doubling space requirements
 dist_row <- function(x, i, self_val = 0) {
-  if (!inherits(x, "dist") ||
-      attr(x, "Diag") ||
-      attr(x, "Upper"))
-    stop("x needs to be a dist object with attributes Diag and Upper being FALSE.")
-  # check it is lower triangle, etc...
   n <- attr(x, "Size")
 
   i <- rep(i, times = n)
@@ -233,7 +228,7 @@ dist_row <- function(x, i, self_val = 0) {
   j[swap_idx] <- tmp
 
   diag_idx <- i == j
-  idx <- n*(i-1) - i*(i-1)/2 + j-i
+  idx <- n * (i - 1) - i * (i - 1) / 2 + j - i
   idx[diag_idx] <- NA
 
   val <- x[idx]
@@ -241,7 +236,11 @@ dist_row <- function(x, i, self_val = 0) {
   val
 }
 
-dist_to_frNN <- function(x, eps) {
+dist_to_frNN <- function(x, eps, sort = FALSE) {
+  if (!inherits(x, "dist") ||
+      attr(x, "Diag") ||
+      attr(x, "Upper"))
+    stop("x needs to be a dist object with attributes Diag and Upper being FALSE.")
 
   n <- attr(x, "Size")
 
@@ -251,8 +250,7 @@ dist_to_frNN <- function(x, eps) {
   for (i in seq_len(n)) {
     ### Inf -> no self-matches
     y <- dist_row(x, i, self_val = Inf)
-    o <- order(y, decreasing = FALSE)
-    o <- o[y[o] <= eps]
+    o <- which(y <= eps)
     id[[i]] <- o
     d[[i]] <- y[o]
   }
@@ -264,14 +262,15 @@ dist_to_frNN <- function(x, eps) {
       dist = d,
       id = id,
       eps = eps,
-      sort = TRUE
+      sort = FALSE
     ),
       class = c("frNN", "NN"))
 
+  if (sort)
+    ret <- sort.frNN(ret)
+
   return(ret)
 }
-
-
 
 #' @rdname frNN
 #' @export

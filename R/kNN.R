@@ -228,6 +228,11 @@ kNN <-
   }
 
 dist_to_kNN <- function(x, k) {
+  if (!inherits(x, "dist") ||
+      attr(x, "Diag") ||
+      attr(x, "Upper"))
+    stop("x needs to be a dist object with attributes Diag and Upper being FALSE.")
+
   n <- attr(x, "Size")
 
   id <- structure(integer(n * k), dim = c(n, k))

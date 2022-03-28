@@ -18,7 +18,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector mrd(NumericVector dm, NumericVector cd) {
   R_xlen_t n = cd.length();
-  if (dm.length() != (n / 2 * (n-1)))
+  if (dm.length() != (n * (n-1) / 2))
     stop("number of mutual reachability distance values and size of the distance matrix do not agree.");
 
   NumericVector res = NumericVector(dm.length());

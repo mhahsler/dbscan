@@ -61,3 +61,8 @@ expect_equal(hc_dend, res$hdbscan_tree)
 dist_moons <- dist(moons, method = "canberra")
 res <- dbscan::hdbscan(dist_moons, minPts = 5)
 expect_s3_class(res, "hdbscan")
+
+
+## test mrdist()
+mrdist(cbind(1:10), 2)
+mrdist(cbind(1:11), 2)

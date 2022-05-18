@@ -6,6 +6,7 @@ proj$
 ^.*\.o$
 ^.*\.Rproj$
 ^LICENSE
+README.Rmd
 Work
 jss
 ignore

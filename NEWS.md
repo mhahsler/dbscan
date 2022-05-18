@@ -6,9 +6,6 @@
   coerce the dist object into a matrix of double the size, but extract the distances directly
   from the dist object.
 
-## Bugfix
-* fixed overflow issue in the parameter check in mrdist.
-
 # dbscan 1.1-10 (2022-01-14)
 
 ## New Features

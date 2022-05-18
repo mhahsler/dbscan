@@ -64,5 +64,9 @@ expect_s3_class(res, "hdbscan")
 
 
 ## test mrdist()
+context("mrdist()")
 mrdist(cbind(1:10), 2)
 mrdist(cbind(1:11), 2)
+mrdist(dist(cbind(1:10)), 2)
+mrdist(dist(cbind(1:11)), 2)
+

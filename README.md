@@ -54,9 +54,8 @@ scikit-learn](https://scikit-learn.org/).
 install.packages("dbscan")
 ```
 
-**Current development version:** Download package from
-[AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts)
-or install from GitHub (needs devtools).
+**Current development version:** Install from GitHub (needs devtools and
+a installed R development environment).
 
 ``` r
 devtools::install_github("mhahsler/dbscan")
@@ -73,7 +72,7 @@ data("iris")
 x <- as.matrix(iris[, 1:4])
 ```
 
-Run DBSCAN
+DBSCAN
 
 ``` r
 db <- dbscan(x, eps = 0.4, minPts = 4)
@@ -89,15 +88,15 @@ db
     ## 
     ## Available fields: cluster, eps, minPts
 
-Visualize results (noise is shown in black)
+Visualize the resulting clustering (noise points are shown in black).
 
 ``` r
 pairs(x, col = db$cluster + 1L)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](inst/README_files/dbscan-1.png)<!-- -->
 
-Run OPTICS
+OPTICS
 
 ``` r
 opt <- optics(x, eps = 1, minPts = 4)
@@ -117,9 +116,9 @@ opt <- extractDBSCAN(opt, eps_cl = 0.4)
 plot(opt)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](inst/README_files/OPTICS_extractDBSCAN-1.png)<!-- -->
 
-Run HDBSCAN (captures stable clusters)
+HDBSCAN
 
 ``` r
 hdb <- hdbscan(x, minPts = 4)
@@ -136,13 +135,14 @@ hdb
     ## Available fields: cluster, minPts, coredist, cluster_scores,
     ##                   membership_prob, outlier_scores, hc
 
-Visualize the results as a simplified tree
+Visualize the hierarchical clustering as a simplified tree. HDBSCAN
+finds 2 stable clusters.
 
 ``` r
-plot(hdb, show_flat = T)
+plot(hdb, show_flat = TRUE)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](inst/README_files/hdbscan-1.png)<!-- -->
 
 ## License
 

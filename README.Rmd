@@ -3,6 +3,11 @@ title: "R package dbscan - Density Based Clustering of Applications with Noise (
 output: github_document
 ---
 
+```{r echo=FALSE}
+options(digits = 2)
+knitr::opts_chunk$set(tidy = TRUE, message = FALSE, fig.path = 'inst/README_files/')
+```
+
 [![CRAN version](https://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
 [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
 [![R build status](https://github.com/mhahsler/dbscan/workflows/R-CMD-check/badge.svg)](https://github.com/mhahsler/dbscan/actions)
@@ -39,17 +44,12 @@ __Stable CRAN version:__ install from within R with
 ```{r eval=FALSE}
 install.packages("dbscan")
 ```
-__Current development version:__ Download package from [AppVeyor](https://ci.appveyor.com/project/mhahsler/dbscan/build/artifacts) or install from GitHub (needs devtools).
+__Current development version:__ Install from GitHub (needs devtools and a installed R development environment).
 ```{r eval=FALSE}
 devtools::install_github("mhahsler/dbscan")
 ```
 
 ## Usage
-
-```{r echo=FALSE}
-options(digits = 2)
-knitr::opts_chunk$set(tidy = TRUE, message = FALSE)
-```
 
 Load the package and use the numeric variables in the iris dataset
 ```{r}
@@ -59,19 +59,19 @@ data("iris")
 x <- as.matrix(iris[, 1:4])
 ```
 
-Run DBSCAN
+DBSCAN
 ```{r}
 db <- dbscan(x, eps = .4, minPts = 4)
 db
 ```
 
-Visualize results (noise is shown in black)
-```{r}
+Visualize the resulting clustering (noise points are shown in black).
+```{r dbscan}
 pairs(x, col = db$cluster + 1L)
 ```
 
 
-Run OPTICS
+OPTICS
 ```{r}
 opt <- optics(x, eps = 1, minPts = 4)
 opt
@@ -79,21 +79,24 @@ opt
 
 Extract DBSCAN-like clustering from OPTICS 
 and create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
-```{r}
+```{r OPTICS_extractDBSCAN, fig.height=3}
 opt <- extractDBSCAN(opt, eps_cl = .4)
 plot(opt)
 ```
 
-Run HDBSCAN (captures stable clusters)
+HDBSCAN
+
 ```{r}
 hdb <- hdbscan(x, minPts = 4)
 hdb
 ```
 
-Visualize the results as a simplified tree 
-```{r}
-plot(hdb, show_flat = T)
+Visualize the hierarchical clustering as a simplified tree. HDBSCAN finds 2 stable clusters.
+
+```{r hdbscan, fig.height=4}
+plot(hdb, show_flat = TRUE)
 ```
+
 
 ## License 
 The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  

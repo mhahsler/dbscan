@@ -3,13 +3,11 @@ R package dbscan - Density Based Clustering of Applications with Noise
 ================
 
 [![CRAN
-version](https://www.r-pkg.org/badges/version/dbscan)](https://cran.r-project.org/package=dbscan)
+version](http://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
+[![stream r-universe
+status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/ui#package:dbscan)
 [![CRAN RStudio mirror
-downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://cran.r-project.org/package=dbscan)
-[![R build
-status](https://github.com/mhahsler/dbscan/workflows/R-CMD-check/badge.svg)](https://github.com/mhahsler/dbscan/actions)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/mhahsler/dbscan?branch=master&svg=true)](https://ci.appveyor.com/project/mhahsler/dbscan)
+downloads](http://cranlogs.r-pkg.org/badges/grand-total/dbscan)](https://CRAN.R-project.org/package=dbscan)
 
 This R package provides a fast C++ (re)implementation of several
 density-based algorithms with a focus on the DBSCAN family for
@@ -54,12 +52,8 @@ scikit-learn](https://scikit-learn.org/).
 install.packages("dbscan")
 ```
 
-**Current development version:** Install from GitHub (needs devtools and
-a installed R development environment).
-
-``` r
-devtools::install_github("mhahsler/dbscan")
-```
+**Current development version:** Install from
+[r-universe.](https://mhahsler.r-universe.dev/ui#package:dbscan)
 
 ## Usage
 

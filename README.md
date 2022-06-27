@@ -1,13 +1,12 @@
-R package dbscan - Density Based Clustering of Applications with Noise
-(DBSCAN) and Related Algorithms
-================
+
+# R package stream - Infrastructure for Data Stream Mining
 
 [![CRAN
-version](http://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
+version](http://www.r-pkg.org/badges/version/stream)](https://CRAN.R-project.org/package=stream)
 [![stream r-universe
-status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/ui#package:dbscan)
+status](https://mhahsler.r-universe.dev/badges/stream)](https://mhahsler.r-universe.dev/ui#package:stream)
 [![CRAN RStudio mirror
-downloads](http://cranlogs.r-pkg.org/badges/grand-total/dbscan)](https://CRAN.R-project.org/package=dbscan)
+downloads](http://cranlogs.r-pkg.org/badges/stream)](https://CRAN.R-project.org/package=stream)
 
 This R package provides a fast C++ (re)implementation of several
 density-based algorithms with a focus on the DBSCAN family for
@@ -46,14 +45,18 @@ scikit-learn](https://scikit-learn.org/).
 
 ## Installation
 
-**Stable CRAN version:** install from within R with
+**Stable CRAN version:** Install from within R with
 
 ``` r
-install.packages("dbscan")
+install.packages("stream")
 ```
 
 **Current development version:** Install from
-[r-universe.](https://mhahsler.r-universe.dev/ui#package:dbscan)
+[r-universe.](https://mhahsler.r-universe.dev/ui#package:stream)
+
+``` r
+install.packages("stream", repos = "https://mhahsler.r-universe.dev")
+```
 
 ## Usage
 

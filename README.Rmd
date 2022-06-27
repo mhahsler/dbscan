@@ -1,21 +1,12 @@
 ---
-title: "R package dbscan - Density Based Clustering of Applications with Noise (DBSCAN) and Related Algorithms"
 output: github_document
 ---
 
-```{r echo=FALSE}
-options(digits = 2)
-knitr::opts_chunk$set(tidy = TRUE, message = FALSE, fig.path = 'inst/README_files/')
-```
-
 ```{r echo=FALSE, results = 'asis'}
-pkg <- 'dbscan'
+pkg <- 'stream'
 
-library(stringr)
-
-  cat(str_interp("[![CRAN version](http://www.r-pkg.org/badges/version/${pkg})](https://CRAN.R-project.org/package=${pkg})\n"))
-  cat(str_interp("[![stream r-universe status](https://mhahsler.r-universe.dev/badges/${pkg})](https://mhahsler.r-universe.dev/ui#package:${pkg})\n"))
-  cat(str_interp("[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/${pkg})](https://CRAN.R-project.org/package=${pkg})\n"))
+source("https://raw.githubusercontent.com/mhahsler/pkg_helpers/main/pkg_helpers.R")
+pkg_title(pkg)
 ```
 
 This R package provides a fast C++ (re)implementation of several density-based algorithms with a focus on the DBSCAN family for clustering spatial data.
@@ -43,16 +34,9 @@ __Fast Nearest-Neighbor Search (using kd-trees)__
 The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
 implementations in [WEKA](https://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
 
-## Installation
-
-__Stable CRAN version:__ install from within R with
-```{r eval=FALSE}
-install.packages("dbscan")
+```{r echo=FALSE, results = 'asis'}
+pkg_install(pkg)
 ```
-
-__Current development version:__ Install from [r-universe.](https://mhahsler.r-universe.dev/ui#package:dbscan)
-
-
 
 ## Usage
 

@@ -3,7 +3,7 @@ output: github_document
 ---
 
 ```{r echo=FALSE, results = 'asis'}
-pkg <- 'stream'
+pkg <- 'dbscan'
 
 source("https://raw.githubusercontent.com/mhahsler/pkg_helpers/main/pkg_helpers.R")
 pkg_title(pkg)

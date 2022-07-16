@@ -1,5 +1,5 @@
 
-# R package dbscan - Density-Based Spatial Clustering of Applications with Noise (DBSCAN) and Related Algorithms
+# <img src="man/figures/logo.svg" align="right" height="139" /> R package dbscan - Density-Based Spatial Clustering of Applications with Noise (DBSCAN) and Related Algorithms
 
 [![CRAN
 version](http://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)

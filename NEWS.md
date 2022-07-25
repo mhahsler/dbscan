@@ -13,7 +13,7 @@
 * coredist() and mrdist() for HDBSCAN.
 * find connected components with comps().
 
-# Changes
+## Changes
 * reachability plot now shows all undefined distances as a dashed line.
 
 ## Bugfix

@@ -53,7 +53,7 @@
 #' If `x` is a matrix or a data.frame, then fast fixed-radius nearest
 #' neighbor computation using a kd-tree is performed using Euclidean distance.
 #' See [frNN()] for more information on the parameters related to
-#' nearest neighbor search.
+#' nearest neighbor search. **Note** that only numerical values are allowed in `x`.
 #'
 #' Any precomputed distance matrix (dist object) can be specified as `x`.
 #' You may run into memory issues since distance matrices are large.
@@ -84,9 +84,16 @@
 #'
 #' [predict()] can be used to predict cluster memberships for new data
 #' points. A point is considered a member of a cluster if it is within the eps
-#' neighborhood of a member of the cluster (Euclidean distance is used). Points
+#' neighborhood of a core point of the cluster. Points
 #' which cannot be assigned to a cluster will be reported as
 #' noise points (i.e., cluster ID 0).
+#' **Important note:** `predict()` currently can only use Euclidean distance to determine
+#' the neighborhood of core points. If `dbscan()` was called using distances other than Euclidean,
+#' then the neighborhood calculation will not be correct and only approximated by Euclidean
+#' distances. If the data contain factor columns (e.g., using Gower's distance), then
+#' the factors in `data` and `query` first need to be converted to numeric to use the
+#' Euclidean approximation.
+#'
 #'
 #' @aliases dbscan DBSCAN print.dbscan_fast
 #' @family clustering functions
@@ -228,6 +235,14 @@ dbscan <-
     if (inherits(x, "frNN") && missing(eps))
       eps <- x$eps
 
+    if (inherits(x, "dist"))
+      dist_method <- attr(x, "method")
+    else
+      dist_method <- "euclidean"
+
+    if (is.null(dist_method))
+      dist_method <- "unknown"
+
     ### extra contains settings for frNN
     ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
     ### also check for MinPts for fpc compartibility (does not work for
@@ -295,13 +310,13 @@ dbscan <-
 
     } else{
       if (!.matrixlike(x))
-        stop("x needs to be a matrix")
+        stop("x needs to be a matrix or data.frame.")
       ## make sure x is numeric
       x <- as.matrix(x)
       if (storage.mode(x) == "integer")
         storage.mode(x) <- "double"
       if (storage.mode(x) != "double")
-        stop("x has to be a numeric matrix.")
+        stop("all data in x has to be numeric.")
     }
 
     if (length(frNN) == 0 && any(is.na(x)))
@@ -341,12 +356,14 @@ dbscan <-
     structure(list(
       cluster = ret,
       eps = eps,
-      minPts = minPts
+      minPts = minPts,
+      dist = dist_method,
+      borderPoints = borderPoints
     ),
       class = c("dbscan_fast", "dbscan"))
   }
 
-
+#' @export
 print.dbscan_fast <- function(x, ...) {
   cl <- unique(x$cluster)
   cl <- length(cl[cl != 0L])
@@ -354,6 +371,7 @@ print.dbscan_fast <- function(x, ...) {
   writeLines(c(
     paste0("DBSCAN clustering for ", length(x$cluster), " objects."),
     paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
+    paste0("Using ", x$dist, " distances and borderpoints = ", x$borderPoints),
     paste0(
       "The clustering contains ",
       cl,

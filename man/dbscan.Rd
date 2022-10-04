@@ -88,7 +88,7 @@ noise points. This is implemented with \code{borderPoints = FALSE}.
 If \code{x} is a matrix or a data.frame, then fast fixed-radius nearest
 neighbor computation using a kd-tree is performed using Euclidean distance.
 See \code{\link[=frNN]{frNN()}} for more information on the parameters related to
-nearest neighbor search.
+nearest neighbor search. \strong{Note} that only numerical values are allowed in \code{x}.
 
 Any precomputed distance matrix (dist object) can be specified as \code{x}.
 You may run into memory issues since distance matrices are large.
@@ -119,9 +119,15 @@ are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
 
 \code{\link[=predict]{predict()}} can be used to predict cluster memberships for new data
 points. A point is considered a member of a cluster if it is within the eps
-neighborhood of a member of the cluster (Euclidean distance is used). Points
+neighborhood of a core point of the cluster. Points
 which cannot be assigned to a cluster will be reported as
 noise points (i.e., cluster ID 0).
+\strong{Important note:} \code{predict()} currently can only use Euclidean distance to determine
+the neighborhood of core points. If \code{dbscan()} was called using distances other than Euclidean,
+then the neighborhood calculation will not be correct and only approximated by Euclidean
+distances. If the data contain factor columns (e.g., using Gower's distance), then
+the factors in \code{data} and \code{query} first need to be converted to numeric to use the
+Euclidean approximation.
 }
 \examples{
 ## Example 1: use dbscan on the iris data set

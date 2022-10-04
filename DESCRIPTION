@@ -39,7 +39,5 @@ License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and
     David Mount. All other code is copyright by Michael Hahsler and Matthew Piekenbrock.
 Encoding: UTF-8
-RoxygenNote: 7.1.2.9000
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
-
-

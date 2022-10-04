@@ -159,19 +159,21 @@ frNN <-
 
     ## make sure x is numeric
     if (!.matrixlike(x))
-      stop("x needs to be a matrix to calculate distances")
+      stop("x needs to be a matrix or a data.frame.")
     x <- as.matrix(x)
     if (storage.mode(x) == "integer")
       storage.mode(x) <- "double"
     if (storage.mode(x) != "double")
-      stop("x has to be a numeric matrix.")
+      stop("all data in x has to be numeric.")
 
     if (!is.null(query)) {
+      if (!.matrixlike(query))
+        stop("query needs to be a matrix or a data.frame.")
       query <- as.matrix(query)
       if (storage.mode(query) == "integer")
         storage.mode(query) <- "double"
       if (storage.mode(query) != "double")
-        stop("query has to be NULL or a numeric matrix.")
+        stop("query has to be NULL or a numeric matrix or data.frame.")
       if (ncol(x) != ncol(query))
         stop("x and query need to have the same number of columns!")
     }

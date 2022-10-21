@@ -97,6 +97,8 @@
 #' `mrdist()` returns a [dist] object containing pairwise mutual reachability distances.
 #'
 #' @author Matt Piekenbrock
+#'
+#' @references
 #' Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on
 #' Hierarchical Density Estimates. Proceedings of the 17th Pacific-Asia
 #' Conference on Knowledge Discovery in Databases, PAKDD 2013, _Lecture Notes

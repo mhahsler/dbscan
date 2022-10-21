@@ -7,7 +7,7 @@
 \usage{
 kNNdist(x, k, all = FALSE, ...)
 
-kNNdistplot(x, k, ...)
+kNNdistplot(x, k, minPts, ...)
 }
 \arguments{
 \item{x}{the data set as a matrix of points (Euclidean distance is used) or
@@ -20,6 +20,9 @@ returned?}
 
 \item{...}{further arguments (e.g., kd-tree related parameters) are passed
 on to \code{\link[=kNN]{kNN()}}.}
+
+\item{minPts}{to use a k-NN plot to determine a suitable \code{eps} value for \code{\link[=dbscan]{dbscan()}},
+\code{minPts} used in dbscan can be specified and will set \code{k = minPts - 1}.}
 }
 \value{
 \code{kNNdist()} returns a numeric vector with the distance to its k

@@ -155,16 +155,7 @@ plot(res, show_flat = TRUE)
 ## Plot the actual clusters (noise has cluster id 0 and is shown in black)
 plot(DS3, col = res$cluster + 1L, cex = .5)
 }
-\seealso{
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{extractFOSC}()},
-\code{\link{jpclust}()},
-\code{\link{optics}()},
-\code{\link{sNNclust}()}
-}
-\author{
-Matt Piekenbrock
+\references{
 Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on
 Hierarchical Density Estimates. Proceedings of the 17th Pacific-Asia
 Conference on Knowledge Discovery in Databases, PAKDD 2013, \emph{Lecture Notes
@@ -175,6 +166,17 @@ Campello RJGB, Moulavi D, Zimek A, Sander J (2015). Hierarchical density
 estimates for data clustering, visualization, and outlier detection.
 \emph{ACM Transactions on Knowledge Discovery from Data (TKDD),} 10(5):1-51.
 \doi{10.1145/2733381}
+}
+\seealso{
+Other clustering functions: 
+\code{\link{dbscan}()},
+\code{\link{extractFOSC}()},
+\code{\link{jpclust}()},
+\code{\link{optics}()},
+\code{\link{sNNclust}()}
+}
+\author{
+Matt Piekenbrock
 }
 \concept{HDBSCAN functions}
 \concept{clustering functions}

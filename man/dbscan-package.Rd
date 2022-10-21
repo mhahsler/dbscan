@@ -15,7 +15,7 @@ detection algorithms LOF (local outlier factor) and GLOSH (global-local
 outlier score from hierarchies). The implementations use the kd-tree data
 structure (from library ANN) for faster k-nearest neighbor search. An R
 interface to fast kNN and fixed-radius NN search is also provided.
-Hahsler, Piekenbrock and Doran (2019) \url{doi:10.18637/jss.v091.i01}.
+Hahsler, Piekenbrock and Doran (2019) .
 }
 \section{Key functions}{
 
@@ -26,6 +26,9 @@ Hahsler, Piekenbrock and Doran (2019) \url{doi:10.18637/jss.v091.i01}.
 }
 }
 
+\references{
+Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R. Journal of Statistical Software, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
+}
 \author{
 Michael Hahsler and Matthew Piekenbrock
 }

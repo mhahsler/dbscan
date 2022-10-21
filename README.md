@@ -15,21 +15,24 @@ clustering spatial data. The package includes:
 **Clustering**
 
 -   **DBSCAN:** Density-based spatial clustering of applications with
-    noise.
+    noise (Ester et al, 1996).
 -   **HDBSCAN:** Hierarchical DBSCAN with simplified hierarchy
-    extraction.
+    extraction (Campello et al, 2015).
 -   **OPTICS/OPTICSXi:** Ordering points to identify the clustering
-    structure clustering algorithms.
+    structure clustering algorithms (Ankerst et al, 1999).
 -   **FOSC:** Framework for Optimal Selection of Clusters for
     unsupervised and semisupervised clustering of hierarchical cluster
-    tree.
--   **Jarvis-Patrick clustering**
--   **SNN Clustering**: Shared Nearest Neighbor Clustering.
+    tree (Campello et al, 2013).
+-   **Jarvis-Patrick clustering**: Shared Nearest Neighbor Graph
+    partitioning (Javis and Patrick, 1973).
+-   **SNN Clustering**: Shared Nearest Neighbor Clustering (Erdoz et al,
+    2003).
 
 **Outlier Detection**
 
--   **LOF:** Local outlier factor algorithm.
--   **GLOSH:** Global-Local Outlier Score from Hierarchies algorithm.
+-   **LOF:** Local outlier factor algorithm (Breunig et al, 2000).
+-   **GLOSH:** Global-Local Outlier Score from Hierarchies algorithm
+    (Campello et al, 2015).
 
 **Fast Nearest-Neighbor Search (using kd-trees)**
 
@@ -78,12 +81,13 @@ db
 
     ## DBSCAN clustering for 150 objects.
     ## Parameters: eps = 0.4, minPts = 4
+    ## Using euclidean distances and borderpoints = TRUE
     ## The clustering contains 4 cluster(s) and 25 noise points.
     ## 
     ##  0  1  2  3  4 
     ## 25 47 38 36  4 
     ## 
-    ## Available fields: cluster, eps, minPts
+    ## Available fields: cluster, eps, minPts, dist, borderPoints
 
 Visualize the resulting clustering (noise points are shown in black).
 
@@ -173,7 +177,13 @@ granted by the original author, Erich Schubert.
 -   Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander
     (1999). OPTICS: Ordering Points To Identify the Clustering
     Structure. ACM SIGMOD international conference on Management of
-    data. ACM Press. pp. doi: <https://doi.org/10.1145/304181.304187>
+    data. ACM Press. pp 49-60. doi:
+    <https://doi.org/10.1145/304181.304187>
+-   Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg
+    Sander (2013). A framework for semi-supervised and unsupervised
+    optimal extraction of clusters from hierarchies. Data Mining and
+    Knowledge Discovery 27(3): 344-371. doi:
+    <https://doi.org/10.1007/s10618-013-0311-4>
 -   Campello RJGB, Moulavi D, Zimek A, Sander J (2015). Hierarchical
     density estimates for data clustering, visualization, and outlier
     detection. ACM Transactions on Knowledge Discovery from Data (TKDD),

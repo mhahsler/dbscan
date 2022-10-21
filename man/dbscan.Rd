@@ -137,7 +137,7 @@ iris <- as.matrix(iris[, 1:4])
 ## Find suitable DBSCAN parameters:
 ## 1. We use minPts = dim + 1 = 5 for iris. A larger value can also be used.
 ## 2. We inspect the k-NN distance plot for k = minPts - 1 = 4
-kNNdistplot(iris, k = 5 - 1)
+kNNdistplot(iris, minPts = 5)
 
 ## Noise seems to start around a 4-NN distance of .7
 abline(h=.7, col = "red", lty = 2)

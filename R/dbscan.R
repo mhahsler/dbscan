@@ -235,9 +235,10 @@ dbscan <-
     if (inherits(x, "frNN") && missing(eps))
       eps <- x$eps
 
-    if (inherits(x, "dist"))
+    if (inherits(x, "dist")) {
+      .check_dist(x)
       dist_method <- attr(x, "method")
-    else
+    } else
       dist_method <- "euclidean"
 
     if (is.null(dist_method))
@@ -245,10 +246,11 @@ dbscan <-
 
     ### extra contains settings for frNN
     ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
-    ### also check for MinPts for fpc compartibility (does not work for
+    ### also check for MinPts for fpc compatibility (does not work for
     ### search method dist)
     extra <- list(...)
-    args <- c("MinPts", "search", "bucketSize", "splitRule", "approx")
+    args <-
+      c("MinPts", "search", "bucketSize", "splitRule", "approx")
     m <- pmatch(names(extra), args)
     if (any(is.na(m)))
       stop("Unknown parameter: ",
@@ -353,14 +355,16 @@ dbscan <-
       frNN
     )
 
-    structure(list(
-      cluster = ret,
-      eps = eps,
-      minPts = minPts,
-      dist = dist_method,
-      borderPoints = borderPoints
-    ),
-      class = c("dbscan_fast", "dbscan"))
+    structure(
+      list(
+        cluster = ret,
+        eps = eps,
+        minPts = minPts,
+        dist = dist_method,
+        borderPoints = borderPoints
+      ),
+      class = c("dbscan_fast", "dbscan")
+    )
   }
 
 #' @export
@@ -371,7 +375,12 @@ print.dbscan_fast <- function(x, ...) {
   writeLines(c(
     paste0("DBSCAN clustering for ", length(x$cluster), " objects."),
     paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
-    paste0("Using ", x$dist, " distances and borderpoints = ", x$borderPoints),
+    paste0(
+      "Using ",
+      x$dist,
+      " distances and borderpoints = ",
+      x$borderPoints
+    ),
     paste0(
       "The clustering contains ",
       cl,

@@ -227,11 +227,23 @@ kNN <-
     ret
   }
 
+# make sure we have a lower-triangle representation w/o diagonal
+.check_dist <- function(x) {
+  if (!inherits(x, "dist"))
+    stop("x needs to be a dist object")
+
+  # cluster::dissimilarity does not have Diag or Upper attributes, but is a lower triangle
+  # representation
+  if (inherits(x, "dissimilarity"))
+    return(TRUE)
+
+  # check that dist objects have diag = FALSE, upper = FALSE
+  if(attr(x, "Diag") || attr(x, "Upper"))
+    stop("x needs to be a dist object with attributes Diag and Upper set to FALSE. Use as.dist(x, diag = FALSE, upper = FALSE) fist.")
+  }
+
 dist_to_kNN <- function(x, k) {
-  if (!inherits(x, "dist") ||
-      attr(x, "Diag") ||
-      attr(x, "Upper"))
-    stop("x needs to be a dist object with attributes Diag and Upper being FALSE.")
+  .check_dist(x)
 
   n <- attr(x, "Size")
 

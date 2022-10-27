@@ -1,4 +1,4 @@
-# dbscan 1.1-11 (2022-10-21)
+# dbscan 1.1-11 (2022-10-26)
 
 ## New Features
 * kNNdistplot gained parameter minPts.
@@ -8,9 +8,12 @@
   coerce the dist object into a matrix of double the size, but extract the distances directly
   from the dist object.
 * Better description of how predict uses only Euclidean distances and more error checking.
+* The package now exports a new generic for as.dendrogram().
 
 ## Bugfix
-* is.corepoint() now uses the correct epsilon value (reported by Eng Aun)
+* is.corepoint() now uses the correct epsilon value (reported by Eng Aun).
+* functions now check for cluster::dissimilariy objects which have class dist 
+  but missing attributes.
 
 # dbscan 1.1-10 (2022-01-14)
 

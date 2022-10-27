@@ -19,9 +19,16 @@
 
 #' Coersions to Dendrogram
 #'
-#' Coerce [hclust], [hdbscan] or [reachability] objects to [dendrogram].
+#' Provides a new generic function to coerce objects to dendrograms with
+#' [stats::as.dendrogram()] as the default. Additional methods for
+#' [hclust], [hdbscan] and [reachability] objects are provided.
 #'
-#' The coersion from hclust is a faster reimplementation of [stats::as.dendrogram()].
+#' Coersion methods for
+#' [hclust], [hdbscan] and [reachability] objects to [dendrogram] are provided.
+#'
+#' The coercion from `hclust` is a faster C++ reimplementation of the coercion in
+#' package `stats`. The original implementation can be called
+#' using [stats::as.dendrogram()].
 #'
 #' The coersion from [hdbscan] builds the non-simplified HDBSCAN hierarchy as a
 #' dendrogram object.
@@ -35,6 +42,18 @@ NULL
 
 #' @rdname dendrogram
 #' @export
+as.dendrogram <- function (object, ...) {
+  UseMethod("as.dendrogram", object)
+}
+
+#' @rdname dendrogram
+#' @export
+as.dendrogram.default <- function (object, ...)
+  stats::as.dendrogram(object, ...)
+
+## this is a replacement for stats::as.dendrogram for hclust
+#' @rdname dendrogram
+#' @export
 as.dendrogram.hclust <- function(object, ...) {
   return(buildDendrogram(object))
 }
@@ -44,17 +63,6 @@ as.dendrogram.hclust <- function(object, ...) {
 as.dendrogram.hdbscan <- function(object, ...) {
   return(buildDendrogram(object$hc))
 }
-
-#' @rdname dendrogram
-#' @name reachability-coersion
-#' @aliases as.reachability
-NULL
-
-#' @rdname dendrogram
-#' @export
-as.reachability <-
-  function(object, ...)
-    UseMethod("as.reachability")
 
 #' @rdname dendrogram
 #' @export

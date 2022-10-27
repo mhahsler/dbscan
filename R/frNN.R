@@ -239,10 +239,7 @@ dist_row <- function(x, i, self_val = 0) {
 }
 
 dist_to_frNN <- function(x, eps, sort = FALSE) {
-  if (!inherits(x, "dist") ||
-      attr(x, "Diag") ||
-      attr(x, "Upper"))
-    stop("x needs to be a dist object with attributes Diag and Upper being FALSE.")
+  .check_dist(x)
 
   n <- attr(x, "Size")
 

@@ -297,7 +297,7 @@ plot.hdbscan <-
 
     ## Depth-first search to recursively plot rectangles
     eps_dfs <- function(dend, index, parent_height, scale) {
-      coord <- coords[index,]
+      coord <- coords[index, ]
       cl_key <- as.character(attr(dend, "label"))
 
       ## widths == number of points in the cluster at each eps it was alive
@@ -426,10 +426,7 @@ coredist <- function(x, minPts) {
 #' @export
 mrdist <- function(x, minPts, coredist = NULL) {
   if (inherits(x, "dist")) {
-    if (attr(x, "Diag") || attr(x, "Upper"))
-      stop(
-        "if x is a dist object then it needs to be created with dist(..., diag = FALSE, upper = FALSE)"
-      )
+    .check_dist(x)
     x_dist <- x
   } else{
     x_dist <- dist(x,

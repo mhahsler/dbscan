@@ -18,9 +18,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-#' Reachability Plots
+#' Reachability Distances
 #'
-#' Reachability plots can be used to show hierarchical relationships between data points.
+#' Reachability distances can be plotted to show the hierarchical relationships between data points.
 #' The idea was originally introduced by Ankerst et al (1999) for [OPTICS]. Later,
 #' Sanders et al (2003) showed that the visualization is useful for other hierarchical
 #' structures and introduced an algorithm to convert [dendrogram] representation to
@@ -64,7 +64,7 @@
 #' neighbors in the epsilon neighborhood. We represent these undefined cases as `Inf`
 #' and represent them in the plot as a dashed line.
 #'
-#' @name reachability_plot
+#' @name reachability
 #' @aliases reachability reachability_plot print.reachability
 #'
 #' @param object any object that can be coerced to class
@@ -83,7 +83,7 @@
 #' \item{reachdist }{reachability distance for each data point in `x`. }
 #'
 #' @author Matthew Piekenbrock
-#' @seealso [optics()], [stats::hclust()].
+#' @seealso [optics()], [as.dendrogram()], and [stats::hclust()].
 #' @references Ankerst, M., M. M. Breunig, H.-P. Kriegel, J. Sander (1999).
 #' OPTICS: Ordering Points To Identify the Clustering Structure. _ACM
 #' SIGMOD international conference on Management of data._ ACM Press. pp.
@@ -130,7 +130,7 @@
 #' plot(as.reachability(dend))
 NULL
 
-#' @rdname reachability_plot
+#' @rdname reachability
 #' @export
 print.reachability <- function(x, ...) {
   avg_reach <- mean(x$reachdist[which(x$reachdist != Inf)], na.rm = T)
@@ -146,7 +146,7 @@ print.reachability <- function(x, ...) {
   )
 }
 
-#' @rdname reachability_plot
+#' @rdname reachability
 #' @export
 plot.reachability <- function(x,
   order_labels = FALSE,
@@ -179,84 +179,14 @@ plot.reachability <- function(x,
   }
 }
 
-# calculate midpoints for dendrogram
-# from stats, but not exported
-# see stats:::midcache.dendrogram
+#' @rdname reachability
+#' @export
+as.reachability <-
+  function(object, ...)
+    UseMethod("as.reachability")
 
-.midcache.dendrogram <- function (x, type = "hclust", quiet = FALSE)
-{
-  type <- match.arg(type)
-  stopifnot(inherits(x, "dendrogram"))
-  verbose <- getOption("verbose", 0) >= 2
-  setmid <- function(d, type) {
-    depth <- 0L
-    kk <- integer()
-    jj <- integer()
-    dd <- list()
-    repeat {
-      if (!is.leaf(d)) {
-        k <- length(d)
-        if (k < 1)
-          stop("dendrogram node with non-positive #{branches}")
-        depth <- depth + 1L
-        if (verbose)
-          cat(sprintf(" depth(+)=%4d, k=%d\n", depth,
-            k))
-        kk[depth] <- k
-        if (storage.mode(jj) != storage.mode(kk))
-          storage.mode(jj) <- storage.mode(kk)
-        dd[[depth]] <- d
-        d <- d[[jj[depth] <- 1L]]
-        next
-      }
-      while (depth) {
-        k <- kk[depth]
-        j <- jj[depth]
-        r <- dd[[depth]]
-        r[[j]] <- unclass(d)
-        if (j < k)
-          break
-        depth <- depth - 1L
-        if (verbose)
-          cat(sprintf(" depth(-)=%4d, k=%d\n", depth,
-            k))
-        midS <- sum(vapply(r, .midDend, 0))
-        if (!quiet && type == "hclust" && k != 2)
-          warning("midcache() of non-binary dendrograms only partly implemented")
-        attr(r, "midpoint") <- (.memberDend(r[[1L]]) +
-            midS) / 2
-        d <- r
-      }
-      if (!depth)
-        break
-      dd[[depth]] <- r
-      d <- r[[jj[depth] <- j + 1L]]
-    }
-    d
-  }
-  setmid(x, type = type)
-}
 
-.midDend <- function (x)
-{
-  if (is.null(mp <- attr(x, "midpoint")))
-    0
-  else
-    mp
-}
-
-.memberDend <- function (x)
-{
-  r <- attr(x, "x.member")
-  if (is.null(r)) {
-    r <- attr(x, "members")
-    if (is.null(r))
-      r <- 1L
-  }
-  r
-}
-
-#' @rdname reachability_plot
+#' @rdname reachability
 #' @export
 as.reachability.dendrogram <- function(object, ...) {
   if (!inherits(object, "dendrogram"))

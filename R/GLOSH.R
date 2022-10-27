@@ -111,6 +111,8 @@ glosh <- function(x, k = 4, ...) {
         x
     else
       dist(x, method = "euclidean") # copy since mrd changes by reference!
+
+    .check_dist(x_dist)
     mrd <- mrd(x_dist, d$dist[, k - 1])
 
     # need to assemble hclust object manually

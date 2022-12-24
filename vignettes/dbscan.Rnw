@@ -908,7 +908,9 @@ the R15 validation data set used for maximum variance based clustering approach 
 the well-known spatial data set t4.8k used for validation of the CHAMELEON algorithm~\citep{karypis1999chameleon},
 along with a variety of shape data sets commonly found in clustering validation papers~\citep{gionis2007clustering, zahn1971graph, chang2008robust, jain2005law, fu2007flame}.
 
-We performed the comparison with ELKI version 0.7, PyClustering 0.6.6, \pkg{fpc} 2.1-10, \pkg{dbscan} 0.9-8, SPMF v2.10, WEKA 3.8.0, SciKit-Learn 0.17.1 on a MacBook Pro equipped with an 2.5 GHz Intel Core i7 processor, running OS X El Capitan 10.11.6.
+In 2019, we performed a comparison between \pkg{dbscan} 0.9-8, \pkg{fpc} 2.1-10, ELKI version 0.7, PyClustering 0.6.6, SPMF v2.10, WEKA 3.8.0, SciKit-Learn 0.17.1 on a MacBook Pro equipped with a 2.5 GHz Intel Core i7 processor, running OS X El Capitan 10.11.6.
+Note that newer versions of all mentioned software packages have been released since then. Changes in data structures and added optimization may result in significant improvements in runtime for different packages.
+
 All data sets where normalized to the unit interval, [0, 1], per dimension to standardize neighbor queries. For all data sets we used $\mathit{minPts} = 2$ and $\epsilon = 0.10$ for DBSCAN. For OPTICS, $\mathit{minPts} = 2$ with a large $\epsilon = 1$ was used.
 We replicated each run for each data set 15 times and report
 the average runtime here.

@@ -918,6 +918,7 @@ Figures~\ref{fig:dbscan_bench}
 and \ref{fig:optics_bench}
 shows the runtimes. The datasets are sorted from easiest to hardest
 and the algorithm in the legend are sorted from on average fastest to slowest.
+Dimensionality, used distance function, data set size, and other data characteristics have a substantial impact on runtime performance.
 The results show that the implementation in $\pkg{dbscan}$
 compares very favorably to the other implementations (but note that we did not enable data indexing in ELKI, and used a very small $\mathit{minPts}$).
 

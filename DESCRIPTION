@@ -1,6 +1,6 @@
 Package: dbscan
-Version: 1.1-11
-Date: 2022-10-26
+Version: 1.1-11-1
+Date: 2022-xx-xx
 Title: Density-Based Spatial Clustering of Applications with Noise (DBSCAN) 
     and Related Algorithms
 Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),

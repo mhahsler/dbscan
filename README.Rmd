@@ -8,6 +8,8 @@ pkg <- 'dbscan'
 source("https://raw.githubusercontent.com/mhahsler/pkg_helpers/main/pkg_helpers.R")
 pkg_title(pkg)
 ```
+[![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
+
 
 This R package provides a fast C++ (re)implementation of several density-based algorithms with a focus on the DBSCAN family for clustering spatial data.
 The package includes: 
@@ -87,6 +89,29 @@ Visualize the hierarchical clustering as a simplified tree. HDBSCAN finds 2 stab
 plot(hdb, show_flat = TRUE)
 ```
 
+
+## Using dbscan from Python
+R, R package `dbscan`, and Python package `rpy2` need to be installed.
+
+```{python, eval = FALSE}
+import pandas as pd
+import numpy as np
+
+### prepare data
+iris = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', 
+                   header=None, 
+                   names = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species'])
+iris_numeric = iris[['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth']]
+
+from rpy2.robjects import packages
+dbscan = packages.importr('dbscan')
+
+r = dbscan.dbscan(iris_numeric, eps=0.5, MinPts=5)
+print(r)
+
+# get clustering vector
+np.array(r.rx('cluster'))
+```
 
 ## License 
 The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  

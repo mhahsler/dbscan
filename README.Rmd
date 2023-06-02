@@ -99,18 +99,49 @@ import numpy as np
 
 ### prepare data
 iris = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', 
-                   header=None, 
+                   header = None, 
                    names = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species'])
 iris_numeric = iris[['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth']]
 
+# get R dbscan package
 from rpy2.robjects import packages
 dbscan = packages.importr('dbscan')
 
-r = dbscan.dbscan(iris_numeric, eps=0.5, MinPts=5)
-print(r)
+# enable automatic conversion of pandas dataframes to R dataframes
+from rpy2.robjects import pandas2ri
+pandas2ri.activate()
 
-# get clustering vector
-np.array(r.rx('cluster'))
+db = dbscan.dbscan(iris_numeric, eps = 0.5, MinPts = 5)
+print(db)
+```
+
+```
+## DBSCAN clustering for 150 objects.
+## Parameters: eps = 0.5, minPts = 5
+## Using euclidean distances and borderpoints = TRUE
+## The clustering contains 2 cluster(s) and 17 noise points.
+## 
+##  0  1  2 
+## 17 49 84 
+## 
+## Available fields: cluster, eps, minPts, dist, borderPoints
+```
+
+```{python, eval = FALSE}
+# get the cluster assignment vector
+labels = np.array(db.rx('cluster'))
+labels
+```
+
+```
+## array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+##         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+##         1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2, 2, 2, 2, 2,
+##         2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+##         2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 0, 0,
+##         2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0,
+##         2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]],
+##       dtype=int32)
 ```
 
 ## License 

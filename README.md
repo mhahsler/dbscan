@@ -9,6 +9,8 @@ status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-unive
 downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
 
+## Introduction
+
 This R package provides a fast C++ (re)implementation of several
 density-based algorithms with a focus on the DBSCAN family for
 clustering spatial data. The package includes:
@@ -47,6 +49,80 @@ implementations in [WEKA](https://www.cs.waikato.ac.nz/ml/weka/),
 [ELKI](https://elki-project.github.io/) and [Python’s
 scikit-learn](https://scikit-learn.org/).
 
+The following R packages use `dbscan`:
+[AFM](https://CRAN.R-project.org/package=AFM),
+[bioregion](https://CRAN.R-project.org/package=bioregion),
+[CIDER](https://CRAN.R-project.org/package=CIDER),
+[CLONETv2](https://CRAN.R-project.org/package=CLONETv2),
+[ClustAssess](https://CRAN.R-project.org/package=ClustAssess),
+[cordillera](https://CRAN.R-project.org/package=cordillera),
+[CPC](https://CRAN.R-project.org/package=CPC),
+[crosshap](https://CRAN.R-project.org/package=crosshap),
+[daltoolbox](https://CRAN.R-project.org/package=daltoolbox),
+[DDoutlier](https://CRAN.R-project.org/package=DDoutlier),
+[diceR](https://CRAN.R-project.org/package=diceR),
+[dobin](https://CRAN.R-project.org/package=dobin),
+[doc2vec](https://CRAN.R-project.org/package=doc2vec),
+[dPCP](https://CRAN.R-project.org/package=dPCP),
+[EHRtemporalVariability](https://CRAN.R-project.org/package=EHRtemporalVariability),
+[eventstream](https://CRAN.R-project.org/package=eventstream),
+[FCPS](https://CRAN.R-project.org/package=FCPS),
+[fdacluster](https://CRAN.R-project.org/package=fdacluster),
+[FORTLS](https://CRAN.R-project.org/package=FORTLS),
+[funtimes](https://CRAN.R-project.org/package=funtimes),
+[FuzzyDBScan](https://CRAN.R-project.org/package=FuzzyDBScan),
+[ksharp](https://CRAN.R-project.org/package=ksharp),
+[ktaucenters](https://CRAN.R-project.org/package=ktaucenters),
+[LOMAR](https://CRAN.R-project.org/package=LOMAR),
+[maotai](https://CRAN.R-project.org/package=maotai),
+[metaCluster](https://CRAN.R-project.org/package=metaCluster),
+[mlr3cluster](https://CRAN.R-project.org/package=mlr3cluster),
+[MOSS](https://CRAN.R-project.org/package=MOSS),
+[oclust](https://CRAN.R-project.org/package=oclust),
+[openSkies](https://CRAN.R-project.org/package=openSkies),
+[opticskxi](https://CRAN.R-project.org/package=opticskxi),
+[pagoda2](https://CRAN.R-project.org/package=pagoda2),
+[parameters](https://CRAN.R-project.org/package=parameters),
+[ParBayesianOptimization](https://CRAN.R-project.org/package=ParBayesianOptimization),
+[performance](https://CRAN.R-project.org/package=performance),
+[pguIMP](https://CRAN.R-project.org/package=pguIMP),
+[rMultiNet](https://CRAN.R-project.org/package=rMultiNet),
+[seriation](https://CRAN.R-project.org/package=seriation),
+[sfdep](https://CRAN.R-project.org/package=sfdep),
+[sfnetworks](https://CRAN.R-project.org/package=sfnetworks),
+[sharp](https://CRAN.R-project.org/package=sharp),
+[shipunov](https://CRAN.R-project.org/package=shipunov),
+[smotefamily](https://CRAN.R-project.org/package=smotefamily),
+[snap](https://CRAN.R-project.org/package=snap),
+[spdep](https://CRAN.R-project.org/package=spdep),
+[spNetwork](https://CRAN.R-project.org/package=spNetwork),
+[squat](https://CRAN.R-project.org/package=squat),
+[ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
+[stream](https://CRAN.R-project.org/package=stream),
+[supc](https://CRAN.R-project.org/package=supc),
+[synr](https://CRAN.R-project.org/package=synr),
+[tidySEM](https://CRAN.R-project.org/package=tidySEM),
+[ts2net](https://CRAN.R-project.org/package=ts2net)
+
+Please cite the use of this package as:
+
+> To cite dbscan in publications use:
+
+Hahsler M, Piekenbrock M, Doran D (2019). “dbscan: Fast Density-Based
+Clustering with R.” *Journal of Statistical Software*, *91*(1), 1-30.
+<doi:10.18637/jss.v091.i01> <https://doi.org/10.18637/jss.v091.i01>.
+
+    @Article{,
+      title = {{dbscan}: Fast Density-Based Clustering with {R}},
+      author = {Michael Hahsler and Matthew Piekenbrock and Derek Doran},
+      journal = {Journal of Statistical Software},
+      year = {2019},
+      volume = {91},
+      number = {1},
+      pages = {1--30},
+      doi = {10.18637/jss.v091.i01},
+    }
+
 ## Installation
 
 **Stable CRAN version:** Install from within R with
@@ -76,7 +152,7 @@ x <- as.matrix(iris[, 1:4])
 DBSCAN
 
 ``` r
-db <- dbscan(x, eps = .4, minPts = 4)
+db <- dbscan(x, eps = 0.4, minPts = 4)
 db
 ```
 
@@ -114,7 +190,7 @@ Extract DBSCAN-like clustering from OPTICS and create a reachability
 plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 
 ``` r
-opt <- extractDBSCAN(opt, eps_cl = .4)
+opt <- extractDBSCAN(opt, eps_cl = 0.4)
 plot(opt)
 ```
 
@@ -202,8 +278,8 @@ labels
 The dbscan package is licensed under the [GNU General Public License
 (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The
 **OPTICSXi** R implementation was directly ported from the ELKI
-framework’s Java implementation (GNU AGPLv3), with explicit permission
-granted by the original author, Erich Schubert.
+framework’s Java implementation (GNU AGPLv3), with permission by the
+original author, Erich Schubert.
 
 ## Changes
 

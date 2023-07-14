@@ -10,6 +10,7 @@ pkg_title(pkg)
 ```
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
 
+## Introduction
 
 This R package provides a fast C++ (re)implementation of several density-based algorithms with a focus on the DBSCAN family for clustering spatial data.
 The package includes: 
@@ -38,6 +39,8 @@ The implementations use the kd-tree data structure (from library ANN) for faster
 implementations in [WEKA](https://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
 
 ```{r echo=FALSE, results = 'asis'}
+pkg_usage(pkg)
+pkg_citation(pkg, 2)
 pkg_install(pkg)
 ```
 
@@ -145,7 +148,7 @@ labels
 ```
 
 ## License 
-The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with explicit permission granted by the original author, Erich Schubert.  
+The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with permission by the original author, Erich Schubert.  
 
 ## Changes
 * List of changes from [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)

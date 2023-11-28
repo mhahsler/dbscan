@@ -1,3 +1,12 @@
+//----------------------------------------------------------------------
+//              R interface to dbscan using the ANN library
+//----------------------------------------------------------------------
+// Copyright (c) 2015 Michael Hahsler, Matt Piekenbrock. All Rights Reserved.
+//
+// This software is provided under the provisions of the
+// GNU General Public License (GPL) Version 3
+// (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
+
 #include <Rcpp.h>
 using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
@@ -581,7 +590,7 @@ List validateConstraintList(List& constraints, int n){
     }
   }
   // Produce warning if asymmetric constraints detected; return attempt at fixing constraints.
-  if (!is_valid){ 
+  if (!is_valid){
       warning("Incomplete (asymmetric) constraints detected. Populating constraint list.");
   }
   return(constraints);

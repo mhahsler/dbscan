@@ -2,7 +2,7 @@
 //                                OPTICS
 // File:                        R_optics.cpp
 //----------------------------------------------------------------------
-// Copyright (c) 2015 Michael Hahsler. All Rights Reserved.
+// Copyright (c) 2015 Michael Hahsler, Matt Piekenbrock. All Rights Reserved.
 //
 // This software is provided under the provisions of the
 // GNU General Public License (GPL) Version 3

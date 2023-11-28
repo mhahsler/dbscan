@@ -1,3 +1,12 @@
+//----------------------------------------------------------------------
+//              R interface to dbscan using the ANN library
+//----------------------------------------------------------------------
+// Copyright (c) 2015 Michael Hahsler, Matt Piekenbrock. All Rights Reserved.
+//
+// This software is provided under the provisions of the
+// GNU General Public License (GPL) Version 3
+// (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
+
 #include <Rcpp.h>
 #include <sstream>
 #include <string>
@@ -36,14 +45,14 @@ int which_int(IntegerVector x, int target) {
 
 // [[Rcpp::export]]
 List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_order) {
-  
-  // Set up sorted reachability distance 
+
+  // Set up sorted reachability distance
   NumericVector pl = Rcpp::clone(as<NumericVector>(reachability["reachdist"])).sort();
-  
-  // Get 0-based order 
-  IntegerVector order = Rcpp::clone(as<IntegerVector>(reachability["order"])) - 1; 
-  
-  /// Initialize disjoint-set structure 
+
+  // Get 0-based order
+  IntegerVector order = Rcpp::clone(as<IntegerVector>(reachability["order"])) - 1;
+
+  /// Initialize disjoint-set structure
   int n_nodes = order.size();
   UnionFind uf((size_t) n_nodes);
 
@@ -58,13 +67,13 @@ List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_o
     leaf.attr("leaf") = true;
     dendrogram.at(i) = leaf;
   }
-  
+
   // Precompute the q order
-  IntegerVector q_order(n_nodes); 
+  IntegerVector q_order(n_nodes);
   for (int i = 0; i < n_nodes - 1; ++i) {
-    q_order.at(i) = order(which_int(order, pl_order(i)) - 1); 
+    q_order.at(i) = order(which_int(order, pl_order(i)) - 1);
   }
-  
+
   // Get the index of the point with next smallest reach dist and its neighbor
   IntegerVector members(n_nodes, 1);
   int insert = 0, p = 0, q = 0, p_i = 0, q_i = 0;
@@ -76,17 +85,17 @@ List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_o
     // Get the actual index of the branch(es) containing the p and q
     p_i = uf.Find(p), q_i = uf.Find(q);
     List branch = List::create(dendrogram.at(q_i), dendrogram.at(p_i));
-    
+
     // generic proxy blocks attr access for mixed types, so keep track of members manually!
-    branch.attr("members") = members.at(p_i) + members.at(q_i); 
+    branch.attr("members") = members.at(p_i) + members.at(q_i);
     branch.attr("height") = pl(i);
     branch.attr("class") = "dendrogram";
 
     // Merge the two, retrieving the new index
     uf.Union(p_i, q_i);
     insert = uf.Find(q_i); // q because q_branch is first in the new branch
-    
-    // Update members reference and insert the branch 
+
+    // Update members reference and insert the branch
     members.at(insert) = branch.attr("members");
     dendrogram.at(insert) = branch;
   }
@@ -136,7 +145,7 @@ List dendrogram_to_reach(const Rcpp::List x) {
   DFS(x, rp, 0, stack);
   List res = List::create(_["reachdist"] = rp["reachdist"], _["order"] = rp["order"]);
   res.attr("class") = "reachability";
-  return(res); 
+  return(res);
 }
 
 // [[Rcpp::export]]
@@ -146,8 +155,8 @@ List mst_to_dendrogram(const NumericMatrix mst) {
   NumericVector p_order = mst(_, 0);
   NumericVector q_order = mst(_, 1);
   NumericVector dist = mst(_, 2);
-  int n_nodes = p_order.length() + 1; 
-  
+  int n_nodes = p_order.length() + 1;
+
   // Make sure to clone so as to not make changes by reference
   p_order = Rcpp::clone(p_order);
   q_order = Rcpp::clone(q_order);
@@ -166,7 +175,7 @@ List mst_to_dendrogram(const NumericMatrix mst) {
     leaf.attr("leaf") = true;
     dendrogram.at(i) = leaf;
   }
-  
+
   // Get the index of the point with next smallest reach dist and its neighbor
   IntegerVector members(n_nodes, 1);
   int insert = 0, p = 0, q = 0, p_i = 0, q_i = 0;
@@ -175,7 +184,7 @@ List mst_to_dendrogram(const NumericMatrix mst) {
 
     // Get the actual index of the branch(es) containing the p and q
     p_i = uf.Find(p), q_i = uf.Find(q);
-    
+
     // Merge the two, retrieving the new index
     uf.Union(p_i, q_i);
     List branch = List::create(dendrogram.at(q_i), dendrogram.at(p_i));
@@ -184,25 +193,25 @@ List mst_to_dendrogram(const NumericMatrix mst) {
 
     // Update members in the branch
     int tmp_members = members.at(p_i) + members.at(q_i);
-    
-    // Branches with equivalent distances are merged simultaneously 
+
+    // Branches with equivalent distances are merged simultaneously
     while((i + 1) < (n_nodes-1) && dist(i + 1) == dist(i)){
       i += 1;
       p = p_order(i), q = q_order(i);
       p_i = uf.Find(p), q_i = uf.Find(q);
-      
+
       // Merge the branches, update current insert index
-      int insert2 = uf.Find(q_i); 
-      branch.push_back(insert == insert2 ? dendrogram.at(p_i) : dendrogram.at(q_i)); 
-      tmp_members += insert == insert2 ? members.at(p_i) : members.at(q_i); 
+      int insert2 = uf.Find(q_i);
+      branch.push_back(insert == insert2 ? dendrogram.at(p_i) : dendrogram.at(q_i));
+      tmp_members += insert == insert2 ? members.at(p_i) : members.at(q_i);
       uf.Union(p_i, q_i);
-      insert = uf.Find(q_i); 
+      insert = uf.Find(q_i);
 
     }
     // Generic proxy blocks attr access for mixed types, so need to keep track of members manually!
     branch.attr("height") = dist(i);
     branch.attr("class") = "dendrogram";
-    branch.attr("members") = tmp_members;  
+    branch.attr("members") = tmp_members;
 
     // Update members reference and insert the branch
     members.at(insert) = branch.attr("members");
@@ -212,4 +221,4 @@ List mst_to_dendrogram(const NumericMatrix mst) {
   return(dendrogram.at(insert));
 }
 
-  
+

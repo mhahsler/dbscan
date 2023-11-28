@@ -1,3 +1,12 @@
+//----------------------------------------------------------------------
+//              R interface to dbscan using the ANN library
+//----------------------------------------------------------------------
+// Copyright (c) 2015 Michael Hahsler. All Rights Reserved.
+//
+// This software is provided under the provisions of the
+// GNU General Public License (GPL) Version 3
+// (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
+
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -15,15 +24,15 @@ template < typename T > std::string to_string( const T& n )
 template <typename T, typename C> bool contains (const T& container, const C& key)
 {
   if (std::find(container.begin(), container.end(), key) != container.end()){
-    return true; 
+    return true;
   } else {
-    return false; 
+    return false;
   }
 }
 
 // [[Rcpp::export]]
 IntegerVector lowerTri(IntegerMatrix m){
-  int n = m.nrow(); 
+  int n = m.nrow();
   IntegerVector lower_tri = IntegerVector(n * (n - 1) / 2);
   for (int i = 0, c = 0; i < n; ++i){
     for (int j = i + 1; j < n; ++j){
@@ -81,12 +90,12 @@ IntegerVector combine(const IntegerVector& t1, const IntegerVector& t2){
 IntegerVector concat_int (List const& container){
   int total_length = 0;
   for (List::const_iterator it = container.begin(); it != container.end(); ++it){
-      total_length += as<IntegerVector>(*it).size(); 
+      total_length += as<IntegerVector>(*it).size();
   }
   int pos = 0;
   IntegerVector output = Rcpp::no_init(total_length);
   for (List::const_iterator it = container.begin(); it != container.end(); ++it){
-    IntegerVector vec = as<IntegerVector>(*it); 
+    IntegerVector vec = as<IntegerVector>(*it);
     std::copy(vec.begin(), vec.end(), output.begin() + pos);
     pos += vec.size();
   }

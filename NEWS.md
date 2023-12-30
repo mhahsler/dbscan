@@ -1,4 +1,6 @@
-# dbscan 1.1-11-1 (2023-xx-xx)
+# dbscan 1.1-12-1 (2024-xx-xx)
+
+# dbscan 1.1-12 (2023-11-28)
 
 ## Bugfix
 * point_density checks now for missing values (reported by soelderer)

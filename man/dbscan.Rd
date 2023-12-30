@@ -70,9 +70,13 @@ algorithm as described by Ester et al (1996). DBSCAN performs the following step
 \item Estimate the density
 around each data point by counting the number of points in a user-specified
 eps-neighborhood and applies a used-specified minPts thresholds to identify
-core, border and noise points.
-\item Core points are joined into
-a cluster if they are density-reachable (i.e., there is a chain of core
+\itemize{
+\item core points (points with more than minPts points in their neighborhood),
+\item border points (non-core points with a core point in their neighborhood) and
+\item noise points (all other points).
+}
+\item Core points form the backbone of clusters by joining them into
+a cluster if they are density-reachable from each other (i.e., there is a chain of core
 points where one falls inside the eps-neighborhood of the next).
 \item Border points are assigned to clusters. The algorithm needs parameters
 \code{eps} (the radius of the epsilon neighborhood) and \code{minPts} (the
@@ -100,20 +104,32 @@ data sets, where a sparse distance matrix is available. See
 
 \strong{Setting parameters for DBSCAN}
 
-The parameters \code{minPts} and \code{eps} depend on each other and
-changing one typically requires changing the other one as well. The original
-DBSCAN paper suggests to start by setting \code{minPts} to the
-dimensionality of the data plus one or higher. \code{minPts} defines the
-minimum density around a core point (i.e., the minimum density for non-noise
-areas). Increase the parameter to suppress more noise in the data and
-require more points to form a cluster. A suitable neighborhood size
+The parameters \code{minPts} and \code{eps} define the minimum density required
+in the area around core points which form the backbone of clusters.
+\code{minPts} is the number of points
+required in the neighborhood around the point defined by the parameter \code{eps}
+(i.e., the radius around the point). Both parameters
+depend on each other and changing one typically requires changing
+the other one as well. The parameters also depend on the size of the data set with
+larger datasets requiring a larger \code{minPts} or a smaller \code{eps}.
+\itemize{
+\item \verb{minPts:} The original
+DBSCAN paper (Ester et al, 1996) suggests to start by setting \eqn{\text{minPts} \ge d + 1},
+the data dimensionality plus one or higher with a minimum of 3. Larger values
+are preferable since increasing the parameter suppresses more noise in the data
+by requiring more points to form clusters.
+Sander et al (1998) uses in the examples two times the data dimensionality.
+Note that setting \eqn{\text{minPts} \le 2} is equivalent to hierarchical clustering
+with the single link metric and the dendrogram cut at height \code{eps}.
+\item \verb{eps:} A suitable neighborhood size
 parameter \code{eps} given a fixed value for \code{minPts} can be found
 visually by inspecting the \code{\link[=kNNdistplot]{kNNdistplot()}} of the data using
-\code{k = minPts - 1} (\code{minPts} includes the point itself, while the
+\eqn{k = \text{minPts} - 1} (\code{minPts} includes the point itself, while the
 k-nearest neighbors distance does not). The k-nearest neighbor distance plot
 sorts all data points by their k-nearest neighbor distance. A sudden
 increase of the kNN distance (a knee) indicates that the points to the right
 are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
+}
 
 \strong{Predict cluster memberships}
 
@@ -231,6 +247,11 @@ Clustering Based on Hierarchical Density Estimates. Proceedings of the
 17th Pacific-Asia Conference on Knowledge Discovery in Databases, PAKDD
 2013, \emph{Lecture Notes in Computer Science} 7819, p. 160.
 \doi{10.1007/978-3-642-37456-2_14}
+
+Sander, J., Ester, M., Kriegel, HP. et al. (1998). Density-Based
+Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications.
+\emph{Data Mining and Knowledge Discovery} 2, 169-194.
+\doi{10.1023/A:1009745219419}
 }
 \seealso{
 Other clustering functions: 

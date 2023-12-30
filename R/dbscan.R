@@ -36,9 +36,11 @@
 #' 1. Estimate the density
 #'   around each data point by counting the number of points in a user-specified
 #'   eps-neighborhood and applies a used-specified minPts thresholds to identify
-#'   core, border and noise points.
-#' 2. Core points are joined into
-#'   a cluster if they are density-reachable (i.e., there is a chain of core
+#'      - core points (points with more than minPts points in their neighborhood),
+#'      - border points (non-core points with a core point in their neighborhood) and
+#'      - noise points (all other points).
+#' 2. Core points form the backbone of clusters by joining them into
+#'   a cluster if they are density-reachable from each other (i.e., there is a chain of core
 #'   points where one falls inside the eps-neighborhood of the next).
 #' 3. Border points are assigned to clusters. The algorithm needs parameters
 #'   `eps` (the radius of the epsilon neighborhood) and `minPts` (the
@@ -65,16 +67,28 @@
 #'
 #' **Setting parameters for DBSCAN**
 #'
-#' The parameters `minPts` and `eps` depend on each other and
-#' changing one typically requires changing the other one as well. The original
-#' DBSCAN paper suggests to start by setting `minPts` to the
-#' dimensionality of the data plus one or higher. `minPts` defines the
-#' minimum density around a core point (i.e., the minimum density for non-noise
-#' areas). Increase the parameter to suppress more noise in the data and
-#' require more points to form a cluster. A suitable neighborhood size
+#' The parameters `minPts` and `eps` define the minimum density required
+#' in the area around core points which form the backbone of clusters.
+#' `minPts` is the number of points
+#' required in the neighborhood around the point defined by the parameter `eps`
+#' (i.e., the radius around the point). Both parameters
+#' depend on each other and changing one typically requires changing
+#' the other one as well. The parameters also depend on the size of the data set with
+#' larger datasets requiring a larger `minPts` or a smaller `eps`.
+#'
+#' * `minPts:` The original
+#' DBSCAN paper (Ester et al, 1996) suggests to start by setting \eqn{\text{minPts} \ge d + 1},
+#' the data dimensionality plus one or higher with a minimum of 3. Larger values
+#' are preferable since increasing the parameter suppresses more noise in the data
+#' by requiring more points to form clusters.
+#' Sander et al (1998) uses in the examples two times the data dimensionality.
+#' Note that setting \eqn{\text{minPts} \le 2} is equivalent to hierarchical clustering
+#' with the single link metric and the dendrogram cut at height `eps`.
+#'
+#' * `eps:` A suitable neighborhood size
 #' parameter `eps` given a fixed value for `minPts` can be found
 #' visually by inspecting the [kNNdistplot()] of the data using
-#' `k = minPts - 1` (`minPts` includes the point itself, while the
+#' \eqn{k = \text{minPts} - 1} (`minPts` includes the point itself, while the
 #' k-nearest neighbors distance does not). The k-nearest neighbor distance plot
 #' sorts all data points by their k-nearest neighbor distance. A sudden
 #' increase of the kNN distance (a knee) indicates that the points to the right
@@ -140,6 +154,12 @@
 #' 17th Pacific-Asia Conference on Knowledge Discovery in Databases, PAKDD
 #' 2013, _Lecture Notes in Computer Science_ 7819, p. 160.
 #' \doi{10.1007/978-3-642-37456-2_14}
+#'
+#' Sander, J., Ester, M., Kriegel, HP. et al. (1998). Density-Based
+#' Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications.
+#' _Data Mining and Knowledge Discovery_ 2, 169-194.
+#' \doi{10.1023/A:1009745219419}
+#'
 #' @keywords model clustering
 #' @examples
 #' ## Example 1: use dbscan on the iris data set

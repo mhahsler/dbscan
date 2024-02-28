@@ -12,7 +12,7 @@
 // neighborhood.
 
 #include <Rcpp.h>
-#include "R_regionQuery.h"
+#include "regionQuery.h"
 //#include "ANN/ANN.h"
 
 using namespace Rcpp;

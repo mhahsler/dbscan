@@ -1,5 +1,8 @@
 # dbscan 1.1-12-1 (2024-xx-xx)
 
+## Changes
+* Reorganized the C++ source code.
+
 # dbscan 1.1-12 (2023-11-28)
 
 ## Bugfix

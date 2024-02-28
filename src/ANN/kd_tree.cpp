@@ -31,7 +31,7 @@
 #include "kd_tree.h"					// kd-tree declarations
 #include "kd_split.h"					// kd-tree splitting rules
 #include "kd_util.h"					// kd-tree utilities
-#include "ANN/ANNperf.h"				// performance evaluation
+#include "ANNperf.h"				// performance evaluation
 
 //----------------------------------------------------------------------
 //	Global data

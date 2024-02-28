@@ -10,7 +10,7 @@
 
 #include <Rcpp.h>
 #include "ANN/ANN.h"
-#include "R_regionQuery.h"
+#include "regionQuery.h"
 
 using namespace Rcpp;
 

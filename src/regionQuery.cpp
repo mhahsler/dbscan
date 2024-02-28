@@ -11,7 +11,7 @@
 
 
 #include <Rcpp.h>
-#include "R_regionQuery.h"
+#include "regionQuery.h"
 
 using namespace Rcpp;
 

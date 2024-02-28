@@ -27,8 +27,8 @@
 //----------------------------------------------------------------------
 
 #include <cstdlib>
-#include "ANN/ANNx.h"					// all ANN include
-#include "ANN/ANNperf.h"				// ANN performance
+#include "ANNx.h"					// all ANN include
+#include "ANNperf.h"				// ANN performance
 //using namespace std;					// make std:: accessible
 
 #include <R.h>

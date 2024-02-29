@@ -73,8 +73,8 @@ plot(x, col = cl)
 Other NN functions: 
 \code{\link{comps}()},
 \code{\link{frNN}()},
-\code{\link{kNNdist}()},
 \code{\link{kNN}()},
+\code{\link{kNNdist}()},
 \code{\link{sNN}()}
 }
 \author{

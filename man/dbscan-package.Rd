@@ -3,19 +3,9 @@
 \docType{package}
 \name{dbscan-package}
 \alias{dbscan-package}
-\title{dbscan: Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
-and Related Algorithms}
+\title{dbscan: Density-Based Spatial Clustering of Applications with Noise (DBSCAN) and Related Algorithms}
 \description{
-A fast reimplementation of several density-based algorithms of
-the DBSCAN family. Includes the clustering algorithms DBSCAN (density-based
-spatial clustering of applications with noise) and HDBSCAN (hierarchical
-DBSCAN), the ordering algorithm OPTICS (ordering points to identify the
-clustering structure), shared nearest neighbor clustering, and the outlier
-detection algorithms LOF (local outlier factor) and GLOSH (global-local
-outlier score from hierarchies). The implementations use the kd-tree data
-structure (from library ANN) for faster k-nearest neighbor search. An R
-interface to fast kNN and fixed-radius NN search is also provided.
-Hahsler, Piekenbrock and Doran (2019) .
+A fast reimplementation of several density-based algorithms of the DBSCAN family. Includes the clustering algorithms DBSCAN (density-based spatial clustering of applications with noise) and HDBSCAN (hierarchical DBSCAN), the ordering algorithm OPTICS (ordering points to identify the clustering structure), shared nearest neighbor clustering, and the outlier detection algorithms LOF (local outlier factor) and GLOSH (global-local outlier score from hierarchies). The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search. An R interface to fast kNN and fixed-radius NN search is also provided. Hahsler, Piekenbrock and Doran (2019) \doi{10.18637/jss.v091.i01}.
 }
 \section{Key functions}{
 
@@ -29,6 +19,27 @@ Hahsler, Piekenbrock and Doran (2019) .
 \references{
 Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering with R. Journal of Statistical Software, 91(1), 1-30. \doi{10.18637/jss.v091.i01}
 }
-\author{
-Michael Hahsler and Matthew Piekenbrock
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/mhahsler/dbscan}
+  \item Report bugs at \url{https://github.com/mhahsler/dbscan/issues}
 }
+
+}
+\author{
+\strong{Maintainer}: Michael Hahsler \email{mhahsler@lyle.smu.edu} [copyright holder]
+
+Authors:
+\itemize{
+  \item Matthew Piekenbrock [copyright holder]
+}
+
+Other contributors:
+\itemize{
+  \item Sunil Arya [contributor, copyright holder]
+  \item David Mount [contributor, copyright holder]
+}
+
+}
+\keyword{internal}

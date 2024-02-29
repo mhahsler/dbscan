@@ -119,8 +119,8 @@ Other NN functions:
 \code{\link{NN}},
 \code{\link{comps}()},
 \code{\link{frNN}()},
-\code{\link{kNNdist}()},
-\code{\link{kNN}()}
+\code{\link{kNN}()},
+\code{\link{kNNdist}()}
 }
 \author{
 Michael Hahsler

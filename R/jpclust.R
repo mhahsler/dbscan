@@ -111,6 +111,7 @@ jpclust <- function(x, k, kt, ...) {
   )
 }
 
+#' @export
 print.general_clustering <- function(x, ...) {
   cl <- unique(x$cluster)
   cl <- length(cl[cl != 0L])

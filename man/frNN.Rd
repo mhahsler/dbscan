@@ -124,8 +124,8 @@ Approximate Nearest Neighbor Searching,
 Other NN functions: 
 \code{\link{NN}},
 \code{\link{comps}()},
-\code{\link{kNNdist}()},
 \code{\link{kNN}()},
+\code{\link{kNNdist}()},
 \code{\link{sNN}()}
 }
 \author{

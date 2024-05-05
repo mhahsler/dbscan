@@ -1,13 +1,14 @@
 
 # <img src="man/figures/logo.svg" align="right" height="139" /> R package dbscan - Density-Based Spatial Clustering of Applications with Noise (DBSCAN) and Related Algorithms
 
-[![CRAN
-version](http://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
-[![stream r-universe
+[![r-universe
 status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/dbscan)
+[![Package on
+CRAN](http://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![CRAN RStudio mirror
 downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
+[![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan+r-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan+r)
 
 ## Introduction
 
@@ -52,7 +53,6 @@ scikit-learn](https://scikit-learn.org/).
 The following R packages use `dbscan`:
 [AFM](https://CRAN.R-project.org/package=AFM),
 [bioregion](https://CRAN.R-project.org/package=bioregion),
-[CIDER](https://CRAN.R-project.org/package=CIDER),
 [CLONETv2](https://CRAN.R-project.org/package=CLONETv2),
 [ClustAssess](https://CRAN.R-project.org/package=ClustAssess),
 [cordillera](https://CRAN.R-project.org/package=cordillera),
@@ -66,13 +66,14 @@ The following R packages use `dbscan`:
 [dPCP](https://CRAN.R-project.org/package=dPCP),
 [EHRtemporalVariability](https://CRAN.R-project.org/package=EHRtemporalVariability),
 [eventstream](https://CRAN.R-project.org/package=eventstream),
+[evprof](https://CRAN.R-project.org/package=evprof),
 [FCPS](https://CRAN.R-project.org/package=FCPS),
 [fdacluster](https://CRAN.R-project.org/package=fdacluster),
 [FORTLS](https://CRAN.R-project.org/package=FORTLS),
 [funtimes](https://CRAN.R-project.org/package=funtimes),
 [FuzzyDBScan](https://CRAN.R-project.org/package=FuzzyDBScan),
+[karyotapR](https://CRAN.R-project.org/package=karyotapR),
 [ksharp](https://CRAN.R-project.org/package=ksharp),
-[ktaucenters](https://CRAN.R-project.org/package=ktaucenters),
 [LOMAR](https://CRAN.R-project.org/package=LOMAR),
 [maotai](https://CRAN.R-project.org/package=maotai),
 [metaCluster](https://CRAN.R-project.org/package=metaCluster),
@@ -81,11 +82,11 @@ The following R packages use `dbscan`:
 [oclust](https://CRAN.R-project.org/package=oclust),
 [openSkies](https://CRAN.R-project.org/package=openSkies),
 [opticskxi](https://CRAN.R-project.org/package=opticskxi),
+[OTclust](https://CRAN.R-project.org/package=OTclust),
 [pagoda2](https://CRAN.R-project.org/package=pagoda2),
 [parameters](https://CRAN.R-project.org/package=parameters),
 [ParBayesianOptimization](https://CRAN.R-project.org/package=ParBayesianOptimization),
 [performance](https://CRAN.R-project.org/package=performance),
-[pguIMP](https://CRAN.R-project.org/package=pguIMP),
 [rMultiNet](https://CRAN.R-project.org/package=rMultiNet),
 [seriation](https://CRAN.R-project.org/package=seriation),
 [sfdep](https://CRAN.R-project.org/package=sfdep),
@@ -102,15 +103,13 @@ The following R packages use `dbscan`:
 [supc](https://CRAN.R-project.org/package=supc),
 [synr](https://CRAN.R-project.org/package=synr),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
-[ts2net](https://CRAN.R-project.org/package=ts2net)
+[weird](https://CRAN.R-project.org/package=weird)
 
-Please cite the use of this package as:
+To cite package ‘dbscan’ in publications use:
 
-> To cite dbscan in publications use:
-
-Hahsler M, Piekenbrock M, Doran D (2019). “dbscan: Fast Density-Based
-Clustering with R.” *Journal of Statistical Software*, *91*(1), 1-30.
-<doi:10.18637/jss.v091.i01> <https://doi.org/10.18637/jss.v091.i01>.
+> Hahsler M, Piekenbrock M, Doran D (2019). “dbscan: Fast Density-Based
+> Clustering with R.” *Journal of Statistical Software*, *91*(1), 1-30.
+> <doi:10.18637/jss.v091.i01> <https://doi.org/10.18637/jss.v091.i01>.
 
     @Article{,
       title = {{dbscan}: Fast Density-Based Clustering with {R}},
@@ -135,7 +134,8 @@ install.packages("dbscan")
 [r-universe.](https://mhahsler.r-universe.dev/dbscan)
 
 ``` r
-install.packages("dbscan", repos = "https://mhahsler.r-universe.dev")
+install.packages("dbscan",
+    repos = c("https://mhahsler.r-universe.dev". "https://cloud.r-project.org/"))
 ```
 
 ## Usage
@@ -152,7 +152,7 @@ x <- as.matrix(iris[, 1:4])
 DBSCAN
 
 ``` r
-db <- dbscan(x, eps = 0.4, minPts = 4)
+db <- dbscan(x, eps = .4, minPts = 4)
 db
 ```
 
@@ -190,7 +190,7 @@ Extract DBSCAN-like clustering from OPTICS and create a reachability
 plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 
 ``` r
-opt <- extractDBSCAN(opt, eps_cl = 0.4)
+opt <- extractDBSCAN(opt, eps_cl = .4)
 plot(opt)
 ```
 

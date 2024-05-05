@@ -6,9 +6,8 @@ output: github_document
 pkg <- 'dbscan'
 
 source("https://raw.githubusercontent.com/mhahsler/pkg_helpers/main/pkg_helpers.R")
-pkg_title(pkg)
+pkg_title(pkg, anaconda = "r-dbscan", stackoverflow = "dbscan+r")
 ```
-[![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
 
 ## Introduction
 

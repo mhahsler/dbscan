@@ -1,5 +1,8 @@
 # dbscan 1.1-12-1 (2024-xx-xx)
 
+## New Features
+* kNNdistplot can now plot a range of k/minPts values.
+
 ## Changes
 * Reorganized the C++ source code.
 

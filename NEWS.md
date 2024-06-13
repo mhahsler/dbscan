@@ -5,6 +5,7 @@
 
 ## Changes
 * Reorganized the C++ source code.
+* README now used bibtex.
 
 # dbscan 1.1-12 (2023-11-28)
 

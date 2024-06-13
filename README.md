@@ -12,31 +12,34 @@ downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/
 
 ## Introduction
 
-This R package provides a fast C++ (re)implementation of several
-density-based algorithms with a focus on the DBSCAN family for
+This R package ([Hahsler, Piekenbrock, and Doran
+2019](#ref-hahsler2019dbscan)) provides a fast C++ (re)implementation of
+several density-based algorithms with a focus on the DBSCAN family for
 clustering spatial data. The package includes:
 
 **Clustering**
 
 - **DBSCAN:** Density-based spatial clustering of applications with
-  noise (Ester et al, 1996).
+  noise ([Ester et al. 1996](#ref-ester1996density)).
 - **HDBSCAN:** Hierarchical DBSCAN with simplified hierarchy extraction
-  (Campello et al, 2015).
+  ([Campello et al. 2015](#ref-campello2015hierarchical)).
 - **OPTICS/OPTICSXi:** Ordering points to identify the clustering
-  structure clustering algorithms (Ankerst et al, 1999).
+  structure clustering algorithms ([Ankerst et al.
+  1999](#ref-ankerst1999optics)).
 - **FOSC:** Framework for Optimal Selection of Clusters for unsupervised
-  and semisupervised clustering of hierarchical cluster tree (Campello
-  et al, 2013).
+  and semisupervised clustering of hierarchical cluster tree ([Campello,
+  Moulavi, and Sander 2013](#ref-campello2013density)).
 - **Jarvis-Patrick clustering**: Shared Nearest Neighbor Graph
-  partitioning (Javis and Patrick, 1973).
-- **SNN Clustering**: Shared Nearest Neighbor Clustering (Erdoz et al,
-  2003).
+  partitioning ([Jarvis and Patrick 1973](#ref-jarvis1973)).
+- **SNN Clustering**: Shared Nearest Neighbor Clustering ([Ertöz,
+  Steinbach, and Kumar 2003](#ref-erdoz2003)).
 
 **Outlier Detection**
 
-- **LOF:** Local outlier factor algorithm (Breunig et al, 2000).
+- **LOF:** Local outlier factor algorithm ([Breunig et al.
+  2000](#ref-breunig2000lof)).
 - **GLOSH:** Global-Local Outlier Score from Hierarchies algorithm
-  (Campello et al, 2015).
+  ([Campello et al. 2015](#ref-campello2015hierarchical)).
 
 **Fast Nearest-Neighbor Search (using kd-trees)**
 
@@ -96,7 +99,6 @@ The following R packages use `dbscan`:
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
 [snap](https://CRAN.R-project.org/package=snap),
 [spdep](https://CRAN.R-project.org/package=spdep),
-[spNetwork](https://CRAN.R-project.org/package=spNetwork),
 [squat](https://CRAN.R-project.org/package=squat),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
 [stream](https://CRAN.R-project.org/package=stream),
@@ -152,7 +154,7 @@ x <- as.matrix(iris[, 1:4])
 DBSCAN
 
 ``` r
-db <- dbscan(x, eps = .4, minPts = 4)
+db <- dbscan(x, eps = 0.4, minPts = 4)
 db
 ```
 
@@ -190,7 +192,7 @@ Extract DBSCAN-like clustering from OPTICS and create a reachability
 plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 
 ``` r
-opt <- extractDBSCAN(opt, eps_cl = .4)
+opt <- extractDBSCAN(opt, eps_cl = 0.4)
 plot(opt)
 ```
 
@@ -288,37 +290,81 @@ original author, Erich Schubert.
 
 ## References
 
-- Hahsler M, Piekenbrock M, Doran D (2019). [dbscan: Fast Density-Based
-  Clustering with R](https://doi.org/10.18637/jss.v091.i01). *Journal of
-  Statistical Software*, *91*(1), 1-30. doi: 10.18637/jss.v091.i01.
-- Martin Ester, Hans-Peter Kriegel, Joerg Sander, Xiaowei Xu (1996). A
-  Density-Based Algorithm for Discovering Clusters in Large Spatial
-  Databases with Noise. Institute for Computer Science, University of
-  Munich. Proceedings of 2nd International Conference on Knowledge
-  Discovery and Data Mining (KDD-96), 226-231.
-  <https://dl.acm.org/doi/10.5555/3001460.3001507>
-- Breunig, M., Kriegel, H., Ng, R., and Sander, J. (2000). LOF:
-  identifying density-based local outliers. In ACM Int. Conf. on
-  Management of Data, pages 93-104. doi:
-  <https://doi.org/10.1145/335191.335388>
-- Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander
-  (1999). OPTICS: Ordering Points To Identify the Clustering Structure.
-  ACM SIGMOD international conference on Management of data. ACM Press.
-  pp 49-60. doi: <https://doi.org/10.1145/304181.304187>
-- Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander
-  (2013). A framework for semi-supervised and unsupervised optimal
-  extraction of clusters from hierarchies. Data Mining and Knowledge
-  Discovery 27(3): 344-371. doi:
-  <https://doi.org/10.1007/s10618-013-0311-4>
-- Campello RJGB, Moulavi D, Zimek A, Sander J (2015). Hierarchical
-  density estimates for data clustering, visualization, and outlier
-  detection. ACM Transactions on Knowledge Discovery from Data (TKDD),
-  10(5):1-51. doi: <https://doi.org/10.1145/2733381>
-- R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a Similarity
-  Measure Based on Shared Near Neighbors. IEEE Trans. Comput. 22, 11
-  (November 1973), 1025-1034. doi:
-  <https://doi.org/10.1109/T-C.1973.223640>
-- Levent Ertoz, Michael Steinbach, Vipin Kumar, Finding Clusters of
-  Different Sizes, Shapes, and Densities in Noisy, High Dimensional
-  Data, SIAM International Conference on Data Mining, 2003, 47-59. doi:
-  <https://doi.org/10.1137/1.9781611972733.5>
+<div id="refs" class="references csl-bib-body hanging-indent">
+
+<div id="ref-ankerst1999optics" class="csl-entry">
+
+Ankerst, Mihael, Markus M Breunig, Hans-Peter Kriegel, and Jörg Sander.
+1999. “OPTICS: Ordering Points to Identify the Clustering Structure.” In
+*ACM Sigmod Record*, 28:49–60. 2. ACM.
+<https://doi.org/10.1145/304181.304187>.
+
+</div>
+
+<div id="ref-breunig2000lof" class="csl-entry">
+
+Breunig, Markus M, Hans-Peter Kriegel, Raymond T Ng, and Jörg Sander.
+2000. “LOF: Identifying Density-Based Local Outliers.” In *ACM Int.
+Conf. On Management of Data*, 29:93–104. 2. ACM.
+<https://doi.org/10.1145/335191.335388>.
+
+</div>
+
+<div id="ref-campello2013density" class="csl-entry">
+
+Campello, Ricardo JGB, Davoud Moulavi, and Jörg Sander. 2013.
+“Density-Based Clustering Based on Hierarchical Density Estimates.” In
+*Pacific-Asia Conference on Knowledge Discovery and Data Mining*,
+160–72. Springer. <https://doi.org/10.1007/978-3-642-37456-2_14>.
+
+</div>
+
+<div id="ref-campello2015hierarchical" class="csl-entry">
+
+Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg Sander.
+2015. “Hierarchical Density Estimates for Data Clustering,
+Visualization, and Outlier Detection.” *ACM Transactions on Knowledge
+Discovery from Data (TKDD)* 10 (1): 5.
+<https://doi.org/10.1145/2733381>.
+
+</div>
+
+<div id="ref-erdoz2003" class="csl-entry">
+
+Ertöz, Levent, Michael Steinbach, and Vipin Kumar. 2003. “Finding
+Clusters of Different Sizes, Shapes, and Densities in Noisy, High
+Dimensional Data.” In *Proceedings of the 2003 SIAM International
+Conference on Data Mining (SDM)*, 47–58.
+<https://doi.org/10.1137/1.9781611972733.5>.
+
+</div>
+
+<div id="ref-ester1996density" class="csl-entry">
+
+Ester, Martin, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu, et al. 1996.
+“A Density-Based Algorithm for Discovering Clusters in Large Spatial
+Databases with Noise.” In *Proceedings of 2nd International Conference
+on Knowledge Discovery and Data Mining (KDD-96)*, 226–31.
+<https://dl.acm.org/doi/10.5555/3001460.3001507>.
+
+</div>
+
+<div id="ref-hahsler2019dbscan" class="csl-entry">
+
+Hahsler, Michael, Matthew Piekenbrock, and Derek Doran. 2019.
+“<span class="nocase">dbscan</span>: Fast Density-Based Clustering with
+R.” *Journal of Statistical Software* 91 (1): 1–30.
+<https://doi.org/10.18637/jss.v091.i01>.
+
+</div>
+
+<div id="ref-jarvis1973" class="csl-entry">
+
+Jarvis, R. A., and E. A. Patrick. 1973. “Clustering Using a Similarity
+Measure Based on Shared Near Neighbors.” *IEEE Transactions on
+Computers* C-22 (11): 1025–34.
+<https://doi.org/10.1109/T-C.1973.223640>.
+
+</div>
+
+</div>

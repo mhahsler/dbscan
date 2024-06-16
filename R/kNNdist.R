@@ -23,7 +23,7 @@
 #' represented as a matrix of points. The kNN distance is defined as the
 #' distance from a point to its k nearest neighbor. The kNN distance plot
 #' displays the kNN distance of all points sorted from smallest to largest. The
-#' plot can be used to help find suitable parameter values for `dbscan()`.
+#' plot can be used to help find suitable parameter values for [dbscan()].
 #'
 #' @family Outlier Detection Functions
 #' @family NN functions
@@ -64,7 +64,7 @@
 #'
 #' ## Look at all k-NN distance plots for a k of 1 to 10
 #' ## Note that k-NN distances are increasing in k
-#' kNNdistplot(iris, k = 1:10)
+#' kNNdistplot(iris, k = 1:20)
 #'
 #' cl <- dbscan(iris, eps = .7, minPts = 5)
 #' pairs(iris, col = cl$cluster + 1L)
@@ -89,7 +89,7 @@ kNNdistplot <- function(x, k, minPts, ...) {
   if (length(k) == 1) {
   kNNdist <- sort(kNNdist(x, k, ...))
   plot(
-    sort(kNNdist),
+    kNNdist,
     type = "l",
     ylab = paste(k, "-NN distance", sep = ""),
     xlab = "Points sorted by distance"

@@ -6,6 +6,7 @@
 ## Changes
 * Reorganized the C++ source code.
 * README now used bibtex.
+* Removed second sort in kNNdistplot (reported by Natasza Szczypien)
 
 # dbscan 1.1-12 (2023-11-28)
 

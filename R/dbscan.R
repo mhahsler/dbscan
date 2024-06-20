@@ -422,4 +422,4 @@ print.dbscan_fast <- function(x, ...) {
 #' @rdname dbscan
 #' @export
 is.corepoint <- function(x, eps, minPts = 5, ...)
-  sapply(frNN(x, eps = eps, ...)$id, length) >= (minPts - 1)
+  lengths(frNN(x, eps = eps, ...)$id) >= (minPts - 1)

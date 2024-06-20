@@ -272,7 +272,7 @@ dbscan <-
     args <-
       c("MinPts", "search", "bucketSize", "splitRule", "approx")
     m <- pmatch(names(extra), args)
-    if (any(is.na(m)))
+    if (anyNA(m))
       stop("Unknown parameter: ",
         paste(names(extra)[is.na(m)], collapse = ", "))
     names(extra) <- args[m]
@@ -341,7 +341,7 @@ dbscan <-
         stop("all data in x has to be numeric.")
     }
 
-    if (length(frNN) == 0 && any(is.na(x)))
+    if (length(frNN) == 0 && anyNA(x))
       stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
 
     ## add self match and use C numbering if frNN is used

@@ -91,7 +91,7 @@ kNNdistplot <- function(x, k, minPts, ...) {
   plot(
     kNNdist,
     type = "l",
-    ylab = paste(k, "-NN distance", sep = ""),
+    ylab = paste0(k, "-NN distance"),
     xlab = "Points sorted by distance"
   )
 

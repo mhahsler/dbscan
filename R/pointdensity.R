@@ -97,7 +97,7 @@ pointdensity <- function(x,
   search <- .parse_search(search)
   splitRule <- .parse_splitRule(splitRule)
 
-  if (any(is.na(x)))
+  if (anyNA(x))
     stop("missing values are not allowed in x.")
 
   d <- dbscan_density_int(

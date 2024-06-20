@@ -151,7 +151,7 @@ frNN <-
       if (!is.null(query))
         stop("query can only be used if x contains the data.")
 
-      if (any(is.na(x)))
+      if (anyNA(x))
         stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
       return(dist_to_frNN(x, eps = eps, sort = sort))
@@ -178,7 +178,7 @@ frNN <-
         stop("x and query need to have the same number of columns!")
     }
 
-    if (any(is.na(x)))
+    if (anyNA(x))
       stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
     ## returns NO self matches

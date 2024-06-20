@@ -99,7 +99,7 @@ lof <- function(x, minPts = 5, ...) {
 
   args <- c("search", "bucketSize", "splitRule", "approx")
   m <- pmatch(names(extra), args)
-  if (any(is.na(m)))
+  if (anyNA(m))
     stop("Unknown parameter: ",
       paste(names(extra)[is.na(m)], collapse = ", "))
   names(extra) <- args[m]
@@ -146,7 +146,7 @@ lof <- function(x, minPts = 5, ...) {
 
   ### get LOF from a dist object
   if (inherits(x, "dist")) {
-    if (any(is.na(x)))
+    if (anyNA(x))
       stop("NAs not allowed in dist for LOF!")
 
     # find k-NN distance, ids and distances
@@ -174,7 +174,7 @@ lof <- function(x, minPts = 5, ...) {
   } else{
     ### Use kd-tree
 
-    if (any(is.na(x)))
+    if (anyNA(x))
       stop("NAs not allowed for LOF using kdtree!")
 
     ret <- lof_kNN(

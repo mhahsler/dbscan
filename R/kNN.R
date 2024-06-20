@@ -160,7 +160,7 @@ kNN <-
       if (!is.null(query))
         stop("query can only be used if x contains a data matrix.")
 
-      if (any(is.na(x)))
+      if (anyNA(x))
         stop("distances cannot be NAs for kNN!")
 
       return(dist_to_kNN(x, k = k))
@@ -189,7 +189,7 @@ kNN <-
       stop("Not enough neighbors in data set!")
 
 
-    if (any(is.na(x)))
+    if (anyNA(x))
       stop("data/distances cannot contain NAs for kNN (with kd-tree)!")
 
     ## returns NO self matches

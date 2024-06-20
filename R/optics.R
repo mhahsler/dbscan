@@ -200,7 +200,7 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   extra <- list(...)
   args <- c("search", "bucketSize", "splitRule", "approx")
   m <- pmatch(names(extra), args)
-  if (any(is.na(m)))
+  if (anyNA(m))
     stop("Unknown parameter: ",
       paste(names(extra)[is.na(m)], collapse = ", "))
   names(extra) <- args[m]
@@ -269,7 +269,7 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   }
 
   if (length(frNN) == 0 &&
-      any(is.na(x)))
+      anyNA(x))
     stop("data/distances cannot contain NAs for optics (with kd-tree)!")
 
   ret <-

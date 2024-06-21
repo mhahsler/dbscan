@@ -14,7 +14,7 @@ x <- cbind(
 ## no duplicates first!
 x <- x[!duplicated(x),]
 
-rownames(x) <- paste("Object_", 1:nrow(x), sep="")
+rownames(x) <- paste0("Object_", 1:nrow(x))
 
 k <- 5L
 nn <- dbscan::sNN(x, k=k, sort = TRUE)

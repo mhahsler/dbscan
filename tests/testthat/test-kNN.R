@@ -14,7 +14,7 @@ x <- cbind(
 ## no duplicates first! All distances should be unique
 x <- x[!duplicated(x),]
 
-rownames(x) <- paste("Object_", 1:nrow(x), sep="")
+rownames(x) <- paste0("Object_", 1:nrow(x))
 
 k <- 5L
 nn <- dbscan::kNN(x, k=k, sort = TRUE)
@@ -69,7 +69,7 @@ for(bs in c(5, 10, 15, 100)) {
 ## k-NN are not stable. We add 100 copied points to check if self match
 ## filtering and sort works
 x <- rbind(x, x[sample(1:nrow(x), 100),])
-rownames(x) <- paste("Object_", 1:nrow(x), sep="")
+rownames(x) <- paste0("Object_", 1:nrow(x))
 
 k <- 5L
 nn <- dbscan::kNN(x, k=k, sort = TRUE)

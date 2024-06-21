@@ -139,6 +139,6 @@ print.general_clustering <- function(x, ...) {
 
   writeLines(strwrap(paste0(
     "Available fields: ",
-    paste(names(x), collapse = ", ")
+    toString(names(x))
   ), exdent = 18))
 }

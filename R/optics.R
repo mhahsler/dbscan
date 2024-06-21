@@ -202,7 +202,7 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   m <- pmatch(names(extra), args)
   if (anyNA(m))
     stop("Unknown parameter: ",
-      paste(names(extra)[is.na(m)], collapse = ", "))
+      toString(names(extra)[is.na(m)]))
   names(extra) <- args[m]
 
   search <- if (is.null(extra$search))
@@ -344,7 +344,7 @@ print.optics <- function(x, ...) {
   }
   writeLines(strwrap(paste0(
     "Available fields: ",
-    paste(names(x), collapse = ", ")
+    toString(names(x))
   ), exdent = 18))
 }
 

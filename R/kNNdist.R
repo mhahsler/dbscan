@@ -99,7 +99,7 @@ kNNdistplot <- function(x, k, minPts, ...) {
     knnds <- sapply(k, FUN = function(i) sort(kNNdist(x, i, ...)))
 
     matplot(knnds, type = "l", lty = 1,
-            ylab = paste("k-NN distance", sep = ""),
+            ylab = paste0("k-NN distance"),
             xlab = "Points sorted by distance")
   }
 }

@@ -14,7 +14,7 @@ x <- cbind(
 ## no duplicates first!
 #x <- x[!duplicated(x),]
 
-rownames(x) <- paste("Object_", 1:nrow(x), sep="")
+rownames(x) <- paste0("Object_", 1:nrow(x))
 
 eps <- .5
 nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
@@ -63,7 +63,7 @@ for(bs in c(5, 10, 15, 100)) {
 
 ## add 100 copied points to check if self match filtering works
 x <- rbind(x, x[sample(1:nrow(x), 100),])
-rownames(x) <- paste("Object_", 1:nrow(x), sep="")
+rownames(x) <- paste0("Object_", 1:nrow(x))
 
 eps <- .5
 nn <- dbscan::frNN(x, eps = eps, sort = TRUE)

@@ -274,7 +274,7 @@ dbscan <-
     m <- pmatch(names(extra), args)
     if (anyNA(m))
       stop("Unknown parameter: ",
-        paste(names(extra)[is.na(m)], collapse = ", "))
+        toString(names(extra)[is.na(m)]))
     names(extra) <- args[m]
 
     if (!is.null(extra$MinPts)) {
@@ -415,7 +415,7 @@ print.dbscan_fast <- function(x, ...) {
 
   writeLines(strwrap(paste0(
     "Available fields: ",
-    paste(names(x), collapse = ", ")
+    toString(names(x))
   ), exdent = 18))
 }
 

@@ -24,7 +24,7 @@ expect_equal(nn$eps, eps)
 expect_equal(length(nn$dist), nrow(x))
 expect_equal(length(nn$id), nrow(x))
 
-expect_equal(sapply(nn$dist, length), sapply(nn$id, length))
+expect_equal(lengths(nn$dist), lengths(nn$id))
 
 ## check visually
 #plot(x)

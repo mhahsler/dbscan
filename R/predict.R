@@ -84,10 +84,8 @@ predict.hdbscan <- function(object, newdata, data, ...) {
         "data contains factors! The factors are converted to numbers and euclidean distances are used"
       )
     }
-    data[indx] <- lapply(data[indx], function(x)
-      as.numeric(x))
-    newdata[indx] <- lapply(newdata[indx], function(x)
-      as.numeric(x))
+    data[indx] <- lapply(data[indx], as.numeric)
+    newdata[indx] <- lapply(newdata[indx], as.numeric)
   }
 
   # don't use noise

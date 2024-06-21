@@ -250,7 +250,7 @@ print.hdbscan <- function(x, ...) {
   print(table(x$cluster))
   cat("\n")
   writeLines(strwrap(paste0(
-    "Available fields: ", paste(names(x), collapse = ", ")
+    "Available fields: ", toString(names(x))
   ), exdent = 18))
 }
 

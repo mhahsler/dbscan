@@ -325,5 +325,5 @@ print.frNN <- function(x, ...) {
     "\n",
     sep = ""
   )
-  cat("Available fields: ", paste(names(x), collapse = ", "), "\n", sep = "")
+  cat("Available fields: ", toString(names(x)), "\n", sep = "")
 }

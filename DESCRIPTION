@@ -28,7 +28,7 @@ LinkingTo: Rcpp
 Suggests:
     fpc,
     microbenchmark,
-    testthat, 
+    testthat (>= 3.0.0),
     dendextend,
     igraph,
     knitr,
@@ -39,6 +39,7 @@ BugReports: https://github.com/mhahsler/dbscan/issues
 License: GPL (>= 2)
 Copyright: ANN library is copyright by University of Maryland, Sunil Arya and
     David Mount. All other code is copyright by Michael Hahsler and Matthew Piekenbrock.
+Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)

@@ -1,4 +1,4 @@
-library("testthat")
+library(testthat)
+library(dbscan)
 
-library("dbscan")
 test_check("dbscan")

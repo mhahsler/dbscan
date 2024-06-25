@@ -1,104 +1,101 @@
-library("testthat")
-library("dbscan")
+test_that("frNN", {
+  set.seed(665544)
+  n <- 1000
+  x <- cbind(
+    x = runif(10, 0, 10) + rnorm(n, sd = 0.2),
+    y = runif(10, 0, 10) + rnorm(n, sd = 0.2),
+    z = runif(10, 0, 10) + rnorm(n, sd = 0.2)
+  )
 
-context("frNN")
+  ## no duplicates first!
+  #x <- x[!duplicated(x),]
 
-set.seed(665544)
-n <- 1000
-x <- cbind(
-  x = runif(10, 0, 10) + rnorm(n, sd = 0.2),
-  y = runif(10, 0, 10) + rnorm(n, sd = 0.2),
-  z = runif(10, 0, 10) + rnorm(n, sd = 0.2)
-)
+  rownames(x) <- paste0("Object_", 1:nrow(x))
 
-## no duplicates first!
-#x <- x[!duplicated(x),]
+  eps <- .5
+  nn <- frNN(x, eps = eps, sort = TRUE)
 
-rownames(x) <- paste0("Object_", 1:nrow(x))
+  ## check dimensions
+  expect_identical(nn$eps, eps)
+  expect_length(nn$dist, nrow(x))
+  expect_length(nn$id, nrow(x))
 
-eps <- .5
-nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
+  expect_identical(lengths(nn$dist), lengths(nn$id))
 
-## check dimensions
-expect_equal(nn$eps, eps)
-expect_equal(length(nn$dist), nrow(x))
-expect_equal(length(nn$id), nrow(x))
+  ## check visually
+  #plot(x)
+  #points(x[nn$id[[1]],], col="red", lwd=5)
+  #points(x[nn$id[[2]],], col="green", lwd=5)
+  #points(x[1:2,, drop = FALSE], col="blue", pch="+", cex=2)
 
-expect_equal(lengths(nn$dist), lengths(nn$id))
+  ## compare with manually found NNs
+  nn_d <- frNN(dist(x), eps = eps, sort = TRUE)
+  expect_equal(nn, nn_d)
 
-## check visually
-#plot(x)
-#points(x[nn$id[[1]],], col="red", lwd=5)
-#points(x[nn$id[[2]],], col="green", lwd=5)
-#points(x[1:2,, drop = FALSE], col="blue", pch="+", cex=2)
+  nn_d2 <- frNN(x, eps = eps, sort = TRUE, search = "dist")
+  expect_equal(nn, nn_d2)
 
-## compare with manually found NNs
-nn_d <- dbscan::frNN(dist(x), eps = eps, sort = TRUE)
-expect_equal(nn, nn_d)
+  ## without sorting
+  nn2 <- frNN(x, eps = eps, sort = FALSE)
+  expect_identical(lapply(nn$id, sort),
+    lapply(nn2$id, sort))
 
-nn_d2 <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
-expect_equal(nn, nn_d2)
+  ## search options
+  nn_linear <- frNN(x, eps=eps, search = "linear")
+  expect_equal(nn, nn_linear)
 
-## without sorting
-nn2 <- dbscan::frNN(x, eps = eps, sort = FALSE)
-expect_equal(lapply(nn$id, sort),
-  lapply(nn2$id, sort))
+  ## split options
+  for (so in c("STD", "MIDPT", "FAIR", "SL_FAIR")) {
+    nn3 <- frNN(x, eps=eps, splitRule = so)
+    expect_equal(nn, nn3)
+  }
 
-## search options
-nn_linear <- dbscan::frNN(x, eps=eps, search = "linear")
-expect_equal(nn, nn_linear)
-
-## split options
-for(so in c("STD", "MIDPT", "FAIR", "SL_FAIR")) {
-  nn3 <- dbscan::frNN(x, eps=eps, splitRule = so)
-  expect_equal(nn, nn3)
-}
-
-## bucket size
-for(bs in c(5, 10, 15, 100)) {
-  nn3 <- dbscan::frNN(x, eps=eps, bucketSize = bs)
-  expect_equal(nn, nn3)
-}
+  ## bucket size
+  for (bs in c(5, 10, 15, 100)) {
+    nn3 <- frNN(x, eps=eps, bucketSize = bs)
+    expect_equal(nn, nn3)
+  }
 
 
-## add 100 copied points to check if self match filtering works
-x <- rbind(x, x[sample(1:nrow(x), 100),])
-rownames(x) <- paste0("Object_", 1:nrow(x))
+  ## add 100 copied points to check if self match filtering works
+  x <- rbind(x, x[sample(1:nrow(x), 100),])
+  rownames(x) <- paste0("Object_", 1:nrow(x))
 
-eps <- .5
-nn <- dbscan::frNN(x, eps = eps, sort = TRUE)
+  eps <- .5
+  nn <- frNN(x, eps = eps, sort = TRUE)
 
-## compare with manually found NNs
-nn_d <- dbscan::frNN(x, eps = eps, sort = TRUE, search = "dist")
+  ## compare with manually found NNs
+  nn_d <- frNN(x, eps = eps, sort = TRUE, search = "dist")
 
-expect_equal(nn, nn_d)
+  expect_equal(nn, nn_d)
 
-## sort and frNN to reduce eps
-nn5 <- dbscan::frNN(x, eps = .5, sort = FALSE)
-expect_equal(nn5$sort, FALSE)
+  ## sort and frNN to reduce eps
+  nn5 <- frNN(x, eps = .5, sort = FALSE)
+  expect_equal(nn5$sort, FALSE)
 
-nn5s <- sort(nn5)
-expect_equal(nn5s$sort, TRUE)
-expect_equal(all(sapply(nn5s$dist, FUN = function(x) all(x == sort(x)))), TRUE)
+  nn5s <- sort(nn5)
+  expect_equal(nn5s$sort, TRUE)
+  expect_equal(all(sapply(nn5s$dist, FUN = function(x) all(x == sort(x)))), TRUE)
 
-expect_error(dbscan::frNN(nn5, eps = 1))
-nn2 <- dbscan::frNN(nn5, eps = .2)
-expect_equal(all(sapply(nn2$dist, FUN = function(x) all(x <=.2))), TRUE)
+  expect_error(frNN(nn5, eps = 1))
+  nn2 <- frNN(nn5, eps = .2)
+  expect_equal(all(sapply(nn2$dist, FUN = function(x) all(x <=.2))), TRUE)
 
 
-## test with simple data
-x <- data.frame(x=1:10, row.names = LETTERS[1:10])
-nn <- dbscan::frNN(x, eps = 2)
-expect_equivalent(nn$id[[1]], 2:3)
-expect_equivalent(nn$id[[5]], c(4,6,3,7))
-expect_equivalent(nn$id[[10]], 9:8)
+  ## test with simple data
+  x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+  nn <- frNN(x, eps = 2)
+  expect_identical(nn$id[[1]], 2:3)
+  expect_identical(nn$id[[5]], c(4L, 6L, 3L, 7L))
+  expect_identical(nn$id[[10]], 9:8)
 
-## test kNN with query
-x <- data.frame(x=1:10, row.names = LETTERS[1:10])
-nn <- dbscan::frNN(x[1:8, , drop=FALSE], x[9:10, , drop = FALSE], eps = 2)
+  ## test kNN with query
+  x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+  nn <- frNN(x[1:8, , drop=FALSE], x[9:10, , drop = FALSE], eps = 2)
 
-expect_equivalent(length(nn$id), 2L)
-expect_equivalent(nn$id[[1]], 8:7)
-expect_equivalent(nn$id[[2]], 8)
+  expect_length(nn$id, 2L)
+  expect_identical(nn$id[[1]], 8:7)
+  expect_identical(nn$id[[2]], 8L)
 
-expect_error(nn <- dbscan::frNN(dist(x[1:8, , drop=FALSE]), x[9:10, , drop = FALSE], eps = 2))
+  expect_error(frNN(dist(x[1:8, , drop=FALSE]), x[9:10, , drop = FALSE], eps = 2))
+})

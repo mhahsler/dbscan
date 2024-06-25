@@ -1,102 +1,97 @@
-library("dbscan")
-library("testthat")
+test_that("OPTICS", {
+  load(system.file("test_data/test_data.rda", package = "dbscan"))
+  load(system.file("test_data/elki_optics.rda", package = "dbscan"))
 
-context("OPTICS")
+  x <- test_data
 
-load(system.file("test_data/test_data.rda", package = "dbscan"))
-load(system.file("test_data/elki_optics.rda", package = "dbscan"))
+  ### run OPTICS
+  eps <- .1
+  #eps <- .06
+  eps_cl <- .1
+  minPts <- 10
+  res <- optics(x, eps = eps,  minPts = minPts)
 
-x <- test_data
+  expect_length(res$order, nrow(x))
+  expect_length(res$reachdist, nrow(x))
+  expect_length(res$coredist, nrow(x))
+  expect_identical(res$eps, eps)
+  expect_identical(res$minPts, minPts)
 
-### run OPTICS
-eps <- .1
-#eps <- .06
-eps_cl <- .1
-minPts <- 10
-res <- optics(x, eps = eps,  minPts = minPts)
+  ### compare with distance based version!
+  res_d <- optics(dist(x), eps = eps,  minPts = minPts)
+  expect_equal(res, res_d)
 
-expect_identical(length(res$order), nrow(x))
-expect_identical(length(res$reachdist), nrow(x))
-expect_identical(length(res$coredist), nrow(x))
-expect_identical(res$eps, eps)
-expect_identical(res$minPts, minPts)
+  #plot(res)
+  #plot(res_d)
 
-### compare with distance based version!
-res_d <- optics(dist(x), eps = eps,  minPts = minPts)
-expect_equal(res, res_d)
+  ### compare with elki's result
+  expect_equal(res$order, elki$ID)
+  expect_equal(round(res$reachdist[res$order], 3), round(elki$reachability, 3))
 
-#plot(res)
-#plot(res_d)
+  ### compare result with DBSCAN
+  ### "clustering created from a cluster-ordered is nearly indistinguishable
+  ### from a clustering created by DBSCAN. Only some border objects may
+  ### be missed"
 
-### compare with elki's result
-expect_equal(res$order, elki$ID)
-expect_equal(round(res$reachdist[res$order], 3), round(elki$reachability, 3))
+  # extract DBSCAN clustering
+  res <- extractDBSCAN(res, eps_cl = eps_cl)
+  #plot(res)
 
-### compare result with DBSCAN
-### "clustering created from a cluster-ordered is nearly indistinguishable
-### from a clustering created by DBSCAN. Only some border objects may
-### be missed"
+  # are there any clusters with only border points?
+  frnn <- frNN(x, eps_cl)
+  good <- sapply(frnn$id, FUN = function(x) (length(x)+1L)>=minPts)
+  #plot(x, col = (res$cluster+1L))
+  c_good <- res$cluster[good]
+  c_notgood <- res$cluster[!good]
+  expect_false(setdiff(c_notgood, c_good) != 0L)
 
-# extract DBSCAN clustering
-res <- extractDBSCAN(res, eps_cl = eps_cl)
-#plot(res)
+  # compare with DBSCAN
+  db <- dbscan(x, minPts = minPts, eps = eps)
+  #plot(x, col = res$cluster+1L)
+  #plot(x, col = db$cluster+1L)
 
-# are there any clusters with only border points?
-frnn <- frNN(x, eps_cl)
-good <- sapply(frnn$id, FUN = function(x) (length(x)+1L)>=minPts)
-#plot(x, col = (res$cluster+1L))
-c_good <- res$cluster[good]
-c_notgood <- res$cluster[!good]
-expect_false(setdiff(c_notgood, c_good) != 0L)
+  # match clusters (get rid of border points which might differ)
+  pure <- sapply(split(db$cluster, res$cluster),
+    FUN = function(x) length(unique(x)))
 
-# compare with DBSCAN
-db <- dbscan(x, minPts = minPts, eps = eps)
-#plot(x, col = res$cluster+1L)
-#plot(x, col = db$cluster+1L)
+  expect_true(all(pure[names(pure) != "0"] == 1L))
 
-# match clusters (get rid of border points which might differ)
-pure <- sapply(split(db$cluster, res$cluster),
-  FUN = function(x) length(unique(x)))
+  ## missing values, but distances are fine
+  x_na <- x
+  x_na[c(1,3,5), 1] <- NA
+  expect_error(optics(x_na, eps = .2, minPts = 4), regexp = "NA")
+  res_d1 <- optics(x_na, eps = .2, minPts = 4, search = "dist")
+  res_d2 <- optics(dist(x_na), eps = .2, minPts = 4)
+  expect_equal(res_d1, res_d2)
 
-expect_true(all(pure[names(pure) != "0"] == 1L))
+  ## introduce NAs into dist
+  x_na[c(1,3,5), 2] <- NA
+  expect_error(optics(x_na, eps = .2, minPts = 4), regexp = "NA")
+  expect_error(optics(x_na, eps = .2, minPts = 4, search = "dist"),
+    regexp = "NA")
+  expect_error(optics(dist(x_na), eps = .2, minPts = 4), regexp = "NA")
 
-## missing values, but distances are fine
-x_na <- x
-x_na[c(1,3,5), 1] <- NA
-expect_error(optics(x_na, eps = .2, minPts = 4), regexp = "NA")
-res_d1 <- optics(x_na, eps = .2, minPts = 4, search = "dist")
-res_d2 <- optics(dist(x_na), eps = .2, minPts = 4)
-expect_equal(res_d1, res_d2)
+  ## Create OPTICS-converted and single-linkage dendrograms
+  res <- optics(test_data, eps = Inf,  minPts = 2)
+  res_dend <- as.dendrogram(res)
+  reference <- as.dendrogram(hclust(dist(test_data), method = "single"))
 
-## introduce NAs into dist
-x_na[c(1,3,5), 2] <- NA
-expect_error(optics(x_na, eps = .2, minPts = 4), regexp = "NA")
-expect_error(optics(x_na, eps = .2, minPts = 4, search = "dist"),
-  regexp = "NA")
-expect_error(optics(dist(x_na), eps = .2, minPts = 4), regexp = "NA")
+  ## Test dendrogram ordering
+  expect_equal(as.integer(unlist(res_dend)), res$order)
 
-## Create OPTICS-converted and single-linkage dendrograms
-res <- optics(test_data, eps = Inf,  minPts = 2)
-res_dend <- as.dendrogram(res)
-reference <- as.dendrogram(hclust(dist(test_data), method = "single"))
+  ## Test Single Linkage with minPts=2, eps=INF for strict equivalence
+  ## Note: Reordering needed to correct for isomorphisms
+  ref_order <- order.dendrogram(reference)
+  reference <- reorder(reference, ref_order, agglo.FUN = mean)
+  expect_equal(reference, reorder(res_dend, ref_order, agglo.FUN = mean))
 
-## Test dendrogram ordering
-expect_equal(as.integer(unlist(res_dend)), res$order)
+  # Make sure any epsilon that queries the entire neighborhood works,
+  # error otherwise
+  max_rd <- max(res$reachdist[res$reachdist != Inf], na.rm = T)
+  expect_error(as.dendrogram(optics(test_data, eps = max_rd-1e-7,  minPts = 2)), regexp = "Eps")
+  expect_error(as.dendrogram(optics(test_data, eps = max_rd, minPts = nrow(test_data) + 1)), regexp = "'minPts'")
 
-## Test Single Linkage with minPts=2, eps=INF for strict equivalence
-## Note: Reordering needed to correct for isomorphisms
-ref_order <- order.dendrogram(reference)
-reference <- reorder(reference, ref_order, agglo.FUN = mean)
-expect_equal(reference, reorder(res_dend, ref_order, agglo.FUN = mean))
-
-# Make sure any epsilon that queries the entire neighborhood works,
-# error otherwise
-max_rd <- max(res$reachdist[res$reachdist != Inf], na.rm = T)
-expect_error(as.dendrogram(optics(test_data, eps = max_rd-1e-7,  minPts = 2)), regexp = "Eps")
-expect_error(as.dendrogram(optics(test_data, eps = max_rd, minPts = nrow(test_data) + 1)), regexp = "'minPts'")
-
-## Test symmetric relation between reachability <-> dendrogram structures
-expect_equal(as.reachability(as.dendrogram(res))$reachdist, res$reachdist)
-expect_equal(as.reachability(as.dendrogram(res))$order, res$order)
-
-
+  ## Test symmetric relation between reachability <-> dendrogram structures
+  expect_equal(as.reachability(as.dendrogram(res))$reachdist, res$reachdist)
+  expect_equal(as.reachability(as.dendrogram(res))$order, res$order)
+})

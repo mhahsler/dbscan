@@ -1,16 +1,15 @@
-library("dbscan")
-library("testthat")
+test_that("OPTICS-XI", {
+  load(system.file("test_data/test_data.rda", package = "dbscan"))
+  load(system.file("test_data/elki_optics.rda", package = "dbscan"))
+  load(system.file("test_data/elki_optics_xi.rda", package = "dbscan"))
 
-context("OPTICS-XI")
+  ### run OPTICS XI with parameters: xi=0.01, eps=1.0, minPts=5
+  x <- test_data
+  res <- optics(x, eps = 1.0,  minPts = 5)
+  res <- extractXi(res, xi=0.10, minimum=FALSE)
 
-load(system.file("test_data/test_data.rda", package = "dbscan"))
-load(system.file("test_data/elki_optics.rda", package = "dbscan"))
-load(system.file("test_data/elki_optics_xi.rda", package = "dbscan"))
-
-### run OPTICS XI with parameters: xi=0.01, eps=1.0, minPts=5
-x <- test_data
-res <- dbscan::optics(x, eps = 1.0,  minPts = 5)
-res <- dbscan::extractXi(res, xi=0.10, minimum=F)
-
-### Check to make sure ELKI results match R
-testthat::expect_equivalent(elki_optics_xi, res$clusters_xi[, c("start", "end")])
+  ### Check to make sure ELKI results match R
+  expected <- res$clusters_xi[, c("start", "end")]
+  class(expected) <- "data.frame"
+  expect_identical(elki_optics_xi, expected)
+})

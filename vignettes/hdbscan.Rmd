@@ -46,7 +46,7 @@ plot(cl$hc, main="HDBSCAN* Hierarchy")
 As the name implies, the fascinating thing about the HDBSCAN\* hierarchy is that any global 'cut' is equivalent to running DBSCAN\* (DBSCAN w/o border points) at the tree's cutting threshold $eps$ (assuming the same $minPts$ parameter setting was used). But can this be verified manually? Using a modified function to distinguish noise using core distance as 0 (since the stats cutree method _does not_ assign singletons with 0), the results can be shown to be identical. 
 ```{r}
 cl <- hdbscan(moons, minPts = 5)
-check <- rep(F, nrow(moons)-1)
+check <- rep(FALSE, nrow(moons)-1)
 core_dist <- kNNdist(moons, k=5-1)
 
 ## cutree doesn't distinguish noise as 0, so we make a new method to do it manually 
@@ -56,15 +56,15 @@ cut_tree <- function(hcl, eps, core_dist){
   cuts
 }
 
-eps_values <- sort(cl$hc$height, decreasing = T)+.Machine$double.eps ## Machine eps for consistency between cuts 
+eps_values <- sort(cl$hc$height, decreasing = TRUE)+.Machine$double.eps ## Machine eps for consistency between cuts
 for (i in 1:length(eps_values)) { 
   cut_cl <- cut_tree(cl$hc, eps_values[i], core_dist)
-  dbscan_cl <- dbscan(moons, eps = eps_values[i], minPts = 5, borderPoints = F) # DBSCAN* doesn't include border points
+  dbscan_cl <- dbscan(moons, eps = eps_values[i], minPts = 5, borderPoints = FALSE) # DBSCAN* doesn't include border points
   
   ## Use run length encoding as an ID-independent way to check ordering
   check[i] <- (all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths) == "TRUE")
 }
-print(all(check == T))
+print(all(check == TRUE))
 ```
 
 ## Simplified Tree
@@ -85,7 +85,7 @@ plot(cl, gradient = c("purple", "blue", "green", "yellow"), scale=1.5)
 
 ... even outline the most 'stable' clusters reported in the flat solution 
 ```{r}
-plot(cl, gradient = c("purple", "blue", "green", "yellow"), show_flat = T)
+plot(cl, gradient = c("purple", "blue", "green", "yellow"), show_flat = TRUE)
 ```
 
 ## Cluster Stability Scores
@@ -112,7 +112,7 @@ A recent journal publication on HDBSCAN comes with a new outlier measure that co
 
 __Note:__ Because of the distinction made that noise points, points that _are not_ assigned to any clusters, should be considered in the definition of an outlier, the outlier scores computed are not just the inversely-proportional scores to the membership probabilities. 
 ```{r}
-  top_outliers <- order(cl$outlier_scores, decreasing = T)[1:10]
+  top_outliers <- order(cl$outlier_scores, decreasing = TRUE)[1:10]
   colors <- mapply(function(col, i) adjustcolor(col, alpha.f = cl$outlier_scores[i]), 
                    palette()[cl$cluster+1], seq_along(cl$cluster))
   plot(moons, col=colors, pch=20)
@@ -148,7 +148,7 @@ Marking the noise appropriately and highlighting points based on their 'membersh
 
 The simplified tree can be particularly useful for larger datasets  
 ```{r}
-  plot(cl2, scale = 3, gradient = c("purple", "orange", "red"), show_flat = T)
+  plot(cl2, scale = 3, gradient = c("purple", "orange", "red"), show_flat = TRUE)
 ```
 
 ## Performance 

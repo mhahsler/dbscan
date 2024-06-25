@@ -302,7 +302,7 @@ plot.hdbscan <-
 
       ## widths == number of points in the cluster at each eps it was alive
       widths <-
-        sapply(sort(hd_info[[cl_key]]$eps, decreasing = T), function(eps)
+        sapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps)
           length(which(hd_info[[cl_key]]$eps <= eps)))
       if (length(widths) > 0) {
         widths <-
@@ -332,7 +332,7 @@ plot.hdbscan <-
         ytop <- rep(parent_height, length(widths))
         ybottom <-
           c(
-            sort(hd_info[[cl_key]]$eps, decreasing = T),
+            sort(hd_info[[cl_key]]$eps, decreasing = TRUE),
             rep(hd_info[[cl_key]]$eps_death, hd_info[[cl_key]]$n_children)
           )
       }

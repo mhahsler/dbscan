@@ -436,7 +436,7 @@ as.dendrogram.optics <- function(object, ...) {
 #' @rdname optics
 #' @export
 extractDBSCAN <- function(object, eps_cl) {
-  if (!"optics" %in% class(object))
+  if (!inherits(object, "optics"))
     stop("extractDBSCAN only accepts objects resulting from dbscan::optics!")
 
   reachdist <- object$reachdist[object$order]
@@ -476,7 +476,7 @@ extractXi <-
     minimum = FALSE,
     correctPredecessors = TRUE)
   {
-    if (!"optics" %in% class(object))
+    if (!inherits(object, "optics"))
       stop("extractXi only accepts xs resulting from dbscan::optics!")
     if (xi >= 1.0 ||
         xi <= 0.0)

@@ -59,8 +59,6 @@ test_that("HDBSCAN", {
 })
 
 test_that("mrdist", {
-  mrdist(cbind(1:10), 2)
-  mrdist(cbind(1:11), 2)
-  mrdist(dist(cbind(1:10)), 2)
-  mrdist(dist(cbind(1:11)), 2)
+  expect_identical(mrdist(cbind(1:10), 2),  mrdist(dist(cbind(1:10)), 2))
+  expect_identical(mrdist(cbind(1:11), 3), mrdist(dist(cbind(1:11)), 3))
 })

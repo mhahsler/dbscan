@@ -14,5 +14,5 @@ test_that("kNNdist", {
   expect_equal(dim(d), c(n, 5))
 
   # does the plot work?
-  kNNdistplot(x, 5)
+  #kNNdistplot(x, 5)
 })

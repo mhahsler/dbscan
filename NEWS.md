@@ -7,12 +7,13 @@
 * Reorganized the C++ source code.
 * README now used bibtex.
 * Removed redundant sort in kNNdistplot (reported by Natasza Szczypien).
-* Refactor: use more performant anyNA(x) instead of any(is.na(x)) (by m-muecke)
+* Refactor: use more performant anyNA(x) instead of any(is.na(x)) (by m-muecke).
+* Tests use now testthat edition 3 (m-muecke).
 
 # dbscan 1.1-12 (2023-11-28)
 
 ## Bugfix
-* point_density checks now for missing values (reported by soelderer)
+* point_density checks now for missing values (reported by soelderer).
 * Removed C++11 specification.
 * ANN.cpp: fixed Rprintf warning.
 

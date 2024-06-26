@@ -28,7 +28,7 @@ test_that("FOSC", {
 
   ## Constraints should be symmetric, but symmetry test is only done if specified. Asymmetric
   ## constraints through warning, but proceeds with manual warning
-  expect_warning(extractFOSC(x_sl, constraints = list("1" = 2), validate_constraints = T))
+  expect_warning(extractFOSC(x_sl, constraints = list("1" = 2), validate_constraints = TRUE))
 
   ## Make sure that's whats returned
   res <- extractFOSC(x_sl)
@@ -47,9 +47,9 @@ test_that("FOSC", {
   expect_identical(res$hc$method, "single (w/ constraint-based extraction)")
 
   ## Test negative constraints
-  set2 <- c(il_constraints[[as.character(set[1])]], -unlist(il_constraints[as.character(c(ver[1], vir[1]))], use.names = F))
-  ver2 <- c(il_constraints[[as.character(ver[1])]], -unlist(il_constraints[as.character(c(set[1], vir[1]))], use.names = F))
-  vir2 <- c(il_constraints[[as.character(vir[1])]], -unlist(il_constraints[as.character(c(set[1], ver[1]))], use.names = F))
+  set2 <- c(il_constraints[[as.character(set[1])]], -unlist(il_constraints[as.character(c(ver[1], vir[1]))], use.names = FALSE))
+  ver2 <- c(il_constraints[[as.character(ver[1])]], -unlist(il_constraints[as.character(c(set[1], vir[1]))], use.names = FALSE))
+  vir2 <- c(il_constraints[[as.character(vir[1])]], -unlist(il_constraints[as.character(c(set[1], ver[1]))], use.names = FALSE))
   il_constraints2 <- structure(list(set2, ver2, vir2), names = as.character(c(set[1], ver[1], vir[1])))
   res2 <- extractFOSC(x_sl, constraints = il_constraints2)
 

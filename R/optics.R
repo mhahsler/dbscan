@@ -286,8 +286,8 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
 
   ret$minPts <- minPts
   ret$eps <- eps
-  ret$eps_cl <- NA
-  ret$xi <- NA
+  ret$eps_cl <- NA_real_
+  ret$xi <- NA_real_
   class(ret) <- "optics"
 
   ret
@@ -436,7 +436,7 @@ as.dendrogram.optics <- function(object, ...) {
 #' @rdname optics
 #' @export
 extractDBSCAN <- function(object, eps_cl) {
-  if (!"optics" %in% class(object))
+  if (!inherits(object, "optics"))
     stop("extractDBSCAN only accepts objects resulting from dbscan::optics!")
 
   reachdist <- object$reachdist[object$order]
@@ -459,7 +459,7 @@ extractDBSCAN <- function(object, eps_cl) {
   }
 
   object$eps_cl <- eps_cl
-  object$xi <- NA
+  object$xi <- NA_real_
   ### fix the order so cluster is in the same order as the rows in x
   cluster[object$order] <- cluster
   object$cluster <- cluster
@@ -476,7 +476,7 @@ extractXi <-
     minimum = FALSE,
     correctPredecessors = TRUE)
   {
-    if (!"optics" %in% class(object))
+    if (!inherits(object, "optics"))
       stop("extractXi only accepts xs resulting from dbscan::optics!")
     if (xi >= 1.0 ||
         xi <= 0.0)
@@ -638,7 +638,7 @@ extractXi <-
 
     # Keep xi parameter, disable any previous flat clustering parameter
     object$xi <- xi
-    object$eps_cl <- NA
+    object$eps_cl <- NA_real_
 
     # Zero-out clusters (only noise) if none found
     if (length(SetOfClusters) == 0) {

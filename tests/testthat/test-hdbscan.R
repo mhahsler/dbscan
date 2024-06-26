@@ -35,7 +35,7 @@ test_that("HDBSCAN", {
   eps_values <- sort(res$hc$height, decreasing = TRUE)+.Machine$double.eps ## Machine eps for consistency between cuts
   for (i in 1:length(eps_values)) {
     cut_cl <- cut_tree(res$hc, eps_values[i], core_dist)
-    dbscan_cl <- dbscan(moons, eps = eps_values[i], minPts = 5, borderPoints = F) # DBSCAN* doesn't include border points
+    dbscan_cl <- dbscan(moons, eps = eps_values[i], minPts = 5, borderPoints = FALSE) # DBSCAN* doesn't include border points
 
     ## Use run length encoding as an ID-independent way to check ordering
     check[i] <- (all.equal(rle(cut_cl)$lengths, rle(dbscan_cl$cluster)$lengths) == "TRUE")

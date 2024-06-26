@@ -133,7 +133,7 @@ NULL
 #' @rdname reachability
 #' @export
 print.reachability <- function(x, ...) {
-  avg_reach <- mean(x$reachdist[which(x$reachdist != Inf)], na.rm = T)
+  avg_reach <- mean(x$reachdist[which(x$reachdist != Inf)], na.rm = TRUE)
   cat(
     "Reachability plot collection for ",
     length(x$order),

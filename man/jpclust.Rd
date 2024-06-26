@@ -32,7 +32,7 @@ indicates noise points.}
 \description{
 Fast C++ implementation of the Jarvis-Patrick clustering which first builds
 a shared nearest neighbor graph (k nearest neighbor sparsification) and then
-places two points in the same cluster if they are in each other's nearest
+places two points in the same cluster if they are in each others nearest
 neighbor list and they share at least kt nearest neighbors.
 }
 \details{

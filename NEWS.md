@@ -2,6 +2,7 @@
 
 ## New Features
 * kNNdistplot can now plot a range of k/minPts values.
+* added stats::nobs methods for the clusterings.
 
 ## Changes
 * Reorganized the C++ source code.

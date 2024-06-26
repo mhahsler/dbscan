@@ -83,7 +83,7 @@
 #' nn <- frNN(x, eps = .5)
 #'
 #' # Number of neighbors
-#' hist(sapply(adjacencylist(nn), length),
+#' hist(lengths(adjacencylist(nn)),
 #'   xlab = "k", main="Number of Neighbors",
 #'   sub = paste("Neighborhood size eps =", nn$eps))
 #'
@@ -274,7 +274,7 @@ dist_to_frNN <- function(x, eps, sort = FALSE) {
 #' @rdname frNN
 #' @export
 sort.frNN <- function(x, decreasing = FALSE, ...) {
-  if (!is.null(x$sort) && x$sort)
+  if (isTRUE(x$sort))
     return(x)
   if (is.null(x$dist))
     stop("Unable to sort. Distances are missing.")

@@ -91,7 +91,7 @@ x <- iris[, -5]
 nn <- frNN(x, eps = .5)
 
 # Number of neighbors
-hist(sapply(adjacencylist(nn), length),
+hist(lengths(adjacencylist(nn)),
   xlab = "k", main="Number of Neighbors",
   sub = paste("Neighborhood size eps =", nn$eps))
 

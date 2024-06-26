@@ -96,7 +96,7 @@ kNNdistplot <- function(x, k, minPts, ...) {
   )
 
   } else {
-    knnds <- sapply(k, FUN = function(i) sort(kNNdist(x, i, ...)))
+    knnds <- vapply(k, function(i) sort(kNNdist(x, i, ...)), numeric(nrow(x)))
 
     matplot(knnds, type = "l", lty = 1,
             ylab = paste0("k-NN distance"),

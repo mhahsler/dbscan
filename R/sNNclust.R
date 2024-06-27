@@ -81,6 +81,8 @@
 #' # A point needs a least 16 (minPts) links in the sNN graph to be a core point.
 #' # Noise points have cluster id 0 and are shown in black.
 #' cl <- sNNclust(DS3, k = 20, eps = 7, minPts = 16)
+#' cl
+#'
 #' plot(DS3, col = cl$cluster + 1L, cex = .5)
 #'
 #' @export
@@ -90,7 +92,7 @@ sNNclust <- function(x, k, eps, minPts, borderPoints = TRUE, ...) {
   # convert into a frNN object which already enforces eps
   nn_list <- lapply(seq(nrow(nn$id)),
     FUN = function(i) unname(nn$id[i, nn$shared[i,] >= eps]))
-  snn <- structure(list(id = nn_list, eps = eps),
+  snn <- structure(list(id = nn_list, eps = eps, metric = nn$metric),
     class = c("NN", "frNN"))
 
   # run dbscan
@@ -98,6 +100,7 @@ sNNclust <- function(x, k, eps, minPts, borderPoints = TRUE, ...) {
 
   structure(list(cluster = cl$cluster,
     type = "SharedNN clustering",
-    param = list(k = k, eps = eps, minPts = minPts, borderPoints = borderPoints)),
+    param = list(k = k, eps = eps, minPts = minPts, borderPoints = borderPoints),
+    metric = cl$metric),
     class = c("general_clustering"))
 }

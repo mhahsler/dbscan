@@ -443,6 +443,7 @@ mrdist <- function(x, minPts, coredist = NULL) {
   attr(mr_dist, "Size") <- attr(x_dist, "Size")
   attr(mr_dist, "Diag") <- FALSE
   attr(mr_dist, "Upper") <- FALSE
-  attr(mr_dist, "method") <- "mutual reachability"
+  attr(mr_dist, "method") <- paste0("mutual reachability (",
+                                    attr(x_dist, "method"),")")
   mr_dist
 }

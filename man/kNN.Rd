@@ -63,6 +63,7 @@ list with the following components:
 \item{dist }{a matrix with distances. }
 \item{id }{a matrix with \code{ids}. }
 \item{k }{number \code{k} used. }
+\item{metric }{ used distance metric. }
 }
 \description{
 This function uses a kd-tree to find all k nearest neighbors in a data

@@ -65,6 +65,8 @@ data("DS3")
 # A point needs a least 16 (minPts) links in the sNN graph to be a core point.
 # Noise points have cluster id 0 and are shown in black.
 cl <- sNNclust(DS3, k = 20, eps = 7, minPts = 16)
+cl
+
 plot(DS3, col = cl$cluster + 1L, cex = .5)
 
 }

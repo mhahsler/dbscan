@@ -27,6 +27,7 @@ components:
 \item{cluster }{A integer vector with cluster assignments. Zero
 indicates noise points.}
 \item{type }{ name of used clustering algorithm.}
+\item{metric }{ the distance metric used for clustering.}
 \item{param }{ list of used clustering parameters. }
 }
 \description{

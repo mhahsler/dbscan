@@ -131,6 +131,7 @@
 #'
 #' \item{eps }{ value of the `eps` parameter.}
 #' \item{minPts }{ value of the `minPts` parameter.}
+#' \item{metric }{ used distance metric.}
 #' \item{cluster }{A integer vector with cluster assignments. Zero indicates noise points.}
 #'
 #' `is.corepoint()` returns a logical vector indicating for each data point if it is a
@@ -380,7 +381,7 @@ dbscan <-
         cluster = ret,
         eps = eps,
         minPts = minPts,
-        dist = dist_method,
+        metric = dist_method,
         borderPoints = borderPoints
       ),
       class = c("dbscan_fast", "dbscan")
@@ -397,7 +398,7 @@ print.dbscan_fast <- function(x, ...) {
     paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
     paste0(
       "Using ",
-      x$dist,
+      x$metric,
       " distances and borderpoints = ",
       x$borderPoints
     ),

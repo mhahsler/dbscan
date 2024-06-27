@@ -82,7 +82,7 @@ IntegerVector JP_int(IntegerMatrix nn, unsigned int kt) {
 
 // jp == true: use the definition by Jarvis-Patrick: A link is created between a pair of
 // points, p and q, if and only if p and q have each other  in their k-nearest neighbor lists.
-// jp == false: just count the shared NNs
+// jp == false: just count the shared NNs = regular sNN
 // [[Rcpp::export]]
 IntegerMatrix SNN_sim_int(IntegerMatrix nn, LogicalVector jp) {
   R_xlen_t n = nn.nrow();

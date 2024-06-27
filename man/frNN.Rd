@@ -65,6 +65,7 @@ neighbors. }
 \item{dist }{a list with distances (same structure as
 \code{id}). }
 \item{eps }{ neighborhood radius \code{eps} that was used. }
+\item{metric }{ used distance metric. }
 
 \code{adjacencylist()} returns a list with one entry per data point in \code{x}. Each entry
 contains the id of the nearest neighbors.
@@ -89,6 +90,7 @@ x <- iris[, -5]
 
 # Example 1: Find fixed radius nearest neighbors for each point
 nn <- frNN(x, eps = .5)
+nn
 
 # Number of neighbors
 hist(lengths(adjacencylist(nn)),

@@ -33,10 +33,10 @@ neighbors.}
 build the shared nearest neighbor graph. Edges are only preserved if
 \code{kt} or more neighbors are shared.}
 
-\item{jp}{use the definition by Javis and Patrick (1973), where shared
-neighbors are only counted between points that are in each other's
-neighborhood, otherwise 0 is returned. If \code{FALSE}, then the number of shared
-neighbors is returned, even if the points are not neighbors.}
+\item{jp}{In regular sNN graphs, two points that are not neighbors
+can have shared neighbors.
+Javis and Patrick (1973) requires the two points to be neighbors, otherwise
+the count is zeroed out. \code{TRUE} uses this behavior.}
 
 \item{sort}{sort by the number of shared nearest neighbors? Note that this
 is expensive and \code{sort = FALSE} is much faster. sNN objects can be
@@ -67,20 +67,28 @@ with the following components:
 \item{dist}{a matrix with the distances. }
 \item{shared }{a matrix with the number of shared nearest neighbors. }
 \item{k }{number of \code{k} used. }
+\item{metric }{the used distance metric. }
 }
 \description{
-Calculates the number of shared nearest neighbors, the shared nearest
-neighbor similarity and creates a shared nearest neighbors graph.
+Calculates the number of shared nearest neighbors
+and creates a shared nearest neighbors graph.
 }
 \details{
-The number of shared nearest neighbors is the intersection of the kNN
-neighborhood of two points. Note: that each point is considered to be part
-of its own kNN neighborhood. The range for the shared nearest neighbors is
-\eqn{[0, k]}.
+The number of shared nearest neighbors of two points p and q is the
+intersection of the kNN neighborhood of two points.
+Note: that each point is considered to be part
+of its own kNN neighborhood.
+The range for the shared nearest neighbors is
+\eqn{[0, k]}. The result is a n-by-k matrix called \code{shared}.
+Each row is a point and the columns are the point's k nearest neighbors.
+The value is the count of the shared neighbors.
 
-Javis and Patrick (1973) use the shared nearest neighbor graph for
-clustering. They only count shared neighbors between points that are in each
-other's kNN neighborhood.
+The shared nearest neighbor graph connects a point with all its nearest neighbors
+if they have at least one shared neighbor. The number of shared neighbors can be used
+as an edge weight.
+Javis and Patrick (1973) use a slightly
+modified (see parameter \code{jp}) shared nearest neighbor graph for
+clustering.
 }
 \examples{
 data(iris)
@@ -94,7 +102,7 @@ nn
 # shared nearest neighbor distribution
 table(as.vector(nn$shared))
 
-# explore neighborhood of point 10
+# explore number of shared points for the k-neighborhood of point 10
 i <- 10
 nn$shared[i,]
 

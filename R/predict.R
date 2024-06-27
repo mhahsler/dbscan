@@ -24,7 +24,7 @@
 #' predicted.
 #' @export
 predict.dbscan_fast <- function (object, newdata, data, ...) {
-  if (object$dist != "euclidean")
+  if (object$metric != "euclidean")
     warning("dbscan used non-Euclidean distances, predict assigns new points using Euclidean distances!")
   .predict_frNN(newdata, data, object$cluster, object$eps, ...)
 }

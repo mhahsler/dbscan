@@ -79,6 +79,7 @@
 #' \item{dist }{a matrix with distances. }
 #' \item{id }{a matrix with `ids`. }
 #' \item{k }{number `k` used. }
+#' \item{metric }{ used distance metric. }
 #'
 #' @author Michael Hahsler
 #' @references David M. Mount and Sunil Arya (2010). ANN: A Library for
@@ -224,6 +225,8 @@ kNN <-
     if (sort)
       ret <- sort(ret)
 
+    ret$metric = "euclidean"
+
     ret
   }
 
@@ -266,7 +269,8 @@ dist_to_kNN <- function(x, k) {
       dist = d,
       id = id,
       k = k,
-      sort = TRUE
+      sort = TRUE,
+      metric = attr(x, "method")
     ),
       class = c("kNN", "NN"))
 
@@ -323,7 +327,8 @@ print.kNN <- function(x, ...) {
     ").",
     "\n",
     sep = "")
-  cat("Available fields: ", toString(names(x)), "\n", sep = "")
+  cat("Distance metric:", x$metric, "\n")
+  cat("\nAvailable fields: ", toString(names(x)), "\n", sep = "")
 }
 
 # Convert names to integers for C++

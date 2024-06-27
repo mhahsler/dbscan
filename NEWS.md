@@ -3,6 +3,7 @@
 ## New Features
 * kNNdistplot can now plot a range of k/minPts values.
 * added stats::nobs methods for the clusterings.
+* kNN and frNN now contains the used distance metric.
 
 ## Changes
 * Reorganized the C++ source code.
@@ -10,6 +11,7 @@
 * Removed redundant sort in kNNdistplot (reported by Natasza Szczypien).
 * Refactor: use more performant anyNA(x) instead of any(is.na(x)) (by m-muecke).
 * Tests use now testthat edition 3 (m-muecke).
+* dbscan component dist was renamed to metric. 
 
 # dbscan 1.1-12 (2023-11-28)
 

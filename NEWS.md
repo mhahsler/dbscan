@@ -4,6 +4,7 @@
 * kNNdistplot can now plot a range of k/minPts values.
 * added stats::nobs methods for the clusterings.
 * kNN and frNN now contains the used distance metric.
+* dbscan has now tidymodels tidiers (glance, tidy, augment).
 
 ## Changes
 * Reorganized the C++ source code.

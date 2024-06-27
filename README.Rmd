@@ -37,7 +37,7 @@ __Fast Nearest-Neighbor Search (using kd-trees)__
 - __Fixed-radius NN search__
 
 The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
-implementations in [WEKA](https://www.cs.waikato.ac.nz/ml/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
+implementations in [WEKA](https://ml.cms.waikato.ac.nz/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
 
 ```{r echo=FALSE, results = 'asis'}
 pkg_usage(pkg)
@@ -57,7 +57,7 @@ x <- as.matrix(iris[, 1:4])
 
 DBSCAN
 ```{r}
-db <- dbscan(x, eps = .4, minPts = 4)
+db <- dbscan(x, eps = .42, minPts = 5)
 db
 ```
 
@@ -93,9 +93,36 @@ Visualize the hierarchical clustering as a simplified tree. HDBSCAN finds 2 stab
 plot(hdb, show_flat = TRUE)
 ```
 
+## Using dbscan with tidyverse
+
+`dbscan` provides for all clustering algorithms `tidy()`, `augment()`, and `glance()` so they can
+be easily used with tidyverse, ggplot2 and [tidymodels](https://www.tidymodels.org/learn/statistics/k-means/).
+
+```{r tidyverse, message=FALSE, warning=FALSE}
+library(tidyverse)
+db <- x %>% dbscan(eps = .42, minPts = 5)
+```
+
+Get cluster statistics
+
+```{r tidyverse2}
+tidy(db)
+```
+
+Visualize the clustering with ggplot2
+```{r tidyverse3}
+augment(db, x) %>% 
+  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
+    geom_point(aes(color = .cluster, shape = noise)) +
+    scale_shape_manual(values=c(19, 4))
+
+```
+
+
+
 
 ## Using dbscan from Python
-R, R package `dbscan`, and Python package `rpy2` need to be installed.
+R, the R package `dbscan`, and the Python package `rpy2` need to be installed.
 
 ```{python, eval = FALSE}
 import pandas as pd

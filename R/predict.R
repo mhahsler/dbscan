@@ -22,6 +22,7 @@
 #' @param data the data set used to create the clustering object.
 #' @param newdata new data points for which the cluster membership should be
 #' predicted.
+#' @importFrom stats predict
 #' @export
 predict.dbscan_fast <- function (object, newdata, data, ...) {
   if (object$metric != "euclidean")

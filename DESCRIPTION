@@ -23,7 +23,8 @@ Depends:
 Imports:
     Rcpp (>= 1.0.0),
     graphics,
-    stats
+    stats,
+    generics
 LinkingTo: Rcpp
 Suggests:
     fpc,
@@ -32,7 +33,9 @@ Suggests:
     dendextend,
     igraph,
     knitr,
-    rmarkdown
+    rmarkdown,
+    tibble,
+    rlang
 VignetteBuilder: knitr
 URL: https://github.com/mhahsler/dbscan
 BugReports: https://github.com/mhahsler/dbscan/issues

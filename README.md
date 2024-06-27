@@ -49,7 +49,7 @@ clustering spatial data. The package includes:
 The implementations use the kd-tree data structure (from library ANN)
 for faster k-nearest neighbor search, and are typically faster than the
 native R implementations (e.g., dbscan in package `fpc`), or the
-implementations in [WEKA](https://www.cs.waikato.ac.nz/ml/weka/),
+implementations in [WEKA](https://ml.cms.waikato.ac.nz/weka/),
 [ELKI](https://elki-project.github.io/) and [Python’s
 scikit-learn](https://scikit-learn.org/).
 
@@ -99,6 +99,7 @@ The following R packages use `dbscan`:
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
 [snap](https://CRAN.R-project.org/package=snap),
 [spdep](https://CRAN.R-project.org/package=spdep),
+[spNetwork](https://CRAN.R-project.org/package=spNetwork),
 [squat](https://CRAN.R-project.org/package=squat),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
 [stream](https://CRAN.R-project.org/package=stream),
@@ -137,7 +138,8 @@ install.packages("dbscan")
 
 ``` r
 install.packages("dbscan",
-    repos = c("https://mhahsler.r-universe.dev". "https://cloud.r-project.org/"))
+    repos = c("https://mhahsler.r-universe.dev",
+              "https://cloud.r-project.org/"))
 ```
 
 ## Usage
@@ -154,19 +156,19 @@ x <- as.matrix(iris[, 1:4])
 DBSCAN
 
 ``` r
-db <- dbscan(x, eps = 0.4, minPts = 4)
+db <- dbscan(x, eps = 0.42, minPts = 5)
 db
 ```
 
     ## DBSCAN clustering for 150 objects.
-    ## Parameters: eps = 0.4, minPts = 4
+    ## Parameters: eps = 0.42, minPts = 5
     ## Using euclidean distances and borderpoints = TRUE
-    ## The clustering contains 4 cluster(s) and 25 noise points.
+    ## The clustering contains 3 cluster(s) and 29 noise points.
     ## 
-    ##  0  1  2  3  4 
-    ## 25 47 38 36  4 
+    ##  0  1  2  3 
+    ## 29 48 37 36 
     ## 
-    ## Available fields: cluster, eps, minPts, dist, borderPoints
+    ## Available fields: cluster, eps, minPts, metric, borderPoints
 
 Visualize the resulting clustering (noise points are shown in black).
 
@@ -224,9 +226,46 @@ plot(hdb, show_flat = TRUE)
 
 ![](inst/README_files/hdbscan-1.png)<!-- -->
 
+## Using dbscan with tidyverse
+
+`dbscan` provides for all clustering algorithms `tidy()`, `augment()`,
+and `glance()` so they can be easily used with tidyverse, ggplot2 and
+[tidymodels](https://www.tidymodels.org/learn/statistics/k-means/).
+
+``` r
+library(tidyverse)
+db <- x %>%
+    dbscan(eps = 0.42, minPts = 5)
+```
+
+Get cluster statistics
+
+``` r
+tidy(db)
+```
+
+    ## # A tibble: 4 × 3
+    ##   cluster  size noise
+    ##   <fct>   <int> <fct>
+    ## 1 0          29 TRUE 
+    ## 2 1          48 FALSE
+    ## 3 2          37 FALSE
+    ## 4 3          36 FALSE
+
+Visualize the clustering with ggplot2
+
+``` r
+augment(db, x) %>%
+    ggplot(aes(x = Petal.Length, y = Petal.Width)) + geom_point(aes(color = .cluster,
+    shape = noise)) + scale_shape_manual(values = c(19, 4))
+```
+
+![](inst/README_files/tidyverse3-1.png)<!-- -->
+
 ## Using dbscan from Python
 
-R, R package `dbscan`, and Python package `rpy2` need to be installed.
+R, the R package `dbscan`, and the Python package `rpy2` need to be
+installed.
 
 ``` python
 import pandas as pd

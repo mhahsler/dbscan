@@ -71,15 +71,15 @@ test_that("frNN", {
 
   ## sort and frNN to reduce eps
   nn5 <- frNN(x, eps = .5, sort = FALSE)
-  expect_equal(nn5$sort, FALSE)
+  expect_false(nn5$sort)
 
   nn5s <- sort(nn5)
-  expect_equal(nn5s$sort, TRUE)
-  expect_equal(all(sapply(nn5s$dist, FUN = function(x) all(x == sort(x)))), TRUE)
+  expect_true(nn5s$sort)
+  expect_true(all(vapply(nn5s$dist, function(x) !is.unsorted(x), logical(1L))))
 
   expect_error(frNN(nn5, eps = 1))
   nn2 <- frNN(nn5, eps = .2)
-  expect_equal(all(sapply(nn2$dist, FUN = function(x) all(x <=.2))), TRUE)
+  expect_true(all(vapply(nn2$dist, function(x) all(x <= 0.2), logical(1L))))
 
 
   ## test with simple data

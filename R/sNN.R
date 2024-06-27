@@ -161,7 +161,7 @@ sNN <- function(x,
 #' @rdname sNN
 #' @export
 sort.sNN <- function(x, decreasing = TRUE, ...) {
-  if (!is.null(x$sort_shared) && x$sort_shared)
+  if (isTRUE(x$sort_shared))
     return(x)
   if (is.null(x$shared))
     stop("Unable to sort. Number of shared neighbors is missing.")
@@ -173,11 +173,10 @@ sort.sNN <- function(x, decreasing = TRUE, ...) {
 
   ## sort first by number of shared points (decreasing) and break ties by id (increasing)
   k <- ncol(x$shared)
-  o <- sapply(
+  o <- vapply(
     1:nrow(x$shared),
-    FUN =
-      function(i)
-        order(k - x$shared[i, ], x$id[i, ], decreasing = !decreasing)
+    function(i) order(k - x$shared[i, ], x$id[i, ], decreasing = !decreasing),
+    integer(k)
   )
   for (i in 1:ncol(o)) {
     x$shared[i, ] <- x$shared[i, ][o[, i]]

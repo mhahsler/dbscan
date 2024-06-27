@@ -276,7 +276,7 @@ dist_to_kNN <- function(x, k) {
 #' @rdname kNN
 #' @export
 sort.kNN <- function(x, decreasing = FALSE, ...) {
-  if (!is.null(x$sort) && x$sort)
+  if (isTRUE(x$sort))
     return(x)
   if (is.null(x$dist))
     stop("Unable to sort. Distances are missing.")

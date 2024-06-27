@@ -223,9 +223,8 @@ extractFOSC <-
         ## Checks for proper indexing, symmetry of constraints, etc.
         if (validate_constraints) {
           is_valid <- max(as.integer(names(constraints))) < n
-          is_valid <-
-            is_valid && all(sapply(constraints, function(ilc)
-              all(ilc <= n)))
+          is_valid <- is_valid &&
+            all(vapply(constraints, function(ilc) all(ilc <= n), logical(1L)))
           if (!is_valid) {
             stop("Detected constraint indices not in the interval [1, n]")
           }
@@ -279,10 +278,10 @@ extractFOSC <-
         cl_tree <-
           extractSemiSupervised(cl_tree, constraints_list, alpha, prune_unstable)
       } else {
-        stop(paste(
-          "'extractFOSC' doesn't know how to handle constraints of type",
+        stop(
+          "'extractFOSC' doesn't know how to handle constraints of type ",
           class(constraints)
-        ))
+        )
       }
     }
     total_stab <-

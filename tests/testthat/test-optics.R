@@ -39,7 +39,7 @@ test_that("OPTICS", {
 
   # are there any clusters with only border points?
   frnn <- frNN(x, eps_cl)
-  good <- sapply(frnn$id, FUN = function(x) (length(x)+1L)>=minPts)
+  good <- vapply(frnn$id, function(x) (length(x) + 1L) >= minPts, logical(1L))
   #plot(x, col = (res$cluster+1L))
   c_good <- res$cluster[good]
   c_notgood <- res$cluster[!good]
@@ -51,8 +51,9 @@ test_that("OPTICS", {
   #plot(x, col = db$cluster+1L)
 
   # match clusters (get rid of border points which might differ)
-  pure <- sapply(split(db$cluster, res$cluster),
-    FUN = function(x) length(unique(x)))
+  pure <- vapply(
+    split(db$cluster, res$cluster), function(x) length(unique(x)), integer(1L)
+  )
 
   expect_true(all(pure[names(pure) != "0"] == 1L))
 

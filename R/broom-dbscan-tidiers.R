@@ -85,7 +85,7 @@ tidy.dbscan <- function(x, ...) {
   tb <- tibble::tibble(cluster = as.factor(0:n_cl),
          size = as.integer(size))
 
-  tb$noise = factor(tb$cluster == 0L)
+  tb$noise <- tb$cluster == 0L
   tb
 }
 
@@ -97,8 +97,8 @@ tidy.hdbscan <- function(x, ...) {
 
   tb <- tibble::tibble(cluster = as.factor(0:n_cl),
          size = as.integer(size))
-  tb$cluster_score = as.numeric(x$cluster_scores[as.character(tb$cluster)])
-  tb$noise = factor(tb$cluster == 0L)
+  tb$cluster_score <- as.numeric(x$cluster_scores[as.character(tb$cluster)])
+  tb$noise <- tb$cluster == 0L
 
   tb
 }
@@ -111,7 +111,7 @@ tidy.general_clustering <- function(x, ...) {
 
   tb <- tibble::tibble(cluster = as.factor(0:n_cl),
          size = as.integer(size))
-  tb$noise <- factor(tb$cluster == 0L)
+  tb$noise <- tb$cluster == 0L
 
   tb
 }
@@ -130,7 +130,7 @@ generics::augment
 augment.dbscan <- function(x, data = NULL, newdata = NULL, ...) {
   n_cl <- max(x$cluster)
 
-  if(is.null(data) && is.null(newdata))
+  if (is.null(data) && is.null(newdata))
     stop("Must specify either `data` or `newdata` argument.")
 
   if (is.null(data) || nrow(data) != length(x$cluster)) {
@@ -147,7 +147,7 @@ augment.dbscan <- function(x, data = NULL, newdata = NULL, ...) {
                                   data = data), levels = 0:n_cl)
   }
 
-  tb$noise <- factor(tb$.cluster == 0L)
+  tb$noise <- tb$.cluster == 0L
 
   tb
 }

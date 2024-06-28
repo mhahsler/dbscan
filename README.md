@@ -238,7 +238,7 @@ db <- x %>%
     dbscan(eps = 0.42, minPts = 5)
 ```
 
-Get cluster statistics
+Get cluster statistics as a tibble
 
 ``` r
 tidy(db)
@@ -246,13 +246,13 @@ tidy(db)
 
     ## # A tibble: 4 × 3
     ##   cluster  size noise
-    ##   <fct>   <int> <fct>
+    ##   <fct>   <int> <lgl>
     ## 1 0          29 TRUE 
     ## 2 1          48 FALSE
     ## 3 2          37 FALSE
     ## 4 3          36 FALSE
 
-Visualize the clustering with ggplot2
+Visualize the clustering with ggplot2 (use an x for noise points)
 
 ``` r
 augment(db, x) %>%

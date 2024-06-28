@@ -1,18 +1,19 @@
-# dbscan 1.1-12-1 (2024-xx-xx)
+# dbscan 1.2-0 (2024-06-28)
 
 ## New Features
+* dbscan has now tidymodels tidiers (glance, tidy, augment).
 * kNNdistplot can now plot a range of k/minPts values.
 * added stats::nobs methods for the clusterings.
 * kNN and frNN now contains the used distance metric.
-* dbscan has now tidymodels tidiers (glance, tidy, augment).
 
 ## Changes
-* Reorganized the C++ source code.
-* README now used bibtex.
-* Removed redundant sort in kNNdistplot (reported by Natasza Szczypien).
-* Refactor: use more performant anyNA(x) instead of any(is.na(x)) (by m-muecke).
-* Tests use now testthat edition 3 (m-muecke).
 * dbscan component dist was renamed to metric. 
+* Removed redundant sort in kNNdistplot (reported by Natasza Szczypien).
+* Refactoring use more performant anyNA(x) instead of any(is.na(x))
+  and many more (by m-muecke).
+* Reorganized the C++ source code.
+* README now uses bibtex.
+* Tests use now testthat edition 3 (m-muecke).
 
 # dbscan 1.1-12 (2023-11-28)
 

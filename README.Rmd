@@ -103,13 +103,13 @@ library(tidyverse)
 db <- x %>% dbscan(eps = .42, minPts = 5)
 ```
 
-Get cluster statistics
+Get cluster statistics as a tibble
 
 ```{r tidyverse2}
 tidy(db)
 ```
 
-Visualize the clustering with ggplot2
+Visualize the clustering with ggplot2 (use an x for noise points)
 ```{r tidyverse3}
 augment(db, x) %>% 
   ggplot(aes(x = Petal.Length, y = Petal.Width)) +

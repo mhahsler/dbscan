@@ -178,7 +178,6 @@ hdbscan <- function(x,
   ## Generate membership 'probabilities' using core distance as the measure of density
   prob <- rep(0, length(cl))
   for (cid in sl) {
-    ccl <- res[[as.character(cid)]]
     max_f <- max(coredist[which(cl == cid)])
     pr <- (max_f - coredist[which(cl == cid)]) / max_f
     prob[cl == cid] <- pr

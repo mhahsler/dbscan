@@ -33,7 +33,7 @@ test_that("HDBSCAN", {
   }
 
   eps_values <- sort(res$hc$height, decreasing = TRUE)+.Machine$double.eps ## Machine eps for consistency between cuts
-  for (i in 1:length(eps_values)) {
+  for (i in seq_along(eps_values)) {
     cut_cl <- cut_tree(res$hc, eps_values[i], core_dist)
     dbscan_cl <- dbscan(moons, eps = eps_values[i], minPts = 5, borderPoints = FALSE) # DBSCAN* doesn't include border points
 

@@ -225,7 +225,7 @@ kNN <-
     if (sort)
       ret <- sort(ret)
 
-    ret$metric = "euclidean"
+    ret$metric <- "euclidean"
 
     ret
   }

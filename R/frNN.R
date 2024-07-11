@@ -126,7 +126,7 @@ frNN <-
       if (x$eps < eps)
         stop("frNN in x has not a sufficient eps radius.")
 
-      for (i in 1:length(x$dist)) {
+      for (i in seq_along(x$dist)) {
         take <- x$dist[[i]] <= eps
         x$dist[[i]] <- x$dist[[i]][take]
         x$id[[i]] <- x$id[[i]][take]
@@ -197,8 +197,8 @@ frNN <-
         )
       names(ret$dist) <- rownames(query)
       names(ret$id) <- rownames(query)
-      ret$metric = "euclidean"
-    } else{
+      ret$metric <- "euclidean"
+    } else {
       ret <- frNN_int(
         as.matrix(x),
         as.double(eps),
@@ -209,7 +209,7 @@ frNN <-
       )
       names(ret$dist) <- rownames(x)
       names(ret$id) <- rownames(x)
-      ret$metric = "euclidean"
+      ret$metric <- "euclidean"
     }
 
     ret$eps <- eps
@@ -288,19 +288,19 @@ sort.frNN <- function(x, decreasing = FALSE, ...) {
   n <- names(x$id)
 
   o <- lapply(
-    1:length(x$dist),
+    seq_along(x$dist),
     FUN =
       function(i)
         order(x$dist[[i]], x$id[[i]], decreasing = decreasing)
   )
   x$dist <-
     lapply(
-      1:length(o),
+      seq_along(o),
       FUN = function(p)
         x$dist[[p]][o[[p]]]
     )
   x$id <- lapply(
-    1:length(o),
+    seq_along(o),
     FUN = function(p)
       x$id[[p]][o[[p]]]
   )

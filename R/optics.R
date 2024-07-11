@@ -244,12 +244,12 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
     frNN <- frNN(x, eps, ...)
     ## add self match and use C numbering
     frNN$id <- lapply(
-      1:length(frNN$id),
+      seq_along(frNN$id),
       FUN = function(i)
         c(i - 1L, frNN$id[[i]] - 1L)
     )
     frNN$dist <- lapply(
-      1:length(frNN$dist),
+      seq_along(frNN$dist),
       FUN = function(i)
         c(0, frNN$dist[[i]]) ^ 2
     )

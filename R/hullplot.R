@@ -133,7 +133,7 @@ hullplot <- function(x,
     ci_order <- 1:max(cl)
   }
 
-  for (i in 1:length(ci_order)) {
+  for (i in seq_along(ci_order)) {
     ### use all the points for xICSXi's hierarchical structure
     if (is.null(clusters_xi)) {
       d <- x[cl == i, , drop = FALSE]

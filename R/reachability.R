@@ -171,7 +171,7 @@ plot.reachability <- function(x,
     lty = 3)
   if (order_labels) {
     text(
-      x = 1:length(x$order),
+      x = seq_along(x$order),
       y = reachdist,
       labels = x$order,
       pos = 3

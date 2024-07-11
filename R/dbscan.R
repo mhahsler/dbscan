@@ -349,7 +349,7 @@ dbscan <-
     if (length(frNN) > 0)
       frNN <-
       lapply(
-        1:length(frNN),
+        seq_along(frNN),
         FUN = function(i)
           c(i - 1L, frNN[[i]] - 1L)
       )

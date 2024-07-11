@@ -107,8 +107,8 @@ plot.NN <- function(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray"
   ## use lines if it is from the same data
   ## FIXME: this test is not perfect, maybe we should have a parameter here or add the query points...
   if (length(id) == nrow(data)) {
-    for (i in 1:length(id)) {
-      for (j in 1:length(id[[i]]))
+    for (i in seq_along(id)) {
+      for (j in seq_along(id[[i]]))
         lines(x = c(data[i, 1], data[id[[i]][j], 1]),
           y = c(data[i, 2], data[id[[i]][j], 2]), col = linecol,
           ...)
@@ -121,7 +121,7 @@ plot.NN <- function(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray"
     ## ad vertices
     points(data[, 1:2], main = main, pch = pch, ...)
     ## use colors if it was from a query
-    for (i in 1:length(id)) {
+    for (i in seq_along(id)) {
       points(data[id[[i]], ], pch = pch, col = i + 1L)
     }
   }

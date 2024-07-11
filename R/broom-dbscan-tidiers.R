@@ -16,7 +16,7 @@
 #' @seealso [generics::tidy()], [generics::augment()],
 #'  [generics::glance()], [dbscan()]
 #'
-#' @examplesIf rlang::is_installed(c("tibble")) && identical(Sys.getenv("NOT_CRAN"), "true")
+#' @examplesIf requireNamespace("tibble", quietly = TRUE) && identical(Sys.getenv("NOT_CRAN"), "true")
 #'
 #' data(iris)
 #' x <- scale(iris[, 1:4])

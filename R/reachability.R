@@ -104,7 +104,7 @@
 #' )
 #'
 #' plot(x, xlim = range(x), ylim = c(min(x) - sd(x), max(x) + sd(x)), pch = 20)
-#' text(x = x, labels = 1:nrow(x), pos = 3)
+#' text(x = x, labels = seq_len(nrow(x)), pos = 3)
 #'
 #' ### run OPTICS
 #' res <- optics(x, eps = 10,  minPts = 2)

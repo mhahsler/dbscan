@@ -10,7 +10,7 @@ test_that("frNN", {
   ## no duplicates first!
   #x <- x[!duplicated(x),]
 
-  rownames(x) <- paste0("Object_", 1:nrow(x))
+  rownames(x) <- paste0("Object_", seq_len(nrow(x)))
 
   eps <- .5
   nn <- frNN(x, eps = eps, sort = TRUE)
@@ -58,8 +58,8 @@ test_that("frNN", {
 
 
   ## add 100 copied points to check if self match filtering works
-  x <- rbind(x, x[sample(1:nrow(x), 100),])
-  rownames(x) <- paste0("Object_", 1:nrow(x))
+  x <- rbind(x, x[sample(seq_len(nrow(x)), 100),])
+  rownames(x) <- paste0("Object_", seq_len(nrow(x)))
 
   eps <- .5
   nn <- frNN(x, eps = eps, sort = TRUE)

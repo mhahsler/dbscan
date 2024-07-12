@@ -10,7 +10,7 @@ test_that("kNN", {
   ## no duplicates first! All distances should be unique
   x <- x[!duplicated(x),]
 
-  rownames(x) <- paste0("Object_", 1:nrow(x))
+  rownames(x) <- paste0("Object_", seq_len(nrow(x)))
 
   k <- 5L
   nn <- kNN(x, k=k, sort = TRUE)
@@ -64,8 +64,8 @@ test_that("kNN", {
   ## the order is not stable with matching distances which means that the
   ## k-NN are not stable. We add 100 copied points to check if self match
   ## filtering and sort works
-  x <- rbind(x, x[sample(1:nrow(x), 100),])
-  rownames(x) <- paste0("Object_", 1:nrow(x))
+  x <- rbind(x, x[sample(seq_len(nrow(x)), 100),])
+  rownames(x) <- paste0("Object_", seq_len(nrow(x)))
 
   k <- 5L
   nn <- kNN(x, k=k, sort = TRUE)

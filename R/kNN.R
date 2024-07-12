@@ -97,7 +97,7 @@
 #' # explore neighborhood of point 10
 #' i <- 10
 #' nn$id[i,]
-#' plot(x, col = ifelse(1:nrow(iris) %in% nn$id[i,], "red", "black"))
+#' plot(x, col = ifelse(seq_len(nrow(iris)) %in% nn$id[i,], "red", "black"))
 #'
 #' # visualize the 5 nearest neighbors
 #' plot(nn, x)
@@ -291,12 +291,12 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
 
   ## sort first by dist and break ties using id
   o <- sapply(
-    1:nrow(x$dist),
+    seq_len(nrow(x$dist)),
     FUN =
       function(i)
         order(x$dist[i,], x$id[i,], decreasing = decreasing)
   )
-  for (i in 1:ncol(o)) {
+  for (i in seq_len(ncol(o))) {
     x$dist[i,] <- x$dist[i,][o[, i]]
     x$id[i,] <- x$id[i,][o[, i]]
   }

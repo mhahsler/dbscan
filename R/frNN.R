@@ -93,7 +93,7 @@
 #' i <- 10
 #' nn$id[[i]]
 #' nn$dist[[i]]
-#' plot(x, col = ifelse(1:nrow(iris) %in% nn$id[[i]], "red", "black"))
+#' plot(x, col = ifelse(seq_len(nrow(iris)) %in% nn$id[[i]], "red", "black"))
 #'
 #' # get an adjacency list
 #' head(adjacencylist(nn))

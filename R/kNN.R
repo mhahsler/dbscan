@@ -309,10 +309,10 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
 #' @export
 adjacencylist.kNN <- function(x, ...)
   lapply(
-    seq(nrow(x$id)),
+    seq_len(nrow(x$id)),
     FUN = function(i) {
       ## filter NAs
-      tmp <- x$id[i,]
+      tmp <- x$id[i, ]
       tmp[!is.na(tmp)]
     }
   )

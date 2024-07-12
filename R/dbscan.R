@@ -284,15 +284,8 @@ dbscan <-
     }
     extra$MinPts <- NULL
 
-    search <- if (is.null(extra$search))
-      "kdtree"
-    else
-      extra$search
-    splitRule <-
-      if (is.null(extra$splitRule))
-        "suggest"
-    else
-      extra$splitRule
+    search <- extra$search %||% "kdtree"
+    splitRule <- extra$splitRule %||% "suggest"
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
 

@@ -207,7 +207,7 @@ print.sNN <- function(x, ...) {
     " objects (k=",
     x$k,
     ", kt=",
-    ifelse(is.null(x$kt), "NULL", x$kt),
+    x$kt %||% "NULL",
     ").",
     "\n",
     sep = ""

@@ -182,11 +182,11 @@ sort.sNN <- function(x, decreasing = TRUE, ...) {
   ## sort first by number of shared points (decreasing) and break ties by id (increasing)
   k <- ncol(x$shared)
   o <- vapply(
-    1:nrow(x$shared),
+    seq_len(nrow(x$shared)),
     function(i) order(k - x$shared[i, ], x$id[i, ], decreasing = !decreasing),
     integer(k)
   )
-  for (i in 1:ncol(o)) {
+  for (i in seq_len(ncol(o))) {
     x$shared[i, ] <- x$shared[i, ][o[, i]]
     x$dist[i, ] <- x$dist[i, ][o[, i]]
     x$id[i, ] <- x$id[i, ][o[, i]]

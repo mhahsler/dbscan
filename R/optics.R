@@ -244,12 +244,12 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
     frNN <- frNN(x, eps, ...)
     ## add self match and use C numbering
     frNN$id <- lapply(
-      1:length(frNN$id),
+      seq_along(frNN$id),
       FUN = function(i)
         c(i - 1L, frNN$id[[i]] - 1L)
     )
     frNN$dist <- lapply(
-      1:length(frNN$dist),
+      seq_along(frNN$dist),
       FUN = function(i)
         c(0, frNN$dist[[i]]) ^ 2
     )
@@ -383,7 +383,7 @@ plot.optics <-
       )
 
       # Lines beneath plotting region indicating Xi clusters
-      i <- 1:nrow(hclusters)
+      i <- seq_len(nrow(hclusters))
       segments(
         x0 = hclusters$start[i],
         y0 = -(y_increments * i),
@@ -655,7 +655,7 @@ extractXi <-
       object$clusters_xi <-
         object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end), ]
       object$clusters_xi <-
-        cbind(object$clusters_xi, list(cluster_id = 1:nrow(object$clusters_xi)))
+        cbind(object$clusters_xi, list(cluster_id = seq_len(nrow(object$clusters_xi))))
       row.names(object$clusters_xi) <- NULL
     }
 
@@ -720,7 +720,7 @@ extractClusterLabels <- function(cl, order, minimum = FALSE) {
   if (!all(c("start", "end") %in% names(cl)))
     stop("extractClusterLabels expects start and end references")
   if (!"cluster_id" %in% names(cl))
-    cl <- cbind(cl, cluster_id = 1:nrow(cl))
+    cl <- cbind(cl, cluster_id = seq_len(nrow(cl)))
 
   ## Sort cl based on minimum parameter / cluster size
   if (!"cluster_size" %in% names(cl))

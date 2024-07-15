@@ -107,7 +107,7 @@ nn
 # explore neighborhood of point 10
 i <- 10
 nn$id[i,]
-plot(x, col = ifelse(1:nrow(iris) \%in\% nn$id[i,], "red", "black"))
+plot(x, col = ifelse(seq_len(nrow(iris)) \%in\% nn$id[i,], "red", "black"))
 
 # visualize the 5 nearest neighbors
 plot(nn, x)

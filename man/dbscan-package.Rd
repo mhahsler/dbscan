@@ -28,7 +28,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Michael Hahsler \email{mhahsler@lyle.smu.edu} [copyright holder]
+\strong{Maintainer}: Michael Hahsler \email{mhahsler@lyle.smu.edu} (\href{https://orcid.org/0000-0003-2716-1405}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{

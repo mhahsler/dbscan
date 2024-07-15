@@ -55,7 +55,7 @@ Provides \link[generics:tidy]{tidy()}, \link[generics:augment]{augment()}, and
 in package \code{dbscan} to work with \href{https://www.tidymodels.org/}{tidymodels}.
 }
 \examples{
-\dontshow{if (rlang::is_installed(c("tibble")) && identical(Sys.getenv("NOT_CRAN"), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("tibble", quietly = TRUE) && identical(Sys.getenv("NOT_CRAN"), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 
 data(iris)
 x <- scale(iris[, 1:4])

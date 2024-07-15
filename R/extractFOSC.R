@@ -284,11 +284,7 @@ extractFOSC <-
         )
       }
     }
-    total_stab <-
-      if (is.null(attr(cl_tree, "total_stability")))
-        1
-    else
-      attr(cl_tree, "total_stability")
+    total_stab <- attr(cl_tree, "total_stability") %||% 1
     cl_track <- attr(cl_tree, "cl_tracker")
     stability_score <-
       unlist(sapply(cl_track, function(cid)

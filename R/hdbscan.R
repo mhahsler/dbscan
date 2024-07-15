@@ -268,11 +268,7 @@ plot.hdbscan <-
 
     ## Main information needed
     hd_info <- attr(x, "hdbscan")
-    dend <-
-      if (is.null(x$simplified_tree))
-        simplifiedTree(hd_info)
-    else
-      x$simplified_tree
+    dend <- x$simplified_tree %||% simplifiedTree(hd_info)
     coords <-
       node_xy(hd_info, cl_hierarchy = attr(hd_info, "cl_hierarchy"))
 

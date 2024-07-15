@@ -142,20 +142,10 @@ as.dendrogram.reachability <- function(object, ...) {
   setmid(x, type = type)
 }
 
-.midDend <- function (x) {
-  if (is.null(mp <- attr(x, "midpoint")))
-    0
-  else
-    mp
+.midDend <- function(x) {
+  attr(x, "midpoint") %||% 0
 }
 
-.memberDend <- function (x)
-{
-  r <- attr(x, "x.member")
-  if (is.null(r)) {
-    r <- attr(x, "members")
-    if (is.null(r))
-      r <- 1L
-  }
-  r
+.memberDend <- function(x) {
+  attr(x, "x.member") %||% attr(x, "members") %||% 1
 }

@@ -205,15 +205,8 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
       toString(names(extra)[is.na(m)]))
   names(extra) <- args[m]
 
-  search <- if (is.null(extra$search))
-    "kdtree"
-  else
-    extra$search
-  splitRule <-
-    if (is.null(extra$splitRule))
-      "suggest"
-  else
-    extra$splitRule
+  search <- extra$search %||% "kdtree"
+  splitRule <- extra$splitRule %||% "suggest"
   search <- .parse_search(search)
   splitRule <- .parse_splitRule(splitRule)
 

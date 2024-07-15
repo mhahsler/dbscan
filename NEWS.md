@@ -1,3 +1,9 @@
+# dbscan 1.2.0-1 (2024-xx-xx)
+
+## Changes
+* Various refactoring by m-muecke
+
+
 # dbscan 1.2-0 (2024-06-28)
 
 ## New Features

@@ -301,10 +301,9 @@ dbscan <-
       as.integer(extra$approx)
 
     ### do dist search
-    if (search == 3) {
-      if (!inherits(x, "dist"))
-        if (.matrixlike(x))
-          x <- dist(x)
+    if (search == 3 && !inherits(x, "dist")) {
+      if (.matrixlike(x))
+        x <- dist(x)
       else
         stop("x needs to be a matrix to calculate distances")
     }
@@ -324,7 +323,7 @@ dbscan <-
       frNN <- x$id
       x <- matrix(0.0, nrow = 0, ncol = 0)
 
-    } else{
+    } else {
       if (!.matrixlike(x))
         stop("x needs to be a matrix or data.frame.")
       ## make sure x is numeric

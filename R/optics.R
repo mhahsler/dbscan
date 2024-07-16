@@ -223,10 +223,9 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
     as.integer(extra$approx)
 
   ### dist search
-  if (search == 3) {
-    if (!inherits(x, "dist"))
-      if (.matrixlike(x))
-        x <- dist(x)
+  if (search == 3 && !inherits(x, "dist")) {
+    if (.matrixlike(x))
+      x <- dist(x)
     else
       stop("x needs to be a matrix to calculate distances")
   }

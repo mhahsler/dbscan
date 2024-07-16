@@ -148,10 +148,9 @@ kNN <-
       stop("Illegal k: needs to be k>=1!")
 
     ### dist search
-    if (search == 3) {
-      if (!inherits(x, "dist"))
-        if (.matrixlike(x))
-          x <- dist(x)
+    if (search == 3 && !inherits(x, "dist")) {
+      if (.matrixlike(x))
+        x <- dist(x)
       else
         stop("x needs to be a matrix to calculate distances")
     }
@@ -206,7 +205,7 @@ kNN <-
       )
       dimnames(ret$dist) <- list(rownames(query), 1:k)
       dimnames(ret$id) <- list(rownames(query), 1:k)
-    } else{
+    } else {
       ret <- kNN_int(
         as.matrix(x),
         as.integer(k),

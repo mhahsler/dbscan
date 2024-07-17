@@ -359,7 +359,7 @@ plot.optics <-
       par(mar = c(2, 4, 4, 2) + 0.1, omd = c(0, 1, .15, 1))
 
       # Need to know how to spread out lines
-      y_max <- max(x$reachdist[which(x$reachdist != Inf)])
+      y_max <- max(x$reachdist[!is.infinite(x$reachdist)])
       y_increments <- (y_max / 0.85 * .15) / (nrow(hclusters) + 1L)
 
       # Get top level cluster labels
@@ -418,7 +418,7 @@ as.dendrogram.optics <- function(object, ...) {
   if (object$minPts > length(object$order)) {
     stop("'minPts' should be less or equal to the points in the dataset.")
   }
-  if (length(which(object$reachdist == Inf)) > 1)
+  if (sum(is.infinite(object$reachdist)) > 1)
     stop(
       "Eps value is not large enough to capture the complete hiearchical structure of the dataset. Please use a large eps value (such as Inf)."
     )
@@ -529,7 +529,7 @@ extractXi <-
               Inf
           else
             object$ord_rd[index + 1]
-          if (esuccr != Inf) {
+          if (!is.infinite(esuccr)) {
             while (!is.na(object$order[index + 1])) {
               index <- index + 1
               if (steepUp(index, object)) {
@@ -540,7 +540,7 @@ extractXi <-
                     Inf
                 else
                   object$ord_rd[index + 1]
-                if (esuccr == Inf) {
+                if (is.infinite(esuccr)) {
                   endsteep <- endsteep - 1
                   break
                 }
@@ -571,7 +571,7 @@ extractXi <-
 
           # Credit to ELKI
           if (correctPredecessors) {
-            while (cend > cstart && object$ord_rd[cend] == Inf) {
+            while (cend > cstart && is.infinite(object$ord_rd[cend])) {
               cend <- cend - 1
             }
           }
@@ -684,7 +684,7 @@ updateFilterSDASet <- function(mib, sdaset, ixi) {
 # Determines if the reachability distance at the current index 'i' is
 # (xi) significantly lower than the next index
 steepUp <- function(i, object, ixi = object$ixi) {
-  if (object$ord_rd[i] >= Inf)
+  if (is.infinite(object$ord_rd[i]))
     return(FALSE)
   if (!valid(i + 1, object))
     return(TRUE)
@@ -696,7 +696,7 @@ steepUp <- function(i, object, ixi = object$ixi) {
 steepDown <- function(i, object, ixi = object$ixi) {
   if (!valid(i + 1, object))
     return(FALSE)
-  if (object$ord_rd[i + 1] >= Inf)
+  if (is.infinite(object$ord_rd[i + 1]))
     return(FALSE)
   return(object$ord_rd[i] * ixi >= object$ord_rd[i + 1])
 }

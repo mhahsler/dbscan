@@ -88,7 +88,7 @@ test_that("OPTICS", {
 
   # Make sure any epsilon that queries the entire neighborhood works,
   # error otherwise
-  max_rd <- max(res$reachdist[res$reachdist != Inf], na.rm = TRUE)
+  max_rd <- max(res$reachdist[!is.infinite(res$reachdist)], na.rm = TRUE)
   expect_error(as.dendrogram(optics(test_data, eps = max_rd-1e-7,  minPts = 2)), regexp = "Eps")
   expect_error(as.dendrogram(optics(test_data, eps = max_rd, minPts = nrow(test_data) + 1)), regexp = "'minPts'")
 

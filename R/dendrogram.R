@@ -67,7 +67,7 @@ as.dendrogram.hdbscan <- function(object, ...) {
 #' @rdname dendrogram
 #' @export
 as.dendrogram.reachability <- function(object, ...) {
-  if (length(which(object$reachdist == Inf)) > 1)
+  if (sum(is.infinite(object$reachdist)) > 1)
     stop(
       "Multiple Infinite reachability distances found. Reachability plots can only be converted if they contain enough information to fully represent the dendrogram structure. If using OPTICS, a larger eps value (such as Inf) may be needed in the parameterization."
     )
@@ -88,8 +88,7 @@ as.dendrogram.reachability <- function(object, ...) {
 # from stats, but not exported
 # see stats:::midcache.dendrogram
 
-.midcache.dendrogram <- function (x, type = "hclust", quiet = FALSE)
-{
+.midcache.dendrogram <- function(x, type = "hclust", quiet = FALSE) {
   type <- match.arg(type)
   stopifnot(inherits(x, "dendrogram"))
   verbose <- getOption("verbose", 0) >= 2

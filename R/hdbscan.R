@@ -66,6 +66,7 @@
 #' @param x a data matrix (Euclidean distances are used) or a [dist] object
 #' calculated with an arbitrary distance metric.
 #' @param minPts integer; Minimum size of clusters. See details.
+#' @param cluster_selection_epsilon double; a distance threshold below which no clusters should be selected, see Malzer & Baum 2020
 #' @param gen_hdbscan_tree logical; should the robust single linkage tree be
 #' explicitly computed (see cluster tree in Chaudhuri et al, 2010).
 #' @param gen_simplified_tree logical; should the simplified hierarchy be
@@ -109,6 +110,11 @@
 #' estimates for data clustering, visualization, and outlier detection.
 #' _ACM Transactions on Knowledge Discovery from Data (TKDD),_ 10(5):1-51.
 #' \doi{10.1145/2733381}
+#' 
+#' Malzer, C., & Baum, M. (2020). A Hybrid Approach To Hierarchical Density-based Cluster Selection. 
+#' In 2020 IEEE International Conference on Multisensor Fusion and Integration for Intelligent 
+#' Systems (MFI), pp. 223-228.
+#' \doi{10.1109/MFI49285.2020.9235263}
 #' @keywords model clustering hierarchical
 #' @examples
 #' ## cluster the moons data set with HDBSCAN
@@ -139,6 +145,7 @@
 #' @export
 hdbscan <- function(x,
   minPts,
+  cluster_selection_epsilon = 0.0,
   gen_hdbscan_tree = FALSE,
   gen_simplified_tree = FALSE,
   verbose = FALSE) {
@@ -167,7 +174,7 @@ hdbscan <- function(x,
   if (verbose)
     cat("Tree pruning...\n")
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
-  res <- extractUnsupervised(res)
+  res <- extractUnsupervised(res, cluster_selection_epsilon=cluster_selection_epsilon)
   cl <- attr(res, "cluster")
 
   ## 4. Extract the clusters

@@ -716,9 +716,9 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
       }
     }
 
-    double epsbirth = (double) cl["eps_birth"];
-    if (epsbirth < cluster_selection_epsilon){
-      keep_children = false; // prune
+    double epsdeath = (double) cl["eps_death"];
+    if (epsdeath < cluster_selection_epsilon){
+      keep_children = false; // prune children that emerge at distance below epsilon
     }
 
     // Prune children and add parent (cid) if need be

@@ -48,6 +48,23 @@
 #' but also as a "smoothing" factor of the density estimates implicitly
 #' computed from HDBSCAN.
 #'
+#' When using the optional parameter `cluster_selection_epsilon`,
+#' a combination between DBSCAN* and HDBSCAN* can be achieved
+#' (see Malzer & Baum 2020). This means that part of the
+#' tree is affected by `cluster_selection_epsilon` as if
+#' running DBSCAN* with `eps` = `cluster_selection_epsilon`.
+#' The remaining part (on levels above the threshold) is still
+#' processed by HDBSCAN*'s stability-based selection algorithm
+#' and can therefore return clusters of variable densities.
+#' Note that there is not always a remaining part, especially if
+#' the parameter value is chosen too large, or if there aren't
+#' enough clusters of variable densities. In this case, the result
+#' will be equal to DBSCAN*.
+# `cluster_selection_epsilon` is especially useful for cases
+#' where HDBSCAN* produces too many small clusters that
+#' need to be merged, while still being able to extract clusters
+#' of variable densities at higher levels.
+#'
 #' `coredist()`: The core distance is defined for each point as
 #' the distance to the `MinPts`'s neighbor. It is a density estimate.
 #'
@@ -66,7 +83,8 @@
 #' @param x a data matrix (Euclidean distances are used) or a [dist] object
 #' calculated with an arbitrary distance metric.
 #' @param minPts integer; Minimum size of clusters. See details.
-#' @param cluster_selection_epsilon double; a distance threshold below which no clusters should be selected, see Malzer & Baum 2020
+#' @param cluster_selection_epsilon double; a distance threshold below which
+#  no clusters should be selected (see Malzer & Baum 2020)
 #' @param gen_hdbscan_tree logical; should the robust single linkage tree be
 #' explicitly computed (see cluster tree in Chaudhuri et al, 2010).
 #' @param gen_simplified_tree logical; should the simplified hierarchy be
@@ -98,6 +116,7 @@
 #' `mrdist()` returns a [dist] object containing pairwise mutual reachability distances.
 #'
 #' @author Matt Piekenbrock
+#' @author Claudia Malzer (added cluster_selection_epsilon)
 #'
 #' @references
 #' Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on
@@ -110,10 +129,11 @@
 #' estimates for data clustering, visualization, and outlier detection.
 #' _ACM Transactions on Knowledge Discovery from Data (TKDD),_ 10(5):1-51.
 #' \doi{10.1145/2733381}
-#' 
-#' Malzer, C., & Baum, M. (2020). A Hybrid Approach To Hierarchical Density-based Cluster Selection. 
-#' In 2020 IEEE International Conference on Multisensor Fusion and Integration for Intelligent 
-#' Systems (MFI), pp. 223-228.
+#'
+#' Malzer, C., & Baum, M. (2020). A Hybrid Approach To Hierarchical
+#' Density-based Cluster Selection.
+#' In 2020 IEEE International Conference on Multisensor Fusion
+#' and Integration for Intelligent Systems (MFI), pp. 223-228.
 #' \doi{10.1109/MFI49285.2020.9235263}
 #' @keywords model clustering hierarchical
 #' @examples
@@ -142,44 +162,111 @@
 #'
 #' ## Plot the actual clusters (noise has cluster id 0 and is shown in black)
 #' plot(DS3, col = res$cluster + 1L, cex = .5)
+#'
+#' ## Example with cluster_selection_epsilon:
+#' xcoords <- c(
+#'   0.08, 0.46, 0.46, 2.95, 3.50, 1.49, 6.89, 6.87, 0.21, 0.15,
+#'   0.15, 0.39, 0.80, 0.80, 0.37, 3.63, 0.35, 0.30, 0.64, 0.59, 1.20, 1.22,
+#'   1.42, 0.95, 2.70, 6.36, 6.36, 6.36, 6.60, 0.04, 0.71, 0.57, 0.24, 0.24,
+#'   0.04, 0.04, 1.35, 0.82, 1.04, 0.62, 0.26, 5.98, 1.67, 1.67, 0.48, 0.15,
+#'   6.67, 6.67, 1.20, 0.21, 3.99, 0.12, 0.19, 0.15, 6.96, 0.26, 0.08, 0.30,
+#'   1.04, 1.04, 1.04, 0.62, 0.04, 0.04, 0.04, 0.82, 0.82, 1.29, 1.35, 0.46,
+#'   0.46, 0.04, 0.04, 5.98, 5.98, 6.87, 0.37, 6.47, 6.47, 6.47, 6.67, 0.30,
+#'   1.49, 3.21, 3.21, 0.75, 0.75, 0.46, 0.46, 0.46, 0.46, 3.63, 0.39, 3.65,
+#'   4.09, 4.01, 3.36, 1.43, 3.28, 5.94, 6.35, 6.87, 5.60, 5.99, 0.12, 0.00,
+#'   0.32, 0.39, 0.00, 1.63, 1.36, 5.67, 5.60, 5.79, 1.10, 2.99, 0.39, 0.18
+#' )
+#' ycoords <- c(
+#'   7.41, 8.01, 8.01, 5.44, 7.11, 7.13, 1.83, 1.83, 8.22, 8.08,
+#'   8.08, 7.20, 7.83, 7.83, 8.29, 5.99, 8.32, 8.22, 7.38, 7.69, 8.22, 7.31,
+#'   8.25, 8.39, 6.34, 0.16, 0.16, 0.16, 1.66, 7.55, 7.90, 8.18, 8.32, 8.32,
+#'   7.97, 7.97, 8.15, 8.43, 7.83, 8.32, 8.29, 1.03, 7.27, 7.27, 8.08, 7.27,
+#'   0.79, 0.79, 8.22, 7.73, 6.62, 7.62, 8.39, 8.36, 1.73, 8.29, 8.04, 8.22,
+#'   7.83, 7.83, 7.83, 8.32, 8.11, 7.69, 7.55, 7.20, 7.20, 8.01, 8.15, 7.55,
+#'   7.55, 7.97, 7.97, 1.03, 1.03, 1.24, 7.20, 0.47, 0.47, 0.47, 0.79, 8.22,
+#'   7.13, 6.48, 6.48, 7.10, 7.10, 8.01, 8.01, 8.01, 8.01, 5.99, 8.04, 5.22,
+#'   5.82, 5.14, 4.81, 7.62, 5.73, 0.55, 1.31, 0.05, 0.95, 1.59, 7.99, 7.48,
+#'   8.38, 7.12, 2.01, 1.40, 0.00, 9.69, 9.47, 9.25, 2.63, 6.89, 0.56, 3.11
+#' )
+#' X <- cbind(xcoords, ycoords)
+#'
+#' plotClusters <- function(X, labels, algo) {
+#'   rcolors <- rainbow(length(unique(labels)))
+#'   df <- data.frame(
+#'     cluster = unique(labels), color = unlist(rcolors),
+#'     row.names = 1:length(unique(labels))
+#'   )
+#'   df[df$cluster == 0, "color"] <- "#808080" # set noise to gray
+#'   cluster_colors <- unlist(lapply(
+#'     labels,
+#'     function(x) lapply(x, function(y) df[df$cluster == x, "color"])
+#'   ))
+#'   no_noise <- unique(labels)[unique(labels) > 0]
+#'   noise <- length(labels[labels == 0])
+#'   title <- paste0(
+#'     algo, ", ", length(no_noise), " clusters, ",
+#'     noise, " noise points."
+#'   )
+#'   plot(X, xlim = c(0, 7), col = cluster_colors, main = title)
+#' }
+#'
+#' hdb <- hdbscan(X, minPts = 3)
+#' plotClusters(X, hdb$cluster, "HDBSCAN")
+#' plot(hdb, show_flat = TRUE)
+#'
+#' hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
+#' plotClusters(X, hdbe$cluster, "HDBSCAN(e)")
+#' plot(hdbe, show_flat = TRUE)
+#'
+#' db <- dbscan(X, eps = 1, minPts = 3, borderPoints = TRUE)
+#' plotClusters(X, db$cluster, "DBSCAN")
+#'
 #' @export
-hdbscan <- function(x,
-  minPts,
-  cluster_selection_epsilon = 0.0,
-  gen_hdbscan_tree = FALSE,
-  gen_simplified_tree = FALSE,
-  verbose = FALSE) {
-  if (!inherits(x, "dist") && !.matrixlike(x))
+hdbscan <- function(
+    x,
+    minPts,
+    cluster_selection_epsilon = 0.0,
+    gen_hdbscan_tree = FALSE,
+    gen_simplified_tree = FALSE,
+    verbose = FALSE) {
+  if (!inherits(x, "dist") && !.matrixlike(x)) {
     stop("hdbscan expects a numeric matrix or a dist object.")
+  }
 
   ## 1. Calculate the mutual reachability between points
-  if (verbose)
+  if (verbose) {
     cat("Calculating core distances...\n")
+  }
   coredist <- coredist(x, minPts)
-  if (verbose)
+  if (verbose) {
     cat("Calculating the mutual reachability matrix distances...\n")
-  mrd <- mrdist(x, minPts, coredist
-    = coredist)
+  }
+  mrd <- mrdist(x, minPts,
+    coredist = coredist
+  )
   n <- attr(mrd, "Size")
 
   ## 2. Construct a minimum spanning tree and convert to RSL representation
-  if (verbose)
+  if (verbose) {
     cat("Constructing the minimum spanning tree...\n")
+  }
   mst <- prims(mrd, n)
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
   hc$call <- match.call()
 
   ## 3. Prune the tree
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN
-  if (verbose)
+  if (verbose) {
     cat("Tree pruning...\n")
+  }
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
-  res <- extractUnsupervised(res, cluster_selection_epsilon=cluster_selection_epsilon)
+  res <- extractUnsupervised(res, cluster_selection_epsilon = cluster_selection_epsilon)
   cl <- attr(res, "cluster")
 
   ## 4. Extract the clusters
-  if (verbose)
+  if (verbose) {
     cat("Extract clusters...\n")
+  }
   sl <- attr(res, "salient_clusters")
 
   ## Generate membership 'probabilities' using core distance as the measure of density
@@ -202,8 +289,9 @@ hdbscan <- function(x,
   ## Stability scores
   ## NOTE: These scores represent the stability scores -before- the hierarchy traversal
   cluster_scores <-
-    sapply(sl, function(sl_cid)
-      res[[as.character(sl_cid)]]$stability)
+    sapply(sl, function(sl_cid) {
+      res[[as.character(sl_cid)]]$stability
+    })
   names(cluster_scores) <- names(cl_map)
 
   ## Return everything HDBSCAN does
@@ -228,10 +316,10 @@ hdbscan <- function(x,
 
   ## The trees don't need to be explicitly computed, but they may be useful if the user wants them
   if (gen_hdbscan_tree) {
-    out$hdbscan_tree = buildDendrogram(hc)
+    out$hdbscan_tree <- buildDendrogram(hc)
   }
   if (gen_simplified_tree) {
-    out$simplified_tree = simplifiedTree(res)
+    out$simplified_tree <- simplifiedTree(res)
   }
   return(out)
 }
@@ -263,15 +351,17 @@ print.hdbscan <- function(x, ...) {
 #' @rdname hdbscan
 #' @export
 plot.hdbscan <-
-  function(x,
-    scale = "suggest",
-    gradient = c("yellow", "red"),
-    show_flat = FALSE,
-    ...) {
+  function(
+      x,
+      scale = "suggest",
+      gradient = c("yellow", "red"),
+      show_flat = FALSE,
+      ...) {
     ## Logic checks
     if (!(scale == "suggest" ||
-        scale > 0.0))
+      scale > 0.0)) {
       stop("scale parameter must be greater than 0.")
+    }
 
     ## Main information needed
     hd_info <- attr(x, "hdbscan")
@@ -304,8 +394,9 @@ plot.hdbscan <-
 
       ## widths == number of points in the cluster at each eps it was alive
       widths <-
-        sapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps)
-          length(which(hd_info[[cl_key]]$eps <= eps)))
+        sapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps) {
+          length(which(hd_info[[cl_key]]$eps <= eps))
+        })
       if (length(widths) > 0) {
         widths <-
           unlist(c(
@@ -318,8 +409,9 @@ plot.hdbscan <-
       }
 
       ## Normalize and scale widths to length of x-axis
-      normalize <- function(x)
+      normalize <- function(x) {
         (nleaves) * (x - 1) / (npoints - 1)
+      }
       xleft <- coord[[1]] - normalize(widths) / scale
       xright <- coord[[1]] + normalize(widths) / scale
 
@@ -327,8 +419,10 @@ plot.hdbscan <-
       ## Minor adjustment made if at the root equivalent to plot.dendrogram(edge.root=T)
       if (cl_key == "0") {
         ytop <-
-          rep(hd_info[[cl_key]]$eps_birth + 0.0625 * hd_info[[cl_key]]$eps_birth,
-            length(widths))
+          rep(
+            hd_info[[cl_key]]$eps_birth + 0.0625 * hd_info[[cl_key]]$eps_birth,
+            length(widths)
+          )
         ybottom <- rep(hd_info[[cl_key]]$eps_death, length(widths))
       } else {
         ytop <- rep(parent_height, length(widths))
@@ -413,7 +507,8 @@ plot.hdbscan <-
     eps_dfs(dend,
       index = 1,
       parent_height = 0,
-      scale = scale)
+      scale = scale
+    )
     return(invisible(x))
   }
 
@@ -421,7 +516,7 @@ plot.hdbscan <-
 #' @export
 coredist <- function(x, minPts) {
   k <- minPts - 1
-  kNN(x, k = k , sort = TRUE)$dist[, k]
+  kNN(x, k = k, sort = TRUE)$dist[, k]
 }
 
 #' @rdname hdbscan
@@ -430,22 +525,26 @@ mrdist <- function(x, minPts, coredist = NULL) {
   if (inherits(x, "dist")) {
     .check_dist(x)
     x_dist <- x
-  } else{
+  } else {
     x_dist <- dist(x,
       method = "euclidean",
       diag = FALSE,
-      upper = FALSE)
+      upper = FALSE
+    )
   }
 
-  if (is.null(coredist))
+  if (is.null(coredist)) {
     coredist <- coredist(x, minPts)
+  }
   mr_dist <- mrd(x_dist, coredist)
 
   class(mr_dist) <- "dist"
   attr(mr_dist, "Size") <- attr(x_dist, "Size")
   attr(mr_dist, "Diag") <- FALSE
   attr(mr_dist, "Upper") <- FALSE
-  attr(mr_dist, "method") <- paste0("mutual reachability (",
-                                    attr(x_dist, "method"),")")
+  attr(mr_dist, "method") <- paste0(
+    "mutual reachability (",
+    attr(x_dist, "method"), ")"
+  )
   mr_dist
 }

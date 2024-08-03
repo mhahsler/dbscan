@@ -382,11 +382,8 @@ dbscan <-
 
 #' @export
 print.dbscan_fast <- function(x, ...) {
-  cl <- unique(x$cluster)
-  cl <- length(cl[cl != 0L])
-
   writeLines(c(
-    paste0("DBSCAN clustering for ", length(x$cluster), " objects."),
+    paste0("DBSCAN clustering for ", nobs(x), " objects."),
     paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
     paste0(
       "Using ",
@@ -396,9 +393,9 @@ print.dbscan_fast <- function(x, ...) {
     ),
     paste0(
       "The clustering contains ",
-      cl,
+      ncluster(x),
       " cluster(s) and ",
-      sum(x$cluster == 0L),
+      nnoise(x),
       " noise points."
     )
   ))

@@ -220,6 +220,7 @@ Other clustering functions:
 \code{\link{extractFOSC}()},
 \code{\link{hdbscan}()},
 \code{\link{jpclust}()},
+\code{\link{ncluster}()},
 \code{\link{sNNclust}()}
 }
 \author{

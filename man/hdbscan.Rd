@@ -240,6 +240,7 @@ Other clustering functions:
 \code{\link{dbscan}()},
 \code{\link{extractFOSC}()},
 \code{\link{jpclust}()},
+\code{\link{ncluster}()},
 \code{\link{optics}()},
 \code{\link{sNNclust}()}
 }

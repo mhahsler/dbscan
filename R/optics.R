@@ -308,15 +308,13 @@ print.optics <- function(x, ...) {
   ))
 
   if (!is.null(x$cluster)) {
-    cl <- unique(x$cluster)
-    cl <- length(cl[cl != 0L])
 
     if (is.na(x$xi)) {
       writeLines(paste0(
         "The clustering contains ",
-        cl,
+        ncluster(x),
         " cluster(s) and ",
-        sum(x$cluster == 0L),
+        nnoise(x),
         " noise points."
       ))
 
@@ -327,7 +325,7 @@ print.optics <- function(x, ...) {
           "The clustering contains ",
           nrow(x$clusters_xi),
           " cluster(s) and ",
-          sum(x$cluster == 0L),
+          nnoise(x),
           " noise points."
         )
       )

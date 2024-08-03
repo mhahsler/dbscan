@@ -311,16 +311,14 @@ hdbscan <- function(
 #' @rdname hdbscan
 #' @export
 print.hdbscan <- function(x, ...) {
-  cl <- unique(x$cluster)
-  cl <- length(cl[cl != 0L])
   writeLines(c(
-    paste0("HDBSCAN clustering for ", length(x$cluster), " objects."),
+    paste0("HDBSCAN clustering for ", nobs(x), " objects."),
     paste0("Parameters: minPts = ", x$minPts),
     paste0(
       "The clustering contains ",
-      cl,
+      ncluster(x),
       " cluster(s) and ",
-      sum(x$cluster == 0L),
+      nnoise(x),
       " noise points."
     )
   ))

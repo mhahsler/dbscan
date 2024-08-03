@@ -49,7 +49,7 @@
 #'
 #' ### original data with true clustering
 #' hullplot(x, cl, main = "True clusters")
-#' ### use differnt symbols
+#' ### use different symbols
 #' hullplot(x, cl, main = "True clusters", pch = cl)
 #' ### just the hulls
 #' hullplot(x, cl, main = "True clusters", pch = NA)
@@ -57,7 +57,7 @@
 #' hullplot(x, cl, main = "True clusters", solid = FALSE, col = "black", pch = cl)
 #'
 #'
-#' ### run some clustering algorithms and plot the resutls
+#' ### run some clustering algorithms and plot the results
 #' db <- dbscan(x, eps = .07, minPts = 10)
 #' hullplot(x, db, main = "DBSCAN")
 #'
@@ -113,6 +113,7 @@ hullplot <- function(x,
   plot(x[, 1:2],
     col = col[cl %% length(col) + 1L],
     cex = cex,
+    #pch = ifelse(cl == 0L, 4L, 1L),
     main = main,
     ...)
   col_poly <- adjustcolor(col, alpha.f = alpha)

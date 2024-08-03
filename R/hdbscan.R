@@ -195,16 +195,16 @@
 #' ## HDBSCAN splits one cluster
 #' hdb <- hdbscan(X, minPts = 3)
 #' plot(hdb, show_flat = TRUE)
-#' plot(X, col = hdb$cluster + 1L, main = "HDBSCAN")
+#' hullplot(X, hdb, main = "HDBSCAN")
 #'
 #' ## DBSCAN* marks the least dense cluster as outliers
 #' db <- dbscan(X, eps = 1, minPts = 3, borderPoints = FALSE)
-#' plot(X, col = db$cluster + 1L, main = "DBSCAN*")
+#' hullplot(X, db, main = "DBSCAN*")
 #'
-#' ## HDBSCAN(e) mixes HDBSCAN AND DBSCAN*
+#' ## HDBSCAN(e) mixes HDBSCAN AND DBSCAN* to find all clusters
 #' hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
 #' plot(hdbe, show_flat = TRUE)
-#' plot(X, col = hdbe$cluster + 1L, main = "HDBSCAN(e)")
+#' hullplot(X, hdbe, main = "HDBSCAN(e)")
 #' @export
 hdbscan <- function(
     x,

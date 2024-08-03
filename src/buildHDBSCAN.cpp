@@ -635,6 +635,7 @@ double computeVirtualNode(IntegerVector noise, List constraints){
 // [[Rcpp::export]]
 NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy,
                    bool prune_unstable_leaves=false, // whether to prune -very- unstable subbranches
+                   double cluster_selection_epsilon = 0.0, // whether to prune subbranches below a given epsilon
                    const double alpha = 0, // mixed objective case
                    bool useVirtual = false, // return virtual node as well
                    const int n_constraints = 0, // number of constraints
@@ -655,7 +656,7 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
     IntegerVector child_ids = cl_hierarchy[cid];
     for (int i = 0, clen = child_ids.length(); i < clen; ++i){
       int child_id = child_ids.at(i);
-      scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints);
+      scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints);
       stability_scores.push_back(scores.at(0));
       constraint_scores.push_back(scores.at(1));
     }
@@ -715,6 +716,10 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
       }
     }
 
+    double epsdeath = (double) cl["eps_death"];
+    if (epsdeath < cluster_selection_epsilon){
+      keep_children = false; // prune children that emerge at distance below epsilon
+    }
 
     // Prune children and add parent (cid) if need be
     if (!keep_children && cid != "0") {
@@ -753,12 +758,12 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
 // extract the 'most stable' or salient flat cluster assignments. The large number of derivable
 // arguments due to fosc being a recursive function
 // [[Rcpp::export]]
-List extractUnsupervised(List cl_tree, bool prune_unstable = false){
+List extractUnsupervised(List cl_tree, bool prune_unstable = false, double cluster_selection_epsilon = 0.0){
   // Compute Salient Clusters
   std::list<int> sc = std::list<int>();
   List cl_hierarchy = cl_tree.attr("cl_hierarchy");
   int n = as<int>(cl_tree.attr("n"));
-  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable); // Assume root node is always id == 0
+  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable, cluster_selection_epsilon); // Assume root node is always id == 0
 
   // Store results as attributes
   cl_tree.attr("cluster") = getSalientAssignments(cl_tree, cl_hierarchy, sc, n); // Flat assignments
@@ -767,7 +772,7 @@ List extractUnsupervised(List cl_tree, bool prune_unstable = false){
 }
 
 // [[Rcpp::export]]
-List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool prune_unstable_leaves = false){
+List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool prune_unstable_leaves = false, double cluster_selection_epsilon = 0.0){
   // Rcout << "Starting semisupervised extraction..." << std::endl;
   List root = cl_tree["0"];
   List cl_hierarchy = cl_tree.attr("cl_hierarchy");
@@ -814,7 +819,7 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
   }
 
   // First pass: compute unsupervised soln as a means of extracting normalizing constant J_U^*
-  cl_tree = extractUnsupervised(cl_tree, false);
+  cl_tree = extractUnsupervised(cl_tree, false, cluster_selection_epsilon);
   IntegerVector stable_sc = cl_tree.attr("salient_clusters");
   double total_stability = 0.0f;
   for (IntegerVector::iterator it = stable_sc.begin(); it != stable_sc.end(); ++it){
@@ -826,7 +831,7 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
 
   // Compute stable clusters w/ instance-level constraints
   std::list<int> sc = std::list<int>();
-  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable_leaves,
+  fosc(cl_tree, "0", sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon,
        alpha, true, n_constraints, constraints); // semi-supervised parameters
 
   // Store results as attributes and return

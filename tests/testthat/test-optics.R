@@ -1,6 +1,6 @@
 test_that("OPTICS", {
-  load(system.file("test_data/test_data.rda", package = "dbscan"))
-  load(system.file("test_data/elki_optics.rda", package = "dbscan"))
+  load(test_path("fixtures", "test_data.rda"))
+  load(test_path("fixtures", "elki_optics.rda"))
 
   x <- test_data
 

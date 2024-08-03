@@ -287,34 +287,30 @@ extractFOSC <-
     total_stab <- attr(cl_tree, "total_stability") %||% 1
     cl_track <- attr(cl_tree, "cl_tracker")
     stability_score <-
-      unlist(sapply(cl_track, function(cid)
-        cl_tree[[as.character(cid)]]$stability))
+      vapply(cl_track, function(cid)
+        cl_tree[[as.character(cid)]]$stability, numeric(1L))
     constraint_score <-
-      unlist(sapply(cl_track, function(cid)
-        cl_tree[[as.character(cid)]]$vscore))
-    total_score <-
-      unlist(sapply(cl_track, function(cid)
-        cl_tree[[as.character(cid)]]$vscore))
+      vapply(cl_track, function(cid)
+        cl_tree[[as.character(cid)]]$vscore %||% 0, numeric(1L))
     out <- append(
       x,
       list(
         "cluster" = cl_track,
         "stability" = stability_score,
         "constraint" = constraint_score,
-        "total" = total_score
+        # TODO: check if this value is the correct one
+        "total" = total_stab
       )
     )
     extraction_type <-
-      ifelse(
-        missing(constraints),
-        "(w/ stability-based extraction)",
-        ifelse(
-          alpha == 0,
-          "(w/ constraint-based extraction)",
-          "(w/ mixed-objective extraction)"
-        )
-      )
-    substrs <- unlist(strsplit(x$method, split = " \\(w\\/"))
+      if (missing(constraints)) {
+        "(w/ stability-based extraction)"
+      } else if (alpha == 0) {
+        "(w/ constraint-based extraction)"
+      } else {
+        "(w/ mixed-objective extraction)"
+      }
+    substrs <- strsplit(x$method, split = " \\(w\\/")[[1L]]
     out[["method"]] <-
       if (length(substrs) > 1)
         paste(substrs[[1]], extraction_type)

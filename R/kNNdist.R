@@ -71,7 +71,7 @@
 #' ## Note: black points are noise points
 #' @export
 kNNdist <- function(x, k, all = FALSE, ...) {
-  kNNd <- dbscan::kNN(x, k, sort = TRUE, ...)$dist
+  kNNd <- kNN(x, k, sort = TRUE, ...)$dist
   if (!all)
     kNNd <- kNNd[, k]
   kNNd

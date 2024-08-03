@@ -638,18 +638,20 @@ extractXi <-
       object$clusters_xi <- NULL
       object$cluster < rep(0, length(object$cluster))
       return(invisible(object))
-    } else {
-      # Cluster data exists; organize it by starting and ending index, give arbitrary id
-      object$clusters_xi <- do.call(rbind, SetOfClusters)
-      object$clusters_xi <-
-        data.frame(start = unlist(object$clusters_xi[, 1]),
-          end = unlist(object$clusters_xi[, 2]))
-      object$clusters_xi <-
-        object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end), ]
-      object$clusters_xi <-
-        cbind(object$clusters_xi, list(cluster_id = seq_len(nrow(object$clusters_xi))))
-      row.names(object$clusters_xi) <- NULL
     }
+    # Cluster data exists; organize it by starting and ending index, give arbitrary id
+    object$clusters_xi <- do.call(rbind, SetOfClusters)
+    object$clusters_xi <-
+      data.frame(
+        start = unlist(object$clusters_xi[, 1], use.names = FALSE),
+        end = unlist(object$clusters_xi[, 2], use.names = FALSE),
+        check.names = FALSE
+      )
+    object$clusters_xi <-
+      object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end), ]
+    object$clusters_xi <-
+      cbind(object$clusters_xi, list(cluster_id = seq_len(nrow(object$clusters_xi))))
+    row.names(object$clusters_xi) <- NULL
 
     ## Populate cluster vector with either:
     ## 1. 'top-level' cluster labels to aid in plotting

@@ -151,8 +151,7 @@ hdbscan <- function(x,
   coredist <- coredist(x, minPts)
   if (verbose)
     cat("Calculating the mutual reachability matrix distances...\n")
-  mrd <- mrdist(x, minPts, coredist
-    = coredist)
+  mrd <- mrdist(x, minPts, coredist = coredist)
   n <- attr(mrd, "Size")
 
   ## 2. Construct a minimum spanning tree and convert to RSL representation
@@ -195,8 +194,8 @@ hdbscan <- function(x,
   ## Stability scores
   ## NOTE: These scores represent the stability scores -before- the hierarchy traversal
   cluster_scores <-
-    sapply(sl, function(sl_cid)
-      res[[as.character(sl_cid)]]$stability)
+    vapply(sl, function(sl_cid)
+      res[[as.character(sl_cid)]]$stability, numeric(1L))
   names(cluster_scores) <- names(cl_map)
 
   ## Return everything HDBSCAN does
@@ -221,10 +220,10 @@ hdbscan <- function(x,
 
   ## The trees don't need to be explicitly computed, but they may be useful if the user wants them
   if (gen_hdbscan_tree) {
-    out$hdbscan_tree = buildDendrogram(hc)
+    out$hdbscan_tree <- buildDendrogram(hc)
   }
   if (gen_simplified_tree) {
-    out$simplified_tree = simplifiedTree(res)
+    out$simplified_tree <- simplifiedTree(res)
   }
   return(out)
 }
@@ -279,10 +278,10 @@ plot.hdbscan <-
       length(all_children(
         attr(hd_info, "cl_hierarchy"),
         key = 0,
-        leaves_only = T
+        leaves_only = TRUE
       ))
     scale <-
-      ifelse(scale == "suggest", nclusters, nclusters / as.numeric(scale))
+      if (scale == "suggest") nclusters else nclusters / scale
 
     ## Color variables
     col_breaks <-
@@ -296,18 +295,18 @@ plot.hdbscan <-
       cl_key <- as.character(attr(dend, "label"))
 
       ## widths == number of points in the cluster at each eps it was alive
+      # TODO: when can widths be empty?
       widths <-
-        sapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps)
-          length(which(hd_info[[cl_key]]$eps <= eps)))
+        vapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps)
+          sum(hd_info[[cl_key]]$eps <= eps), integer(1))
       if (length(widths) > 0) {
-        widths <-
-          unlist(c(
-            widths + hd_info[[cl_key]]$n_children,
-            rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
-          ))
+        widths <- c(
+          widths + hd_info[[cl_key]]$n_children,
+          rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
+        )
       } else {
         widths <-
-          as.vector(rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children))
+          rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
       }
 
       ## Normalize and scale widths to length of x-axis
@@ -414,7 +413,7 @@ plot.hdbscan <-
 #' @export
 coredist <- function(x, minPts) {
   k <- minPts - 1
-  kNN(x, k = k , sort = TRUE)$dist[, k]
+  kNN(x, k = k, sort = TRUE)$dist[, k]
 }
 
 #' @rdname hdbscan
@@ -423,7 +422,7 @@ mrdist <- function(x, minPts, coredist = NULL) {
   if (inherits(x, "dist")) {
     .check_dist(x)
     x_dist <- x
-  } else{
+  } else {
     x_dist <- dist(x,
       method = "euclidean",
       diag = FALSE,
@@ -439,6 +438,6 @@ mrdist <- function(x, minPts, coredist = NULL) {
   attr(mr_dist, "Diag") <- FALSE
   attr(mr_dist, "Upper") <- FALSE
   attr(mr_dist, "method") <- paste0("mutual reachability (",
-                                    attr(x_dist, "method"),")")
+                                    attr(x_dist, "method"), ")")
   mr_dist
 }

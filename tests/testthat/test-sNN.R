@@ -65,7 +65,7 @@ test_that("sNN", {
   expect_equal(nn5, nn5_x)
 
   ## test with simple data
-  x <- data.frame(x=1:10)
+  x <- data.frame(x = 1:10, check.names = FALSE)
   nn <- sNN(x, k = 5)
 
   i <- 1

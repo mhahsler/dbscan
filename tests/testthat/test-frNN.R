@@ -83,14 +83,14 @@ test_that("frNN", {
 
 
   ## test with simple data
-  x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+  x <- data.frame(x = 1:10, row.names = LETTERS[1:10], check.names = FALSE)
   nn <- frNN(x, eps = 2)
   expect_identical(nn$id[[1]], 2:3)
   expect_identical(nn$id[[5]], c(4L, 6L, 3L, 7L))
   expect_identical(nn$id[[10]], 9:8)
 
   ## test kNN with query
-  x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+  x <- data.frame(x = 1:10, row.names = LETTERS[1:10], check.names = FALSE)
   nn <- frNN(x[1:8, , drop=FALSE], x[9:10, , drop = FALSE], eps = 2)
 
   expect_length(nn$id, 2L)

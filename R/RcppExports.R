@@ -41,16 +41,16 @@ computeVirtualNode <- function(noise, constraints) {
     .Call(`_dbscan_computeVirtualNode`, noise, constraints)
 }
 
-fosc <- function(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves = FALSE, alpha = 0, useVirtual = FALSE, n_constraints = 0L, constraints = NULL) {
-    .Call(`_dbscan_fosc`, cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints)
+fosc <- function(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves = FALSE, cluster_selection_epsilon = 0.0, alpha = 0, useVirtual = FALSE, n_constraints = 0L, constraints = NULL) {
+    .Call(`_dbscan_fosc`, cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints)
 }
 
-extractUnsupervised <- function(cl_tree, prune_unstable = FALSE) {
-    .Call(`_dbscan_extractUnsupervised`, cl_tree, prune_unstable)
+extractUnsupervised <- function(cl_tree, prune_unstable = FALSE, cluster_selection_epsilon = 0.0) {
+    .Call(`_dbscan_extractUnsupervised`, cl_tree, prune_unstable, cluster_selection_epsilon)
 }
 
-extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstable_leaves = FALSE) {
-    .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves)
+extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstable_leaves = FALSE, cluster_selection_epsilon = 0.0) {
+    .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves, cluster_selection_epsilon)
 }
 
 ANN_cleanup <- function() {

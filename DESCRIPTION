@@ -1,50 +1,54 @@
 Package: dbscan
+Title: Density-Based Spatial Clustering of Applications with Noise
+    (DBSCAN) and Related Algorithms
 Version: 1.2-0-1
 Date: 2024-xx-xx
-Title: Density-Based Spatial Clustering of Applications with Noise (DBSCAN) 
-    and Related Algorithms
-Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"),
-                email = "mhahsler@lyle.smu.edu",
-                comment = c(ORCID = "0000-0003-2716-1405")),
-	    person("Matthew", "Piekenbrock", role = c("aut", "cph")),
-	    person("Sunil", "Arya", role = c("ctb", "cph")),
-	    person("David", "Mount", role = c("ctb", "cph")),
-        person("Claudia", "Malzer", role = c("ctb")),
-        )
-Description: A fast reimplementation of several density-based algorithms of
-    the DBSCAN family. Includes the clustering algorithms DBSCAN (density-based 
-    spatial clustering of applications with noise) and HDBSCAN (hierarchical 
-    DBSCAN), the ordering algorithm OPTICS (ordering points to identify the 
-    clustering structure), shared nearest neighbor clustering, and the outlier 
-    detection algorithms LOF (local outlier factor) and GLOSH (global-local 
-    outlier score from hierarchies). The implementations use the kd-tree data 
-    structure (from library ANN) for faster k-nearest neighbor search. An R 
-    interface to fast kNN and fixed-radius NN search is also provided. 
-    Hahsler, Piekenbrock and Doran (2019) <doi:10.18637/jss.v091.i01>.
+Authors@R: c(
+    person("Michael", "Hahsler", , "mhahsler@lyle.smu.edu", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0003-2716-1405")),
+    person("Matthew", "Piekenbrock", role = c("aut", "cph")),
+    person("Sunil", "Arya", role = c("ctb", "cph")),
+    person("David", "Mount", role = c("ctb", "cph")),
+    person("Claudia", "Malzer", role = "ctb")
+  )
+Description: A fast reimplementation of several density-based algorithms
+    of the DBSCAN family. Includes the clustering algorithms DBSCAN
+    (density-based spatial clustering of applications with noise) and
+    HDBSCAN (hierarchical DBSCAN), the ordering algorithm OPTICS (ordering
+    points to identify the clustering structure), shared nearest neighbor
+    clustering, and the outlier detection algorithms LOF (local outlier
+    factor) and GLOSH (global-local outlier score from hierarchies). The
+    implementations use the kd-tree data structure (from library ANN) for
+    faster k-nearest neighbor search. An R interface to fast kNN and
+    fixed-radius NN search is also provided.  Hahsler, Piekenbrock and
+    Doran (2019) <doi:10.18637/jss.v091.i01>.
+License: GPL (>= 2)
+URL: https://github.com/mhahsler/dbscan
+BugReports: https://github.com/mhahsler/dbscan/issues
 Depends:
     R (>= 3.2.0)
 Imports:
-    Rcpp (>= 1.0.0),
+    generics,
     graphics,
-    stats,
-    generics
-LinkingTo: Rcpp
+    Rcpp (>= 1.0.0),
+    stats
 Suggests:
-    fpc,
-    microbenchmark,
-    testthat (>= 3.0.0),
     dendextend,
+    fpc,
     igraph,
     knitr,
+    microbenchmark,
     rmarkdown,
+    testthat (>= 3.0.0),
     tibble
-VignetteBuilder: knitr
-URL: https://github.com/mhahsler/dbscan
-BugReports: https://github.com/mhahsler/dbscan/issues
-License: GPL (>= 2)
-Copyright: ANN library is copyright by University of Maryland, Sunil Arya and
-    David Mount. All other code is copyright by Michael Hahsler and Matthew Piekenbrock.
+LinkingTo: 
+    Rcpp
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
+Copyright: ANN library is copyright by University of Maryland, Sunil Arya
+    and David Mount. All other code is copyright by Michael Hahsler and
+    Matthew Piekenbrock.
 Encoding: UTF-8
-RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

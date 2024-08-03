@@ -39,6 +39,7 @@ Other contributors:
 \itemize{
   \item Sunil Arya [contributor, copyright holder]
   \item David Mount [contributor, copyright holder]
+  \item Claudia Malzer [contributor]
 }
 
 }

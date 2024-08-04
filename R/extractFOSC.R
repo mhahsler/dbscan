@@ -292,14 +292,16 @@ extractFOSC <-
     constraint_score <-
       vapply(cl_track, function(cid)
         cl_tree[[as.character(cid)]]$vscore %||% 0, numeric(1L))
+    total_score <-
+      vapply(cl_track, function(cid)
+        cl_tree[[as.character(cid)]]$vscore %||% 0, numeric(1L))
     out <- append(
       x,
       list(
-        "cluster" = cl_track,
-        "stability" = stability_score,
-        "constraint" = constraint_score,
-        # TODO: check if this value is the correct one
-        "total" = total_stab
+        cluster = cl_track,
+        stability = stability_score,
+        constraint = constraint_score,
+        total = total_score
       )
     )
     extraction_type <-

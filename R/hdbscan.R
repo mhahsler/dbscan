@@ -273,9 +273,9 @@ hdbscan <- function(
   ## Stability scores
   ## NOTE: These scores represent the stability scores -before- the hierarchy traversal
   cluster_scores <-
-    sapply(sl, function(sl_cid) {
+    vapply(sl, function(sl_cid) {
       res[[as.character(sl_cid)]]$stability
-    })
+    }, numeric(1L))
   names(cluster_scores) <- names(cl_map)
 
   ## Return everything HDBSCAN does
@@ -375,11 +375,10 @@ plot.hdbscan <-
       cl_key <- as.character(attr(dend, "label"))
 
       ## widths == number of points in the cluster at each eps it was alive
-      # TODO: when can widths be empty?
       widths <-
-        sapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps) {
-          length(which(hd_info[[cl_key]]$eps <= eps))
-        })
+        vapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps) {
+          sum(hd_info[[cl_key]]$eps <= eps)
+        }, numeric(1L))
       if (length(widths) > 0) {
         widths <- c(
           widths + hd_info[[cl_key]]$n_children,

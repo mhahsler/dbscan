@@ -132,8 +132,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // fosc
-NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, bool prune_unstable_leaves, const double alpha, bool useVirtual, const int n_constraints, List constraints);
-RcppExport SEXP _dbscan_fosc(SEXP cl_treeSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP, SEXP prune_unstable_leavesSEXP, SEXP alphaSEXP, SEXP useVirtualSEXP, SEXP n_constraintsSEXP, SEXP constraintsSEXP) {
+NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hierarchy, bool prune_unstable_leaves, double cluster_selection_epsilon, const double alpha, bool useVirtual, const int n_constraints, List constraints);
+RcppExport SEXP _dbscan_fosc(SEXP cl_treeSEXP, SEXP cidSEXP, SEXP scSEXP, SEXP cl_hierarchySEXP, SEXP prune_unstable_leavesSEXP, SEXP cluster_selection_epsilonSEXP, SEXP alphaSEXP, SEXP useVirtualSEXP, SEXP n_constraintsSEXP, SEXP constraintsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -142,29 +142,31 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::list<int>& >::type sc(scSEXP);
     Rcpp::traits::input_parameter< List >::type cl_hierarchy(cl_hierarchySEXP);
     Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
+    Rcpp::traits::input_parameter< double >::type cluster_selection_epsilon(cluster_selection_epsilonSEXP);
     Rcpp::traits::input_parameter< const double >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< bool >::type useVirtual(useVirtualSEXP);
     Rcpp::traits::input_parameter< const int >::type n_constraints(n_constraintsSEXP);
     Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
-    rcpp_result_gen = Rcpp::wrap(fosc(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, alpha, useVirtual, n_constraints, constraints));
+    rcpp_result_gen = Rcpp::wrap(fosc(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints));
     return rcpp_result_gen;
 END_RCPP
 }
 // extractUnsupervised
-List extractUnsupervised(List cl_tree, bool prune_unstable);
-RcppExport SEXP _dbscan_extractUnsupervised(SEXP cl_treeSEXP, SEXP prune_unstableSEXP) {
+List extractUnsupervised(List cl_tree, bool prune_unstable, double cluster_selection_epsilon);
+RcppExport SEXP _dbscan_extractUnsupervised(SEXP cl_treeSEXP, SEXP prune_unstableSEXP, SEXP cluster_selection_epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type cl_tree(cl_treeSEXP);
     Rcpp::traits::input_parameter< bool >::type prune_unstable(prune_unstableSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractUnsupervised(cl_tree, prune_unstable));
+    Rcpp::traits::input_parameter< double >::type cluster_selection_epsilon(cluster_selection_epsilonSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractUnsupervised(cl_tree, prune_unstable, cluster_selection_epsilon));
     return rcpp_result_gen;
 END_RCPP
 }
 // extractSemiSupervised
-List extractSemiSupervised(List cl_tree, List constraints, float alpha, bool prune_unstable_leaves);
-RcppExport SEXP _dbscan_extractSemiSupervised(SEXP cl_treeSEXP, SEXP constraintsSEXP, SEXP alphaSEXP, SEXP prune_unstable_leavesSEXP) {
+List extractSemiSupervised(List cl_tree, List constraints, float alpha, bool prune_unstable_leaves, double cluster_selection_epsilon);
+RcppExport SEXP _dbscan_extractSemiSupervised(SEXP cl_treeSEXP, SEXP constraintsSEXP, SEXP alphaSEXP, SEXP prune_unstable_leavesSEXP, SEXP cluster_selection_epsilonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -172,7 +174,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< List >::type constraints(constraintsSEXP);
     Rcpp::traits::input_parameter< float >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< bool >::type prune_unstable_leaves(prune_unstable_leavesSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSemiSupervised(cl_tree, constraints, alpha, prune_unstable_leaves));
+    Rcpp::traits::input_parameter< double >::type cluster_selection_epsilon(cluster_selection_epsilonSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractSemiSupervised(cl_tree, constraints, alpha, prune_unstable_leaves, cluster_selection_epsilon));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -485,9 +488,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_computeStability", (DL_FUNC) &_dbscan_computeStability, 3},
     {"_dbscan_validateConstraintList", (DL_FUNC) &_dbscan_validateConstraintList, 2},
     {"_dbscan_computeVirtualNode", (DL_FUNC) &_dbscan_computeVirtualNode, 2},
-    {"_dbscan_fosc", (DL_FUNC) &_dbscan_fosc, 9},
-    {"_dbscan_extractUnsupervised", (DL_FUNC) &_dbscan_extractUnsupervised, 2},
-    {"_dbscan_extractSemiSupervised", (DL_FUNC) &_dbscan_extractSemiSupervised, 4},
+    {"_dbscan_fosc", (DL_FUNC) &_dbscan_fosc, 10},
+    {"_dbscan_extractUnsupervised", (DL_FUNC) &_dbscan_extractUnsupervised, 3},
+    {"_dbscan_extractSemiSupervised", (DL_FUNC) &_dbscan_extractSemiSupervised, 5},
     {"_dbscan_ANN_cleanup", (DL_FUNC) &_dbscan_ANN_cleanup, 0},
     {"_dbscan_comps_kNN", (DL_FUNC) &_dbscan_comps_kNN, 2},
     {"_dbscan_comps_frNN", (DL_FUNC) &_dbscan_comps_frNN, 2},

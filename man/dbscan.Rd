@@ -164,6 +164,7 @@ res <- dbscan(iris, eps = .7, minPts = 5)
 res
 
 pairs(iris, col = res$cluster + 1L)
+clplot(iris, res)
 
 ## Use a precomputed frNN object
 fr <- frNN(iris, eps = .7)
@@ -184,6 +185,7 @@ res
 plot(x, col = res$cluster)
 points(x[res$cluster == 0, ], pch = 3, col = "grey")
 
+clplot(x, res)
 hullplot(x, res)
 
 ## Predict cluster membership for new data points
@@ -259,6 +261,7 @@ Other clustering functions:
 \code{\link{extractFOSC}()},
 \code{\link{hdbscan}()},
 \code{\link{jpclust}()},
+\code{\link{ncluster}()},
 \code{\link{optics}()},
 \code{\link{sNNclust}()}
 }

@@ -2,12 +2,14 @@
 % Please edit documentation in R/hullplot.R
 \name{hullplot}
 \alias{hullplot}
-\title{Plot Convex Hulls of Clusters}
+\alias{clplot}
+\title{Plot Clusters}
 \usage{
 hullplot(
   x,
   cl,
   col = NULL,
+  pch = NULL,
   cex = 0.5,
   hull_lwd = 1,
   hull_lty = 1,
@@ -16,6 +18,8 @@ hullplot(
   main = "Convex Cluster Hulls",
   ...
 )
+
+clplot(x, cl, col = NULL, pch = NULL, cex = 0.5, main = "Cluster Plot", ...)
 }
 \arguments{
 \item{x}{a data matrix. If more than 2 columns are provided, then the data
@@ -27,6 +31,9 @@ clustering object (a list with an element named \code{cluster}).}
 \item{col}{colors used for clusters. Defaults to the standard palette.  The
 first color (default is black) is used for noise/unassigned points (cluster
 id 0).}
+
+\item{pch}{a vector of plotting characters. By default \code{o} is used for
+points and \code{x} for noise points.}
 
 \item{cex}{expansion factor for symbols.}
 
@@ -40,8 +47,9 @@ hulls? alpha controls the level of alpha shading.}
 \item{...}{additional arguments passed on to plot.}
 }
 \description{
-This function produces a two-dimensional scatter plot with added convex
-hulls for clusters.
+This function produces a two-dimensional scatter plot of data points
+and colors the data points according to a supplied clustering. Noise points
+are marked as \code{x}. \code{hullplot()} also adds convex hulls to clusters.
 }
 \examples{
 set.seed(2)
@@ -53,18 +61,22 @@ x <- cbind(
   )
 cl <- rep(1:4, time = 100)
 
+
 ### original data with true clustering
+clplot(x, cl, main = "True clusters")
 hullplot(x, cl, main = "True clusters")
-### use differnt symbols
+### use different symbols
 hullplot(x, cl, main = "True clusters", pch = cl)
 ### just the hulls
 hullplot(x, cl, main = "True clusters", pch = NA)
 ### a version suitable for b/w printing)
-hullplot(x, cl, main = "True clusters", solid = FALSE, col = "black", pch = cl)
+hullplot(x, cl, main = "True clusters", solid = FALSE,
+  col = c("grey", "black"), pch = cl)
 
 
-### run some clustering algorithms and plot the resutls
+### run some clustering algorithms and plot the results
 db <- dbscan(x, eps = .07, minPts = 10)
+clplot(x, db, main = "DBSCAN")
 hullplot(x, db, main = "DBSCAN")
 
 op <- optics(x, eps = 10, minPts = 10)

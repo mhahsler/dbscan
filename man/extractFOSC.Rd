@@ -190,6 +190,7 @@ Other clustering functions:
 \code{\link{dbscan}()},
 \code{\link{hdbscan}()},
 \code{\link{jpclust}()},
+\code{\link{ncluster}()},
 \code{\link{optics}()},
 \code{\link{sNNclust}()}
 }

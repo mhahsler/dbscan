@@ -3,6 +3,12 @@
 ## Changes
 * Various refactoring by m-muecke
 
+## New Features
+* HDBSCAN gained parameter cluster_selection_epsilon to implement 
+  clusters selected from Malzer and Baum (2020).
+* Functions ncluster() and nnoise() were added.
+* hullplot now() marks noise as x.
+* added clplot().
 
 # dbscan 1.2-0 (2024-06-28)
 
@@ -15,7 +21,7 @@
 ## Changes
 * dbscan component dist was renamed to metric. 
 * Removed redundant sort in kNNdistplot (reported by Natasza Szczypien).
-* Refactoring use more performant anyNA(x) instead of any(is.na(x))
+* Refactoring use anyNA(x) instead of any(is.na(x))
   and many more (by m-muecke).
 * Reorganized the C++ source code.
 * README now uses bibtex.

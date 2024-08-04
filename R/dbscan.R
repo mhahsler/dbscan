@@ -180,6 +180,7 @@
 #' res
 #'
 #' pairs(iris, col = res$cluster + 1L)
+#' clplot(iris, res)
 #'
 #' ## Use a precomputed frNN object
 #' fr <- frNN(iris, eps = .7)
@@ -200,6 +201,7 @@
 #' plot(x, col = res$cluster)
 #' points(x[res$cluster == 0, ], pch = 3, col = "grey")
 #'
+#' clplot(x, res)
 #' hullplot(x, res)
 #'
 #' ## Predict cluster membership for new data points
@@ -382,11 +384,8 @@ dbscan <-
 
 #' @export
 print.dbscan_fast <- function(x, ...) {
-  cl <- unique(x$cluster)
-  cl <- length(cl[cl != 0L])
-
   writeLines(c(
-    paste0("DBSCAN clustering for ", length(x$cluster), " objects."),
+    paste0("DBSCAN clustering for ", nobs(x), " objects."),
     paste0("Parameters: eps = ", x$eps, ", minPts = ", x$minPts),
     paste0(
       "Using ",
@@ -396,9 +395,9 @@ print.dbscan_fast <- function(x, ...) {
     ),
     paste0(
       "The clustering contains ",
-      cl,
+      ncluster(x),
       " cluster(s) and ",
-      sum(x$cluster == 0L),
+      nnoise(x),
       " noise points."
     )
   ))

@@ -51,7 +51,7 @@ data("DS3")
 cl <- jpclust(DS3, k = 20, kt = 12)
 cl
 
-plot(DS3, col = cl$cluster+1L, cex = .5)
+clplot(DS3, cl)
 # Note: JP clustering does not consider noise and thus,
 # the sine wave points chain clusters together.
 
@@ -70,7 +70,7 @@ DS3_noiseless <- DS3[d > 110,]
 cl <- jpclust(DS3_noiseless, k = 20, kt = 10)
 cl
 
-plot(DS3_noiseless, col = cl$cluster+1L, cex = .5)
+clplot(DS3_noiseless, cl)
 }
 \references{
 R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a
@@ -83,6 +83,7 @@ Other clustering functions:
 \code{\link{dbscan}()},
 \code{\link{extractFOSC}()},
 \code{\link{hdbscan}()},
+\code{\link{ncluster}()},
 \code{\link{optics}()},
 \code{\link{sNNclust}()}
 }

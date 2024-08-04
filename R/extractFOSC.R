@@ -284,7 +284,6 @@ extractFOSC <-
         )
       }
     }
-    total_stab <- attr(cl_tree, "total_stability") %||% 1
     cl_track <- attr(cl_tree, "cl_tracker")
     stability_score <-
       vapply(cl_track, function(cid)
@@ -294,7 +293,7 @@ extractFOSC <-
         cl_tree[[as.character(cid)]]$vscore %||% 0, numeric(1L))
     total_score <-
       vapply(cl_track, function(cid)
-        cl_tree[[as.character(cid)]]$vscore %||% 0, numeric(1L))
+        cl_tree[[as.character(cid)]]$score %||% 0, numeric(1L))
     out <- append(
       x,
       list(

@@ -155,12 +155,12 @@ res <- hdbscan(moons, minPts = 5)
 res
 
 plot(res)
-plot(moons, col = res$cluster + 1L)
+clplot(moons, res)
 
 ## cluster the moons data set with HDBSCAN using Manhattan distances
 res <- hdbscan(dist(moons, method = "manhattan"), minPts = 5)
 plot(res)
-plot(moons, col = res$cluster + 1L)
+clplot(moons, res)
 
 ## DS3 from Chameleon
 data("DS3")
@@ -170,9 +170,8 @@ res
 
 ## Plot the simplified tree, highlight the most stable clusters
 plot(res, show_flat = TRUE)
-
 ## Plot the actual clusters (noise has cluster id 0 and is shown in black)
-plot(DS3, col = res$cluster + 1L, cex = .5)
+clplot(DS3, res)
 
 ## Example for HDBSCAN(e) using cluster_selection_epsilon
 # data with clusters of various densities.
@@ -206,16 +205,16 @@ X <- data.frame(
 ## HDBSCAN splits one cluster
 hdb <- hdbscan(X, minPts = 3)
 plot(hdb, show_flat = TRUE)
-plot(X, col = hdb$cluster + 1L, main = "HDBSCAN")
+hullplot(X, hdb, main = "HDBSCAN")
 
 ## DBSCAN* marks the least dense cluster as outliers
 db <- dbscan(X, eps = 1, minPts = 3, borderPoints = FALSE)
-plot(X, col = db$cluster + 1L, main = "DBSCAN*")
+hullplot(X, db, main = "DBSCAN*")
 
-## HDBSCAN(e) mixes HDBSCAN AND DBSCAN*
+## HDBSCAN(e) mixes HDBSCAN AND DBSCAN* to find all clusters
 hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
 plot(hdbe, show_flat = TRUE)
-plot(X, col = hdbe$cluster + 1L, main = "HDBSCAN(e)")
+hullplot(X, hdbe, main = "HDBSCAN(e)")
 }
 \references{
 Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on

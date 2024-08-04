@@ -7,6 +7,8 @@
 * HDBSCAN gained parameter cluster_selection_epsilon to implement 
   clusters selected from Malzer and Baum (2020).
 * Functions ncluster() and nnoise() were added.
+* hullplot now() marks noise as x.
+* added clplot().
 
 # dbscan 1.2-0 (2024-06-28)
 

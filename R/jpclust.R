@@ -65,7 +65,7 @@
 #' cl <- jpclust(DS3, k = 20, kt = 12)
 #' cl
 #'
-#' plot(DS3, col = cl$cluster+1L, cex = .5)
+#' clplot(DS3, cl)
 #' # Note: JP clustering does not consider noise and thus,
 #' # the sine wave points chain clusters together.
 #'
@@ -84,7 +84,7 @@
 #' cl <- jpclust(DS3_noiseless, k = 20, kt = 10)
 #' cl
 #'
-#' plot(DS3_noiseless, col = cl$cluster+1L, cex = .5)
+#' clplot(DS3_noiseless, cl)
 #' @export
 jpclust <- function(x, k, kt, ...) {
   # Create NN graph

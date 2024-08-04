@@ -17,10 +17,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' Plot Convex Hulls of Clusters
+#' Plot Clusters
 #'
-#' This function produces a two-dimensional scatter plot with added convex
-#' hulls for clusters.
+#' This function produces a two-dimensional scatter plot of data points
+#' and colors the data points according to a supplied clustering. Noise points
+#' are marked as `x`. `hullplot()` also adds convex hulls to clusters.
+#'
+#' @name hullplot
+#' @aliases hullplot clplot
 #'
 #' @param x a data matrix. If more than 2 columns are provided, then the data
 #' is plotted using the first two principal components.
@@ -29,6 +33,8 @@
 #' @param col colors used for clusters. Defaults to the standard palette.  The
 #' first color (default is black) is used for noise/unassigned points (cluster
 #' id 0).
+#' @param pch a vector of plotting characters. By default `o` is used for
+#'   points and `x` for noise points.
 #' @param cex expansion factor for symbols.
 #' @param hull_lwd,hull_lty line width and line type used for the convex hull.
 #' @param main main title.
@@ -47,18 +53,22 @@
 #'   )
 #' cl <- rep(1:4, time = 100)
 #'
+#'
 #' ### original data with true clustering
+#' clplot(x, cl, main = "True clusters")
 #' hullplot(x, cl, main = "True clusters")
 #' ### use different symbols
 #' hullplot(x, cl, main = "True clusters", pch = cl)
 #' ### just the hulls
 #' hullplot(x, cl, main = "True clusters", pch = NA)
 #' ### a version suitable for b/w printing)
-#' hullplot(x, cl, main = "True clusters", solid = FALSE, col = "black", pch = cl)
+#' hullplot(x, cl, main = "True clusters", solid = FALSE,
+#'   col = c("grey", "black"), pch = cl)
 #'
 #'
 #' ### run some clustering algorithms and plot the results
 #' db <- dbscan(x, eps = .07, minPts = 10)
+#' clplot(x, db, main = "DBSCAN")
 #' hullplot(x, db, main = "DBSCAN")
 #'
 #' op <- optics(x, eps = 10, minPts = 10)
@@ -81,6 +91,7 @@
 hullplot <- function(x,
   cl,
   col = NULL,
+  pch = NULL,
   cex = 0.5,
   hull_lwd = 1,
   hull_lty = 1,
@@ -107,15 +118,29 @@ hullplot <- function(x,
   #if(is.null(col)) col <- c("#000000FF", rainbow(n=max(cl)))
   if (is.null(col))
     col <- palette()
-  if (max(cl) + 1L > length(col))
+
+  # Note: We use the first color for noise points
+  if (length(col) == 1L)
+    col <- c(col, col)
+  col_noise <- col[1]
+  col <- col[-1]
+
+
+  if (max(cl) > length(col)) {
     warning("Not enough colors. Some colors will be reused.")
+    col <- rep(col, length.out = max(cl))
+  }
+
+  # mark noise points
+  pch <- pch %||% ifelse(cl == 0L, 4L, 1L)
 
   plot(x[, 1:2],
-    col = col[cl %% length(col) + 1L],
+    col = c(col_noise, col)[cl + 1L],
+    pch = pch,
     cex = cex,
-    #pch = ifelse(cl == 0L, 4L, 1L),
     main = main,
     ...)
+
   col_poly <- adjustcolor(col, alpha.f = alpha)
   border <- col
 
@@ -147,17 +172,29 @@ hullplot <- function(x,
     ch <- c(ch, ch[1])
     if (!solid) {
       lines(d[ch, ],
-        col = col[ci_order[i] %% length(col) + 1L],
-        lwd = hull_lwd,
-        lty = hull_lty)
+            col = border[ci_order[i]],
+            lwd = hull_lwd,
+            lty = hull_lty)
     } else {
       polygon(
         d[ch, ],
-        col = col_poly[ci_order[i] %% length(col_poly) + 1L],
+        col = col_poly[ci_order[i]],
         lwd = hull_lwd,
         lty = hull_lty,
-        border = border[ci_order[i] %% length(col_poly) + 1L]
+        border = border[ci_order[i]]
       )
     }
   }
 }
+
+#' @rdname hullplot
+#' @export
+clplot <- function(x,
+                   cl,
+                   col = NULL,
+                   pch = NULL,
+                   cex = 0.5,
+                   main = "Cluster Plot",
+                   ...)
+  hullplot(x, cl = cl, col = col, pch = pch, cex = cex, main = main,
+          solid = FALSE, hull_lwd = NA)

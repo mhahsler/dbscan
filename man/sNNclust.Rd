@@ -67,7 +67,7 @@ data("DS3")
 cl <- sNNclust(DS3, k = 20, eps = 7, minPts = 16)
 cl
 
-plot(DS3, col = cl$cluster + 1L, cex = .5)
+clplot(DS3, cl)
 
 }
 \references{

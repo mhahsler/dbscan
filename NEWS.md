@@ -8,7 +8,10 @@
   clusters selected from Malzer and Baum (2020).
 * Functions ncluster() and nnoise() were added.
 * hullplot now() marks noise as x.
-* added clplot().
+* Added clplot().
+
+## Bugfixes
+* extractFOCS: Fixed total_score.
 
 # dbscan 1.2-0 (2024-06-28)
 
@@ -29,7 +32,7 @@
 
 # dbscan 1.1-12 (2023-11-28)
 
-## Bugfix
+## Bugfixes
 * point_density checks now for missing values (reported by soelderer).
 * Removed C++11 specification.
 * ANN.cpp: fixed Rprintf warning.
@@ -46,7 +49,7 @@
 * Better description of how predict uses only Euclidean distances and more error checking.
 * The package now exports a new generic for as.dendrogram().
 
-## Bugfix
+## Bugfixes
 * is.corepoint() now uses the correct epsilon value (reported by Eng Aun).
 * functions now check for cluster::dissimilariy objects which have class dist 
   but missing attributes.
@@ -61,7 +64,7 @@
 ## Changes
 * reachability plot now shows all undefined distances as a dashed line.
 
-## Bugfix
+## Bugfixes
 * memory leak in mrd calculation fixed.
 
 # dbscan 1.1-9 (2022-01-10)
@@ -121,7 +124,7 @@
 
 # dbscan 1.1-3 (2018-11-12)
 
-## Bugfix
+## Bugfixes
 * pointdensity was double counting the query point (reported by Marius Hofert).
 
 # dbscan 1.1-2 (2018-05-18)
@@ -129,13 +132,13 @@
 ## New Features
 * OPTICS now calculates eps if it is omitted.
 
-## Bugfix
+## Bugfixes
 * Example now only uses igraph conditionally since it is unavailable 
   on Solaris (reported by B. Ripley).
 
 # dbscan 1.1-1 (2017-03-19)
 
-## Bugfix
+## Bugfixes
 
 * Fixed problem with constant name on Solaris in ANN code (reported by B. Ripley).
 

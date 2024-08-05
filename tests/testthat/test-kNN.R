@@ -113,14 +113,14 @@ test_that("kNN", {
   expect_identical(ncol(nn5$dist), 5L)
 
   ## test with simple data
-  x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+  x <- data.frame(x = 1:10, row.names = LETTERS[1:10], check.names = FALSE)
   nn <- kNN(x, k = 5)
   expect_identical(unname(nn$id[1, ]), 2:6)
   expect_identical(unname(nn$id[5, ]), c(4L, 6L, 3L, 7L, 2L))
   expect_identical(unname(nn$id[10, ]), 9:5)
 
   ## test kNN with query
-  x <- data.frame(x=1:10, row.names = LETTERS[1:10])
+  x <- data.frame(x = 1:10, row.names = LETTERS[1:10], check.names = FALSE)
   nn <- kNN(x[1:8, , drop=FALSE], x[9:10, , drop = FALSE], k = 5)
   expect_identical(nrow(nn$id), 2L)
   expect_identical(unname(nn$id[1, ]), 8:4)

@@ -119,7 +119,7 @@ print.general_clustering <- function(x, ...) {
     paste0("Parameters: ",
       paste(
         names(x$param),
-        unlist(x$param),
+        unlist(x$param, use.names = FALSE),
         sep = " = ",
         collapse = ", "
       )),

@@ -240,7 +240,7 @@ kNN <-
     return(TRUE)
 
   # check that dist objects have diag = FALSE, upper = FALSE
-  if(attr(x, "Diag") || attr(x, "Upper"))
+  if (attr(x, "Diag") || attr(x, "Upper"))
     stop("x needs to be a dist object with attributes Diag and Upper set to FALSE. Use as.dist(x, diag = FALSE, upper = FALSE) fist.")
   }
 
@@ -289,15 +289,14 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
   }
 
   ## sort first by dist and break ties using id
-  o <- sapply(
+  o <- vapply(
     seq_len(nrow(x$dist)),
-    FUN =
-      function(i)
-        order(x$dist[i,], x$id[i,], decreasing = decreasing)
+    function(i) order(x$dist[i, ], x$id[i, ], decreasing = decreasing),
+    integer(ncol(x$id))
   )
   for (i in seq_len(ncol(o))) {
-    x$dist[i,] <- x$dist[i,][o[, i]]
-    x$id[i,] <- x$id[i,][o[, i]]
+    x$dist[i, ] <- x$dist[i, ][o[, i]]
+    x$id[i, ] <- x$id[i, ][o[, i]]
   }
   x$sort <- TRUE
 

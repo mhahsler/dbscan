@@ -273,9 +273,9 @@ hdbscan <- function(
   ## Stability scores
   ## NOTE: These scores represent the stability scores -before- the hierarchy traversal
   cluster_scores <-
-    sapply(sl, function(sl_cid) {
+    vapply(sl, function(sl_cid) {
       res[[as.character(sl_cid)]]$stability
-    })
+    }, numeric(1L))
   names(cluster_scores) <- names(cl_map)
 
   ## Return everything HDBSCAN does
@@ -358,10 +358,10 @@ plot.hdbscan <-
       length(all_children(
         attr(hd_info, "cl_hierarchy"),
         key = 0,
-        leaves_only = T
+        leaves_only = TRUE
       ))
     scale <-
-      ifelse(scale == "suggest", nclusters, nclusters / as.numeric(scale))
+      if (scale == "suggest") nclusters else nclusters / scale
 
     ## Color variables
     col_breaks <-
@@ -376,18 +376,17 @@ plot.hdbscan <-
 
       ## widths == number of points in the cluster at each eps it was alive
       widths <-
-        sapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps) {
-          length(which(hd_info[[cl_key]]$eps <= eps))
-        })
+        vapply(sort(hd_info[[cl_key]]$eps, decreasing = TRUE), function(eps) {
+          sum(hd_info[[cl_key]]$eps <= eps)
+        }, numeric(1L))
       if (length(widths) > 0) {
-        widths <-
-          unlist(c(
-            widths + hd_info[[cl_key]]$n_children,
-            rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
-          ))
+        widths <- c(
+          widths + hd_info[[cl_key]]$n_children,
+          rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
+        )
       } else {
         widths <-
-          as.vector(rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children))
+          rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
       }
 
       ## Normalize and scale widths to length of x-axis

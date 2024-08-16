@@ -21,18 +21,19 @@ clustering spatial data. The package includes:
 
 - **DBSCAN:** Density-based spatial clustering of applications with
   noise ([Ester et al. 1996](#ref-ester1996density)).
+- **Jarvis-Patrick Clustering**: Clustering using a similarity measure
+  based on shared near neighbors ([Jarvis and Patrick
+  1973](#ref-jarvis1973)).
+- **SNN Clustering**: Shared nearest neighbor clustering ([Ertöz,
+  Steinbach, and Kumar 2003](#ref-erdoz2003)).
 - **HDBSCAN:** Hierarchical DBSCAN with simplified hierarchy extraction
   ([Campello et al. 2015](#ref-campello2015hierarchical)).
-- **OPTICS/OPTICSXi:** Ordering points to identify the clustering
-  structure clustering algorithms ([Ankerst et al.
-  1999](#ref-ankerst1999optics)).
-- **FOSC:** Framework for Optimal Selection of Clusters for unsupervised
+- **FOSC:** Framework for optimal selection of clusters for unsupervised
   and semisupervised clustering of hierarchical cluster tree ([Campello,
   Moulavi, and Sander 2013](#ref-campello2013density)).
-- **Jarvis-Patrick clustering**: Shared Nearest Neighbor Graph
-  partitioning ([Jarvis and Patrick 1973](#ref-jarvis1973)).
-- **SNN Clustering**: Shared Nearest Neighbor Clustering ([Ertöz,
-  Steinbach, and Kumar 2003](#ref-erdoz2003)).
+- **OPTICS/OPTICSXi:** Ordering points to identify the clustering
+  structure and cluster extraction methods ([Ankerst et al.
+  1999](#ref-ankerst1999optics)).
 
 **Outlier Detection**
 
@@ -47,9 +48,10 @@ clustering spatial data. The package includes:
 - **Fixed-radius NN search**
 
 The implementations use the kd-tree data structure (from library ANN)
-for faster k-nearest neighbor search, and are typically faster than the
-native R implementations (e.g., dbscan in package `fpc`), or the
-implementations in [WEKA](https://ml.cms.waikato.ac.nz/weka/),
+for faster k-nearest neighbor search, and are for Euclidean distance
+typically faster than the native R implementations (e.g., dbscan in
+package `fpc`), or the implementations in
+[WEKA](https://ml.cms.waikato.ac.nz/weka/),
 [ELKI](https://elki-project.github.io/) and [Python’s
 scikit-learn](https://scikit-learn.org/).
 
@@ -103,7 +105,6 @@ The following R packages use `dbscan`:
 [squat](https://CRAN.R-project.org/package=squat),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
 [stream](https://CRAN.R-project.org/package=stream),
-[supc](https://CRAN.R-project.org/package=supc),
 [synr](https://CRAN.R-project.org/package=synr),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
 [weird](https://CRAN.R-project.org/package=weird)
@@ -329,7 +330,8 @@ original author, Erich Schubert.
 
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
 
 <div id="ref-ankerst1999optics" class="csl-entry">
 

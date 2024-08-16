@@ -19,12 +19,13 @@ The package includes:
 __Clustering__
 
 - __DBSCAN:__ Density-based spatial clustering of applications with noise [@ester1996density].
+- __Jarvis-Patrick Clustering__: Clustering using a similarity measure based
+on shared near neighbors [@jarvis1973].
+- __SNN Clustering__: Shared nearest neighbor clustering [@erdoz2003].
 - __HDBSCAN:__  Hierarchical DBSCAN with simplified hierarchy extraction [@campello2015hierarchical].
-- __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure clustering algorithms 
+- __FOSC:__ Framework for optimal selection of clusters for unsupervised and semisupervised clustering of hierarchical cluster tree [@campello2013density].
+- __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure and cluster extraction methods
   [@ankerst1999optics].
-- __FOSC:__ Framework for Optimal Selection of Clusters for unsupervised and semisupervised clustering of hierarchical cluster tree [@campello2013density].
-- __Jarvis-Patrick clustering__: Shared Nearest Neighbor Graph  partitioning [@jarvis1973].
-- __SNN Clustering__: Shared Nearest Neighbor Clustering [@erdoz2003].
 
 __Outlier Detection__
 
@@ -36,7 +37,8 @@ __Fast Nearest-Neighbor Search (using kd-trees)__
 - __kNN search__
 - __Fixed-radius NN search__
 
-The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
+The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are
+for Euclidean distance typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
 implementations in [WEKA](https://ml.cms.waikato.ac.nz/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
 
 ```{r echo=FALSE, results = 'asis'}

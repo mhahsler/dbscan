@@ -4,9 +4,9 @@
 [![r-universe
 status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/dbscan)
 [![Package on
-CRAN](http://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
+CRAN](https://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![CRAN RStudio mirror
-downloads](http://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
+downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
 [![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan+r-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan+r)
 

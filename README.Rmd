@@ -32,10 +32,15 @@ __Outlier Detection__
 - __LOF:__ Local outlier factor algorithm [@breunig2000lof]. 
 - __GLOSH:__ Global-Local Outlier Score from Hierarchies algorithm [@campello2015hierarchical]. 
 
+__Cluster Evaluation__
+
+- __DBCV:__ Density-based clustering validation [@moulavi2014].
+
 __Fast Nearest-Neighbor Search (using kd-trees)__
 
 - __kNN search__
 - __Fixed-radius NN search__
+
 
 The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are
 for Euclidean distance typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 

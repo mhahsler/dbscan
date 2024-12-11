@@ -10,13 +10,9 @@
 
 // Note: does not return self-matches!
 
-#include <Rcpp.h>
-#include "ANN/ANN.h"
-
-using namespace Rcpp;
+#include "kNN.h"
 
 // returns knn + dist
-// [[Rcpp::export]]
 List kNN_int(NumericMatrix data, int k,
   int type, int bucketSize, int splitRule, double approx) {
 

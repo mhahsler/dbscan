@@ -85,6 +85,30 @@ dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, approx)
 }
 
+intToStr <- function(iv) {
+    .Call(`_dbscan_intToStr`, iv)
+}
+
+dist_subset <- function(dist, idx) {
+    .Call(`_dbscan_dist_subset`, dist, idx)
+}
+
+all_pts_core_sorted_dist <- function(sorted_dist, cl, d, squared) {
+    .Call(`_dbscan_all_pts_core_sorted_dist`, sorted_dist, cl, d, squared)
+}
+
+all_pts_core <- function(data, cl, squared) {
+    .Call(`_dbscan_all_pts_core`, data, cl, squared)
+}
+
+XOR <- function(lhs, rhs) {
+    .Call(`_dbscan_XOR`, lhs, rhs)
+}
+
+dspc <- function(cl_idx, internal_nodes, all_cl_ids, mrd_dist) {
+    .Call(`_dbscan_dspc`, cl_idx, internal_nodes, all_cl_ids, mrd_dist)
+}
+
 frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_frNN_int`, data, eps, type, bucketSize, splitRule, approx)
 }
@@ -93,12 +117,12 @@ frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, approx
     .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, approx)
 }
 
-kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, approx)
-}
-
 kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, approx)
+}
+
+kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
+    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, approx)
 }
 
 lof_kNN <- function(data, minPts, type, bucketSize, splitRule, approx) {

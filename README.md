@@ -42,6 +42,11 @@ clustering spatial data. The package includes:
 - **GLOSH:** Global-Local Outlier Score from Hierarchies algorithm
   ([Campello et al. 2015](#ref-campello2015hierarchical)).
 
+**Cluster Evaluation**
+
+- **DBCV:** Density-based clustering validation ([Moulavi et al.
+  2014](#ref-moulavi2014)).
+
 **Fast Nearest-Neighbor Search (using kd-trees)**
 
 - **kNN search**
@@ -57,6 +62,7 @@ scikit-learn](https://scikit-learn.org/).
 
 The following R packages use `dbscan`:
 [AFM](https://CRAN.R-project.org/package=AFM),
+[AnimalSequences](https://CRAN.R-project.org/package=AnimalSequences),
 [bioregion](https://CRAN.R-project.org/package=bioregion),
 [CLONETv2](https://CRAN.R-project.org/package=CLONETv2),
 [ClustAssess](https://CRAN.R-project.org/package=ClustAssess),
@@ -77,13 +83,15 @@ The following R packages use `dbscan`:
 [FORTLS](https://CRAN.R-project.org/package=FORTLS),
 [funtimes](https://CRAN.R-project.org/package=funtimes),
 [FuzzyDBScan](https://CRAN.R-project.org/package=FuzzyDBScan),
+[immunaut](https://CRAN.R-project.org/package=immunaut),
 [karyotapR](https://CRAN.R-project.org/package=karyotapR),
 [ksharp](https://CRAN.R-project.org/package=ksharp),
 [LOMAR](https://CRAN.R-project.org/package=LOMAR),
 [maotai](https://CRAN.R-project.org/package=maotai),
+[MapperAlgo](https://CRAN.R-project.org/package=MapperAlgo),
 [metaCluster](https://CRAN.R-project.org/package=metaCluster),
+[metasnf](https://CRAN.R-project.org/package=metasnf),
 [mlr3cluster](https://CRAN.R-project.org/package=mlr3cluster),
-[MOSS](https://CRAN.R-project.org/package=MOSS),
 [oclust](https://CRAN.R-project.org/package=oclust),
 [openSkies](https://CRAN.R-project.org/package=openSkies),
 [opticskxi](https://CRAN.R-project.org/package=opticskxi),
@@ -101,10 +109,10 @@ The following R packages use `dbscan`:
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
 [snap](https://CRAN.R-project.org/package=snap),
 [spdep](https://CRAN.R-project.org/package=spdep),
-[spNetwork](https://CRAN.R-project.org/package=spNetwork),
 [squat](https://CRAN.R-project.org/package=squat),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
 [stream](https://CRAN.R-project.org/package=stream),
+[SuperCell](https://CRAN.R-project.org/package=SuperCell),
 [synr](https://CRAN.R-project.org/package=synr),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
 [weird](https://CRAN.R-project.org/package=weird)
@@ -405,6 +413,15 @@ Jarvis, R. A., and E. A. Patrick. 1973. “Clustering Using a Similarity
 Measure Based on Shared Near Neighbors.” *IEEE Transactions on
 Computers* C-22 (11): 1025–34.
 <https://doi.org/10.1109/T-C.1973.223640>.
+
+</div>
+
+<div id="ref-moulavi2014" class="csl-entry">
+
+Moulavi, Davoud, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur
+Zimek, and Jörg Sander. 2014. “Density-Based Clustering Validation.” In
+*Proceedings of the 2014 SIAM International Conference on Data Mining
+(SDM)*, 839–47. <https://doi.org/10.1137/1.9781611973440.96>.
 
 </div>
 

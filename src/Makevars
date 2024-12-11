@@ -8,6 +8,7 @@ SOURCES = \
 	optics.cpp cleanup.cpp density.cpp frNN.cpp dendrogram.cpp \
 	comps.cpp JP.cpp mrd.cpp union_find.cpp lof.cpp \
 	regionQuery.cpp buildHDBSCAN.cpp kNN.cpp \
-	prims_mst.cpp dbscan.cpp RcppExports.cpp
+	prims_mst.cpp dbscan.cpp utilities.cpp dspc.cpp \
+	RcppExports.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)

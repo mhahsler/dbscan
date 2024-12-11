@@ -282,6 +282,82 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// intToStr
+StringVector intToStr(IntegerVector iv);
+RcppExport SEXP _dbscan_intToStr(SEXP ivSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type iv(ivSEXP);
+    rcpp_result_gen = Rcpp::wrap(intToStr(iv));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dist_subset
+NumericVector dist_subset(const NumericVector& dist, IntegerVector idx);
+RcppExport SEXP _dbscan_dist_subset(SEXP distSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector& >::type dist(distSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(dist_subset(dist, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// all_pts_core_sorted_dist
+List all_pts_core_sorted_dist(const NumericMatrix& sorted_dist, const List& cl, const int d, const bool squared);
+RcppExport SEXP _dbscan_all_pts_core_sorted_dist(SEXP sorted_distSEXP, SEXP clSEXP, SEXP dSEXP, SEXP squaredSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type sorted_dist(sorted_distSEXP);
+    Rcpp::traits::input_parameter< const List& >::type cl(clSEXP);
+    Rcpp::traits::input_parameter< const int >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const bool >::type squared(squaredSEXP);
+    rcpp_result_gen = Rcpp::wrap(all_pts_core_sorted_dist(sorted_dist, cl, d, squared));
+    return rcpp_result_gen;
+END_RCPP
+}
+// all_pts_core
+List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared);
+RcppExport SEXP _dbscan_all_pts_core(SEXP dataSEXP, SEXP clSEXP, SEXP squaredSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const List& >::type cl(clSEXP);
+    Rcpp::traits::input_parameter< const bool >::type squared(squaredSEXP);
+    rcpp_result_gen = Rcpp::wrap(all_pts_core(data, cl, squared));
+    return rcpp_result_gen;
+END_RCPP
+}
+// XOR
+Rcpp::LogicalVector XOR(Rcpp::LogicalVector lhs, Rcpp::LogicalVector rhs);
+RcppExport SEXP _dbscan_XOR(SEXP lhsSEXP, SEXP rhsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type lhs(lhsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type rhs(rhsSEXP);
+    rcpp_result_gen = Rcpp::wrap(XOR(lhs, rhs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dspc
+NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const IntegerVector& all_cl_ids, const NumericVector& mrd_dist);
+RcppExport SEXP _dbscan_dspc(SEXP cl_idxSEXP, SEXP internal_nodesSEXP, SEXP all_cl_idsSEXP, SEXP mrd_distSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const List& >::type cl_idx(cl_idxSEXP);
+    Rcpp::traits::input_parameter< const List& >::type internal_nodes(internal_nodesSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type all_cl_ids(all_cl_idsSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type mrd_dist(mrd_distSEXP);
+    rcpp_result_gen = Rcpp::wrap(dspc(cl_idx, internal_nodes, all_cl_ids, mrd_dist));
+    return rcpp_result_gen;
+END_RCPP
+}
 // frNN_int
 List frNN_int(NumericMatrix data, double eps, int type, int bucketSize, int splitRule, double approx);
 RcppExport SEXP _dbscan_frNN_int(SEXP dataSEXP, SEXP epsSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
@@ -315,22 +391,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// kNN_int
-List kNN_int(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
-RcppExport SEXP _dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
-    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
-    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
-    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
-    rcpp_result_gen = Rcpp::wrap(kNN_int(data, k, type, bucketSize, splitRule, approx));
-    return rcpp_result_gen;
-END_RCPP
-}
 // kNN_query_int
 List kNN_query_int(NumericMatrix data, NumericMatrix query, int k, int type, int bucketSize, int splitRule, double approx);
 RcppExport SEXP _dbscan_kNN_query_int(SEXP dataSEXP, SEXP querySEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
@@ -345,6 +405,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
     Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
     rcpp_result_gen = Rcpp::wrap(kNN_query_int(data, query, k, type, bucketSize, splitRule, approx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// kNN_int
+List kNN_int(NumericMatrix data, int k, int type, int bucketSize, int splitRule, double approx);
+RcppExport SEXP _dbscan_kNN_int(SEXP dataSEXP, SEXP kSEXP, SEXP typeSEXP, SEXP bucketSizeSEXP, SEXP splitRuleSEXP, SEXP approxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type type(typeSEXP);
+    Rcpp::traits::input_parameter< int >::type bucketSize(bucketSizeSEXP);
+    Rcpp::traits::input_parameter< int >::type splitRule(splitRuleSEXP);
+    Rcpp::traits::input_parameter< double >::type approx(approxSEXP);
+    rcpp_result_gen = Rcpp::wrap(kNN_int(data, k, type, bucketSize, splitRule, approx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -499,10 +575,16 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_dendrogram_to_reach", (DL_FUNC) &_dbscan_dendrogram_to_reach, 1},
     {"_dbscan_mst_to_dendrogram", (DL_FUNC) &_dbscan_mst_to_dendrogram, 1},
     {"_dbscan_dbscan_density_int", (DL_FUNC) &_dbscan_dbscan_density_int, 6},
+    {"_dbscan_intToStr", (DL_FUNC) &_dbscan_intToStr, 1},
+    {"_dbscan_dist_subset", (DL_FUNC) &_dbscan_dist_subset, 2},
+    {"_dbscan_all_pts_core_sorted_dist", (DL_FUNC) &_dbscan_all_pts_core_sorted_dist, 4},
+    {"_dbscan_all_pts_core", (DL_FUNC) &_dbscan_all_pts_core, 3},
+    {"_dbscan_XOR", (DL_FUNC) &_dbscan_XOR, 2},
+    {"_dbscan_dspc", (DL_FUNC) &_dbscan_dspc, 4},
     {"_dbscan_frNN_int", (DL_FUNC) &_dbscan_frNN_int, 6},
     {"_dbscan_frNN_query_int", (DL_FUNC) &_dbscan_frNN_query_int, 7},
-    {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 6},
     {"_dbscan_kNN_query_int", (DL_FUNC) &_dbscan_kNN_query_int, 7},
+    {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 6},
     {"_dbscan_lof_kNN", (DL_FUNC) &_dbscan_lof_kNN, 6},
     {"_dbscan_mrd", (DL_FUNC) &_dbscan_mrd, 2},
     {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},

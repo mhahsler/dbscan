@@ -7,10 +7,10 @@
 // GNU General Public License (GPL) Version 3
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
-#include <Rcpp.h>
-#include <queue> // priority_queue
-using namespace Rcpp;
+// Header 
+#include "prims_mst.h"
 
+// inline indexing of distance matrix 
 #define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
 
 // Structures to do priority queue

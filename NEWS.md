@@ -11,6 +11,7 @@
 * Added clplot().
 * pointdensity now also accepts a dist object as input and has the new type
   "gaussian" to calculate a Gaussian kernel estimate.
+* Added the DBCV index.
 
 ## Bugfixes
 * extractFOCS: Fixed total_score.

@@ -14,6 +14,8 @@
 
 using namespace Rcpp;
 
+// faster implementation of counting point densities from a matrix
+// using a kd-tree
 // [[Rcpp::export]]
 IntegerVector dbscan_density_int(
     NumericMatrix data, double eps,

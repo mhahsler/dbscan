@@ -16,13 +16,15 @@ pointdensity(
 )
 }
 \arguments{
-\item{x}{a data matrix.}
+\item{x}{a data matrix or a dist object.}
 
 \item{eps}{radius of the eps-neighborhood, i.e., bandwidth of the uniform
-kernel).}
+kernel). For the Gaussian kde, this parameter specifies the standard deviation of
+the kernel.}
 
-\item{type}{\code{"frequency"} or \code{"density"}. should the raw count of
-points inside the eps-neighborhood or the kde be returned.}
+\item{type}{\code{"frequency"}, \code{"density"}, or \code{"gaussian"}. should the raw count of
+points inside the eps-neighborhood, the eps-neighborhood density estimate,
+or a Gaussian density estimate be returned?}
 
 \item{search, bucketSize, splitRule, approx}{algorithmic parameters for
 \code{\link[=frNN]{frNN()}}.}
@@ -44,6 +46,11 @@ Kernel density estimation (KDE) using a uniform kernel, which is just this point
 count in the eps-neighborhood divided by \eqn{(2\,eps\,n)}{(2 eps n)}, where
 \eqn{n} is the number of points in \code{x}.
 
+Alternatively, \code{type = "gaussian"} calculates a Gaussian kernel estimate where
+\code{eps} is used as the standard deviation. To speed up computation, a
+kd-tree is used to find all points within 3 times the standard deviation and
+these points are used for the estimate.
+
 Points with low local density often indicate noise (see e.g., Wishart (1969)
 and Hartigan (1975)).
 }
@@ -56,7 +63,7 @@ x <- cbind(
   )
 plot(x)
 
-### calculate density
+### calculate density around points
 d <- pointdensity(x, eps = .5, type = "density")
 
 ### density distribution

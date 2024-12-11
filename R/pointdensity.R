@@ -30,17 +30,24 @@
 #' count in the eps-neighborhood divided by \eqn{(2\,eps\,n)}{(2 eps n)}, where
 #' \eqn{n} is the number of points in `x`.
 #'
+#' Alternatively, `type = "gaussian"` calculates a Gaussian kernel estimate where
+#' `eps` is used as the standard deviation. To speed up computation, a
+#' kd-tree is used to find all points within 3 times the standard deviation and
+#' these points are used for the estimate.
+#'
 #' Points with low local density often indicate noise (see e.g., Wishart (1969)
 #' and Hartigan (1975)).
 #'
 #' @aliases pointdensity density
 #' @family Outlier Detection Functions
 #'
-#' @param x a data matrix.
+#' @param x a data matrix or a dist object.
 #' @param eps radius of the eps-neighborhood, i.e., bandwidth of the uniform
-#' kernel).
-#' @param type `"frequency"` or `"density"`. should the raw count of
-#' points inside the eps-neighborhood or the kde be returned.
+#' kernel). For the Gaussian kde, this parameter specifies the standard deviation of
+#' the kernel.
+#' @param type `"frequency"`, `"density"`, or `"gaussian"`. should the raw count of
+#' points inside the eps-neighborhood, the eps-neighborhood density estimate,
+#' or a Gaussian density estimate be returned?
 #' @param search,bucketSize,splitRule,approx algorithmic parameters for
 #' [frNN()].
 #'
@@ -65,7 +72,7 @@
 #'   )
 #' plot(x)
 #'
-#' ### calculate density
+#' ### calculate density around points
 #' d <- pointdensity(x, eps = .5, type = "density")
 #'
 #' ### density distribution
@@ -92,27 +99,62 @@ pointdensity <- function(x,
   bucketSize = 10,
   splitRule = "suggest",
   approx = 0) {
-  type <- match.arg(type, choices = c("frequency", "density"))
-
-  search <- .parse_search(search)
-  splitRule <- .parse_splitRule(splitRule)
+  type <- match.arg(type, choices = c("frequency", "density", "gaussian"))
 
   if (anyNA(x))
     stop("missing values are not allowed in x.")
 
-  d <- dbscan_density_int(
-    as.matrix(x),
-    as.double(eps),
-    as.integer(search),
-    as.integer(bucketSize),
-    as.integer(splitRule),
-    as.double(approx)
-  )
+  if (type == "gaussian")
+    return (.pointdensity_gaussian(x, sd = eps, search = search, bucketSize = bucketSize,
+                                   splitRule = splitRule, approx = approx))
+
+  # regular dbscan density estimation
+  if (inherits(x, "dist")) {
+    nn <- frNN(
+      x,
+      eps,
+      sort = FALSE,
+      search = search,
+      bucketSize = bucketSize,
+      splitRule = splitRule,
+      approx = approx
+    )
+    d <- lengths(nn$id) + 1L
+
+  } else {
+    # faster implementation for a data matrix
+    search <- .parse_search(search)
+    splitRule <- .parse_splitRule(splitRule)
+
+    d <- dbscan_density_int(
+      as.matrix(x),
+      as.double(eps),
+      as.integer(search),
+      as.integer(bucketSize),
+      as.integer(splitRule),
+      as.double(approx)
+    )
+  }
 
   if (type == "density")
     d <- d / (2 * eps * nrow(x))
 
   d
+}
+
+.pointdensity_gaussian <- function(x, sd, ...) {
+    ### consider all points within 3 standard deviations
+    nn <- frNN(
+      x,
+      3 * sd,
+      sort = FALSE,
+      ...
+    )
+
+    sigma <- sd^2
+    d <- sapply(nn$dist, FUN = function(ds) sum(exp(-1 * ds^2 / (2 * sigma))))
+    d <- d / (length(d) * sd * 2 * pi)
+    d
 }
 
 #gof <- function(x, eps, ...) {

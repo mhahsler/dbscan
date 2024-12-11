@@ -9,6 +9,8 @@
 * Functions ncluster() and nnoise() were added.
 * hullplot now() marks noise as x.
 * Added clplot().
+* pointdensity now also accepts a dist object as input and has the new type
+  "gaussian" to calculate a Gaussian kernel estimate.
 
 ## Bugfixes
 * extractFOCS: Fixed total_score.

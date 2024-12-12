@@ -5,7 +5,7 @@
 \alias{DBCV}
 \title{Density-Based Clustering Validation Index (DBCV)}
 \usage{
-dbcv(x, cl, d = 2)
+dbcv(x, cl, d = 2, sample = NULL)
 }
 \arguments{
 \item{x}{a data matrix or a dist object.}
@@ -13,6 +13,8 @@ dbcv(x, cl, d = 2)
 \item{cl}{a clustering (e.g., a integer vector)}
 
 \item{d}{dimensionality of the original data if a dist object is provided.}
+
+\item{sample}{sample size used for large datasets.}
 }
 \value{
 A list with the DBCV score for the clustering, the DSC values,
@@ -37,7 +39,9 @@ The validity index for a cluster is calculated for these measures and aggregated
 to a validity index for the whole clustering using a weighted average.
 
 The index is in the range \eqn{[-1,1]}. If the cluster density compactness is better
-than the density separation, a positive value is returned.
+than the density separation, a positive value is returned. The actual value depends
+on the separability of the data. In general, greater values
+of the measure indicating a better density-based clustering solution.
 
 Noise points are included in the calculation only in the weighted average,
 therefore clustering with more noise points will get a lower index.
@@ -46,12 +50,38 @@ therefore clustering with more noise points will get a lower index.
 can only be used for small or sampled datasets.
 }
 \examples{
-data(moons)
+# Load a test dataset
+data(Dataset_1)
+x <- Dataset_1[, c("x", "y")]
+class <- Dataset_1$class
 
-cl <- dbscan(moons, eps = .3, minPts = 3)
-clplot(moons, cl)
+clplot(x, class)
 
-dbcv(moons, cl)
+# We use MinPts 3 and use the knee at eps = .1 for dbscan
+kNNdistplot(x, minPts = 3)
+
+cl <- dbscan(x, eps = .1, minPts = 3)
+clplot(x, cl)
+
+dbcv(x, cl)
+
+# compare to the DBCV index on the original class labels and
+# with a random partitioning
+dbcv(x, class)
+dbcv(x, sample(1:4, replace = TRUE, size = nrow(x)))
+
+# find the best eps using dbcv
+eps_grid <- seq(.01,.2, by = .01)
+cls <- lapply(eps_grid, FUN = function(e) dbscan(x, eps = e, minPts = 3))
+dbcvs <- sapply(cls, FUN = function(cl) dbcv(x, cl)$score)
+
+plot(eps_grid, dbcvs, type = "l")
+
+eps_opt <- eps_grid[which.max(dbcvs)]
+eps_opt
+
+cl <- dbscan(x, eps = eps_opt, minPts = 3)
+clplot(x, cl)
 }
 \references{
 Davoud Moulavi and Pablo A. Jaskowiak and

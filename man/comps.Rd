@@ -29,7 +29,7 @@ comps(x, ...)
 \item{mutual}{for a pair of points, do both have to be in each other's neighborhood?}
 }
 \value{
-a integer vector with component assignments.
+an integer vector with component assignments.
 }
 \description{
 Generic function and methods to find connected components in nearest neighbor graphs.

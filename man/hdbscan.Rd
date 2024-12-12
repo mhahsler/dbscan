@@ -137,7 +137,8 @@ need to be merged, while still being able to extract clusters
 of variable densities at higher levels.
 
 \code{coredist()}: The core distance is defined for each point as
-the distance to the \code{MinPts}'s neighbor. It is a density estimate.
+the distance to the \code{MinPts - 1}'s neighbor.
+It is a density estimate equivalent to \code{kNNdist()} with \code{k = MinPts -1}.
 
 \code{mrdist()}: The mutual reachability distance is defined between two points as
 \code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}. This distance metric is used by

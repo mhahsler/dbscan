@@ -56,6 +56,7 @@ INDEX_TF <- function(N, to, from)
 #' @param x a data matrix or a dist object.
 #' @param cl a clustering (e.g., a integer vector)
 #' @param d dimensionality of the original data if a dist object is provided.
+#' @param sample sample size used for large datasets.
 #'
 #' @return A list with the DBCV score for the clustering, the DSC values,
 #' the DSPC distance matrix
@@ -69,31 +70,38 @@ INDEX_TF <- function(N, to, from)
 #' pages 839-847
 #' \doi{10.1137/1.9781611973440.96}
 #' @examples
-#' data(moons)
+#' # Load a test dataset
+#' data(Dataset_1)
+#' x <- Dataset_1[, c("x", "y")]
+#' class <- Dataset_1$class
 #'
-#' # We use MinPts 3 and use the knee at .3 for eps
-#' kNNdistplot(moons, minPts = 3)
+#' clplot(x, class)
 #'
-#' cl <- dbscan(moons, eps = .3, minPts = 3)
-#' clplot(moons, cl)
+#' # We use MinPts 3 and use the knee at eps = .1 for dbscan
+#' kNNdistplot(x, minPts = 3)
 #'
-#' dbcv(moons, cl)
+#' cl <- dbscan(x, eps = .1, minPts = 3)
+#' clplot(x, cl)
 #'
-#' # compare to the DBCV index of a random partitioning
-#' dbcv(moons, sample(1:4, replace = TRUE, size = nrow(moons)))
+#' dbcv(x, cl)
+#'
+#' # compare to the DBCV index on the original class labels and
+#' # with a random partitioning
+#' dbcv(x, class)
+#' dbcv(x, sample(1:4, replace = TRUE, size = nrow(x)))
 #'
 #' # find the best eps using dbcv
-#' eps_grid <- seq(.1,.5, by = .01)
-#' cls <- lapply(eps_grid, FUN = function(e) dbscan(moons, eps = e, minPts = 3))
-#' dbcvs <- sapply(cls, FUN = function(cl) dbcv(moons, cl)$score)
+#' eps_grid <- seq(.01,.2, by = .01)
+#' cls <- lapply(eps_grid, FUN = function(e) dbscan(x, eps = e, minPts = 3))
+#' dbcvs <- sapply(cls, FUN = function(cl) dbcv(x, cl)$score)
 #'
 #' plot(eps_grid, dbcvs, type = "l")
 #'
 #' eps_opt <- eps_grid[which.max(dbcvs)]
 #' eps_opt
 #'
-#' cl <- dbscan(moons, eps = eps_opt, minPts = 3)
-#' clplot(moons, cl)
+#' cl <- dbscan(x, eps = eps_opt, minPts = 3)
+#' clplot(x, cl)
 #' @export
 dbcv <- function(x,
                  cl,

@@ -7,11 +7,14 @@
 // GNU General Public License (GPL) Version 3
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
-// Header 
-#include "prims_mst.h"
+// Header
+#include "mst.h"
 
-// inline indexing of distance matrix 
+// inline indexing of distance matrix
 #define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
+
+
+// Minimal Spanning Tree
 
 // Structures to do priority queue
 struct edge
@@ -44,30 +47,30 @@ public:
 // this might be useful in some situations. For example, you can get the core distance
 // from only a dist object, without needing the original data. In experimentation, the
 // kNNdist ended up being faster than this.
+//
+// // [[Rcpp::export]]
+// NumericVector coreFromDist(const NumericVector dist, const int n, const int minPts){
+//   NumericVector core_dist = NumericVector(n);
+//   NumericVector row_dist = NumericVector(n - 1);
+//   for (R_xlen_t i = 0; i < n; ++i){
+//     for (R_xlen_t j = 0; j < n; ++j){
+//       if (i == j) continue;
+//       R_xlen_t index = i > j ? INDEX_TF(n, j, i) : INDEX_TF(n, i, j);
+//       row_dist.at(j > i ? j  - 1 : j) = dist.at(index);
+//     }
+//     std::sort(row_dist.begin(), row_dist.end());
+//     core_dist[i] = row_dist.at(minPts-2); // one for 0-based indexes, one for inclusive minPts condition
+//   }
+//   return(core_dist);
+// }
 
 // [[Rcpp::export]]
-NumericVector coreFromDist(const NumericVector dist, const int n, const int minPts){
-  NumericVector core_dist = NumericVector(n);
-  NumericVector row_dist = NumericVector(n - 1);
-  for (R_xlen_t i = 0; i < n; ++i){
-    for (R_xlen_t j = 0; j < n; ++j){
-      if (i == j) continue;
-      R_xlen_t index = i > j ? INDEX_TF(n, j, i) : INDEX_TF(n, i, j);
-      row_dist.at(j > i ? j  - 1 : j) = dist.at(index);
-    }
-    std::sort(row_dist.begin(), row_dist.end());
-    core_dist[i] = row_dist.at(minPts-2); // one for 0-based indexes, one for inclusive minPts condition
-  }
-  return(core_dist);
-}
-
-// [[Rcpp::export]]
-NumericMatrix prims(const NumericVector x_dist, const R_xlen_t n) {
+NumericMatrix mst_prims(const NumericVector x_dist, const R_xlen_t n) {
 
   // Resulting MST
   NumericMatrix mst = NumericMatrix(n-1, 3);
 
-  // Data structures for prims
+  // Data structures for prims algorithm
   std::vector<int> v_selected = std::vector<int>(n, -1); // -1 to indicate node is not in MST
   std::vector<edge> fringe = std::vector<edge>(n, edge(-1, std::numeric_limits<double>::infinity()));
   // r_priority_queue<edge, std::vector<edge>, compare_edge> _heap(n);
@@ -105,16 +108,20 @@ NumericMatrix prims(const NumericVector x_dist, const R_xlen_t n) {
   return(mst);
 }
 
+//
+// // [[Rcpp::export]]
+// IntegerVector order_(NumericVector x) {
+//   if (is_true(any(duplicated(x)))) {
+//     Rf_warning("There are duplicates in 'x'; order not guaranteed to match that of R's base::order");
+//   }
+//   NumericVector sorted = clone(x).sort();
+//   return match(sorted, x);
+// }
 
-// [[Rcpp::export]]
-IntegerVector order_(NumericVector x) {
-  if (is_true(any(duplicated(x)))) {
-    Rf_warning("There are duplicates in 'x'; order not guaranteed to match that of R's base::order");
-  }
-  NumericVector sorted = clone(x).sort();
-  return match(sorted, x);
-}
 
+
+// Single link hierarchical clustering
+// used by GLOSH.R and hdbscan.R
 
 void visit(const IntegerMatrix& merge, IntegerVector& order, int i, int j, int& ind) {
   // base case

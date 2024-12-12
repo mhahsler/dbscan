@@ -11,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-#include "union_find.h"
+#include "UnionFind.h"
 using namespace Rcpp;
 
 // std::to_string is apparently a c++11 only thing that crashes appveyor, so using ostringstream it is!

@@ -5,14 +5,14 @@
 \alias{DBCV}
 \title{Density-Based Clustering Validation Index (DBCV)}
 \usage{
-dbcv(x, cl, squared = TRUE)
+dbcv(x, cl, d = 2)
 }
 \arguments{
-\item{x}{a data matrix.}
+\item{x}{a data matrix or a dist object.}
 
 \item{cl}{a clustering (e.g., a integer vector)}
 
-\item{squared}{logical; should distances be squared?}
+\item{d}{dimensionality of the original data if a dist object is provided.}
 }
 \value{
 A list with the DBCV score for the clustering, the DSC values,

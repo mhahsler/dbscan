@@ -65,6 +65,22 @@ comps_frNN <- function(nn, mutual) {
     .Call(`_dbscan_comps_frNN`, nn, mutual)
 }
 
+intToStr <- function(iv) {
+    .Call(`_dbscan_intToStr`, iv)
+}
+
+dist_subset <- function(dist, idx) {
+    .Call(`_dbscan_dist_subset`, dist, idx)
+}
+
+XOR <- function(lhs, rhs) {
+    .Call(`_dbscan_XOR`, lhs, rhs)
+}
+
+dspc <- function(cl_idx, internal_nodes, all_cl_ids, mrd_dist) {
+    .Call(`_dbscan_dspc`, cl_idx, internal_nodes, all_cl_ids, mrd_dist)
+}
+
 dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
     .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
 }
@@ -83,30 +99,6 @@ mst_to_dendrogram <- function(mst) {
 
 dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, approx)
-}
-
-intToStr <- function(iv) {
-    .Call(`_dbscan_intToStr`, iv)
-}
-
-dist_subset <- function(dist, idx) {
-    .Call(`_dbscan_dist_subset`, dist, idx)
-}
-
-all_pts_core_sorted_dist <- function(sorted_dist, cl, d, squared) {
-    .Call(`_dbscan_all_pts_core_sorted_dist`, sorted_dist, cl, d, squared)
-}
-
-all_pts_core <- function(data, cl, squared) {
-    .Call(`_dbscan_all_pts_core`, data, cl, squared)
-}
-
-XOR <- function(lhs, rhs) {
-    .Call(`_dbscan_XOR`, lhs, rhs)
-}
-
-dspc <- function(cl_idx, internal_nodes, all_cl_ids, mrd_dist) {
-    .Call(`_dbscan_dspc`, cl_idx, internal_nodes, all_cl_ids, mrd_dist)
 }
 
 frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
@@ -133,24 +125,16 @@ mrd <- function(dm, cd) {
     .Call(`_dbscan_mrd`, dm, cd)
 }
 
-optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
-    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
-}
-
-coreFromDist <- function(dist, n, minPts) {
-    .Call(`_dbscan_coreFromDist`, dist, n, minPts)
-}
-
-prims <- function(x_dist, n) {
-    .Call(`_dbscan_prims`, x_dist, n)
-}
-
-order_ <- function(x) {
-    .Call(`_dbscan_order_`, x)
+mst_prims <- function(x_dist, n) {
+    .Call(`_dbscan_mst_prims`, x_dist, n)
 }
 
 hclustMergeOrder <- function(mst, o) {
     .Call(`_dbscan_hclustMergeOrder`, mst, o)
+}
+
+optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
+    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
 }
 
 lowerTri <- function(m) {

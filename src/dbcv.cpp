@@ -3,8 +3,8 @@ using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
 
 // Includes
-#include "prims_mst.h"
 #include "utilities.h"
+#include "mst.h"
 #include "ANN/ANN.h"
 #include "kNN.h"
 #include <string>
@@ -81,98 +81,98 @@ ANNdist inv_density(ANNdist cdist){
   return(1.0/cdist);
 }
 
-// [[Rcpp::export]]
-List all_pts_core_sorted_dist(const NumericMatrix& sorted_dist, const List& cl, const int d, const bool squared){
-  // The all core dists to return
-  List all_core_res = List(cl.size());
+// // [[Rcpp::export]]
+// List all_pts_core_sorted_dist(const NumericMatrix& sorted_dist, const List& cl, const int d, const bool squared){
+//   // The all core dists to return
+//   List all_core_res = List(cl.size());
+//
+//   // Do the kNN searches per cluster; note that k varies with the cluster
+//   int i = 0;
+//   for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
+//     const IntegerVector& cl_pts = (*it);
+//     const int k = cl_pts.length();
+//
+//     // Initial vector to record the per-point all core dists
+//     NumericVector all_core_cl = Rcpp::no_init_vector(k);
+//
+//     // For each point in the cluster, get the all core points dist
+//     int j = 0;
+//     for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
+//       const NumericMatrix::ConstColumn& knn_dist = sorted_dist.column((*pt_id) - 1);
+//
+//       // Calculate the all core points distance for this point
+//       std::vector<ANNdist> ndists = std::vector<ANNdist>(knn_dist.begin(), knn_dist.begin()+k);
+//       std::remove_if(ndists.begin(), ndists.end(), remove_zero);
+//       std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, d); });
+//       ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
+//       double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / double(d))); // Apply all core points equation
+//       all_core_cl[j] = acdist;
+//       // return(List::create(_["ndists"] = acdist, _["denom"] = sum_inv_density/(k - 1.0), _["k"] = k));
+//     }
+//     all_core_res[i] = all_core_cl;
+//   }
+//   return(all_core_res);
+// }
 
-  // Do the kNN searches per cluster; note that k varies with the cluster
-  int i = 0;
-  for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
-    const IntegerVector& cl_pts = (*it);
-    const int k = cl_pts.length();
-
-    // Initial vector to record the per-point all core dists
-    NumericVector all_core_cl = Rcpp::no_init_vector(k);
-
-    // For each point in the cluster, get the all core points dist
-    int j = 0;
-    for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
-      const NumericMatrix::ConstColumn& knn_dist = sorted_dist.column((*pt_id) - 1);
-
-      // Calculate the all core points distance for this point
-      std::vector<ANNdist> ndists = std::vector<ANNdist>(knn_dist.begin(), knn_dist.begin()+k);
-      std::remove_if(ndists.begin(), ndists.end(), remove_zero);
-      std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, d); });
-      ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
-      double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / double(d))); // Apply all core points equation
-      all_core_cl[j] = acdist;
-      // return(List::create(_["ndists"] = acdist, _["denom"] = sum_inv_density/(k - 1.0), _["k"] = k));
-    }
-    all_core_res[i] = all_core_cl;
-  }
-  return(all_core_res);
-}
-
-// [[Rcpp::export]]
-List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
-  // copy data
-  int nrow = data.nrow();
-  int ncol = data.ncol();
-  ANNpointArray dataPts = annAllocPts(nrow, ncol);
-  for(int i = 0; i < nrow; i++){
-    for(int j = 0; j < ncol; j++){
-      (dataPts[i])[j] = data(i, j);
-    }
-  }
-
-  // create kd-tree (1) or linear search structure (2)
-  ANNpointSet* kdTree = new ANNkd_tree(dataPts, nrow, ncol, 30, (ANNsplitRule)  5);
-
-  // The all core dists to
-  List all_core_res = List(cl.size());
-
-  // Do the kNN searches per cluster; note that k varies with the cluster
-  int i = 0;
-  for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
-    const IntegerVector& cl_pts = (*it);
-    const int k = cl_pts.length();
-
-    // Initial vector to record the per-point all core dists
-    NumericVector all_core_cl = Rcpp::no_init_vector(k);
-
-    // For each point in the cluster, get the all core points dist
-    int j = 0;
-    ANNdistArray dists = new ANNdist[k];
-    ANNidxArray nnIdx = new ANNidx[k];
-    for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
-      // Do the search
-      ANNpoint queryPt = dataPts[(*pt_id) - 1]; // use original data points
-      kdTree->annkSearch(queryPt, k, nnIdx, dists);
-
-      // V2.
-      std::vector<ANNdist> ndists = std::vector<ANNdist>(dists, dists+k);
-      std::remove_if(ndists.begin(), ndists.end(), remove_zero);
-      std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, ncol); });
-      ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
-      double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / double(ncol))); // Apply all core points equation
-      all_core_cl[j] = acdist;
-      // return(List::create(_["ndists"] = acdist, _["denom"] = sum_inv_density/(k - 1.0), _["k"] = k));
-    }
-    delete [] dists;
-    delete [] nnIdx;
-    all_core_res[i] = all_core_cl;
-  }
-
-  // cleanup
-  delete kdTree;
-  annDeallocPts(dataPts);
-  annClose();
-
-  // Return the all point core distance
-  if(!squared){ for (int i = 0; i < cl.size(); ++i){ all_core_res[i] = Rcpp::sqrt(all_core_res[i]); } }
-  return(all_core_res);
-}
+// // [[Rcpp::export]]
+// List all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
+//   // copy data
+//   int nrow = data.nrow();
+//   int ncol = data.ncol();
+//   ANNpointArray dataPts = annAllocPts(nrow, ncol);
+//   for(int i = 0; i < nrow; i++){
+//     for(int j = 0; j < ncol; j++){
+//       (dataPts[i])[j] = data(i, j);
+//     }
+//   }
+//
+//   // create kd-tree (1) or linear search structure (2)
+//   ANNpointSet* kdTree = new ANNkd_tree(dataPts, nrow, ncol, 30, (ANNsplitRule)  5);
+//
+//   // The all core dists to
+//   List all_core_res = List(cl.size());
+//
+//   // Do the kNN searches per cluster; note that k varies with the cluster
+//   int i = 0;
+//   for (List::const_iterator it = cl.begin(); it < cl.end(); ++it, ++i){
+//     const IntegerVector& cl_pts = (*it);
+//     const int k = cl_pts.length();
+//
+//     // Initial vector to record the per-point all core dists
+//     NumericVector all_core_cl = Rcpp::no_init_vector(k);
+//
+//     // For each point in the cluster, get the all core points dist
+//     int j = 0;
+//     ANNdistArray dists = new ANNdist[k];
+//     ANNidxArray nnIdx = new ANNidx[k];
+//     for (IntegerVector::const_iterator pt_id = cl_pts.begin(); pt_id != cl_pts.end(); ++pt_id, ++j){
+//       // Do the search
+//       ANNpoint queryPt = dataPts[(*pt_id) - 1]; // use original data points
+//       kdTree->annkSearch(queryPt, k, nnIdx, dists);
+//
+//       // V2.
+//       std::vector<ANNdist> ndists = std::vector<ANNdist>(dists, dists+k);
+//       std::remove_if(ndists.begin(), ndists.end(), remove_zero);
+//       std::transform(ndists.begin(), ndists.end(), ndists.begin(), [=](ANNdist cdist){ return std::pow(1.0/cdist, ncol); });
+//       ANNdist sum_inv_density = std::accumulate(ndists.begin(), ndists.end(), (ANNdist) 0.0);
+//       double acdist = std::pow(sum_inv_density/(k - 1.0), -(1.0 / double(ncol))); // Apply all core points equation
+//       all_core_cl[j] = acdist;
+//       // return(List::create(_["ndists"] = acdist, _["denom"] = sum_inv_density/(k - 1.0), _["k"] = k));
+//     }
+//     delete [] dists;
+//     delete [] nnIdx;
+//     all_core_res[i] = all_core_cl;
+//   }
+//
+//   // cleanup
+//   delete kdTree;
+//   annDeallocPts(dataPts);
+//   annClose();
+//
+//   // Return the all point core distance
+//   if(!squared){ for (int i = 0; i < cl.size(); ++i){ all_core_res[i] = Rcpp::sqrt(all_core_res[i]); } }
+//   return(all_core_res);
+// }
 
 
 
@@ -225,7 +225,7 @@ NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const Integer
       IntegerVector int_idx = combine(rel_i_idx, rel_j_idx);
 
       // Get the pairwise MST
-      NumericMatrix pairwise_mst = prims(dist_subset(mrd_dist, int_idx), int_idx.length());
+      NumericMatrix pairwise_mst = mst_prims(dist_subset(mrd_dist, int_idx), int_idx.length());
 
       // Do lots of indexing / casting
       const IntegerVector from_int = seq_len(rel_i_idx.length());
@@ -288,33 +288,3 @@ NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const Integer
 // }
 
 
-/*** R
-# intToStr(1:4)
-#
-# # acp_dist_map[as.character(1:3)]
-# # test_func(1:3, acp_dist_map)
-# km <- structure(as.list(4:6), names = as.character(1:3))
-# test_int <- 1:3
-#
-# config <- list(n = 3, ncl = 3L, node_ids = as.list(1:3), acp = km, xdist=dist(1:3))
-# dspc(config)
-# # toMap(km)
-#
-# x <- as.matrix(iris[, 1:4])
-# xdist <- dist(x)
-# cl <- 1L:10L
-# all_pts_core(xdist, cl, ncol(x))
-
-dspc2 <- mapply(function(idx1, idx2){
-  rel_idx1 <- match(cl_ids_idx[[idx1]], all_cl_ids)[ (internal_nodes[[idx1]]) ]
-  rel_idx2 <- match(cl_ids_idx[[idx2]], all_cl_ids)[ (internal_nodes[[idx2]]) ]
-  int_idx <- c(rel_idx1, rel_idx2)
-  pairwise_mst <- dbscan:::prims(dbscan::dist_subset(cl_mrd, idx = int_idx), n = length(int_idx))
-  from_idx <- 1:length(rel_idx1)
-  min(pairwise_mst[xor(pairwise_mst[, 1] %in% from_idx, pairwise_mst[, 2] %in% from_idx), 3])
-}, cl_pairs[, 1], cl_pairs[, 2])
-
-# all_pts_core(const NumericMatrix& data, const List& cl, const bool squared){
-dbscan:::dspc(cl_ids_idx, internal_nodes, unlist(cl_ids_idx), cl_mrd)
-
-*/

@@ -51,9 +51,9 @@ INDEX_TF <- function(N, to, from)
 #' @aliases dbcv DBCV
 #' @family Evaluation Functions
 #'
-#' @param x a data matrix.
+#' @param x a data matrix or a dist object.
 #' @param cl a clustering (e.g., a integer vector)
-#' @param squared logical; should distances be squared?
+#' @param d dimensionality of the original data if a dist object is provided.
 #'
 #' @return A list with the DBCV score for the clustering, the DSC values,
 #' the DSPC distance matrix
@@ -76,15 +76,21 @@ INDEX_TF <- function(N, to, from)
 #' @export
 dbcv <- function(x,
                  cl,
-                 squared = TRUE) {
+                 d = 2) {
 
-  if (!.matrixlike(x)) {
-    stop("'dbcv' expects x needs to be a matrix to calculate distances.")
+  if (inherits(x, "dist")) {
+    xdist <- x
   }
-  x <- as.matrix(x)
-  n <- nrow(x)                    # number of points
+  else if (.matrixlike(x)) {
+    x <- as.matrix(x)
+    n <- nrow(x)
+    d <- ncol(x)
 
-  xdist <- dist(x, method = "euclidean") ^ (ifelse(squared, 2, 1)) ## use squared if flagged
+    xdist <- dist(x, method = "euclidean")
+  } else
+    stop("'dbcv' expects x needs to be a matrix to calculate distances.")
+
+  n <- attr(xdist, "Size")
 
   # a clustering with a cluster element
   if (is.list(cl)) {
@@ -94,19 +100,29 @@ dbcv <- function(x,
   # in case we get a factor
   cl <- as.integer(cl)
 
-  if (length(cl) != nrow(x))
+  if (length(cl) != n)
     stop("cl does not match the number of rows in x!")
 
-  ## Deal with noise points and singleton clusters
+  ## Deal with noise points and singleton clusters and reorder by cluster
   cl_ids_idx <- getClusterIdList(cl)
+  all_cl_ids <- unlist(cl_ids_idx)
+  n_cl <- length(cl_ids_idx)
+
+  ## distances w/o noise
+  cl_dist <- dist_subset(xdist, all_cl_ids)
 
   ## Get the all-points-core-distance for each point, within each cluster
-  all_pts_cd <- all_pts_core(x, cl_ids_idx, squared)
+  #all_pts_cd <- unlist(all_pts_core(x, cl_ids_idx, squared))
 
-  n_cl <- length(cl_ids_idx)
-  all_cl_ids <- unlist(cl_ids_idx)
-  cl_dist <- dist_subset(xdist, all_cl_ids)
-  cl_mrd <- structure(mrd(cl_dist, unlist(all_pts_cd)),
+  ## Calculate the all-points-core-distance from the dist
+  # we need to know dimensionality of the data d
+  all_pts_cd <- lapply(cl_ids_idx, FUN = function(ids) {
+    dists <- (rowSums(as.matrix((1 / dist_subset(xdist, ids))) ^ d) / (length(ids) - 1)) ^ (-1/d)
+  })
+  all_pts_cd <- unlist(all_pts_cd)
+
+
+  cl_mrd <- structure(mrd(cl_dist, all_pts_cd),
                       class = "dist",
                       Size = length(all_cl_ids))
   ## Noise points are removed, but the core is affected by dividing by the
@@ -116,7 +132,7 @@ dbcv <- function(x,
   ## 1. Create Mutual reachability MSTs, one for each cluster
   mrd_graphs <- lapply(cl_ids_idx, function(idx) {
     rel_idx <- match(idx, all_cl_ids)
-    mst <- prims(x_dist = dist_subset(cl_mrd, rel_idx),
+    mst <- mst_prims(x_dist = dist_subset(cl_mrd, rel_idx),
                  n = length(rel_idx))
     matrix(mst[order(mst[, 3]), ], ncol = 3) # return mst ordered by edge weight
   })

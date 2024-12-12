@@ -66,7 +66,8 @@
 #' of variable densities at higher levels.
 #'
 #' `coredist()`: The core distance is defined for each point as
-#' the distance to the `MinPts`'s neighbor. It is a density estimate.
+#' the distance to the `MinPts - 1`'s neighbor.
+#' It is a density estimate equivalent to `kNNdist()` with `k = MinPts -1`.
 #'
 #' `mrdist()`: The mutual reachability distance is defined between two points as
 #' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This distance metric is used by
@@ -206,13 +207,12 @@
 #' plot(hdbe, show_flat = TRUE)
 #' hullplot(X, hdbe, main = "HDBSCAN(e)")
 #' @export
-hdbscan <- function(
-    x,
-    minPts,
-    cluster_selection_epsilon = 0.0,
-    gen_hdbscan_tree = FALSE,
-    gen_simplified_tree = FALSE,
-    verbose = FALSE) {
+hdbscan <- function(x,
+                    minPts,
+                    cluster_selection_epsilon = 0.0,
+                    gen_hdbscan_tree = FALSE,
+                    gen_simplified_tree = FALSE,
+                    verbose = FALSE) {
   if (!inherits(x, "dist") && !.matrixlike(x)) {
     stop("hdbscan expects a numeric matrix or a dist object.")
   }
@@ -222,12 +222,12 @@ hdbscan <- function(
     cat("Calculating core distances...\n")
   }
   coredist <- coredist(x, minPts)
+
+
   if (verbose) {
     cat("Calculating the mutual reachability matrix distances...\n")
   }
-  mrd <- mrdist(x, minPts,
-    coredist = coredist
-  )
+  mrd <- mrdist(x, minPts, coredist = coredist)
   n <- attr(mrd, "Size")
 
   ## 2. Construct a minimum spanning tree and convert to RSL representation
@@ -325,23 +325,22 @@ print.hdbscan <- function(x, ...) {
 
   print(table(x$cluster))
   cat("\n")
-  writeLines(strwrap(paste0(
-    "Available fields: ", toString(names(x))
-  ), exdent = 18))
+  writeLines(strwrap(paste0("Available fields: ", toString(names(
+    x
+  ))), exdent = 18))
 }
 
 #' @rdname hdbscan
 #' @export
 plot.hdbscan <-
-  function(
-      x,
-      scale = "suggest",
-      gradient = c("yellow", "red"),
-      show_flat = FALSE,
-      ...) {
+  function(x,
+           scale = "suggest",
+           gradient = c("yellow", "red"),
+           show_flat = FALSE,
+           ...) {
     ## Logic checks
     if (!(scale == "suggest" ||
-      scale > 0.0)) {
+          scale > 0.0)) {
       stop("scale parameter must be greater than 0.")
     }
 
@@ -361,7 +360,10 @@ plot.hdbscan <-
         leaves_only = TRUE
       ))
     scale <-
-      if (scale == "suggest") nclusters else nclusters / scale
+      if (scale == "suggest")
+        nclusters
+    else
+      nclusters / scale
 
     ## Color variables
     col_breaks <-
@@ -380,10 +382,8 @@ plot.hdbscan <-
           sum(hd_info[[cl_key]]$eps <= eps)
         }, numeric(1L))
       if (length(widths) > 0) {
-        widths <- c(
-          widths + hd_info[[cl_key]]$n_children,
-          rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
-        )
+        widths <- c(widths + hd_info[[cl_key]]$n_children,
+                    rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children))
       } else {
         widths <-
           rep(hd_info[[cl_key]]$n_children, hd_info[[cl_key]]$n_children)
@@ -400,10 +400,8 @@ plot.hdbscan <-
       ## Minor adjustment made if at the root equivalent to plot.dendrogram(edge.root=T)
       if (cl_key == "0") {
         ytop <-
-          rep(
-            hd_info[[cl_key]]$eps_birth + 0.0625 * hd_info[[cl_key]]$eps_birth,
-            length(widths)
-          )
+          rep(hd_info[[cl_key]]$eps_birth + 0.0625 * hd_info[[cl_key]]$eps_birth,
+              length(widths))
         ybottom <- rep(hd_info[[cl_key]]$eps_death, length(widths))
       } else {
         ytop <- rep(parent_height, length(widths))
@@ -486,19 +484,16 @@ plot.hdbscan <-
       ...
     )
     eps_dfs(dend,
-      index = 1,
-      parent_height = 0,
-      scale = scale
-    )
+            index = 1,
+            parent_height = 0,
+            scale = scale)
     return(invisible(x))
   }
 
 #' @rdname hdbscan
 #' @export
-coredist <- function(x, minPts) {
-  k <- minPts - 1
-  kNN(x, k = k, sort = TRUE)$dist[, k]
-}
+coredist <- function(x, minPts)
+  kNNdist(x, k = minPts - 1)
 
 #' @rdname hdbscan
 #' @export
@@ -508,24 +503,22 @@ mrdist <- function(x, minPts, coredist = NULL) {
     x_dist <- x
   } else {
     x_dist <- dist(x,
-      method = "euclidean",
-      diag = FALSE,
-      upper = FALSE
-    )
+                   method = "euclidean",
+                   diag = FALSE,
+                   upper = FALSE)
   }
 
   if (is.null(coredist)) {
     coredist <- coredist(x, minPts)
   }
-  mr_dist <- mrd(x_dist, coredist)
 
+  # mr_dist <- as.vector(pmax(as.dist(outer(coredist, coredist, pmax)), x_dist))
+  # much faster in C++
+  mr_dist <- mrd(x_dist, coredist)
   class(mr_dist) <- "dist"
   attr(mr_dist, "Size") <- attr(x_dist, "Size")
   attr(mr_dist, "Diag") <- FALSE
   attr(mr_dist, "Upper") <- FALSE
-  attr(mr_dist, "method") <- paste0(
-    "mutual reachability (",
-    attr(x_dist, "method"), ")"
-  )
+  attr(mr_dist, "method") <- paste0("mutual reachability (", attr(x_dist, "method"), ")")
   mr_dist
 }

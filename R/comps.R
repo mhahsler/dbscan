@@ -32,7 +32,7 @@
 #' @param mutual for a pair of points, do both have to be in each other's neighborhood?
 #' @param ... further arguments are currently unused.
 #'
-#' @return a integer vector with component assignments.
+#' @return an integer vector with component assignments.
 #'
 #' @author Michael Hahsler
 #' @keywords model

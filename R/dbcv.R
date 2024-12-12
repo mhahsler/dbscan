@@ -40,7 +40,9 @@ INDEX_TF <- function(N, to, from)
 #' to a validity index for the whole clustering using a weighted average.
 #'
 #' The index is in the range \eqn{[-1,1]}. If the cluster density compactness is better
-#' than the density separation, a positive value is returned.
+#' than the density separation, a positive value is returned. The actual value depends
+#' on the separability of the data. In general, greater values
+#' of the measure indicating a better density-based clustering solution.
 #'
 #' Noise points are included in the calculation only in the weighted average,
 #' therefore clustering with more noise points will get a lower index.
@@ -69,33 +71,59 @@ INDEX_TF <- function(N, to, from)
 #' @examples
 #' data(moons)
 #'
+#' # We use MinPts 3 and use the knee at .3 for eps
+#' kNNdistplot(moons, minPts = 3)
+#'
 #' cl <- dbscan(moons, eps = .3, minPts = 3)
 #' clplot(moons, cl)
 #'
 #' dbcv(moons, cl)
+#'
+#' # compare to the DBCV index of a random partitioning
+#' dbcv(moons, sample(1:4, replace = TRUE, size = nrow(moons)))
+#'
+#' # find the best eps using dbcv
+#' eps_grid <- seq(.1,.5, by = .01)
+#' cls <- lapply(eps_grid, FUN = function(e) dbscan(moons, eps = e, minPts = 3))
+#' dbcvs <- sapply(cls, FUN = function(cl) dbcv(moons, cl)$score)
+#'
+#' plot(eps_grid, dbcvs, type = "l")
+#'
+#' eps_opt <- eps_grid[which.max(dbcvs)]
+#' eps_opt
+#'
+#' cl <- dbscan(moons, eps = eps_opt, minPts = 3)
+#' clplot(moons, cl)
 #' @export
 dbcv <- function(x,
                  cl,
-                 d = 2) {
-
-  if (inherits(x, "dist")) {
-    xdist <- x
-  }
-  else if (.matrixlike(x)) {
-    x <- as.matrix(x)
-    n <- nrow(x)
-    d <- ncol(x)
-
-    xdist <- dist(x, method = "euclidean")
-  } else
-    stop("'dbcv' expects x needs to be a matrix to calculate distances.")
-
-  n <- attr(xdist, "Size")
-
+                 d = 2,
+                 sample = NULL) {
   # a clustering with a cluster element
   if (is.list(cl)) {
     cl <- cl$cluster
   }
+
+  if (inherits(x, "dist")) {
+    xdist <- x
+
+  } else if (.matrixlike(x)) {
+    if (!is.null(sample)) {
+      take <- sample(nrow(x), size = sample)
+      x <- x[take, ]
+      cl <- cl[take]
+    }
+
+    x <- as.matrix(x)
+    d <- ncol(x)
+
+    xdist <- dist(x)
+
+  } else
+    stop("'dbcv' expects x needs to be a matrix to calculate distances.")
+
+  .check_dist(xdist)
+  n <- attr(xdist, "Size")
 
   # in case we get a factor
   cl <- as.integer(cl)
@@ -117,7 +145,7 @@ dbcv <- function(x,
   ## Calculate the all-points-core-distance from the dist
   # we need to know dimensionality of the data d
   all_pts_cd <- lapply(cl_ids_idx, FUN = function(ids) {
-    dists <- (rowSums(as.matrix((1 / dist_subset(xdist, ids))) ^ d) / (length(ids) - 1)) ^ (-1/d)
+    dists <- (rowSums(as.matrix( (1 / dist_subset(xdist, ids))^d )) / (length(ids) - 1)) ^ (-1/d)
   })
   all_pts_cd <- unlist(all_pts_cd)
 

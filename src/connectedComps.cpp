@@ -10,6 +10,8 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// Find connected components in kNN and frNN objects.
+
 // [[Rcpp::export]]
 IntegerVector comps_kNN(IntegerMatrix nn, bool mutual) {
   R_xlen_t n = nn.nrow();

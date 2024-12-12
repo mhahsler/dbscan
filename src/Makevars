@@ -11,7 +11,7 @@ SOURCES = \
 	dbscan.cpp \
 	optics.cpp \
 	JP.cpp \
-	buildHDBSCAN.cpp \
+	hdbscan.cpp \
 	dendrogram.cpp UnionFind.cpp \
 	mrd.cpp \
 	mst.cpp \

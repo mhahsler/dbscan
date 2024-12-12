@@ -9,50 +9,6 @@ SNN_sim_int <- function(nn, jp) {
     .Call(`_dbscan_SNN_sim_int`, nn, jp)
 }
 
-distToAdjacency <- function(constraints, N) {
-    .Call(`_dbscan_distToAdjacency`, constraints, N)
-}
-
-buildDendrogram <- function(hcl) {
-    .Call(`_dbscan_buildDendrogram`, hcl)
-}
-
-all_children <- function(hier, key, leaves_only = FALSE) {
-    .Call(`_dbscan_all_children`, hier, key, leaves_only)
-}
-
-node_xy <- function(cl_tree, cl_hierarchy, cid = 0L) {
-    .Call(`_dbscan_node_xy`, cl_tree, cl_hierarchy, cid)
-}
-
-simplifiedTree <- function(cl_tree) {
-    .Call(`_dbscan_simplifiedTree`, cl_tree)
-}
-
-computeStability <- function(hcl, minPts, compute_glosh = FALSE) {
-    .Call(`_dbscan_computeStability`, hcl, minPts, compute_glosh)
-}
-
-validateConstraintList <- function(constraints, n) {
-    .Call(`_dbscan_validateConstraintList`, constraints, n)
-}
-
-computeVirtualNode <- function(noise, constraints) {
-    .Call(`_dbscan_computeVirtualNode`, noise, constraints)
-}
-
-fosc <- function(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves = FALSE, cluster_selection_epsilon = 0.0, alpha = 0, useVirtual = FALSE, n_constraints = 0L, constraints = NULL) {
-    .Call(`_dbscan_fosc`, cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints)
-}
-
-extractUnsupervised <- function(cl_tree, prune_unstable = FALSE, cluster_selection_epsilon = 0.0) {
-    .Call(`_dbscan_extractUnsupervised`, cl_tree, prune_unstable, cluster_selection_epsilon)
-}
-
-extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstable_leaves = FALSE, cluster_selection_epsilon = 0.0) {
-    .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves, cluster_selection_epsilon)
-}
-
 ANN_cleanup <- function() {
     invisible(.Call(`_dbscan_ANN_cleanup`))
 }
@@ -107,6 +63,50 @@ frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
 
 frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, approx) {
     .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, approx)
+}
+
+distToAdjacency <- function(constraints, N) {
+    .Call(`_dbscan_distToAdjacency`, constraints, N)
+}
+
+buildDendrogram <- function(hcl) {
+    .Call(`_dbscan_buildDendrogram`, hcl)
+}
+
+all_children <- function(hier, key, leaves_only = FALSE) {
+    .Call(`_dbscan_all_children`, hier, key, leaves_only)
+}
+
+node_xy <- function(cl_tree, cl_hierarchy, cid = 0L) {
+    .Call(`_dbscan_node_xy`, cl_tree, cl_hierarchy, cid)
+}
+
+simplifiedTree <- function(cl_tree) {
+    .Call(`_dbscan_simplifiedTree`, cl_tree)
+}
+
+computeStability <- function(hcl, minPts, compute_glosh = FALSE) {
+    .Call(`_dbscan_computeStability`, hcl, minPts, compute_glosh)
+}
+
+validateConstraintList <- function(constraints, n) {
+    .Call(`_dbscan_validateConstraintList`, constraints, n)
+}
+
+computeVirtualNode <- function(noise, constraints) {
+    .Call(`_dbscan_computeVirtualNode`, noise, constraints)
+}
+
+fosc <- function(cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves = FALSE, cluster_selection_epsilon = 0.0, alpha = 0, useVirtual = FALSE, n_constraints = 0L, constraints = NULL) {
+    .Call(`_dbscan_fosc`, cl_tree, cid, sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints)
+}
+
+extractUnsupervised <- function(cl_tree, prune_unstable = FALSE, cluster_selection_epsilon = 0.0) {
+    .Call(`_dbscan_extractUnsupervised`, cl_tree, prune_unstable, cluster_selection_epsilon)
+}
+
+extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstable_leaves = FALSE, cluster_selection_epsilon = 0.0) {
+    .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves, cluster_selection_epsilon)
 }
 
 kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {

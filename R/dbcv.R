@@ -108,7 +108,11 @@
 #' cl <- dbscan(x, eps = eps_opt, minPts = 3)
 #' clplot(x, cl)
 #' @export
-dbcv <- function(x, cl, d, metric = "euclidean", sample = NULL) {
+dbcv <- function(x,
+                 cl,
+                 d,
+                 metric = "euclidean",
+                 sample = NULL) {
   # a clustering with a cluster element
   if (is.list(cl)) {
     cl <- cl$cluster
@@ -148,45 +152,50 @@ dbcv <- function(x, cl, d, metric = "euclidean", sample = NULL) {
   if (length(cl) != n)
     stop("cl does not match the number of rows in x!")
 
-  ## getClusterIdList removes noise points and singleton clusters.
-  ## returns indices reorder by cluster
-  cl_ids_idx <- getClusterIdList(cl)
-  all_cl_ids <- unlist(cl_ids_idx)
-  n_cl <- length(cl_ids_idx)
-
+  ## calculate everything for all non-noise points ordered by cluster
+  ## getClusterIdList removes noise points and singleton clusters
+  ## and returns indices reorder by cluster
+  cl_idx_list <- getClusterIdList(cl)
+  n_cl <- length(cl_idx_list)
   ## reordered distances w/o noise
-  cl_dist <- dist_subset(xdist, all_cl_ids)
+  all_dist <- dist_subset(xdist, unlist(cl_idx_list))
+
+  new_cl_idx_list <- list()
+  i <- 1L
+  start <- 1
+  for(l in lengths(cl_idx_list)) {
+    end <- start + l - 1
+    new_cl_idx_list[[i]] <- seq(start, end)
+    start <- end + 1
+    i <- i + 1L
+  }
+
+  cl_idx_list <- new_cl_idx_list
+  all_idx <- unlist(cl_idx_list)
+
 
   ## 1. Calculate all-points-core-distance
   ## Calculate the all-points-core-distance for each point, within each cluster
   ## Note: this needs the dimensionality of the data d
-  all_pts_core_dist <- lapply(
-    cl_ids_idx,
+  all_pts_core_dist <- unlist(lapply(
+    cl_idx_list,
     FUN = function(ids) {
       dists <- (rowSums(as.matrix((
-        1 / dist_subset(xdist, ids)
-      ) ^ d)) / (length(ids) - 1)) ^ (-1 / d)
-      #dists <- ((rowSums(1 / as.matrix(xdist)[ids, ids]) ^ d) / (length(ids) - 1)) ^ (-1 / d)
+        1 / dist_subset(all_dist, ids)
+      )^d)) / (length(ids) - 1))^(-1 / d)
     }
-  )
-  all_pts_core_dist <- unlist(all_pts_core_dist)
+  ))
 
-
-  ## 2. Create for each cluster a mutual reachability MSTs based on
-  ## the all_pts_core_dist
-  cl_mrd <- structure(mrd(cl_dist, all_pts_core_dist),
-                      class = "dist",
-                      Size = length(all_cl_ids))
+  ## 2. Create for each cluster a mutual reachability MSTs
+  all_mrd <- structure(mrd(all_dist, all_pts_core_dist),
+                       class = "dist",
+                       Size = length(all_idx))
   ## Noise points are removed, but the index is affected by dividing by the
   ## total number of objects including the noise points (n)!
 
   ## mst is a matrix with columns: from to and weight
-  mrd_graphs <- lapply(cl_ids_idx, function(idx) {
-    # is this necessary? cl_ids_idx is already in the same order as all_cl_ids
-    #rel_idx <- match(idx, all_cl_ids)
-    rel_idx <- idx
-    mst(x_dist = dist_subset(cl_mrd, rel_idx),
-                     n = length(rel_idx))
+  mrd_graphs <- lapply(cl_idx_list, function(idx) {
+    mst(x_dist = dist_subset(all_mrd, idx), n = length(idx))
   })
 
   ## 3. Density Sparseness of a Cluster (DSC):
@@ -196,25 +205,25 @@ dbcv <- function(x, cl, d, metric = "euclidean", sample = NULL) {
   ## find internal nodes for DSC and DSPC. Internal nodes have a degree > 1
   internal_nodes <- lapply(mrd_graphs, function(mst) {
     node_deg <- table(c(mst[, 1], mst[, 2]))
-    idx <- as.integer(names(node_deg)[which(node_deg > 1)])
+    idx <- as.integer(names(node_deg)[node_deg > 1])
     idx
   })
 
   dsc <- mapply(function(mst, int_idx) {
     # find internal edges
-    int_edge_idx <- (mst[, 1] %in% int_idx) &
-      (mst[, 2] %in% int_idx)
-    if (length(which(int_edge_idx)) == 0) {
-      return(as.numeric(max(mst[, 3])))
+    int_edge_idx <- which((mst[, 1L] %in% int_idx) &
+                            (mst[, 2L] %in% int_idx))
+    if (length(int_edge_idx) == 0L) {
+      return(max(mst[, 3L]))
     }
-    as.numeric(max(mst[int_edge_idx, 3]))
+    max(mst[int_edge_idx, 3L])
   }, mrd_graphs, internal_nodes)
 
 
   ## 4. Density Separation of a Pair of Clusters (DSPC):
   ## The minimum reachability distance between the internal nodes of the
   ## internal nodes of a pair of MST_MRD's of clusters Ci and Cj
-  dspc_dist <- dspc(cl_ids_idx, internal_nodes, unlist(cl_ids_idx), cl_mrd)
+  dspc_dist <- dspc(cl_idx_list, internal_nodes, all_idx, all_mrd)
   # returns a matrix with Ci, Cj, dist
 
   # make it into a full distance matrix
@@ -233,12 +242,12 @@ dbcv <- function(x, cl, d, metric = "euclidean", sample = NULL) {
 
 
   ## 5. Validity index for whole clustering
-  res <- sum(lengths(cl_ids_idx) / n * v_c)
+  res <- sum(lengths(cl_idx_list) / n * v_c)
 
   return(list(
     score = res,
     n = n,
-    n_c = lengths(cl_ids_idx),
+    n_c = lengths(cl_idx_list),
     d = d,
     dsc = dsc,
     dspc = dspc_dist,

@@ -12,7 +12,7 @@ test_that("mst", {
   d <- dist(x)
   (m <- mst(d, n = nrow(x)))
 
-  draw_mst(x, m)
+  #draw_mst(x, m)
 
   expect_equal(m, structure(
     c(2, 3, 1, 2, 1, 1),
@@ -32,7 +32,7 @@ test_that("mst", {
   d <- dist(x)
   (m <- mst(d, n = nrow(x)))
 
-  draw_mst(x, m)
+  #draw_mst(x, m)
 
   expect_equal(m, structure(
     c(
@@ -64,6 +64,17 @@ test_that("mst", {
     dim = c(8L, 3L),
     dimnames = list(NULL, c("from", "to", "weight"))
   ))
+
+  # data("Dataset_2")
+  # x <- Dataset_2[,1:2]
+  # cl <- Dataset_2[,3]
+  # x_3 <- x[cl==3, ]
+  #
+  # (m <- mst(dist(x_3), n = nrow(x_3)))
+  # max(m[,3])
+  # draw_mst(x_3, m)
+
+
 })
 
 test_that("dist_subset", {

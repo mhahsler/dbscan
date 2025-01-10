@@ -10,10 +10,6 @@ using namespace Rcpp;
 #include <string>
 #include <unordered_map>
 
-
-// inline indexing of distance matrix
-#define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
-
 // [[Rcpp::export]]
 StringVector intToStr(IntegerVector iv){
   StringVector res = StringVector(iv.length());
@@ -63,7 +59,7 @@ NumericVector dist_subset(const NumericVector& dist, IntegerVector idx){
   for (IntegerVector::iterator i = idx.begin(); i != idx.end(); ++i){
     for (IntegerVector::iterator j = i; j != idx.end(); ++j){
       if (*i == *j) { continue; }
-      const int ij_idx = INDEX_TF(n, (*i < *j ? *i : *j) - 1, (*i < *j ? *j : *i) - 1);
+      const int ij_idx = LT_POS1(n, *i, *j);
       new_dist[ii++] = dist[ij_idx];
     }
   }
@@ -196,6 +192,7 @@ ANNdist inv_density(ANNdist cdist){
 // }
 
 
+// RCPP does not provide xor!
 // [[Rcpp::export]]
 Rcpp::LogicalVector XOR(Rcpp::LogicalVector lhs, Rcpp::LogicalVector rhs) {
   R_xlen_t i = 0, n = lhs.size();
@@ -225,7 +222,7 @@ NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const Integer
       IntegerVector int_idx = combine(rel_i_idx, rel_j_idx);
 
       // Get the pairwise MST
-      NumericMatrix pairwise_mst = mst_prims(dist_subset(mrd_dist, int_idx), int_idx.length());
+      NumericMatrix pairwise_mst = mst(dist_subset(mrd_dist, int_idx), int_idx.length());
 
       // Do lots of indexing / casting
       const IntegerVector from_int = seq_len(rel_i_idx.length());

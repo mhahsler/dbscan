@@ -5,7 +5,7 @@
 \alias{DBCV}
 \title{Density-Based Clustering Validation Index (DBCV)}
 \usage{
-dbcv(x, cl, d = 2, sample = NULL)
+dbcv(x, cl, d, metric = "euclidean", sample = NULL)
 }
 \arguments{
 \item{x}{a data matrix or a dist object.}
@@ -14,12 +14,17 @@ dbcv(x, cl, d = 2, sample = NULL)
 
 \item{d}{dimensionality of the original data if a dist object is provided.}
 
+\item{metric}{distance metric used. The available metrics are the methods
+implemented by \code{dist()} plus \code{"sqeuclidean"} for the squared
+Euclidean distance used in the original DBCV implementation.}
+
 \item{sample}{sample size used for large datasets.}
 }
 \value{
-A list with the DBCV score for the clustering, the DSC values,
-the DSPC distance matrix
-and the cluster validity indices.
+A list with the DBCV \code{score} for the clustering,
+the density sparseness of cluster (\code{dsc}) values,
+the density separation of pairs of clusters (\code{dspc}) distances,
+and the validity indices of clusters (\code{c_c}).
 }
 \description{
 Calculate the Density-Based Clustering Validation Index (DBCV)  for a
@@ -31,11 +36,13 @@ and the density separation of each pair of clusters.
 
 The density sparseness of a cluster (DSC) is deﬁned as the maximum edge weight of
 a minimal spanning tree for the points of the cluster using the mutual
-reachability distance. The
-density separation of a pair of clusters (DSPC)
+reachability distance based on the all-points-core-distance.
+
+The density separation of a pair of clusters (DSPC)
 is deﬁned as the minimum reachability distance between the internal nodes of
 the spanning trees of the two clusters.
-The validity index for a cluster is calculated for these measures and aggregated
+
+The validity index for a cluster is calculated using these measures and aggregated
 to a validity index for the whole clustering using a weighted average.
 
 The index is in the range \eqn{[-1,1]}. If the cluster density compactness is better
@@ -90,6 +97,9 @@ Density-Based Clustering Validation. In
 \emph{Proceedings of the 2014 SIAM International Conference on Data Mining,}
 pages 839-847
 \doi{10.1137/1.9781611973440.96}
+
+Pablo A. Jaskowiak (2022). MATLAB implementation of DBCV.
+\url{https://github.com/pajaskowiak/dbcv}
 }
 \author{
 Matt Piekenbrock and Michael Hahsler

@@ -125,8 +125,8 @@ mrd <- function(dm, cd) {
     .Call(`_dbscan_mrd`, dm, cd)
 }
 
-mst_prims <- function(x_dist, n) {
-    .Call(`_dbscan_mst_prims`, x_dist, n)
+mst <- function(x_dist, n) {
+    .Call(`_dbscan_mst`, x_dist, n)
 }
 
 hclustMergeOrder <- function(mst, o) {

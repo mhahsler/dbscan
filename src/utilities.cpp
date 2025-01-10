@@ -11,6 +11,7 @@
 
 #include "utilities.h"
 
+// extract the lower triangle from a matrix
 IntegerVector lowerTri(IntegerMatrix m) {
   int n = m.nrow();
   IntegerVector lower_tri = IntegerVector(n * (n - 1) / 2);

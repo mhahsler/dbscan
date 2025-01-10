@@ -234,7 +234,7 @@ hdbscan <- function(x,
   if (verbose) {
     cat("Constructing the minimum spanning tree...\n")
   }
-  mst <- mst_prims(mrd, n)
+  mst <- mst(mrd, n)
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
   hc$call <- match.call()
 

@@ -14,16 +14,6 @@
 #include "UnionFind.h"
 using namespace Rcpp;
 
-// std::to_string is apparently a c++11 only thing that crashes appveyor, so using ostringstream it is!
-namespace patch
-{
-  template < typename T > std::string to_string( const T& n )
-  {
-    std::ostringstream stm ;
-    stm << n ;
-    return stm.str() ;
-  }
-}
 // Ditto with atoi!
 int fast_atoi( const char * str )
 {
@@ -61,7 +51,7 @@ List reach_to_dendrogram(const Rcpp::List reachability, const NumericVector pl_o
   for (int i = 0; i < n_nodes; ++i) {
     IntegerVector leaf = IntegerVector();
     leaf.push_back(i+1);
-    leaf.attr("label") = patch::to_string(i + 1);
+    leaf.attr("label") = std::to_string(i + 1);
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;
     leaf.attr("leaf") = true;
@@ -106,7 +96,7 @@ int DFS(List d, List& rp, int pnode, NumericVector stack) {
   if (d.hasAttribute("leaf")) { // If at a leaf node, compare to previous node
     std::string leaf_label = as<std::string>( d.attr("label") );
     rp[leaf_label] = stack; // Record the ancestors reachability values
-    std::string pnode_label = patch::to_string(pnode);
+    std::string pnode_label = std::to_string(pnode);
     double new_reach = 0.0f;
     if(!rp.containsElementNamed(pnode_label.c_str())) { // 1st time seeing this point
       new_reach = INFINITY;
@@ -169,7 +159,7 @@ List mst_to_dendrogram(const NumericMatrix mst) {
   for (int i = 0; i < n_nodes; ++i) {
     IntegerVector leaf = IntegerVector();
     leaf.push_back(i+1);
-    leaf.attr("label") = patch::to_string(i + 1);
+    leaf.attr("label") = std::to_string(i + 1);
     leaf.attr("members") = 1;
     leaf.attr("height") = 0;
     leaf.attr("leaf") = true;

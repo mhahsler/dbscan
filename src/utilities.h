@@ -14,15 +14,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// std::to_string is apparently a c++11 only thing that crashes appveyor, so using ostringstream it is!
-namespace patch {
-template <typename T> std::string to_string(const T& n) {
-  std::ostringstream stm;
-  stm << n;
-  return stm.str();
-}
-} // namespace patch
-
 template <typename T, typename C>
 bool contains(const T& container, const C& key) {
   if (std::find(container.begin(), container.end(), key) != container.end()) {

@@ -138,26 +138,26 @@ IntegerVector all_children(List hier, int key, bool leaves_only = false){
   IntegerVector res = IntegerVector();
 
   // If the key doesn't exist return an empty vector
-  if (!hier.containsElementNamed(patch::to_string(key).c_str())){
+  if (!hier.containsElementNamed(std::to_string(key).c_str())){
     return(res);
   }
 
   // Else, do iterative 'recursive' type function to extract all the IDs of
   // all sub trees
-  IntegerVector children = hier[patch::to_string(key).c_str()];
+  IntegerVector children = hier[std::to_string(key).c_str()];
   std::queue<int> to_do = std::queue<int>();
   to_do.push(key);
   while (to_do.size() != 0){
     int parent = to_do.front();
-    if (!hier.containsElementNamed(patch::to_string(parent).c_str())){
+    if (!hier.containsElementNamed(std::to_string(parent).c_str())){
       to_do.pop();
     } else {
-      children = hier[patch::to_string(parent).c_str()];
+      children = hier[std::to_string(parent).c_str()];
       to_do.pop();
       for (int n_children = 0; n_children < children.length(); ++n_children){
         int child_id = children.at(n_children);
         if (leaves_only){
-          if (!hier.containsElementNamed(patch::to_string(child_id).c_str())) {
+          if (!hier.containsElementNamed(std::to_string(child_id).c_str())) {
             res.push_back(child_id);
           }
         } else { res.push_back(child_id); }
@@ -176,13 +176,13 @@ IntegerVector getSalientAssignments(List cl_tree, List cl_hierarchy, std::list<i
 
     // If at a leaf, its not necessary to recursively get point indices, else need to traverse hierarchy
     if (child_cl.length() == 0){
-      List cl = cl_tree[patch::to_string(*it)];
+      List cl = cl_tree[std::to_string(*it)];
       cluster[as<IntegerVector>(cl["contains"]) - 1] = *it;
     } else {
-      List cl = cl_tree[patch::to_string(*it)];
+      List cl = cl_tree[std::to_string(*it)];
       cluster[as<IntegerVector>(cl["contains"]) - 1] = *it;
       for (IntegerVector::iterator child_cid = child_cl.begin(); child_cid != child_cl.end(); ++child_cid){
-        cl = cl_tree[patch::to_string(*child_cid)];
+        cl = cl_tree[std::to_string(*child_cid)];
         IntegerVector child_contains = as<IntegerVector>(cl["contains"]);
         if (child_contains.length() > 0){
           cluster[child_contains - 1] = *it;
@@ -205,7 +205,7 @@ NumericMatrix node_xy(List cl_tree, List cl_hierarchy, int cid = 0){
   }
 
   // Retrieve/set variables
-  std::string cid_str = patch::to_string(cid);
+  std::string cid_str = std::to_string(cid);
   NumericMatrix node_xy_ = cl_tree["node_xy"];
   List cl = cl_tree[cid_str];
 
@@ -264,7 +264,7 @@ List simplifiedTree(List cl_tree) {
 
   // Premake children
   for (IntegerVector::iterator it = all_childs.begin(); it != all_childs.end(); ++it){
-    std::string cid_label = patch::to_string(*it);
+    std::string cid_label = std::to_string(*it);
     List cl = cl_tree[cid_label];
     if (!cl_hierarchy.containsElementNamed(cid_label.c_str())){
       // Create leaf
@@ -283,14 +283,14 @@ List simplifiedTree(List cl_tree) {
   // Building the dendrogram bottom-up
   while(!cid_stack.empty()) {
     int cid = cid_stack.top();
-    std::string cid_label = patch::to_string(cid);
+    std::string cid_label = std::to_string(cid);
     List cl = cl_tree[cid_label];
 
     // Recursive calls
     IntegerVector local_children = cl_hierarchy[cid_label];
 
     // Members and midpoint extraction
-    std::string l_str = patch::to_string(local_children.at(0)), r_str = patch::to_string(local_children.at(1));
+    std::string l_str = std::to_string(local_children.at(0)), r_str = std::to_string(local_children.at(1));
     // Rcout << "Comparing: " << l_str << ", " << r_str << std::endl;
     if (!dendrogram.containsElementNamed(l_str.c_str())){ cid_stack.push(local_children.at(0)); continue; }
     if (!dendrogram.containsElementNamed(r_str.c_str())){ cid_stack.push(local_children.at(1)); continue; }
@@ -391,7 +391,7 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
     // Current Merge
     int lm = merge(k, 0), rm = merge(k, 1), cid = cl_tracker.at(k);
     IntegerVector m = IntegerVector::create(lm, rm);
-    std::string cl_cid = patch::to_string(cid);
+    std::string cl_cid = std::to_string(cid);
 
     // Trivial case: split into singletons, record eps, contains, and ensure eps_death is minimal
     if (all(m < 0).is_true()){
@@ -415,7 +415,7 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
 
         // Mark the lower merge steps as new clusters
         cl_hierarchy[cl_cid] = IntegerVector::create(global_cid+1, global_cid+2);
-        std::string l_index = patch::to_string(global_cid+1), r_index = patch::to_string(global_cid+2);
+        std::string l_index = std::to_string(global_cid+1), r_index = std::to_string(global_cid+2);
         cl_tracker.at(lm - 1) = ++global_cid, cl_tracker.at(rm - 1) = ++global_cid;
 
         // Record the distance the new clusters appeared and initialize containers
@@ -459,7 +459,7 @@ List computeStability(const List hcl, const int minPts, bool compute_glosh = fal
           eps_max = eps_death[key->first];
         } else {
           for (IntegerVector::iterator it = leaf_membership.begin(); it != leaf_membership.end(); ++it){
-            eps_max = std::min(eps_max, eps_death[patch::to_string(*it)]);
+            eps_max = std::min(eps_max, eps_death[std::to_string(*it)]);
           }
         }
         NumericVector eps_max_vec =  NumericVector(eps[key->first].size(), eps_max) / as<NumericVector>(eps[key->first]);
@@ -554,7 +554,7 @@ List validateConstraintList(List& constraints, int n){
       IntegerVector pcons = as<IntegerVector>(cs_[cs_ > 0]);
       for (IntegerVector::iterator pc = pcons.begin(); pc != pcons.end(); ++pc){
         int ic = *pc < 0 ? -(*pc) : *pc;
-        std::string ic_str = patch::to_string(ic);
+        std::string ic_str = std::to_string(ic);
         bool exists = constraints.containsElementNamed(ic_str.c_str());
         tmp_valid = exists ? contains(as<IntegerVector>(constraints[ic_str]), cid) : false;
         if (!tmp_valid){
@@ -573,7 +573,7 @@ List validateConstraintList(List& constraints, int n){
       IntegerVector ncons = -(as<IntegerVector>(cs_[cs_ < 0]));
       for (IntegerVector::iterator nc = ncons.begin(); nc != ncons.end(); ++nc){
         int ic = *nc < 0 ? -(*nc) : *nc;
-        std::string ic_str = patch::to_string(ic);
+        std::string ic_str = std::to_string(ic);
         bool exists = constraints.containsElementNamed(ic_str.c_str());
         tmp_valid = exists ? contains(as<IntegerVector>(constraints[ic_str]), cid) : false;
         if (!tmp_valid){
@@ -605,7 +605,7 @@ double computeVirtualNode(IntegerVector noise, List constraints){
   int satisfied_constraints = 0;
   // Rcout << "Starting constraint based optimization" << std::endl;
   for (IntegerVector::iterator it = noise.begin(); it != noise.end(); ++it){
-    std::string cs_str = patch::to_string(*it);
+    std::string cs_str = std::to_string(*it);
     if (constraints.containsElementNamed(cs_str.c_str())){
       // Get constraints
       IntegerVector cs_ = constraints[cs_str];
@@ -656,7 +656,7 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
     IntegerVector child_ids = cl_hierarchy[cid];
     for (int i = 0, clen = child_ids.length(); i < clen; ++i){
       int child_id = child_ids.at(i);
-      scores = fosc(cl_tree, patch::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints);
+      scores = fosc(cl_tree, std::to_string(child_id), sc, cl_hierarchy, prune_unstable_leaves, cluster_selection_epsilon, alpha, useVirtual, n_constraints, constraints);
       stability_scores.push_back(scores.at(0));
       constraint_scores.push_back(scores.at(1));
     }
@@ -794,7 +794,7 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
   IntegerVector cl_ids = all_children(cl_hierarchy, 0);
   for (IntegerVector::iterator it = cl_ids.begin(); it != cl_ids.end(); ++it){
     if (*it != 0){
-      std::string cid_str = patch::to_string(*it);
+      std::string cid_str = std::to_string(*it);
       List cl = cl_tree[cid_str];
 
       // Store the initial fraction of constraints satisfied for each node as 'vscore'
@@ -804,7 +804,7 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
         IntegerVector child_cl = all_children(cl_hierarchy, *it), child_ids;
         List cl_container = List();
         for (IntegerVector::iterator ch_id = child_cl.begin(); ch_id != child_cl.end(); ++ch_id){
-          List ch_cl = cl_tree[patch::to_string(*ch_id)];
+          List ch_cl = cl_tree[std::to_string(*ch_id)];
           //child_ids = combine(child_ids, ch_cl["contains"]);
           cl_container.push_back(as<IntegerVector>(ch_cl["contains"]));
         }
@@ -823,7 +823,7 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
   IntegerVector stable_sc = cl_tree.attr("salient_clusters");
   double total_stability = 0.0f;
   for (IntegerVector::iterator it = stable_sc.begin(); it != stable_sc.end(); ++it){
-    List cl = cl_tree[patch::to_string(*it)];
+    List cl = cl_tree[std::to_string(*it)];
     total_stability += (double) cl["stability"];
   }
   cl_tree.attr("total_stability") = total_stability;

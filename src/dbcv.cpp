@@ -15,7 +15,7 @@ StringVector intToStr(IntegerVector iv){
   StringVector res = StringVector(iv.length());
   int ci = 0;
   for (IntegerVector::iterator i = iv.begin(); i != iv.end(); ++i){
-    res[ci++] = patch::to_string(*i);
+    res[ci++] = std::to_string(*i);
   }
   return(res);
 }
@@ -269,8 +269,8 @@ NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const Integer
 //         for (IntegerVector::iterator j = j_idx.begin(); j != j_idx.end(); ++j){
 //           const int lhs = *i < *j ? *i : *j, rhs = *i < *j ? *j : *i;
 //           double dist_ij = xdist[INDEX_TF(n, lhs - 1, rhs - 1)]; // dist(p_i, p_j)
-//           double acd_i = acp_map[patch::to_string(*i)]; // all core distance for p_i
-//           double acd_j = acp_map[patch::to_string(*j)]; // all core distance for p_i
+//           double acd_i = acp_map[std::to_string(*i)]; // all core distance for p_i
+//           double acd_j = acp_map[std::to_string(*j)]; // all core distance for p_i
 //           double mrd_ij = std::max(std::max(acd_i, acd_j), dist_ij); // mutual reachability distance of the pair
 //           if (mrd_ij < min_mrd){
 //             min_mrd = mrd_ij;

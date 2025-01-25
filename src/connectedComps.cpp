@@ -8,6 +8,7 @@
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 #include <Rcpp.h>
+
 using namespace Rcpp;
 
 // Find connected components in kNN and frNN objects.

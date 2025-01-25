@@ -8,7 +8,7 @@ CRAN](https://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/p
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
-[![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan+r-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan+r)
+[![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan%2br-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan%2br)
 
 ## Introduction
 
@@ -78,6 +78,7 @@ The following R packages use `dbscan`:
 [EHRtemporalVariability](https://CRAN.R-project.org/package=EHRtemporalVariability),
 [eventstream](https://CRAN.R-project.org/package=eventstream),
 [evprof](https://CRAN.R-project.org/package=evprof),
+[fastml](https://CRAN.R-project.org/package=fastml),
 [FCPS](https://CRAN.R-project.org/package=FCPS),
 [fdacluster](https://CRAN.R-project.org/package=fdacluster),
 [FORTLS](https://CRAN.R-project.org/package=FORTLS),
@@ -109,6 +110,7 @@ The following R packages use `dbscan`:
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
 [snap](https://CRAN.R-project.org/package=snap),
 [spdep](https://CRAN.R-project.org/package=spdep),
+[spNetwork](https://CRAN.R-project.org/package=spNetwork),
 [squat](https://CRAN.R-project.org/package=squat),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
 [stream](https://CRAN.R-project.org/package=stream),

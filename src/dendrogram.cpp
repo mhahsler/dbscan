@@ -10,8 +10,8 @@
 #include <Rcpp.h>
 #include <sstream>
 #include <string>
-
 #include "UnionFind.h"
+
 using namespace Rcpp;
 
 // Ditto with atoi!

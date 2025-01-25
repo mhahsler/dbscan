@@ -13,7 +13,6 @@
 
 #include <Rcpp.h>
 #include "regionQuery.h"
-//#include "ANN/ANN.h"
 
 using namespace Rcpp;
 

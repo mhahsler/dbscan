@@ -2,13 +2,11 @@
 #define MST_H
 
 #include <Rcpp.h>
-using namespace Rcpp;
-
-#include <queue>
-#include <bits/stdc++.h>
 #include "lt.h"
 
-// Functions to compute MST and build hclust object out of resulting tree
+using namespace Rcpp;
+
+// Functions to compute MST and build hclust object out of the resulting tree
 NumericMatrix mst(const NumericVector x_dist, const R_xlen_t n);
 
 List hclustMergeOrder(NumericMatrix mst, IntegerVector o);

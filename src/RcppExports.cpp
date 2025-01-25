@@ -478,29 +478,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// combine
-NumericVector combine(const NumericVector& t1, const NumericVector& t2);
-RcppExport SEXP _dbscan_combine(SEXP t1SEXP, SEXP t2SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericVector& >::type t1(t1SEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type t2(t2SEXP);
-    rcpp_result_gen = Rcpp::wrap(combine(t1, t2));
-    return rcpp_result_gen;
-END_RCPP
-}
-// concat_int
-IntegerVector concat_int(List const& container);
-RcppExport SEXP _dbscan_concat_int(SEXP containerSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List const& >::type container(containerSEXP);
-    rcpp_result_gen = Rcpp::wrap(concat_int(container));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_JP_int", (DL_FUNC) &_dbscan_JP_int, 2},
@@ -538,8 +515,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_hclustMergeOrder", (DL_FUNC) &_dbscan_hclustMergeOrder, 2},
     {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},
     {"_dbscan_lowerTri", (DL_FUNC) &_dbscan_lowerTri, 1},
-    {"_dbscan_combine", (DL_FUNC) &_dbscan_combine, 2},
-    {"_dbscan_concat_int", (DL_FUNC) &_dbscan_concat_int, 1},
     {NULL, NULL, 0}
 };
 

@@ -1,4 +1,9 @@
-# dbscan 1.2.0-1 (2024-xx-xx)
+# dbscan 1.2.2 (2025-01-24)
+
+## Changes
+* Removed dependence on the /bits/stdc++.h header. 
+
+# dbscan 1.2.1 (2025-01-23)
 
 ## Changes
 * Various refactoring by m-muecke
@@ -15,6 +20,7 @@
 
 ## Bugfixes
 * extractFOCS: Fixed total_score.
+* Rewrote minimal spanning tree code.
 
 # dbscan 1.2-0 (2024-06-28)
 

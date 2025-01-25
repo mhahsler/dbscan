@@ -8,8 +8,6 @@
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 #include <Rcpp.h>
-using namespace Rcpp;
-// [[Rcpp::plugins(cpp11)]]
 
 // C++ includes
 #include <unordered_map>
@@ -19,6 +17,9 @@ using namespace Rcpp;
 
 // Helper functions
 #include "utilities.h"
+
+using namespace Rcpp;
+// [[Rcpp::plugins(cpp11)]]
 
 // Macros
 #define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)

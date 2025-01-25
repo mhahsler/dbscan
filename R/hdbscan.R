@@ -152,18 +152,6 @@
 #' plot(res)
 #' clplot(moons, res)
 #'
-#' ## DS3 from Chameleon
-#' data("DS3")
-#'
-#' res <- hdbscan(DS3, minPts = 50)
-#' res
-#'
-#' ## Plot the simplified tree, highlight the most stable clusters
-#' plot(res, show_flat = TRUE)
-#
-#' ## Plot the actual clusters (noise has cluster id 0 and is shown in black)
-#' clplot(DS3, res)
-#'
 #' ## Example for HDBSCAN(e) using cluster_selection_epsilon
 #' # data with clusters of various densities.
 #' X <- data.frame(

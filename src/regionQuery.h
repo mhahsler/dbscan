@@ -13,6 +13,7 @@
 
 #include <Rcpp.h>
 #include "ANN/ANN.h"
+
 using namespace Rcpp;
 
 // pair of ids and dists

@@ -10,7 +10,6 @@
 
 
 
-#include <Rcpp.h>
 #include "regionQuery.h"
 
 using namespace Rcpp;

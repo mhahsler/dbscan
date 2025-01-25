@@ -1,6 +1,14 @@
+//----------------------------------------------------------------------
+//                                DBSCAN
+// File:                         dbcv.cpp
+//----------------------------------------------------------------------
+// Copyright (c) 2025 Michael Hahsler. All Rights Reserved.
+//
+// This software is provided under the provisions of the
+// GNU General Public License (GPL) Version 3
+// (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
+
 #include <Rcpp.h>
-using namespace Rcpp;
-// [[Rcpp::plugins(cpp11)]]
 
 // Includes
 #include "utilities.h"
@@ -9,6 +17,9 @@ using namespace Rcpp;
 #include "kNN.h"
 #include <string>
 #include <unordered_map>
+
+using namespace Rcpp;
+// [[Rcpp::plugins(cpp11)]]
 
 // [[Rcpp::export]]
 StringVector intToStr(IntegerVector iv){
@@ -217,23 +228,31 @@ NumericMatrix dspc(const List& cl_idx, const List& internal_nodes, const Integer
 
       // Do lots of indexing to get the relative indexes corresponding to internal nodes
       const IntegerVector i_idx = internal_nodes[ci], j_idx = internal_nodes[cj]; // i and j cluster point indices
-      const IntegerVector rel_i_idx = match(as<IntegerVector>(cl_idx[ci]), all_cl_ids)[i_idx - 1];
-      const IntegerVector rel_j_idx = match(as<IntegerVector>(cl_idx[cj]), all_cl_ids)[j_idx - 1];
-      IntegerVector int_idx = combine(rel_i_idx, rel_j_idx);
 
-      // Get the pairwise MST
-      NumericMatrix pairwise_mst = mst(dist_subset(mrd_dist, int_idx), int_idx.length());
+      // ignore clusters with no internal nodes! -> get infinity for minimum edge
+      // this leads to a NaN and should not happen in this implementation since
+      // we have already filtered out clusters of size < 3
+      if(i_idx.length() > 1 || j_idx.length() > 1) {
 
-      // Do lots of indexing / casting
-      const IntegerVector from_int = seq_len(rel_i_idx.length());
-      const NumericVector from_idx = as<NumericVector>(from_int);
-      const NumericVector from = pairwise_mst.column(0), to = pairwise_mst.column(1), height = pairwise_mst.column(2);
+        const IntegerVector rel_i_idx = match(as<IntegerVector>(cl_idx[ci]), all_cl_ids)[i_idx - 1];
+        const IntegerVector rel_j_idx = match(as<IntegerVector>(cl_idx[cj]), all_cl_ids)[j_idx - 1];
+        IntegerVector int_idx = combine(rel_i_idx, rel_j_idx);
 
-      // Find which distances in the MST cross to both clusters
-      LogicalVector cross_edges = XOR(Rcpp::in(from, from_idx), Rcpp::in(to, from_idx));
+        // Get the pairwise MST
+        NumericMatrix pairwise_mst = mst(dist_subset(mrd_dist, int_idx), int_idx.length());
 
-      // The minimum weighted edge of these cross edges is the density separation between the two clusters
-      min_edge = min(as<NumericVector>(height[cross_edges]));
+        // Do lots of indexing / casting
+        const IntegerVector from_int = seq_len(rel_i_idx.length());
+        const NumericVector from_idx = as<NumericVector>(from_int);
+        const NumericVector from = pairwise_mst.column(0), to = pairwise_mst.column(1), height = pairwise_mst.column(2);
+
+        // Find which distances in the MST cross to both clusters
+        LogicalVector cross_edges = XOR(Rcpp::in(from, from_idx), Rcpp::in(to, from_idx));
+
+        // The minimum weighted edge of these cross edges is the density separation between the two clusters
+        min_edge = min(as<NumericVector>(height[cross_edges]));
+
+      }
 
       // Save the minimum edge
       res(c++, _) = NumericVector::create(ci+1, cj+1, min_edge);

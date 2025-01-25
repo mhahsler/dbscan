@@ -7,7 +7,6 @@
 // GNU General Public License (GPL) Version 3
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
-// Header
 #include "mst.h"
 
 // coreFromDist indexes through the a dist vector to retrieve the core distance;
@@ -31,9 +30,9 @@
 //   return(core_dist);
 // }
 
+
 // Prim's Algorithm
-// this implementation is based on
-// https://www.geeksforgeeks.org/prims-algorithm-in-cpp/
+// this implementation for dense dist objects avoids the use of a min-heap.
 // [[Rcpp::export]]
 Rcpp::NumericMatrix mst(const NumericVector x_dist, const R_xlen_t n) {
   Rcpp::NumericMatrix mst = NumericMatrix(n - 1, 3);
@@ -41,45 +40,43 @@ Rcpp::NumericMatrix mst(const NumericVector x_dist, const R_xlen_t n) {
 
   // vector to store the parent of vertex
   std::vector<int> parent(n);
-  std::vector<double> weight(n);
-  std::vector<bool> visited(n);
+  std::vector<double> weight(n, INFINITY);
+  std::vector<bool> visited(n, false);
 
-  std::priority_queue<std::pair<double, int>,
-                 std::vector<std::pair<double, int>>,
-                 std::greater<std::pair<double, int>>> pq;
-
-  // Initialize weights and visited
-  for (int i = 0; i < n; i++) {
-    weight[i] = INT_MAX;
-    visited[i] = false;
-  }
-
-  // First node is always the root of MST. pick it first.
+  // first node is always the root of MST.
   parent[0] = -1;
-  weight[0] = -INFINITY;
+  weight[0] = 0;
 
-  // Push the source vertex to the min-heap
-  pq.push({0, 0});
+  int next_node = 0;
+  double next_weight;
+  int node;
 
-  while (!pq.empty()) {
-    int node = pq.top().second;
-    pq.pop();
+  while (next_node >= 0) {
+    node = next_node;
+    next_node = -1;
+    next_weight = INFINITY;
+
     visited[node] = true;
-    for (int i = 0; i < n; i++) {
+    mst(node-1, 1) = parent[node] +1;
+    mst(node-1, 0) = node + 1;
+    mst(node-1, 2) = weight[node];
+
+    for (int i = 1; i < n; i++) { // 0 is always the first node
+      if (visited[i] || node == i) continue;
+
       double the_weight = x_dist[LT_POS0(n, node, i)];
-      if (!visited[i] && node != i
-            && the_weight < weight[i]) {
-        pq.push({the_weight, i});
+      if (the_weight < weight[i]) {
         weight[i] = the_weight;
         parent[i] = node;
       }
-    }
-  }
 
-  for (int i = 1; i < n; i++) {
-    mst(i-1, 1) = parent[i] +1;
-    mst(i-1, 0) = i + 1;
-    mst(i-1, 2) = x_dist[LT_POS0(n, i, parent[i])];
+      // find minimum weight node
+      if (weight[i] < next_weight) {
+        next_weight = weight[i];
+        next_node = i;
+      }
+
+    }
   }
 
   return(mst);

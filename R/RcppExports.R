@@ -141,11 +141,3 @@ lowerTri <- function(m) {
     .Call(`_dbscan_lowerTri`, m)
 }
 
-combine <- function(t1, t2) {
-    .Call(`_dbscan_combine`, t1, t2)
-}
-
-concat_int <- function(container) {
-    .Call(`_dbscan_concat_int`, container)
-}
-

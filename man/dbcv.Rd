@@ -35,8 +35,11 @@ DBCV (Moulavi et al, 2014) computes a score based on the density sparseness of e
 and the density separation of each pair of clusters.
 
 The density sparseness of a cluster (DSC) is deﬁned as the maximum edge weight of
-a minimal spanning tree for the points of the cluster using the mutual
-reachability distance based on the all-points-core-distance.
+a minimal spanning tree for the internal points of the cluster using the mutual
+reachability distance based on the all-points-core-distance. Internal points
+are connected to more than one other point in the cluster. Since clusters of
+a size less then 3 cannot have internal points, they are ignored (considered
+noise) in this implementation.
 
 The density separation of a pair of clusters (DSPC)
 is deﬁned as the minimum reachability distance between the internal nodes of
@@ -78,7 +81,7 @@ dbcv(x, class)
 dbcv(x, sample(1:4, replace = TRUE, size = nrow(x)))
 
 # find the best eps using dbcv
-eps_grid <- seq(.01,.2, by = .01)
+eps_grid <- seq(.05,.2, by = .01)
 cls <- lapply(eps_grid, FUN = function(e) dbscan(x, eps = e, minPts = 3))
 dbcvs <- sapply(cls, FUN = function(cl) dbcv(x, cl)$score)
 

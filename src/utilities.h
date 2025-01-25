@@ -12,8 +12,10 @@
 #define UTILITIES_H
 
 #include <Rcpp.h>
+
 using namespace Rcpp;
 
+// contains used in hdbscan.cpp
 template <typename T, typename C>
 bool contains(const T& container, const C& key) {
   if (std::find(container.begin(), container.end(), key) != container.end()) {
@@ -22,17 +24,16 @@ bool contains(const T& container, const C& key) {
   return false;
 }
 
+// extract the lower triangle from a matrix
 // [[Rcpp::export]]
 IntegerVector lowerTri(IntegerMatrix m);
 
-// [[Rcpp::export]]
+// internal c (combine) for Rcpp vectors
 NumericVector combine(const NumericVector& t1, const NumericVector& t2);
-
 IntegerVector combine(const IntegerVector& t1, const IntegerVector& t2);
 
 // Faster version of above combine function, assuming you can precompute and store
 // the containers needing to be concatenated
-// [[Rcpp::export]]
 IntegerVector concat_int(List const& container);
 
 #endif

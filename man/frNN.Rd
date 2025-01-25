@@ -60,7 +60,7 @@ enjoy a significant speedup.}
 \code{frNN()} returns an object of class \link{frNN} (subclass of
 \link{NN}) containing a list with the following components:
 \item{id }{a list of
-integer vectors. Each vector contains the ids of the fixed radius nearest
+integer vectors. Each vector contains the ids (row numbers) of the fixed radius nearest
 neighbors. }
 \item{dist }{a list with distances (same structure as
 \code{id}). }

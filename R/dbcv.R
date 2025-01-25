@@ -27,8 +27,11 @@
 #' and the density separation of each pair of clusters.
 #'
 #' The density sparseness of a cluster (DSC) is deﬁned as the maximum edge weight of
-#' a minimal spanning tree for the points of the cluster using the mutual
-#' reachability distance based on the all-points-core-distance.
+#' a minimal spanning tree for the internal points of the cluster using the mutual
+#' reachability distance based on the all-points-core-distance. Internal points
+#' are connected to more than one other point in the cluster. Since clusters of
+#' a size less then 3 cannot have internal points, they are ignored (considered
+#' noise) in this implementation.
 #'
 #' The density separation of a pair of clusters (DSPC)
 #' is deﬁned as the minimum reachability distance between the internal nodes of
@@ -96,7 +99,7 @@
 #' dbcv(x, sample(1:4, replace = TRUE, size = nrow(x)))
 #'
 #' # find the best eps using dbcv
-#' eps_grid <- seq(.01,.2, by = .01)
+#' eps_grid <- seq(.05,.2, by = .01)
 #' cls <- lapply(eps_grid, FUN = function(e) dbscan(x, eps = e, minPts = 3))
 #' dbcvs <- sapply(cls, FUN = function(cl) dbcv(x, cl)$score)
 #'
@@ -135,7 +138,7 @@ dbcv <- function(x,
       stop("d does not match the number of columns in x!")
     d <- ncol(x)
 
-    if (pmatch(metric, "sqeuclidean"))
+    if (pmatch(metric, "sqeuclidean", nomatch = 0))
       xdist <- dist(x, method = "euclidean")^2
     else
       xdist <- dist(x, method = metric)
@@ -259,9 +262,12 @@ dbcv <- function(x,
 getClusterIdList <- function(cl) {
   ## In DBCV, singletons are ambiguously defined. However, they cannot be
   ## considered valid clusters, for reasons listed in section 4 of the
-  ## original paper. To ensure coverage, they are assigned into the noise category.
+  ## original paper.
+  ## Clusters with less then 3 points cannot have internal nodes, so we need to
+  ## ignore them as well.
+  ## To ensure coverage, they are assigned into the noise category.
   cl_freq <- table(cl)
-  cl[which(cl %in% as.integer(names(cl_freq[cl_freq == 1])))] <- 0L
+  cl[cl %in% as.integer(names(which(cl_freq < 3)))] <- 0L
   if (all(cl == 0)) {
     return(0)
   }
@@ -272,7 +278,7 @@ getClusterIdList <- function(cl) {
 
   ## 1 or 0 clusters results in worst score + a warning
   if (n_cl <= 1) {
-    warning("DBCV is undefined for less than 2 non-noise clusters passed in.")
+    warning("DBCV is undefined for less than 2 non-noise clusters with more than 2 member points.")
     return(-1L)
   }
 

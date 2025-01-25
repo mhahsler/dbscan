@@ -8,6 +8,7 @@
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 #include <Rcpp.h>
+
 using namespace Rcpp;
 
 // Computes the mutual reachability distance defined for HDBSCAN

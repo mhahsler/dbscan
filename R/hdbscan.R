@@ -93,7 +93,8 @@
 #' @param verbose report progress.
 #' @param ...  additional arguments are passed on.
 #' @param scale integer; used to scale condensed tree based on the graphics
-#' device. Lower scale results in wider trees.
+#' device. Lower scale results in wider colored trees lines.
+#' The default `'suggest'` sets scale to the number of clusters.
 #' @param gradient character vector; the colors to build the condensed tree
 #' coloring with.
 #' @param show_flat logical; whether to draw boxes indicating the most stable
@@ -319,16 +320,22 @@ print.hdbscan <- function(x, ...) {
 }
 
 #' @rdname hdbscan
+#' @param leaflab a string specifying how leaves are labeled (see [stats::plot.dendrogram()]).
+#' @param ylab the label for the y axis.
+#' @param main Title of the plot.
 #' @export
 plot.hdbscan <-
   function(x,
            scale = "suggest",
            gradient = c("yellow", "red"),
            show_flat = FALSE,
+           main = "HDBSCAN*",
+           ylab = "eps value",
+           leaflab = "none",
            ...) {
     ## Logic checks
     if (!(scale == "suggest" ||
-          scale > 0.0)) {
+          scale > 0)) {
       stop("scale parameter must be greater than 0.")
     }
 
@@ -347,17 +354,12 @@ plot.hdbscan <-
         key = 0,
         leaves_only = TRUE
       ))
-    scale <-
-      if (scale == "suggest")
-        nclusters
-    else
-      nclusters / scale
+
+    scale <- ifelse(scale == "suggest", nclusters, nclusters / scale)
 
     ## Color variables
-    col_breaks <-
-      seq(0, length(x$cluster) + nclusters, by = nclusters)
-    gcolors <-
-      grDevices::colorRampPalette(gradient)(length(col_breaks))
+    col_breaks <- seq(0, length(x$cluster) + nclusters, by = nclusters)
+    gcolors <- grDevices::colorRampPalette(gradient)(length(col_breaks))
 
     ## Depth-first search to recursively plot rectangles
     eps_dfs <- function(dend, index, parent_height, scale) {
@@ -466,9 +468,9 @@ plot.hdbscan <-
     plot(
       dend,
       edge.root = TRUE,
-      main = "HDBSCAN*",
-      ylab = "eps value",
-      leaflab = "none",
+      main = main,
+      ylab = ylab,
+      leaflab = leaflab,
       ...
     )
     eps_dfs(dend,

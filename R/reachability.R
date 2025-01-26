@@ -59,7 +59,7 @@
 #' linkage trees, and vice versa.
 #'
 #' _Note:_ The reachability distance for the first point is by definition not defined
-#' (it has no preceeding point).
+#' (it has no preceding point).
 #' Also, the reachability distances can be undefined when a point does not have enough
 #' neighbors in the epsilon neighborhood. We represent these undefined cases as `Inf`
 #' and represent them in the plot as a dashed line.

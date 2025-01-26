@@ -26,6 +26,9 @@ hdbscan(
   scale = "suggest",
   gradient = c("yellow", "red"),
   show_flat = FALSE,
+  main = "HDBSCAN*",
+  ylab = "eps value",
+  leaflab = "none",
   ...
 )
 
@@ -54,13 +57,20 @@ explicitly computed (see Campello et al, 2013).}
 \item{...}{additional arguments are passed on.}
 
 \item{scale}{integer; used to scale condensed tree based on the graphics
-device. Lower scale results in wider trees.}
+device. Lower scale results in wider colored trees lines.
+The default \code{'suggest'} sets scale to the number of clusters.}
 
 \item{gradient}{character vector; the colors to build the condensed tree
 coloring with.}
 
 \item{show_flat}{logical; whether to draw boxes indicating the most stable
 clusters.}
+
+\item{main}{Title of the plot.}
+
+\item{ylab}{the label for the y axis.}
+
+\item{leaflab}{a string specifying how leaves are labeled (see \code{\link[stats:dendrogram]{stats::plot.dendrogram()}}).}
 
 \item{coredist}{numeric vector with precomputed core distances (optional).}
 

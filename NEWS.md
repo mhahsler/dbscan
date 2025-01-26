@@ -1,3 +1,8 @@
+# dbscan 1.2.2-1 (2025-xx-xx)
+
+## Bugfixes
+* plot.hdbscan gained parameters main, ylab, and leaflab (reported by nhward).
+
 # dbscan 1.2.2 (2025-01-24)
 
 ## Changes

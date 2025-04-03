@@ -7,7 +7,6 @@ proj$
 ^.*\.Rproj$
 ^LICENSE
 README.Rmd
-Work
-jss
+data_src
 ignore
 ^\.github$

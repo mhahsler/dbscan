@@ -7,6 +7,7 @@ status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-unive
 CRAN](https://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
+![License](https://img.shields.io/cran/l/dbscan)
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
 [![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan%2br-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan%2br)
 
@@ -61,21 +62,22 @@ package `fpc`), or the implementations in
 scikit-learn](https://scikit-learn.org/).
 
 The following R packages use `dbscan`:
-[AFM](https://CRAN.R-project.org/package=AFM),
 [AnimalSequences](https://CRAN.R-project.org/package=AnimalSequences),
 [bioregion](https://CRAN.R-project.org/package=bioregion),
+[CIDER](https://CRAN.R-project.org/package=CIDER),
+[clayringsmiletus](https://CRAN.R-project.org/package=clayringsmiletus),
 [CLONETv2](https://CRAN.R-project.org/package=CLONETv2),
-[ClustAssess](https://CRAN.R-project.org/package=ClustAssess),
 [cordillera](https://CRAN.R-project.org/package=cordillera),
 [CPC](https://CRAN.R-project.org/package=CPC),
 [crosshap](https://CRAN.R-project.org/package=crosshap),
 [daltoolbox](https://CRAN.R-project.org/package=daltoolbox),
-[DDoutlier](https://CRAN.R-project.org/package=DDoutlier),
+[DataSimilarity](https://CRAN.R-project.org/package=DataSimilarity),
 [diceR](https://CRAN.R-project.org/package=diceR),
 [dobin](https://CRAN.R-project.org/package=dobin),
 [doc2vec](https://CRAN.R-project.org/package=doc2vec),
 [dPCP](https://CRAN.R-project.org/package=dPCP),
 [EHRtemporalVariability](https://CRAN.R-project.org/package=EHRtemporalVariability),
+[emcAdr](https://CRAN.R-project.org/package=emcAdr),
 [eventstream](https://CRAN.R-project.org/package=eventstream),
 [evprof](https://CRAN.R-project.org/package=evprof),
 [fastml](https://CRAN.R-project.org/package=fastml),
@@ -93,14 +95,18 @@ The following R packages use `dbscan`:
 [metaCluster](https://CRAN.R-project.org/package=metaCluster),
 [metasnf](https://CRAN.R-project.org/package=metasnf),
 [mlr3cluster](https://CRAN.R-project.org/package=mlr3cluster),
+[neuroim2](https://CRAN.R-project.org/package=neuroim2),
 [oclust](https://CRAN.R-project.org/package=oclust),
 [openSkies](https://CRAN.R-project.org/package=openSkies),
 [opticskxi](https://CRAN.R-project.org/package=opticskxi),
 [OTclust](https://CRAN.R-project.org/package=OTclust),
+[outlierensembles](https://CRAN.R-project.org/package=outlierensembles),
+[outlierMBC](https://CRAN.R-project.org/package=outlierMBC),
 [pagoda2](https://CRAN.R-project.org/package=pagoda2),
 [parameters](https://CRAN.R-project.org/package=parameters),
 [ParBayesianOptimization](https://CRAN.R-project.org/package=ParBayesianOptimization),
 [performance](https://CRAN.R-project.org/package=performance),
+[PiC](https://CRAN.R-project.org/package=PiC),
 [rMultiNet](https://CRAN.R-project.org/package=rMultiNet),
 [seriation](https://CRAN.R-project.org/package=seriation),
 [sfdep](https://CRAN.R-project.org/package=sfdep),
@@ -117,6 +123,7 @@ The following R packages use `dbscan`:
 [SuperCell](https://CRAN.R-project.org/package=SuperCell),
 [synr](https://CRAN.R-project.org/package=synr),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
+[VIProDesign](https://CRAN.R-project.org/package=VIProDesign),
 [weird](https://CRAN.R-project.org/package=weird)
 
 To cite package ‘dbscan’ in publications use:

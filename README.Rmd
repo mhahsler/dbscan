@@ -131,7 +131,7 @@ augment(db, x) %>%
 ## Using dbscan from Python
 R, the R package `dbscan`, and the Python package `rpy2` need to be installed.
 
-```{python, eval = FALSE}
+```{python, eval = FALSE, python.reticulate = FALSE}
 import pandas as pd
 import numpy as np
 
@@ -165,7 +165,7 @@ print(db)
 ## Available fields: cluster, eps, minPts, dist, borderPoints
 ```
 
-```{python, eval = FALSE}
+```{python, eval = FALSE, python.reticulate = FALSE}
 # get the cluster assignment vector
 labels = np.array(db.rx('cluster'))
 labels

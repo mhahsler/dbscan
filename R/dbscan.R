@@ -242,7 +242,7 @@
 #' }}
 #'
 #' ## Example 3: manually create a frNN object for dbscan (dbscan only needs ids and eps)
-#' nn <- structure(list(ids = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1),
+#' nn <- structure(list(id = list(c(2,3), c(1,3), c(1,2,3), c(3,5), c(4,5)), eps = 1),
 #'   class =  c("NN", "frNN"))
 #' nn
 #' dbscan(nn, minPts = 2)

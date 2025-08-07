@@ -192,8 +192,7 @@
 #' @export
 optics <- function(x, eps = NULL, minPts = 5, ...) {
   ### find eps from minPts
-  if (is.null(eps))
-    eps <- max(kNNdist(x, k =  minPts))
+  eps <- eps %||% max(kNNdist(x, k =  minPts))
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
@@ -205,25 +204,13 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
       toString(names(extra)[is.na(m)]))
   names(extra) <- args[m]
 
-  search <- extra$search %||% "kdtree"
-  splitRule <- extra$splitRule %||% "suggest"
-  search <- .parse_search(search)
-  splitRule <- .parse_splitRule(splitRule)
-
-
-  bucketSize <- if (is.null(extra$bucketSize))
-    10L
-  else
-    as.integer(extra$bucketSize)
-
-  approx <-
-    if (is.null(extra$approx))
-      0L
-  else
-    as.integer(extra$approx)
+  search <- .parse_search(extra$search %||% "kdtree")
+  splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
+  bucketSize <- as.integer(extra$bucketSize %||% 10L)
+  approx <- as.integer(extra$approx %||% 0L)
 
   ### dist search
-  if (search == 3 && !inherits(x, "dist")) {
+  if (search == 3L && !inherits(x, "dist")) {
     if (.matrixlike(x))
       x <- dist(x)
     else

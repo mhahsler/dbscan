@@ -255,8 +255,10 @@ dbscan <-
     weights = NULL,
     borderPoints = TRUE,
     ...) {
-    if (inherits(x, "frNN") && missing(eps))
+    if (inherits(x, "frNN") && missing(eps)) {
       eps <- x$eps
+      dist_method <- x$metric
+    }
 
     if (inherits(x, "dist")) {
       .check_dist(x)
@@ -264,8 +266,7 @@ dbscan <-
     } else
       dist_method <- "euclidean"
 
-    if (is.null(dist_method))
-      dist_method <- "unknown"
+    dist_method <- dist_method %||% "unknown"
 
     ### extra contains settings for frNN
     ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
@@ -280,30 +281,20 @@ dbscan <-
         toString(names(extra)[is.na(m)]))
     names(extra) <- args[m]
 
+    # fpc compartability
     if (!is.null(extra$MinPts)) {
       warning("converting argument MinPts (fpc) to minPts (dbscan)!")
       minPts <- extra$MinPts
+      extra$MinPts <- NULL
     }
-    extra$MinPts <- NULL
 
-    search <- extra$search %||% "kdtree"
-    splitRule <- extra$splitRule %||% "suggest"
-    search <- .parse_search(search)
-    splitRule <- .parse_splitRule(splitRule)
-
-    bucketSize <- if (is.null(extra$bucketSize))
-      10L
-    else
-      as.integer(extra$bucketSize)
-
-    approx <-
-      if (is.null(extra$approx))
-        0L
-    else
-      as.integer(extra$approx)
+    search <- .parse_search(extra$search %||% "kdtree")
+    splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
+    bucketSize <- as.integer(extra$bucketSize %||% 10L)
+    approx <- as.integer(extra$approx %||% 0L)
 
     ### do dist search
-    if (search == 3 && !inherits(x, "dist")) {
+    if (search == 3L && !inherits(x, "dist")) {
       if (.matrixlike(x))
         x <- dist(x)
       else
@@ -340,7 +331,7 @@ dbscan <-
       stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
 
     ## add self match and use C numbering if frNN is used
-    if (length(frNN) > 0)
+    if (length(frNN) > 0L)
       frNN <-
       lapply(
         seq_along(frNN),
@@ -348,7 +339,7 @@ dbscan <-
           c(i - 1L, frNN[[i]] - 1L)
       )
 
-    if (length(minPts) != 1 ||
+    if (length(minPts) != 1L ||
         !is.finite(minPts) ||
         minPts < 0)
       stop("minPts need to be a single integer >=0.")

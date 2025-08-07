@@ -59,7 +59,7 @@ x <- cbind(
   x = runif(4, 0, 1) + rnorm(n, sd = 0.1),
   y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
   )
-cl <- rep(1:4, time = 100)
+cl <- rep(1:4, times = 100)
 
 
 ### original data with true clustering

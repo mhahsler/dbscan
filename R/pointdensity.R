@@ -105,7 +105,8 @@ pointdensity <- function(x,
     stop("missing values are not allowed in x.")
 
   if (type == "gaussian")
-    return (.pointdensity_gaussian(x, sd = eps, search = search, bucketSize = bucketSize,
+    return (.pointdensity_gaussian(x, sd = eps, search = search,
+                                   bucketSize = bucketSize,
                                    splitRule = splitRule, approx = approx))
 
   # regular dbscan density estimation

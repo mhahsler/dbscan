@@ -154,7 +154,7 @@ x <- cbind(
   y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
   )
 
-plot(x, col=rep(1:4, time = 100))
+plot(x, col=rep(1:4, times = 100))
 
 ### run OPTICS (Note: we use the default eps calculation)
 res <- optics(x, minPts = 10)

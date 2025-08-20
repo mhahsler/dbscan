@@ -1,8 +1,8 @@
 Package: dbscan
 Title: Density-Based Spatial Clustering of Applications with Noise
     (DBSCAN) and Related Algorithms
-Version: 1.2.2-1
-Date: 2025-xx-xx
+Version: 1.2.3
+Date: 2025-08-20
 Authors@R: c(
     person("Michael", "Hahsler", email = "mhahsler@lyle.smu.edu", 
            role = c("aut", "cre", "cph"),

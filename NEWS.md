@@ -1,3 +1,9 @@
+# dbscan 1.2.3-1 (2025-xx-xx)
+
+## Bugfixes
+* dbscan now checks for matrices with 0 rows or 0 colums 
+  (reported by maldridgeepa)
+
 # dbscan 1.2.3 (2025-08-20)
 
 ## Bugfixes

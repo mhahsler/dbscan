@@ -18,4 +18,14 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 .ANNsplitRule <- c("STD", "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR", "SUGGEST")
-.matrixlike <- function(x) return(!is.null(dim(x)))
+
+.matrixlike <- function(x) {
+  if  (is.null(dim(x)))
+       return(FALSE)
+
+  # check that there is at least one row and one column!
+  if (nrow(x) < 1L) stop("the provided data has 0 rows!")
+  if (ncol(x) < 1L) stop("the provided data has 0 columns!")
+
+  TRUE
+}

@@ -65,4 +65,10 @@ test_that("dbscan works", {
   expect_error(dbscan(x_na, eps = .2, minPts = 4, search = "dist"),
     regexp = "NA")
   expect_error(dbscan(dist(x_na), eps = .2, minPts = 4), regexp = "NA")
+
+
+  ## call with no rows or no columns
+  expect_error(dbscan(matrix(0, nrow = 0, ncol = 2), eps = .2, minPts = 4))
+  expect_error(dbscan(matrix(0, nrow = 2, ncol = 0), eps = .2, minPts = 4))
+  dbscan(matrix(0, nrow = 1, ncol = 1), eps = .2, minPts = 4)
 })

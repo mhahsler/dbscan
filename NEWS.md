@@ -1,8 +1,10 @@
-# dbscan 1.2.3-1 (2025-xx-xx)
+# dbscan 1.2.4 (2025-12-18)
 
 ## Bugfixes
-* dbscan now checks for matrices with 0 rows or 0 colums 
-  (reported by maldridgeepa)
+* dbscan now checks for matrices with 0 rows or 0 columns
+  (reported by maldridgeepa).
+* Fixed license information for the ANN library header files (reported by 
+  Charles Plessy).
 
 # dbscan 1.2.3 (2025-08-20)
 

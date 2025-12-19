@@ -1,14 +1,14 @@
 
 # <img src="man/figures/logo.svg" align="right" height="139" /> R package dbscan - Density-Based Spatial Clustering of Applications with Noise (DBSCAN) and Related Algorithms
 
-[![r-universe
-status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/dbscan)
 [![Package on
 CRAN](https://www.r-pkg.org/badges/version/dbscan)](https://CRAN.R-project.org/package=dbscan)
 [![CRAN RStudio mirror
 downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org/package=dbscan)
 ![License](https://img.shields.io/cran/l/dbscan)
 [![Anaconda.org](https://anaconda.org/conda-forge/r-dbscan/badges/version.svg)](https://anaconda.org/conda-forge/r-dbscan)
+[![r-universe
+status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/dbscan)
 [![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan%2br-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan%2br)
 
 ## Introduction
@@ -64,31 +64,33 @@ scikit-learn](https://scikit-learn.org/).
 The following R packages use `dbscan`:
 [AnimalSequences](https://CRAN.R-project.org/package=AnimalSequences),
 [bioregion](https://CRAN.R-project.org/package=bioregion),
-[CIDER](https://CRAN.R-project.org/package=CIDER),
 [clayringsmiletus](https://CRAN.R-project.org/package=clayringsmiletus),
 [CLONETv2](https://CRAN.R-project.org/package=CLONETv2),
+[clusterWebApp](https://CRAN.R-project.org/package=clusterWebApp),
 [cordillera](https://CRAN.R-project.org/package=cordillera),
 [CPC](https://CRAN.R-project.org/package=CPC),
 [crosshap](https://CRAN.R-project.org/package=crosshap),
+[crownsegmentr](https://CRAN.R-project.org/package=crownsegmentr),
+[CspStandSegmentation](https://CRAN.R-project.org/package=CspStandSegmentation),
 [daltoolbox](https://CRAN.R-project.org/package=daltoolbox),
 [DataSimilarity](https://CRAN.R-project.org/package=DataSimilarity),
 [diceR](https://CRAN.R-project.org/package=diceR),
 [dobin](https://CRAN.R-project.org/package=dobin),
 [doc2vec](https://CRAN.R-project.org/package=doc2vec),
 [dPCP](https://CRAN.R-project.org/package=dPCP),
-[EHRtemporalVariability](https://CRAN.R-project.org/package=EHRtemporalVariability),
 [emcAdr](https://CRAN.R-project.org/package=emcAdr),
 [eventstream](https://CRAN.R-project.org/package=eventstream),
 [evprof](https://CRAN.R-project.org/package=evprof),
 [fastml](https://CRAN.R-project.org/package=fastml),
 [FCPS](https://CRAN.R-project.org/package=FCPS),
-[fdacluster](https://CRAN.R-project.org/package=fdacluster),
-[FORTLS](https://CRAN.R-project.org/package=FORTLS),
+[flowcluster](https://CRAN.R-project.org/package=flowcluster),
 [funtimes](https://CRAN.R-project.org/package=funtimes),
 [FuzzyDBScan](https://CRAN.R-project.org/package=FuzzyDBScan),
+[HaploVar](https://CRAN.R-project.org/package=HaploVar),
 [immunaut](https://CRAN.R-project.org/package=immunaut),
 [karyotapR](https://CRAN.R-project.org/package=karyotapR),
 [ksharp](https://CRAN.R-project.org/package=ksharp),
+[LLMing](https://CRAN.R-project.org/package=LLMing),
 [LOMAR](https://CRAN.R-project.org/package=LOMAR),
 [maotai](https://CRAN.R-project.org/package=maotai),
 [MapperAlgo](https://CRAN.R-project.org/package=MapperAlgo),
@@ -97,6 +99,7 @@ The following R packages use `dbscan`:
 [mlr3cluster](https://CRAN.R-project.org/package=mlr3cluster),
 [neuroim2](https://CRAN.R-project.org/package=neuroim2),
 [oclust](https://CRAN.R-project.org/package=oclust),
+[omicsTools](https://CRAN.R-project.org/package=omicsTools),
 [openSkies](https://CRAN.R-project.org/package=openSkies),
 [opticskxi](https://CRAN.R-project.org/package=opticskxi),
 [OTclust](https://CRAN.R-project.org/package=OTclust),
@@ -107,22 +110,22 @@ The following R packages use `dbscan`:
 [ParBayesianOptimization](https://CRAN.R-project.org/package=ParBayesianOptimization),
 [performance](https://CRAN.R-project.org/package=performance),
 [PiC](https://CRAN.R-project.org/package=PiC),
+[rcrisp](https://CRAN.R-project.org/package=rcrisp),
 [rMultiNet](https://CRAN.R-project.org/package=rMultiNet),
 [seriation](https://CRAN.R-project.org/package=seriation),
 [sfdep](https://CRAN.R-project.org/package=sfdep),
 [sfnetworks](https://CRAN.R-project.org/package=sfnetworks),
 [sharp](https://CRAN.R-project.org/package=sharp),
-[shipunov](https://CRAN.R-project.org/package=shipunov),
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
 [snap](https://CRAN.R-project.org/package=snap),
 [spdep](https://CRAN.R-project.org/package=spdep),
 [spNetwork](https://CRAN.R-project.org/package=spNetwork),
-[squat](https://CRAN.R-project.org/package=squat),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
 [stream](https://CRAN.R-project.org/package=stream),
 [SuperCell](https://CRAN.R-project.org/package=SuperCell),
 [synr](https://CRAN.R-project.org/package=synr),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
+[VBphenoR](https://CRAN.R-project.org/package=VBphenoR),
 [VIProDesign](https://CRAN.R-project.org/package=VIProDesign),
 [weird](https://CRAN.R-project.org/package=weird)
 

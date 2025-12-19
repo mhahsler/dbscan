@@ -61,7 +61,7 @@ algorithms as described by the framework for hclust objects. Traditional
 cluster extraction methods from hierarchical representations (such as
 \link{hclust} objects) generally rely on global parameters or cutting values
 which are used to partition a cluster hierarchy into a set of disjoint, flat
-clusters. This is implemented in R in function \code{\link[=cutree]{cutree()}}.
+clusters. This is implemented in R in function \code{\link[stats:cutree]{stats::cutree()}}.
 Although such methods are widespread, using global parameter
 settings are inherently limited in that they cannot capture patterns within
 the cluster hierarchy at varying \emph{local} levels of granularity.

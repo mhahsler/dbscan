@@ -35,7 +35,7 @@
 #' cluster extraction methods from hierarchical representations (such as
 #' [hclust] objects) generally rely on global parameters or cutting values
 #' which are used to partition a cluster hierarchy into a set of disjoint, flat
-#' clusters. This is implemented in R in function [cutree()].
+#' clusters. This is implemented in R in function [stats::cutree()].
 #' Although such methods are widespread, using global parameter
 #' settings are inherently limited in that they cannot capture patterns within
 #' the cluster hierarchy at varying _local_ levels of granularity.

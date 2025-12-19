@@ -53,7 +53,7 @@
   Bobby B. Lyle School of Engineering, SMU\\
   P. O. Box 750123, Dallas, TX 75275\\
   E-mail: \email{mhahsler@lyle.smu.edu}\\
-  URL: \url{http://michael.hahsler.net/}
+  URL: \url{https://michael.hahsler.net/}
 
   \vspace{5mm}
 
@@ -61,8 +61,7 @@
   Department of Computer Science and Engineering\\
   Dept. of Computer Science and Engineering, Wright State University\\
   3640 Colonel Glenn Hwy, Dayton, OH, 45435\\
-  E-mail: \email{piekenbrock.5@wright.edu}\\
-  URL: \url{http://wright.edu/}
+  E-mail: \email{piekenbrock.5@wright.edu}
 
   \vspace{5mm}
 
@@ -70,8 +69,7 @@
   Department of Computer Science and Engineering\\
   Dept. of Computer Science and Engineering, Wright State University\\
   3640 Colonel Glenn Hwy, Dayton, OH, 45435\\
-  E-mail: \email{derek.doran@wright.edu}\\
-  URL: \url{http://knoesis.org/doran}
+  E-mail: \email{derek.doran@wright.edu}
 }
 
 \Abstract {
@@ -113,7 +111,8 @@ These clustering algorithms are widely used in practice with applications rangin
 
 This paper focuses on an efficient implementation of the DBSCAN algorithm~\citep{ester1996density},
 one of the most popular density-based clustering algorithms,
-whose consistent use earned it the SIGKDD 2014's Test of Time Award~\citep{SIGKDDNe30:online}, and OPTICS~\citep{ankerst1999optics}, often referred to as an extension of DBSCAN.
+whose consistent use earned it the SIG
+KDD 2014's Test of Time Award~\citep{SIGKDDNe30:online}, and OPTICS~\citep{ankerst1999optics}, often referred to as an extension of DBSCAN.
 %Matt - what do you mean when you say related algorithms?
 %along with their related algorithms, such as the Local Outlier Factor \citep{breunig2000lof} and the conversion methods between reachability and dendrogram representations\citep{sander2003automatic}.
 %Matt - you can cite the KAIS 17 paper in this first sentence

@@ -62,7 +62,7 @@ The
 implementation is significantly faster and can work with larger data sets
 than \code{\link[fpc:dbscan]{fpc::dbscan()}} in \pkg{fpc}. Use \code{dbscan::dbscan()} (with specifying the package) to
 call this implementation when you also load package \pkg{fpc}.
-\subsection{The algorithm}{
+\subsection{The Algorithm}{
 
 This implementation of DBSCAN follows the original
 algorithm as described by Ester et al (1996). DBSCAN performs the following steps:
@@ -88,7 +88,7 @@ algorithm. DBSCAN* (see Campello et al 2013) treats all border points as
 noise points. This is implemented with \code{borderPoints = FALSE}.
 }
 
-\subsection{Specifying the data}{
+\subsection{Specifying the Data}{
 
 If \code{x} is a matrix or a data.frame, then fast fixed-radius nearest
 neighbor computation using a kd-tree is performed using Euclidean distance.
@@ -104,7 +104,7 @@ data sets, where a sparse distance matrix is available. See
 \code{\link[=frNN]{frNN()}} how to create frNN objects.
 }
 
-\subsection{Setting parameters for DBSCAN}{
+\subsection{Setting Parameters for DBSCAN}{
 
 The parameters \code{minPts} and \code{eps} define the minimum density required
 in the area around core points which form the backbone of clusters.
@@ -134,7 +134,7 @@ are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
 }
 }
 
-\subsection{Predict cluster memberships}{
+\subsection{Predict Cluster Memberships}{
 
 \code{\link[=predict]{predict()}} can be used to predict cluster memberships for new data
 points. A point is considered a member of a cluster if it is within the eps

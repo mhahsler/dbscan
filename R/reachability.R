@@ -32,7 +32,9 @@
 #' reachability distance between two consecutive points.
 #' Reachability distances can be undefined when a point does not have enough
 #' neighbors in the epsilon neighborhood. We represent these undefined cases as `Inf`
-#' and represent them in the plot as a dashed line. Also, the reachability distance for the first
+#' and represent them in the plot as a dashed line.
+#' If many dashed lines show up for [OPTICS] then you need to increase `eps` there.
+#' The reachability distance for the first
 #' point is by definition not defined (it has no preceding point).
 #'
 #' The central idea behind reachability plots is that the ordering in which
@@ -50,7 +52,7 @@
 #'
 #' The original ordering algorithm OPTICS as described by Ankerst et al (1999)
 #' introduced the notion of reachability plots.
-#' OPTICS linearly orders the data points such that points
+#' [OPTICS] linearly orders the data points such that points
 #' which are spatially closest become neighbors in the ordering. Valleys
 #' represent clusters, which can be represented hierarchically. Although the
 #' ordering is crucial to the structure of the reachability plot, its important

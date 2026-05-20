@@ -34,8 +34,10 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 \item{eps}{upper limit of the size of the epsilon neighborhood. Limiting the
 neighborhood size improves performance and has no or very little impact on
 the ordering as long as it is not set too low. If not specified, the largest
-minPts-distance in the data set is used which gives the same result as
-infinity.}
+kNN distance using \code{minPts} in the data set is used. If dashed
+lines show up in the reachability plot, then you need to increase \code{eps}.
+You can set it to \code{Inf}, but this will degrade performance and is only
+recommended for very small data sets.}
 
 \item{minPts}{the parameter is used to identify dense neighborhoods and the
 reachability distance is calculated as the distance to the minPts nearest
@@ -92,7 +94,7 @@ Implementation of the OPTICS (Ordering points to identify the clustering
 structure) point ordering algorithm using a kd-tree.
 }
 \details{
-\strong{The algorithm}
+\subsection{The Algorithm}{
 
 This implementation of OPTICS implements the original
 algorithm as described by Ankerst et al (1999). OPTICS is an ordering
@@ -115,14 +117,16 @@ between two consecutive points
 where the points are sorted by OPTICS. Valleys represent clusters (the
 deeper the valley, the more dense the cluster) and high points indicate
 points between clusters.
+}
 
-\strong{Specifying the data}
+\subsection{Specifying the Data}{
 
 If \code{x} is specified as a data matrix, then Euclidean distances and fast
 nearest neighbor lookup using a kd-tree are used. See \code{\link[=kNN]{kNN()}} for
 details on the parameters for the kd-tree.
+}
 
-\strong{Extracting a clustering}
+\subsection{Extracting a Clustering}{
 
 Several methods to extract a clustering from the order returned by OPTICS are
 implemented:
@@ -139,11 +143,13 @@ relative cluster density. The used algorithm was originally contributed by
 the ELKI framework and is explained in Schubert et al (2018), but contains a
 set of fixes.
 }
+}
 
-\strong{Predict cluster memberships}
+\subsection{Predict Cluster Memberships}{
 
 \code{predict()} requires an extracted DBSCAN clustering with \code{extractDBSCAN()} and then
 uses predict for \code{dbscan()}.
+}
 }
 \examples{
 set.seed(2)

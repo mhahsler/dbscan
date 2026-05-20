@@ -22,7 +22,7 @@
 #' Implementation of the OPTICS (Ordering points to identify the clustering
 #' structure) point ordering algorithm using a kd-tree.
 #'
-#' **The algorithm**
+#' ## The Algorithm
 #'
 #' This implementation of OPTICS implements the original
 #' algorithm as described by Ankerst et al (1999). OPTICS is an ordering
@@ -46,13 +46,13 @@
 #' deeper the valley, the more dense the cluster) and high points indicate
 #' points between clusters.
 #'
-#' **Specifying the data**
+#' ## Specifying the Data
 #'
 #' If `x` is specified as a data matrix, then Euclidean distances and fast
 #' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
 #' details on the parameters for the kd-tree.
 #'
-#' **Extracting a clustering**
+#' ## Extracting a Clustering
 #'
 #' Several methods to extract a clustering from the order returned by OPTICS are
 #' implemented:
@@ -70,7 +70,7 @@
 #'   the ELKI framework and is explained in Schubert et al (2018), but contains a
 #'   set of fixes.
 #'
-#' **Predict cluster memberships**
+#' ## Predict Cluster Memberships
 #'
 #' `predict()` requires an extracted DBSCAN clustering with `extractDBSCAN()` and then
 #' uses predict for `dbscan()`.
@@ -82,8 +82,10 @@
 #' @param eps upper limit of the size of the epsilon neighborhood. Limiting the
 #' neighborhood size improves performance and has no or very little impact on
 #' the ordering as long as it is not set too low. If not specified, the largest
-#' minPts-distance in the data set is used which gives the same result as
-#' infinity.
+#' kNN distance using `minPts` in the data set is used. If dashed
+#' lines show up in the reachability plot, then you need to increase `eps`.
+#' You can set it to `Inf`, but this will degrade performance and is only
+#' recommended for very small data sets.
 #' @param minPts the parameter is used to identify dense neighborhoods and the
 #' reachability distance is calculated as the distance to the minPts nearest
 #' neighbor. Controls the smoothness of the reachability distribution. Default
@@ -191,6 +193,7 @@
 #' plot(res)
 #' @export
 optics <- function(x, eps = NULL, minPts = 5, ...) {
+
   ### find eps from minPts
   eps <- eps %||% max(kNNdist(x, k =  minPts))
 

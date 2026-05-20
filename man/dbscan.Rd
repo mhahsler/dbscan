@@ -62,8 +62,7 @@ The
 implementation is significantly faster and can work with larger data sets
 than \code{\link[fpc:dbscan]{fpc::dbscan()}} in \pkg{fpc}. Use \code{dbscan::dbscan()} (with specifying the package) to
 call this implementation when you also load package \pkg{fpc}.
-
-\strong{The algorithm}
+\subsection{The algorithm}{
 
 This implementation of DBSCAN follows the original
 algorithm as described by Ester et al (1996). DBSCAN performs the following steps:
@@ -87,8 +86,9 @@ density threshold).
 Border points are arbitrarily assigned to clusters in the original
 algorithm. DBSCAN* (see Campello et al 2013) treats all border points as
 noise points. This is implemented with \code{borderPoints = FALSE}.
+}
 
-\strong{Specifying the data}
+\subsection{Specifying the data}{
 
 If \code{x} is a matrix or a data.frame, then fast fixed-radius nearest
 neighbor computation using a kd-tree is performed using Euclidean distance.
@@ -102,8 +102,9 @@ A precomputed frNN object can be supplied as \code{x}. In this case
 \code{eps} does not need to be specified. This option us useful for large
 data sets, where a sparse distance matrix is available. See
 \code{\link[=frNN]{frNN()}} how to create frNN objects.
+}
 
-\strong{Setting parameters for DBSCAN}
+\subsection{Setting parameters for DBSCAN}{
 
 The parameters \code{minPts} and \code{eps} define the minimum density required
 in the area around core points which form the backbone of clusters.
@@ -131,8 +132,9 @@ sorts all data points by their k-nearest neighbor distance. A sudden
 increase of the kNN distance (a knee) indicates that the points to the right
 are most likely outliers. Choose \code{eps} for DBSCAN where the knee is.
 }
+}
 
-\strong{Predict cluster memberships}
+\subsection{Predict cluster memberships}{
 
 \code{\link[=predict]{predict()}} can be used to predict cluster memberships for new data
 points. A point is considered a member of a cluster if it is within the eps
@@ -145,6 +147,7 @@ then the neighborhood calculation will not be correct and only approximated by E
 distances. If the data contain factor columns (e.g., using Gower's distance), then
 the factors in \code{data} and \code{query} first need to be converted to numeric to use the
 Euclidean approximation.
+}
 }
 \examples{
 ## Example 1: use dbscan on the iris data set

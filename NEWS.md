@@ -1,3 +1,8 @@
+# dbscan 1.2.4-1 (2026-xx-xx)
+
+## Changes
+* Improvement of some mman pages.
+
 # dbscan 1.2.4 (2025-12-18)
 
 ## Bugfixes

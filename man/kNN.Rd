@@ -70,11 +70,13 @@ This function uses a kd-tree to find all k nearest neighbors in a data
 matrix (including distances) fast.
 }
 \details{
-\strong{Ties:} If the kth and the (k+1)th nearest neighbor are tied, then the
+Handling of ties and self-matches
+\itemize{
+\item \strong{Ties:} If the kth and the (k+1)th nearest neighbor are tied, then the
 neighbor found first is returned and the other one is ignored.
-
-\strong{Self-matches:} If no query is specified, then self-matches are
+\item \strong{Self-matches:} If no query is specified, then self-matches are
 removed.
+}
 
 Details on the search parameters:
 \itemize{

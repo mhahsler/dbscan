@@ -27,13 +27,12 @@
 #' This implementation of OPTICS implements the original
 #' algorithm as described by Ankerst et al (1999). OPTICS is an ordering
 #' algorithm with methods to extract a clustering from the ordering.
-#' While using similar concepts as DBSCAN, for OPTICS `eps`
-#' is only an upper limit for the neighborhood size used to reduce
-#' computational complexity. Note that `minPts` in OPTICS has a different
-#' effect then in DBSCAN. It is used to define dense neighborhoods, but since
-#' `eps` is typically set rather high, this does not effect the ordering
-#' much. However, it is also used to calculate the reachability distance and
-#' larger values will make the reachability distance plot smoother.
+#' While using similar concepts as DBSCAN, `minPts` in OPTICS has a different
+#' effect then in DBSCAN. Since it is also used to calculate the reachability
+#' distance, larger values will make the reachability distance plot smoother.
+#' The parameter `eps` is optional and defaults to `Inf`. It only represents a
+#' an upper limit for the neighborhood size used to reduce
+#' computational complexity which is helpful for large data sets.
 #'
 #' OPTICS linearly orders the data points such that points which are spatially
 #' closest become neighbors in the ordering. The closest analog to this
@@ -79,13 +78,10 @@
 #' @family clustering functions
 #'
 #' @param x a data matrix or a [dist] object.
-#' @param eps upper limit of the size of the epsilon neighborhood. Limiting the
-#' neighborhood size improves performance and has no or very little impact on
-#' the ordering as long as it is not set too low. If not specified, the largest
-#' kNN distance using `minPts` in the data set is used. If dashed
-#' lines show up in the reachability plot, then you need to increase `eps`.
-#' You can set it to `Inf`, but this will degrade performance and is only
-#' recommended for very small data sets.
+#' @param eps OPTICS uses a maximum epsilon neighborhood size of `Inf`.
+#' The upper limit of the size can be limited to improves performance. If set
+#' too low then many reachability values will erroneously become `Inf`
+#' shown as dashed lines in the reachability plot. `eps` should be increased.
 #' @param minPts the parameter is used to identify dense neighborhoods and the
 #' reachability distance is calculated as the distance to the minPts nearest
 #' neighbor. Controls the smoothness of the reachability distribution. Default
@@ -192,7 +188,7 @@
 #' res <- optics(d, minPts = 10)
 #' plot(res)
 #' @export
-optics <- function(x, eps = NULL, minPts = 5, ...) {
+optics <- function(x, eps = Inf, minPts = 5, ...) {
 
   ### find eps from minPts
   eps <- eps %||% max(kNNdist(x, k =  minPts))

@@ -12,7 +12,7 @@
 \alias{predict.optics}
 \title{Ordering Points to Identify the Clustering Structure (OPTICS)}
 \usage{
-optics(x, eps = NULL, minPts = 5, ...)
+optics(x, eps = Inf, minPts = 5, ...)
 
 \method{print}{optics}(x, ...)
 
@@ -31,13 +31,10 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 \arguments{
 \item{x}{a data matrix or a \link{dist} object.}
 
-\item{eps}{upper limit of the size of the epsilon neighborhood. Limiting the
-neighborhood size improves performance and has no or very little impact on
-the ordering as long as it is not set too low. If not specified, the largest
-kNN distance using \code{minPts} in the data set is used. If dashed
-lines show up in the reachability plot, then you need to increase \code{eps}.
-You can set it to \code{Inf}, but this will degrade performance and is only
-recommended for very small data sets.}
+\item{eps}{OPTICS uses a maximum epsilon neighborhood size of \code{Inf}.
+The upper limit of the size can be limited to improves performance. If set
+too low then many reachability values will erroneously become \code{Inf}
+shown as dashed lines in the reachability plot. \code{eps} should be increased.}
 
 \item{minPts}{the parameter is used to identify dense neighborhoods and the
 reachability distance is calculated as the distance to the minPts nearest
@@ -99,13 +96,12 @@ structure) point ordering algorithm using a kd-tree.
 This implementation of OPTICS implements the original
 algorithm as described by Ankerst et al (1999). OPTICS is an ordering
 algorithm with methods to extract a clustering from the ordering.
-While using similar concepts as DBSCAN, for OPTICS \code{eps}
-is only an upper limit for the neighborhood size used to reduce
-computational complexity. Note that \code{minPts} in OPTICS has a different
-effect then in DBSCAN. It is used to define dense neighborhoods, but since
-\code{eps} is typically set rather high, this does not effect the ordering
-much. However, it is also used to calculate the reachability distance and
-larger values will make the reachability distance plot smoother.
+While using similar concepts as DBSCAN, \code{minPts} in OPTICS has a different
+effect then in DBSCAN. Since it is also used to calculate the reachability
+distance, larger values will make the reachability distance plot smoother.
+The parameter \code{eps} is optional and defaults to \code{Inf}. It only represents a
+an upper limit for the neighborhood size used to reduce
+computational complexity which is helpful for large data sets.
 
 OPTICS linearly orders the data points such that points which are spatially
 closest become neighbors in the ordering. The closest analog to this

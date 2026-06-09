@@ -1,4 +1,4 @@
-# dbscan 1.2.4-1 (2026-xx-xx)
+# dbscan 1.2.5 (2026-06-08)
 
 ## Changes
 * OPTICS defaults now to eps = Inf. 

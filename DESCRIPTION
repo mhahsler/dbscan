@@ -1,8 +1,8 @@
 Package: dbscan
 Title: Density-Based Spatial Clustering of Applications with Noise
     (DBSCAN) and Related Algorithms
-Version: 1.2.5
-Date: 2026-06-08
+Version: 1.2.5-1
+Date: 2026-xx-xx
 Authors@R: c(
     person("Michael", "Hahsler", email = "mhahsler@lyle.smu.edu", 
            role = c("aut", "cre", "cph"),
@@ -52,4 +52,4 @@ Copyright: ANN library is copyright by University of Maryland, Sunil Arya
     Matthew Piekenbrock.
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0

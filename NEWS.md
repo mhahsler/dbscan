@@ -1,3 +1,13 @@
+# dbscan 1.2.5-1 (2026-xx-xx)
+
+## Changes
+* Fixed many Typos (by m-muecke)
+
+## Bugfixes
+* kNN preserve $dist when reducing k on an sNN object (by m-muecke)
+* mst: avoid out-of-bounds write for the MST root node
+* Optics: assign noise labels as integers when extractXi finds no clusters (by m-muecke) 
+
 # dbscan 1.2.5 (2026-06-08)
 
 ## Changes

@@ -57,9 +57,11 @@ Rcpp::NumericMatrix mst(const NumericVector x_dist, const R_xlen_t n) {
     next_weight = INFINITY;
 
     visited[node] = true;
-    mst(node-1, 1) = parent[node] +1;
-    mst(node-1, 0) = node + 1;
-    mst(node-1, 2) = weight[node];
+    if (node > 0) {
+      mst(node-1, 1) = parent[node] +1;
+      mst(node-1, 0) = node + 1;
+      mst(node-1, 2) = weight[node];
+    }
 
     for (int i = 1; i < n; i++) { // 0 is always the first node
       if (visited[i] || node == i) continue;

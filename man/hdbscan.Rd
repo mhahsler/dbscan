@@ -70,7 +70,7 @@ clusters.}
 
 \item{ylab}{the label for the y axis.}
 
-\item{leaflab}{a string specifying how leaves are labeled (see \code{\link[stats:dendrogram]{stats::plot.dendrogram()}}).}
+\item{leaflab}{a string specifying how leaves are labeled (see \code{\link[stats:plot.dendrogram]{stats::plot.dendrogram()}}).}
 
 \item{coredist}{numeric vector with precomputed core distances (optional).}
 
@@ -235,13 +235,13 @@ and Integration for Intelligent Systems (MFI), pp. 223-228.
 \doi{10.1109/MFI49285.2020.9235263}
 }
 \seealso{
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{extractFOSC}()},
-\code{\link{jpclust}()},
-\code{\link{ncluster}()},
-\code{\link{optics}()},
-\code{\link{sNNclust}()}
+Other clustering functions:
+\code{\link[=dbscan]{dbscan()}},
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=jpclust]{jpclust()}},
+\code{\link[=ncluster]{ncluster()}},
+\code{\link[=optics]{optics()}},
+\code{\link[=sNNclust]{sNNclust()}}
 }
 \author{
 Matt Piekenbrock

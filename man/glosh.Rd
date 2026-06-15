@@ -87,10 +87,10 @@ and outlier detection. \emph{ACM Transactions on Knowledge Discovery from Data
 \doi{10.1145/2733381}
 }
 \seealso{
-Other Outlier Detection Functions: 
-\code{\link{kNNdist}()},
-\code{\link{lof}()},
-\code{\link{pointdensity}()}
+Other Outlier Detection Functions:
+\code{\link[=kNNdist]{kNNdist()}},
+\code{\link[=lof]{lof()}},
+\code{\link[=pointdensity]{pointdensity()}}
 }
 \author{
 Matt Piekenbrock

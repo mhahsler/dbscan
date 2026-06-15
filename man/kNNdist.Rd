@@ -63,17 +63,17 @@ pairs(iris, col = cl$cluster + 1L)
 ## Note: black points are noise points
 }
 \seealso{
-Other Outlier Detection Functions: 
-\code{\link{glosh}()},
-\code{\link{lof}()},
-\code{\link{pointdensity}()}
+Other Outlier Detection Functions:
+\code{\link[=glosh]{glosh()}},
+\code{\link[=lof]{lof()}},
+\code{\link[=pointdensity]{pointdensity()}}
 
-Other NN functions: 
+Other NN functions:
 \code{\link{NN}},
-\code{\link{comps}()},
-\code{\link{frNN}()},
-\code{\link{kNN}()},
-\code{\link{sNN}()}
+\code{\link[=comps]{comps()}},
+\code{\link[=frNN]{frNN()}},
+\code{\link[=kNN]{kNN()}},
+\code{\link[=sNN]{sNN()}}
 }
 \author{
 Michael Hahsler

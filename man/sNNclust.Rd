@@ -77,13 +77,13 @@ of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data,
 \doi{10.1137/1.9781611972733.5}
 }
 \seealso{
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{extractFOSC}()},
-\code{\link{hdbscan}()},
-\code{\link{jpclust}()},
-\code{\link{ncluster}()},
-\code{\link{optics}()}
+Other clustering functions:
+\code{\link[=dbscan]{dbscan()}},
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=jpclust]{jpclust()}},
+\code{\link[=ncluster]{ncluster()}},
+\code{\link[=optics]{optics()}}
 }
 \author{
 Michael Hahsler

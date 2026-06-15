@@ -43,12 +43,12 @@ nnoise(cl)
 nobs(res)
 }
 \seealso{
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{extractFOSC}()},
-\code{\link{hdbscan}()},
-\code{\link{jpclust}()},
-\code{\link{optics}()},
-\code{\link{sNNclust}()}
+Other clustering functions:
+\code{\link[=dbscan]{dbscan()}},
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=jpclust]{jpclust()}},
+\code{\link[=optics]{optics()}},
+\code{\link[=sNNclust]{sNNclust()}}
 }
 \concept{clustering functions}

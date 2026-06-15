@@ -73,12 +73,12 @@ components <- comps(snn)
 plot(snn, data = x, col = components)
 }
 \seealso{
-Other NN functions: 
+Other NN functions:
 \code{\link{NN}},
-\code{\link{frNN}()},
-\code{\link{kNN}()},
-\code{\link{kNNdist}()},
-\code{\link{sNN}()}
+\code{\link[=frNN]{frNN()}},
+\code{\link[=kNN]{kNN()}},
+\code{\link[=kNNdist]{kNNdist()}},
+\code{\link[=sNN]{sNN()}}
 }
 \author{
 Michael Hahsler

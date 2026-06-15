@@ -217,13 +217,13 @@ pp. 318-329.
 \seealso{
 Density \link{reachability}.
 
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{extractFOSC}()},
-\code{\link{hdbscan}()},
-\code{\link{jpclust}()},
-\code{\link{ncluster}()},
-\code{\link{sNNclust}()}
+Other clustering functions:
+\code{\link[=dbscan]{dbscan()}},
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=jpclust]{jpclust()}},
+\code{\link[=ncluster]{ncluster()}},
+\code{\link[=sNNclust]{sNNclust()}}
 }
 \author{
 Michael Hahsler and Matthew Piekenbrock

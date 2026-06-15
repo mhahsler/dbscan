@@ -77,10 +77,10 @@ Management of Data,} pages 93-104.
 \doi{10.1145/335191.335388}
 }
 \seealso{
-Other Outlier Detection Functions: 
-\code{\link{glosh}()},
-\code{\link{kNNdist}()},
-\code{\link{pointdensity}()}
+Other Outlier Detection Functions:
+\code{\link[=glosh]{glosh()}},
+\code{\link[=kNNdist]{kNNdist()}},
+\code{\link[=pointdensity]{pointdensity()}}
 }
 \author{
 Michael Hahsler

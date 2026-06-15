@@ -123,12 +123,12 @@ Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput.}
 \doi{10.1109/T-C.1973.223640}
 }
 \seealso{
-Other NN functions: 
+Other NN functions:
 \code{\link{NN}},
-\code{\link{comps}()},
-\code{\link{frNN}()},
-\code{\link{kNN}()},
-\code{\link{kNNdist}()}
+\code{\link[=comps]{comps()}},
+\code{\link[=frNN]{frNN()}},
+\code{\link[=kNN]{kNN()}},
+\code{\link[=kNNdist]{kNNdist()}}
 }
 \author{
 Michael Hahsler

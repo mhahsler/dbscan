@@ -123,12 +123,12 @@ Approximate Nearest Neighbor Searching,
 \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
-Other NN functions: 
+Other NN functions:
 \code{\link{NN}},
-\code{\link{comps}()},
-\code{\link{kNN}()},
-\code{\link{kNNdist}()},
-\code{\link{sNN}()}
+\code{\link[=comps]{comps()}},
+\code{\link[=kNN]{kNN()}},
+\code{\link[=kNNdist]{kNNdist()}},
+\code{\link[=sNN]{sNN()}}
 }
 \author{
 Michael Hahsler

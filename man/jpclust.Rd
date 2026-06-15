@@ -79,13 +79,13 @@ Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput.
 \doi{10.1109/T-C.1973.223640}
 }
 \seealso{
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{extractFOSC}()},
-\code{\link{hdbscan}()},
-\code{\link{ncluster}()},
-\code{\link{optics}()},
-\code{\link{sNNclust}()}
+Other clustering functions:
+\code{\link[=dbscan]{dbscan()}},
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=ncluster]{ncluster()}},
+\code{\link[=optics]{optics()}},
+\code{\link[=sNNclust]{sNNclust()}}
 }
 \author{
 Michael Hahsler

@@ -260,13 +260,13 @@ Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications.
 \doi{10.1023/A:1009745219419}
 }
 \seealso{
-Other clustering functions: 
-\code{\link{extractFOSC}()},
-\code{\link{hdbscan}()},
-\code{\link{jpclust}()},
-\code{\link{ncluster}()},
-\code{\link{optics}()},
-\code{\link{sNNclust}()}
+Other clustering functions:
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=jpclust]{jpclust()}},
+\code{\link[=ncluster]{ncluster()}},
+\code{\link[=optics]{optics()}},
+\code{\link[=sNNclust]{sNNclust()}}
 }
 \author{
 Michael Hahsler

@@ -94,10 +94,10 @@ New York, NY, USA.
 \seealso{
 \code{\link[=frNN]{frNN()}}, \code{\link[stats:density]{stats::density()}}.
 
-Other Outlier Detection Functions: 
-\code{\link{glosh}()},
-\code{\link{kNNdist}()},
-\code{\link{lof}()}
+Other Outlier Detection Functions:
+\code{\link[=glosh]{glosh()}},
+\code{\link[=kNNdist]{kNNdist()}},
+\code{\link[=lof]{lof()}}
 }
 \author{
 Michael Hahsler

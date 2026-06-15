@@ -9,7 +9,7 @@ header-includes: \usepackage{animation}
 output: html_document
 ---
 The dbscan package [6] includes a fast implementation of Hierarchical DBSCAN (HDBSCAN) and its related algorithm(s) for the 
-R platform. This vignette introduces how to interface with these features. To understand how HDBSCAN works, we refer to an excellent Python Notebook resource that goes over the basic concepts of the algorithm (see [ the SciKit-learn docs](http://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)). For the sake of simplicity, consider the same sample 
+R platform. This vignette introduces how to interface with these features. To understand how HDBSCAN works, we refer to an excellent Python Notebook resource that goes over the basic concepts of the algorithm (see [ the SciKit-learn docs](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)). For the sake of simplicity, consider the same sample 
 dataset from the notebook:
 ```{r}
 library("dbscan")

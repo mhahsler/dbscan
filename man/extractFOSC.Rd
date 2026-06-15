@@ -186,13 +186,13 @@ Discovery} 27(3): 344-371.
 \seealso{
 \code{\link[=hclust]{hclust()}}, \code{\link[=hdbscan]{hdbscan()}}, \code{\link[stats:cutree]{stats::cutree()}}
 
-Other clustering functions: 
-\code{\link{dbscan}()},
-\code{\link{hdbscan}()},
-\code{\link{jpclust}()},
-\code{\link{ncluster}()},
-\code{\link{optics}()},
-\code{\link{sNNclust}()}
+Other clustering functions:
+\code{\link[=dbscan]{dbscan()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=jpclust]{jpclust()}},
+\code{\link[=ncluster]{ncluster()}},
+\code{\link[=optics]{optics()}},
+\code{\link[=sNNclust]{sNNclust()}}
 }
 \author{
 Matt Piekenbrock

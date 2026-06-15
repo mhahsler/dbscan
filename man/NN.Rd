@@ -70,12 +70,12 @@ plot(x, col = cl)
 }
 }
 \seealso{
-Other NN functions: 
-\code{\link{comps}()},
-\code{\link{frNN}()},
-\code{\link{kNN}()},
-\code{\link{kNNdist}()},
-\code{\link{sNN}()}
+Other NN functions:
+\code{\link[=comps]{comps()}},
+\code{\link[=frNN]{frNN()}},
+\code{\link[=kNN]{kNN()}},
+\code{\link[=kNNdist]{kNNdist()}},
+\code{\link[=sNN]{sNN()}}
 }
 \author{
 Michael Hahsler

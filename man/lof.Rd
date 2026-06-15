@@ -18,7 +18,7 @@ Note: \code{sort} cannot be specified here since \code{lof()}
 uses always \code{sort = TRUE}.}
 }
 \value{
-A numeric vector of length \code{ncol(x)} containing LOF values for
+A numeric vector of length \code{nrow(x)} containing LOF values for
 all data points.
 }
 \description{
@@ -26,7 +26,7 @@ Calculate the Local Outlier Factor (LOF) score for each data point using a
 kd-tree to speed up kNN search.
 }
 \details{
-LOF compares the local readability density (lrd) of an point to the lrd of
+LOF compares the local reachability density (lrd) of a point to the lrd of
 its neighbors. A LOF score of approximately 1 indicates that the lrd around
 the point is comparable to the lrd of its neighbors and that the point is
 not an outlier. Points that have a substantially lower lrd than their
@@ -61,7 +61,7 @@ lof <- lof(x, minPts = 3)
 summary(lof)
 hist(lof, breaks = 10, main = "LOF (minPts = 3)")
 
-### plot sorted lof. Looks like outliers start arounf a LOF of 2.
+### plot sorted lof. Looks like outliers start around a LOF of 2.
 plot(sort(lof), type = "l",  main = "LOF (minPts = 3)",
   xlab = "Points sorted by LOF", ylab = "LOF")
 

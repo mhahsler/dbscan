@@ -733,7 +733,7 @@ NumericVector fosc(List cl_tree, std::string cid, std::list<int>& sc, List cl_hi
       // If flag passed, prunes leaves with insignificant stability scores
       // this can happen in cases where one leaf has a stability score significantly greater
       // than both its siblings and its parent (or other ancestors), causing sibling branches
-      // to be considered as clusters even though they may nto be significantly more stable than their parent
+      // to be considered as clusters even though they may not be significantly more stable than their parent
       if (all(stability_scores < old_stability_score).is_false()){
         for (int i = 0, clen = child_ids.length(); i < clen; ++i){
           if (stability_scores.at(i) < old_stability_score){

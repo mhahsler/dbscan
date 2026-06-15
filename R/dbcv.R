@@ -30,7 +30,7 @@
 #' a minimal spanning tree for the internal points of the cluster using the mutual
 #' reachability distance based on the all-points-core-distance. Internal points
 #' are connected to more than one other point in the cluster. Since clusters of
-#' a size less then 3 cannot have internal points, they are ignored (considered
+#' a size less than 3 cannot have internal points, they are ignored (considered
 #' noise) in this implementation.
 #'
 #' The density separation of a pair of clusters (DSPC)
@@ -263,7 +263,7 @@ getClusterIdList <- function(cl) {
   ## In DBCV, singletons are ambiguously defined. However, they cannot be
   ## considered valid clusters, for reasons listed in section 4 of the
   ## original paper.
-  ## Clusters with less then 3 points cannot have internal nodes, so we need to
+  ## Clusters with less than 3 points cannot have internal nodes, so we need to
   ## ignore them as well.
   ## To ensure coverage, they are assigned into the noise category.
   cl_freq <- table(cl)

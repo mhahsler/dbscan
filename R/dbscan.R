@@ -61,7 +61,7 @@
 #' You may run into memory issues since distance matrices are large.
 #'
 #' A precomputed frNN object can be supplied as `x`. In this case
-#' `eps` does not need to be specified. This option us useful for large
+#' `eps` does not need to be specified. This option is useful for large
 #' data sets, where a sparse distance matrix is available. See
 #' [frNN()] how to create frNN objects.
 #'
@@ -281,7 +281,7 @@ dbscan <-
         toString(names(extra)[is.na(m)]))
     names(extra) <- args[m]
 
-    # fpc compartability
+    # fpc compatibility
     if (!is.null(extra$MinPts)) {
       warning("converting argument MinPts (fpc) to minPts (dbscan)!")
       minPts <- extra$MinPts

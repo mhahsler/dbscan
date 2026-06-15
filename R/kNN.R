@@ -242,7 +242,7 @@ kNN <-
 
   # check that dist objects have diag = FALSE, upper = FALSE
   if (attr(x, "Diag") || attr(x, "Upper"))
-    stop("x needs to be a dist object with attributes Diag and Upper set to FALSE. Use as.dist(x, diag = FALSE, upper = FALSE) fist.")
+    stop("x needs to be a dist object with attributes Diag and Upper set to FALSE. Use as.dist(x, diag = FALSE, upper = FALSE) first.")
   }
 
 dist_to_kNN <- function(x, k) {

@@ -127,8 +127,8 @@ sNN <- function(x,
         stop("kNN object does not contain enough neighbors!")
       if (!x$sort)
         x <- sort.kNN(x)
-      x$id <- x$id[, 1:k]
-      x$dist <- x$dist[, 1:k]
+      x$id <- x$id[, 1:k, drop = FALSE]
+      x$dist <- x$dist[, 1:k, drop = FALSE]
       x$k <- k
     }
 

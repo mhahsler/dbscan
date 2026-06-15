@@ -136,7 +136,7 @@ kNN <-
       if (!is.null(x$dist))
         x$dist <- x$dist[, 1:k]
       if (!is.null(x$shared))
-        x$dist <- x$shared[, 1:k]
+        x$shared <- x$shared[, 1:k]
       x$k <- k
       return(x)
     }

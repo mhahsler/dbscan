@@ -156,7 +156,7 @@ hullplot <- function(x,
       clusters_xi[order(-(clusters_xi$end - clusters_xi$start)), ] # Order by size (descending)
     ci_order <- clusters_xi$cluster_id
   } else {
-    ci_order <- 1:max(cl)
+    ci_order <- seq_len(max(cl))
   }
 
   for (i in seq_along(ci_order)) {

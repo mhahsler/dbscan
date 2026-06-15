@@ -132,11 +132,11 @@ kNN <-
         stop("kNN in x has not enough nearest neighbors.")
       if (!x$sort)
         x <- sort(x)
-      x$id <- x$id[, 1:k]
+      x$id <- x$id[, 1:k, drop = FALSE]
       if (!is.null(x$dist))
-        x$dist <- x$dist[, 1:k]
+        x$dist <- x$dist[, 1:k, drop = FALSE]
       if (!is.null(x$shared))
-        x$shared <- x$shared[, 1:k]
+        x$shared <- x$shared[, 1:k, drop = FALSE]
       x$k <- k
       return(x)
     }

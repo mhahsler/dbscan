@@ -99,7 +99,7 @@ Any precomputed distance matrix (dist object) can be specified as \code{x}.
 You may run into memory issues since distance matrices are large.
 
 A precomputed frNN object can be supplied as \code{x}. In this case
-\code{eps} does not need to be specified. This option us useful for large
+\code{eps} does not need to be specified. This option is useful for large
 data sets, where a sparse distance matrix is available. See
 \code{\link[=frNN]{frNN()}} how to create frNN objects.
 }

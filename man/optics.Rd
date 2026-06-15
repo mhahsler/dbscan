@@ -32,7 +32,7 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 \item{x}{a data matrix or a \link{dist} object.}
 
 \item{eps}{OPTICS uses a maximum epsilon neighborhood size of \code{Inf}.
-The upper limit of the size can be limited to improves performance. If set
+The upper limit of the size can be limited to improve performance. If set
 too low then many reachability values will erroneously become \code{Inf}
 shown as dashed lines in the reachability plot. \code{eps} should be increased.}
 
@@ -81,7 +81,7 @@ components are available:
 
 For \code{extractXi()}, in addition the following components
 are available:
-\item{xi}{ Steepness threshold\code{x}. }
+\item{xi}{ Steepness threshold \code{xi}. }
 \item{cluster }{ assigned cluster labels in the order of the data points in \code{x}.}
 \item{clusters_xi }{ data.frame containing the start and end of each cluster
 found in the OPTICS ordering. }
@@ -97,9 +97,9 @@ This implementation of OPTICS implements the original
 algorithm as described by Ankerst et al (1999). OPTICS is an ordering
 algorithm with methods to extract a clustering from the ordering.
 While using similar concepts as DBSCAN, \code{minPts} in OPTICS has a different
-effect then in DBSCAN. Since it is also used to calculate the reachability
+effect than in DBSCAN. Since it is also used to calculate the reachability
 distance, larger values will make the reachability distance plot smoother.
-The parameter \code{eps} is optional and defaults to \code{Inf}. It only represents a
+The parameter \code{eps} is optional and defaults to \code{Inf}. It only represents
 an upper limit for the neighborhood size used to reduce
 computational complexity which is helpful for large data sets.
 

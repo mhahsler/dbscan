@@ -121,7 +121,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     // find core distance
     if(N.second.size() >= (size_t) minPts) {
       ds = N.second;
-      std::sort(ds.begin(), ds.end()); // sort inceasing
+      std::sort(ds.begin(), ds.end()); // sort increasing
       coredist[p] = ds[minPts-1];
     }
     int tmp_p = NA_INTEGER;
@@ -145,7 +145,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       for (std::vector<int>::iterator it = seeds.begin();
         it!=seeds.end(); ++it) {
         // Note: The second part of the if statement ensures that ties are
-        // always broken consistenty (higher ID wins to produce the same
+        // always broken consistently (higher ID wins to produce the same
         // results as the elki implementation)!
         if (reachdist[*it] < reachdist[*q_it] ||
           (reachdist[*it] == reachdist[*q_it] && *q_it < *it)) q_it = it;

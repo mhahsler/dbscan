@@ -17,20 +17,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#' Coersions to Dendrogram
+#' Coercions to Dendrogram
 #'
 #' Provides a new generic function to coerce objects to dendrograms with
 #' [stats::as.dendrogram()] as the default. Additional methods for
 #' [hclust], [hdbscan] and [reachability] objects are provided.
 #'
-#' Coersion methods for
+#' Coercion methods for
 #' [hclust], [hdbscan] and [reachability] objects to [dendrogram] are provided.
 #'
 #' The coercion from `hclust` is a faster C++ reimplementation of the coercion in
 #' package `stats`. The original implementation can be called
 #' using [stats::as.dendrogram()].
 #'
-#' The coersion from [hdbscan] builds the non-simplified HDBSCAN hierarchy as a
+#' The coercion from [hdbscan] builds the non-simplified HDBSCAN hierarchy as a
 #' dendrogram object.
 #'
 #' @name dendrogram

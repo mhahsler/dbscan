@@ -134,7 +134,7 @@ citation("dbscan")
 
 \section{Density-based clustering}\label{sec:dbc}
 Density-based clustering is now a well-studied field. Conceptually, the idea behind density-based clustering is simple: given a set of data points, define a structure that accurately reflects the underlying density~\citep{sander2011density}. An important distinction between density-based clustering and alternative approaches to cluster analysis, such as the use of \emph{(Gaussian) mixture models}~\citep[see][]{jain1999review}, is that the latter represents a \emph{parametric} approach in which the observed data are assumed to have been produced by mixture of either Gaussian or other parametric families of distributions.
-While certainly useful in many applications, parametric approaches naturally assume clusters will exhibit some type convex (generally hyper-spherical or hyper-elliptical) shape. Other approaches, such as $k$-means clustering (where the $k$ parameter signifies the user-specified number of clusters to find), share this common theme of `minimum variance', where the underlying assumption is made that ideal clusters are found by minimizing some measure of intra-cluster variance (often referred to as cluster cohesion) and maximizing the inter-cluster variance (cluster separation)~\citep{arbelaitz2013extensive}. Conversely, the label density-based clustering is used for methods which do not assume parametric distributions, are capable of finding arbitrarily-shaped clusters, handle varying amounts of noise, and require no prior knowledge regarding how to set the number of clusters $k$. This methodology is best expressed in the DBSCAN algorithm, which we discuss next.
+While certainly useful in many applications, parametric approaches naturally assume clusters will exhibit some type of convex (generally hyper-spherical or hyper-elliptical) shape. Other approaches, such as $k$-means clustering (where the $k$ parameter signifies the user-specified number of clusters to find), share this common theme of `minimum variance', where the underlying assumption is made that ideal clusters are found by minimizing some measure of intra-cluster variance (often referred to as cluster cohesion) and maximizing the inter-cluster variance (cluster separation)~\citep{arbelaitz2013extensive}. Conversely, the label density-based clustering is used for methods which do not assume parametric distributions, are capable of finding arbitrarily-shaped clusters, handle varying amounts of noise, and require no prior knowledge regarding how to set the number of clusters $k$. This methodology is best expressed in the DBSCAN algorithm, which we discuss next.
 
 \subsection{DBSCAN: Density Based Spatial Clustering of Applications with Noise}
 As one of the most cited of the density-based clustering algorithms~\citep{acade96:online}, DBSCAN~\citep{ester1996density} is likely the best known density-based clustering algorithm in the scientific community today. The central idea behind DBSCAN and its extensions and revisions is the notion that points are assigned to the same cluster if they are \emph{density-reachable} from each other. To understand this concept, we will go through the most important definitions used in DBSCAN and related algorithms. The definitions and the presented pseudo code follows the original by \cite{ester1996density}, but are adapted to provide a more consistent presentation with the other algorithms discussed in the paper.
@@ -743,7 +743,7 @@ Figure~\ref{fig:opticsOrder} shows that points in each cluster are
 visited in consecutive order starting with the points in the center (the densest region) and then the points in the surrounding area.
 
 
-As noted in Section~\ref{sec:optics}, OPTICS has two primary cluster extraction methods using the ordered reachability structure it produces. A DBSCAN-type clustering can be extracted using \code{extractDBSCAN()} by specifying the global eps parameter. The reachability plot in figure~\ref{fig:opticsReachPlot} shows four peaks, i.e., points with a high reachability-distance. These points indicate boundaries between clusters four clusters. An \code{eps} threshold that separates the four clusters can be visually determined. In this case we use \code{eps_cl}  of 0.065.
+As noted in Section~\ref{sec:optics}, OPTICS has two primary cluster extraction methods using the ordered reachability structure it produces. A DBSCAN-type clustering can be extracted using \code{extractDBSCAN()} by specifying the global eps parameter. The reachability plot in figure~\ref{fig:opticsReachPlot} shows four peaks, i.e., points with a high reachability-distance. These points indicate boundaries between the four clusters. An \code{eps} threshold that separates the four clusters can be visually determined. In this case we use \code{eps_cl}  of 0.065.
 <<fig=TRUE, include=FALSE, label=extractDBSCANReachPlot2, width=7, height=4>>=
 res <- extractDBSCAN(res, eps_cl = .065)
 plot(res)
@@ -775,7 +775,7 @@ res <- extractXi(res, xi = 0.05)
 res
 @
 
-The $\xi$ method results in a hierarchical clustering structure, and thus points can be members of several nested clusters. Clusters are represented as contiguous ranges in the reachability plot and are available the field \code{clusters_xi}.
+The $\xi$ method results in a hierarchical clustering structure, and thus points can be members of several nested clusters. Clusters are represented as contiguous ranges in the reachability plot and are available in the field \code{clusters_xi}.
 
 <<>>=
 res$clusters_xi
@@ -817,7 +817,7 @@ Figure~\ref{fig:extractXiReachPlot} shows the reachability plot with clusters re
 %summary(lof)
 %@
 %The distribution of outlier factors can be view simply using the specialized hist function:
-%<<fig=TRUE, include=FALSE, label=LOF_hist, height=4, widht=9>>=
+%<<fig=TRUE, include=FALSE, label=LOF_hist, height=4, width=9>>=
 %hist(lof, breaks=20)
 %@
 %\begin{figure}

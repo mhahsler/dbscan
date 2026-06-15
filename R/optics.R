@@ -620,7 +620,7 @@ extractXi <-
     if (length(SetOfClusters) == 0) {
       warning(paste("No clusters were found with threshold:", xi))
       object$clusters_xi <- NULL
-      object$cluster < rep(0, length(object$cluster))
+      object$cluster <- integer(length(object$order))
       return(invisible(object))
     }
     # Cluster data exists; organize it by starting and ending index, give arbitrary id
@@ -711,7 +711,7 @@ extractClusterLabels <- function(cl, order, minimum = FALSE) {
     }
 
   ## Fill in the [cluster] vector with cluster IDs
-  clusters <- rep(0, length(order))
+  clusters <- integer(length(order))
   for (cid in cl$cluster_id) {
     cluster <- cl[cl$cluster_id == cid, ]
     if (minimum) {

@@ -421,7 +421,7 @@ extractDBSCAN <- function(object, eps_cl) {
   cluster <- integer(n)
 
   clusterid <- 0L         ### 0 is noise
-  for (i in 1:n) {
+  for (i in seq_len(n)) {
     if (reachdist[i] > eps_cl) {
       if (coredist[i] <= eps_cl) {
         clusterid <- clusterid + 1L

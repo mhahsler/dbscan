@@ -2,6 +2,7 @@
 
 ## Changes
 * Fixed many Typos (by m-muecke)
+* Finish std::iota migration (bu m-muecke)
 
 ## Bugfixes
 * kNN preserve $dist when reducing k on an sNN object (by m-muecke)

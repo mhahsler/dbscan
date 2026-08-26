@@ -1,4 +1,4 @@
-# dbscan 1.2.5-1 (2026-xx-xx)
+# dbscan 1.2.6 (2026-08-24)
 
 ## Changes
 * Fixed many Typos (by m-muecke)

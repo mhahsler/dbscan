@@ -13,28 +13,35 @@ status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-unive
 
 ## Introduction
 
-This R package ([Hahsler, Piekenbrock, and Doran
-2019](#ref-hahsler2019dbscan)) provides a fast C++ (re)implementation of
-several density-based algorithms with a focus on the DBSCAN family for
-clustering spatial data. The package includes:
+This R package ([Hahsler et al. 2019](#ref-hahsler2019dbscan)) provides
+a fast C++ (re)implementation of several density-based algorithms with a
+focus on the DBSCAN family for clustering spatial data. The package
+includes:
 
 **Clustering**
 
 - **DBSCAN:** Density-based spatial clustering of applications with
-  noise ([Ester et al. 1996](#ref-ester1996density)).
+  noise ([<span class="nocase">Ester et al.</span>
+  1996](#ref-ester1996density)).
+
+- **FOSC:** Framework for optimal selection of clusters for unsupervised
+  and semisupervised clustering of hierarchical cluster trees ([Campello
+  et al. 2013](#ref-campello2013density)).
+
+- **HDBSCAN:** Hierarchical DBSCAN with simplified hierarchy extraction
+  ([Campello et al. 2015](#ref-campello2015hierarchical)).
+
 - **Jarvis-Patrick Clustering**: Clustering using a similarity measure
   based on shared near neighbors ([Jarvis and Patrick
   1973](#ref-jarvis1973)).
-- **SNN Clustering**: Shared nearest neighbor clustering ([Ertöz,
-  Steinbach, and Kumar 2003](#ref-erdoz2003)).
-- **HDBSCAN:** Hierarchical DBSCAN with simplified hierarchy extraction
-  ([Campello et al. 2015](#ref-campello2015hierarchical)).
-- **FOSC:** Framework for optimal selection of clusters for unsupervised
-  and semisupervised clustering of hierarchical cluster tree ([Campello,
-  Moulavi, and Sander 2013](#ref-campello2013density)).
+
 - **OPTICS/OPTICSXi:** Ordering points to identify the clustering
-  structure and cluster extraction methods ([Ankerst et al.
-  1999](#ref-ankerst1999optics)).
+  structure and cluster extraction methods
+
+- **SNN Clustering**: Shared nearest neighbor clustering ([Ertöz et al.
+  2003](#ref-erdoz2003)).
+
+  ([Ankerst et al. 1999](#ref-ankerst1999optics)).
 
 **Outlier Detection**
 
@@ -63,6 +70,7 @@ scikit-learn](https://scikit-learn.org/).
 
 The following R packages use `dbscan`:
 [AnimalSequences](https://CRAN.R-project.org/package=AnimalSequences),
+[autoFlagR](https://CRAN.R-project.org/package=autoFlagR),
 [bioregion](https://CRAN.R-project.org/package=bioregion),
 [clayringsmiletus](https://CRAN.R-project.org/package=clayringsmiletus),
 [CLONETv2](https://CRAN.R-project.org/package=CLONETv2),
@@ -70,22 +78,26 @@ The following R packages use `dbscan`:
 [cordillera](https://CRAN.R-project.org/package=cordillera),
 [CPC](https://CRAN.R-project.org/package=CPC),
 [crosshap](https://CRAN.R-project.org/package=crosshap),
-[crownsegmentr](https://CRAN.R-project.org/package=crownsegmentr),
-[CspStandSegmentation](https://CRAN.R-project.org/package=CspStandSegmentation),
+[cyclicwave](https://CRAN.R-project.org/package=cyclicwave),
 [daltoolbox](https://CRAN.R-project.org/package=daltoolbox),
 [DataSimilarity](https://CRAN.R-project.org/package=DataSimilarity),
 [diceR](https://CRAN.R-project.org/package=diceR),
+[discoCVI](https://CRAN.R-project.org/package=discoCVI),
 [dobin](https://CRAN.R-project.org/package=dobin),
 [doc2vec](https://CRAN.R-project.org/package=doc2vec),
 [dPCP](https://CRAN.R-project.org/package=dPCP),
+[DrData](https://CRAN.R-project.org/package=DrData),
+[EHRtemporalVariability](https://CRAN.R-project.org/package=EHRtemporalVariability),
 [emcAdr](https://CRAN.R-project.org/package=emcAdr),
 [eventstream](https://CRAN.R-project.org/package=eventstream),
 [evprof](https://CRAN.R-project.org/package=evprof),
 [fastml](https://CRAN.R-project.org/package=fastml),
 [FCPS](https://CRAN.R-project.org/package=FCPS),
+[fdacluster](https://CRAN.R-project.org/package=fdacluster),
 [flowcluster](https://CRAN.R-project.org/package=flowcluster),
+[flownet](https://CRAN.R-project.org/package=flownet),
+[FuelDeep3D](https://CRAN.R-project.org/package=FuelDeep3D),
 [funtimes](https://CRAN.R-project.org/package=funtimes),
-[FuzzyDBScan](https://CRAN.R-project.org/package=FuzzyDBScan),
 [HaploVar](https://CRAN.R-project.org/package=HaploVar),
 [immunaut](https://CRAN.R-project.org/package=immunaut),
 [karyotapR](https://CRAN.R-project.org/package=karyotapR),
@@ -94,6 +106,7 @@ The following R packages use `dbscan`:
 [LOMAR](https://CRAN.R-project.org/package=LOMAR),
 [maotai](https://CRAN.R-project.org/package=maotai),
 [MapperAlgo](https://CRAN.R-project.org/package=MapperAlgo),
+[mditools](https://CRAN.R-project.org/package=mditools),
 [metaCluster](https://CRAN.R-project.org/package=metaCluster),
 [metasnf](https://CRAN.R-project.org/package=metasnf),
 [mlr3cluster](https://CRAN.R-project.org/package=mlr3cluster),
@@ -107,24 +120,41 @@ The following R packages use `dbscan`:
 [outlierMBC](https://CRAN.R-project.org/package=outlierMBC),
 [pagoda2](https://CRAN.R-project.org/package=pagoda2),
 [parameters](https://CRAN.R-project.org/package=parameters),
-[ParBayesianOptimization](https://CRAN.R-project.org/package=ParBayesianOptimization),
 [performance](https://CRAN.R-project.org/package=performance),
+[pguIMP](https://CRAN.R-project.org/package=pguIMP),
 [PiC](https://CRAN.R-project.org/package=PiC),
+[quickOutlier](https://CRAN.R-project.org/package=quickOutlier),
+[rarefun](https://CRAN.R-project.org/package=rarefun),
 [rcrisp](https://CRAN.R-project.org/package=rcrisp),
+[Rhobots](https://CRAN.R-project.org/package=Rhobots),
+[riemannianStats](https://CRAN.R-project.org/package=riemannianStats),
+[riskutility](https://CRAN.R-project.org/package=riskutility),
 [rMultiNet](https://CRAN.R-project.org/package=rMultiNet),
+[rtemis](https://CRAN.R-project.org/package=rtemis),
+[SampleCore](https://CRAN.R-project.org/package=SampleCore),
 [seriation](https://CRAN.R-project.org/package=seriation),
 [sfdep](https://CRAN.R-project.org/package=sfdep),
 [sfnetworks](https://CRAN.R-project.org/package=sfnetworks),
 [sharp](https://CRAN.R-project.org/package=sharp),
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
 [snap](https://CRAN.R-project.org/package=snap),
+[spCF](https://CRAN.R-project.org/package=spCF),
 [spdep](https://CRAN.R-project.org/package=spdep),
+[specmine](https://CRAN.R-project.org/package=specmine),
 [spNetwork](https://CRAN.R-project.org/package=spNetwork),
+[squat](https://CRAN.R-project.org/package=squat),
+[ssel](https://CRAN.R-project.org/package=ssel),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
+[stdbscan](https://CRAN.R-project.org/package=stdbscan),
 [stream](https://CRAN.R-project.org/package=stream),
 [SuperCell](https://CRAN.R-project.org/package=SuperCell),
 [synr](https://CRAN.R-project.org/package=synr),
+[tbnb](https://CRAN.R-project.org/package=tbnb),
+[TextAnalysisR](https://CRAN.R-project.org/package=TextAnalysisR),
+[tidyclust](https://CRAN.R-project.org/package=tidyclust),
+[tidylearn](https://CRAN.R-project.org/package=tidylearn),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
+[tlsR](https://CRAN.R-project.org/package=tlsR),
 [VBphenoR](https://CRAN.R-project.org/package=VBphenoR),
 [VIProDesign](https://CRAN.R-project.org/package=VIProDesign),
 [weird](https://CRAN.R-project.org/package=weird)
@@ -177,7 +207,7 @@ x <- as.matrix(iris[, 1:4])
 DBSCAN
 
 ``` r
-db <- dbscan(x, eps = 0.42, minPts = 5)
+db <- dbscan(x, eps = .42, minPts = 5)
 db
 ```
 
@@ -215,7 +245,7 @@ Extract DBSCAN-like clustering from OPTICS and create a reachability
 plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 
 ``` r
-opt <- extractDBSCAN(opt, eps_cl = 0.4)
+opt <- extractDBSCAN(opt, eps_cl = .4)
 plot(opt)
 ```
 
@@ -255,8 +285,7 @@ and `glance()` so they can be easily used with tidyverse, ggplot2 and
 
 ``` r
 library(tidyverse)
-db <- x %>%
-    dbscan(eps = 0.42, minPts = 5)
+db <- x %>% dbscan(eps = .42, minPts = 5)
 ```
 
 Get cluster statistics as a tibble
@@ -276,9 +305,10 @@ tidy(db)
 Visualize the clustering with ggplot2 (use an x for noise points)
 
 ``` r
-augment(db, x) %>%
-    ggplot(aes(x = Petal.Length, y = Petal.Width)) + geom_point(aes(color = .cluster,
-    shape = noise)) + scale_shape_manual(values = c(19, 4))
+augment(db, x) %>% 
+  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
+    geom_point(aes(color = .cluster, shape = noise)) +
+    scale_shape_manual(values=c(19, 4))
 ```
 
 ![](inst/README_files/tidyverse3-1.png)<!-- -->
@@ -350,23 +380,21 @@ original author, Erich Schubert.
 
 ## References
 
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
 <div id="ref-ankerst1999optics" class="csl-entry">
 
 Ankerst, Mihael, Markus M Breunig, Hans-Peter Kriegel, and Jörg Sander.
-1999. “OPTICS: Ordering Points to Identify the Clustering Structure.” In
-*ACM Sigmod Record*, 28:49–60. 2. ACM.
-<https://doi.org/10.1145/304181.304187>.
+1999. “OPTICS: Ordering Points to Identify the Clustering Structure.”
+*ACM Sigmod Record* 28: 49–60. <https://doi.org/10.1145/304181.304187>.
 
 </div>
 
 <div id="ref-breunig2000lof" class="csl-entry">
 
 Breunig, Markus M, Hans-Peter Kriegel, Raymond T Ng, and Jörg Sander.
-2000. “LOF: Identifying Density-Based Local Outliers.” In *ACM Int.
-Conf. On Management of Data*, 29:93–104. 2. ACM.
+2000. “LOF: Identifying Density-Based Local Outliers.” *ACM Int. Conf.
+On Management of Data* 29: 93–104.
 <https://doi.org/10.1145/335191.335388>.
 
 </div>
@@ -374,9 +402,9 @@ Conf. On Management of Data*, 29:93–104. 2. ACM.
 <div id="ref-campello2013density" class="csl-entry">
 
 Campello, Ricardo JGB, Davoud Moulavi, and Jörg Sander. 2013.
-“Density-Based Clustering Based on Hierarchical Density Estimates.” In
+“Density-Based Clustering Based on Hierarchical Density Estimates.”
 *Pacific-Asia Conference on Knowledge Discovery and Data Mining*,
-160–72. Springer. <https://doi.org/10.1007/978-3-642-37456-2_14>.
+160–72. <https://doi.org/10.1007/978-3-642-37456-2_14>.
 
 </div>
 
@@ -395,17 +423,18 @@ Discovery from Data (TKDD)* 10 (1): 5.
 Ertöz, Levent, Michael Steinbach, and Vipin Kumar. 2003. “Finding
 Clusters of Different Sizes, Shapes, and Densities in Noisy, High
 Dimensional Data.” In *Proceedings of the 2003 SIAM International
-Conference on Data Mining (SDM)*, 47–58.
+Conference on Data Mining (SDM)*.
 <https://doi.org/10.1137/1.9781611972733.5>.
 
 </div>
 
 <div id="ref-ester1996density" class="csl-entry">
 
-Ester, Martin, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu, et al. 1996.
-“A Density-Based Algorithm for Discovering Clusters in Large Spatial
-Databases with Noise.” In *Proceedings of 2nd International Conference
-on Knowledge Discovery and Data Mining (KDD-96)*, 226–31.
+<span class="nocase">Ester, Martin, Hans-Peter Kriegel, Jörg Sander,
+Xiaowei Xu, et al.</span> 1996. “A Density-Based Algorithm for
+Discovering Clusters in Large Spatial Databases with Noise.”
+*Proceedings of 2nd International Conference on Knowledge Discovery and
+Data Mining (KDD-96)*, 226–31.
 <https://dl.acm.org/doi/10.5555/3001460.3001507>.
 
 </div>
@@ -433,7 +462,7 @@ Computers* C-22 (11): 1025–34.
 Moulavi, Davoud, Pablo A. Jaskowiak, Ricardo J. G. B. Campello, Arthur
 Zimek, and Jörg Sander. 2014. “Density-Based Clustering Validation.” In
 *Proceedings of the 2014 SIAM International Conference on Data Mining
-(SDM)*, 839–47. <https://doi.org/10.1137/1.9781611973440.96>.
+(SDM)*. <https://doi.org/10.1137/1.9781611973440.96>.
 
 </div>
 

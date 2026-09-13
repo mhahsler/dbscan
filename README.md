@@ -122,6 +122,7 @@ The following R packages use `dbscan`:
 [parameters](https://CRAN.R-project.org/package=parameters),
 [performance](https://CRAN.R-project.org/package=performance),
 [pguIMP](https://CRAN.R-project.org/package=pguIMP),
+[phynotype](https://CRAN.R-project.org/package=phynotype),
 [PiC](https://CRAN.R-project.org/package=PiC),
 [quickOutlier](https://CRAN.R-project.org/package=quickOutlier),
 [rarefun](https://CRAN.R-project.org/package=rarefun),
@@ -145,6 +146,7 @@ The following R packages use `dbscan`:
 [squat](https://CRAN.R-project.org/package=squat),
 [ssel](https://CRAN.R-project.org/package=ssel),
 [ssMRCD](https://CRAN.R-project.org/package=ssMRCD),
+[STATassist](https://CRAN.R-project.org/package=STATassist),
 [stdbscan](https://CRAN.R-project.org/package=stdbscan),
 [stream](https://CRAN.R-project.org/package=stream),
 [SuperCell](https://CRAN.R-project.org/package=SuperCell),
@@ -166,7 +168,7 @@ To cite package ‘dbscan’ in publications use:
 > <doi:10.18637/jss.v091.i01> <https://doi.org/10.18637/jss.v091.i01>.
 
     @Article{,
-      title = {{dbscan}: Fast Density-Based Clustering with {R}},
+      title = {dbscan: Fast Density-Based Clustering with {R}},
       author = {Michael Hahsler and Matthew Piekenbrock and Derek Doran},
       journal = {Journal of Statistical Software},
       year = {2019},

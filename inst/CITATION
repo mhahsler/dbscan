@@ -1,7 +1,7 @@
 citation(auto = meta)
 
 bibentry(bibtype = "Article",
-  title        = "{dbscan}: Fast Density-Based Clustering with {R}",
+  title        = "dbscan: Fast Density-Based Clustering with {R}",
   author       = c(person(given = "Michael",
                           family = "Hahsler",
                           email = "mhahsler@lyle.smu.edu",

@@ -11,7 +11,7 @@ downloads](https://cranlogs.r-pkg.org/badges/dbscan)](https://CRAN.R-project.org
 status](https://mhahsler.r-universe.dev/badges/dbscan)](https://mhahsler.r-universe.dev/dbscan)
 [![StackOverflow](https://img.shields.io/badge/stackoverflow-dbscan%2br-orange.svg)](https://stackoverflow.com/questions/tagged/dbscan%2br)
 
-**Author:** [Michael Hahsler](https://michael.hahsler.net)
+**Maintainer:** [Michael Hahsler](https://michael.hahsler.net)
 
 ## Introduction
 

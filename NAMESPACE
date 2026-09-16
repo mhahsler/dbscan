@@ -79,28 +79,36 @@ export(sNN)
 export(sNNclust)
 export(tidy)
 import(Rcpp)
-importFrom(generics,augment)
-importFrom(generics,glance)
-importFrom(generics,tidy)
-importFrom(grDevices,adjustcolor)
-importFrom(grDevices,chull)
-importFrom(grDevices,palette)
-importFrom(graphics,abline)
-importFrom(graphics,lines)
-importFrom(graphics,matplot)
-importFrom(graphics,par)
-importFrom(graphics,plot)
-importFrom(graphics,points)
-importFrom(graphics,polygon)
-importFrom(graphics,segments)
-importFrom(graphics,text)
-importFrom(stats,as.dendrogram)
-importFrom(stats,dendrapply)
-importFrom(stats,dist)
-importFrom(stats,hclust)
-importFrom(stats,is.leaf)
-importFrom(stats,nobs)
-importFrom(stats,prcomp)
-importFrom(stats,predict)
+importFrom(generics,
+  augment,
+  glance,
+  tidy
+)
+importFrom(grDevices,
+  adjustcolor,
+  chull,
+  palette
+)
+importFrom(graphics,
+  abline,
+  lines,
+  matplot,
+  par,
+  plot,
+  points,
+  polygon,
+  segments,
+  text
+)
+importFrom(stats,
+  as.dendrogram,
+  dendrapply,
+  dist,
+  hclust,
+  is.leaf,
+  nobs,
+  prcomp,
+  predict
+)
 importFrom(utils,tail)
 useDynLib(dbscan, .registration=TRUE)

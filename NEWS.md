@@ -1,3 +1,5 @@
+# dbscan 1.2.6.1 (Unreleased)
+
 # dbscan 1.2.6 (2026-08-24)
 
 ## Changes

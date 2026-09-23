@@ -4,7 +4,7 @@
 // Copyright (c) 2015 Michael Hahsler, Matt Piekenbrock. All Rights Reserved.
 //
 // This software is provided under the provisions of the
-// GNU General Public License (GPL) Version 3
+// GNU General Public License (GPL) Version 3 or later
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 #include <Rcpp.h>
@@ -840,7 +840,6 @@ List extractSemiSupervised(List cl_tree, List constraints, float alpha = 0, bool
   cl_tree.attr("cluster") = getSalientAssignments(cl_tree, cl_hierarchy, sc, n);
   return(cl_tree);
 }
-
 
 
 

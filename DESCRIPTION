@@ -23,7 +23,7 @@ Description: A fast reimplementation of several density-based algorithms
     faster k-nearest neighbor search. An R interface to fast kNN and
     fixed-radius NN search is also provided.  Hahsler, Piekenbrock and
     Doran (2019) <doi:10.18637/jss.v091.i01>.
-License: GPL (>= 2)
+License: GPL (>= 3)
 URL: https://github.com/mhahsler/dbscan
 BugReports: https://github.com/mhahsler/dbscan/issues
 Depends:

@@ -184,10 +184,9 @@ labels
 ```
 
 ## License 
-The dbscan package is licensed under the [GNU General Public License (GPL) Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation (GNU AGPLv3), with permission by the original author, Erich Schubert.  
+The dbscan package is licensed under the [GNU General Public License (GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html). The __OPTICSXi__ R implementation was directly ported from the ELKI framework's Java implementation with permission by the original author, Erich Schubert. This function is redistributed under the stricter [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 
 ## Changes
 * List of changes from [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)
 
 ## References
-

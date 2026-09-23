@@ -4,7 +4,7 @@
 // Copyright (c) 2015 Michael Hahsler, Matt Piekenbrock. All Rights Reserved.
 //
 // This software is provided under the provisions of the
-// GNU General Public License (GPL) Version 3
+// GNU General Public License (GPL) Version 3 or later
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 #include <Rcpp.h>
@@ -210,5 +210,3 @@ List mst_to_dendrogram(const NumericMatrix mst) {
   }
   return(dendrogram.at(insert));
 }
-
-

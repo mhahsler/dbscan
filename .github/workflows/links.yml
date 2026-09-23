@@ -1,0 +1,21 @@
+name: Check Links
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  linkChecker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Check all Markdown, Text, and HTML files
+          # 403 is Forbidden shown for doi.org
+          args: --verbose --no-progress --accept "100..=103, 200..=299, 403" "**/*.md" "**/*.html" "**/*.Rd"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,5 +1,8 @@
 # dbscan 1.2.6.1 (Unreleased)
 
+## Bugfixes
+* hdbscan() and predict() for hdbscan objects now always return integer cluster assignments
+
 # dbscan 1.2.6 (2026-08-24)
 
 ## Changes

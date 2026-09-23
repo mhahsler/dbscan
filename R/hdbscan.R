@@ -252,7 +252,7 @@ hdbscan <- function(x,
 
   ## Match cluster assignments to be incremental, with 0 representing noise
   if (any(cl == 0)) {
-    cluster <- match(cl, c(0, sl)) - 1
+    cluster <- match(cl, c(0, sl)) - 1L
   } else {
     cluster <- match(cl, sl)
   }

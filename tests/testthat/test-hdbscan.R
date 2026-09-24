@@ -11,6 +11,7 @@ test_that("HDBSCAN", {
 
   res <- hdbscan(iris, minPts = 4)
   expect_length(res$cluster, nrow(iris))
+  expect_type(res$cluster, "integer")
 
   ## expected result of table(res$cluster) is:
   expect_identical(table(res$cluster, dnn = NULL),

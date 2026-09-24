@@ -259,8 +259,8 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
       frNN
     )
 
-  ret$minPts <- minPts
-  ret$eps <- eps
+  ret$minPts <- as.integer(minPts)
+  ret$eps <- as.double(eps)
   ret$eps_cl <- NA_real_
   ret$xi <- NA_real_
   class(ret) <- "optics"

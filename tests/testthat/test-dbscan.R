@@ -7,6 +7,7 @@ test_that("dbscan works", {
 
   res <- dbscan(iris, eps = .4, minPts = 4)
 
+  expect_type(res$cluster, "integer")
   expect_length(res$cluster, nrow(iris))
 
   ## expected result of table(res$cluster) is:

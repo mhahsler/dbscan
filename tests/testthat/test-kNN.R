@@ -19,6 +19,7 @@ test_that("kNN", {
   expect_identical(nn$k, k)
   expect_identical(dim(nn$dist), c(nrow(x), k))
   expect_identical(dim(nn$id), c(nrow(x), k))
+  expect_type(nn$id, "integer")
 
   ## check visually
   #plot(x)

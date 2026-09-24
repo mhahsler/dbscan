@@ -39,6 +39,7 @@ test_that("predict", {
   res <- extractDBSCAN(res, eps = .3)
   pr <- predict(res, newdata, data = x)
 
+  expect_type(res$cluster, "integer")
   rbind(true = res$cluster[idx], pred = pr)
   expect_equal(res$cluster[idx], pr)
 

@@ -12,10 +12,12 @@ test_that("OPTICS", {
   res <- optics(x, eps = eps,  minPts = minPts)
 
   expect_length(res$order, nrow(x))
+  expect_type(res$order, "integer")
   expect_length(res$reachdist, nrow(x))
   expect_length(res$coredist, nrow(x))
   expect_identical(res$eps, eps)
-  expect_identical(res$minPts, minPts)
+  expect_identical(res$minPts, as.integer(minPts))
+  expect_type(res$minPts, "integer")
 
   ### compare with distance based version!
   res_d <- optics(dist(x), eps = eps,  minPts = minPts)

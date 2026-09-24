@@ -19,6 +19,7 @@ test_that("sNN", {
   expect_equal(nn$k, k)
   expect_equal(dim(nn$dist), c(nrow(x), k))
   expect_equal(dim(nn$id), c(nrow(x), k))
+  expect_type(nn$id, "integer")
 
   ## check visually
   #plot(x)

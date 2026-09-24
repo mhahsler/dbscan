@@ -19,6 +19,7 @@ test_that("frNN", {
   expect_identical(nn$eps, eps)
   expect_length(nn$dist, nrow(x))
   expect_length(nn$id, nrow(x))
+  for (id in nn$id) expect_type(id, "integer")
 
   expect_identical(lengths(nn$dist), lengths(nn$id))
 

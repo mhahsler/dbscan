@@ -47,6 +47,8 @@ test_that("predict", {
   # HDBSCAN (note predict is not perfect for the data.)
   res <- hdbscan(x, minPts = 3)
   pr <- predict(res, newdata, data = x)
+  expect_type(res$cluster, "integer")
+  expect_type(pr, "integer")
 
   rbind(true = res$cluster[idx], pred = pr)
   accuracy <- sum(res$cluster[idx] == pr)/length(pr)

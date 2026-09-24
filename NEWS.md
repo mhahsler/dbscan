@@ -6,6 +6,7 @@
 
 ## Bugfixes
 * clplot() now passes ... on to plot()
+* hdbscan() and predict() for hdbscan objects now always return integer cluster assignments
 
 # dbscan 1.2.6 (2026-08-24)
 

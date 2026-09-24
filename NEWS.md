@@ -2,11 +2,12 @@
 
 ## Changes
 * Raised required R version to 4.3.0 to guarantee C++17 support.
-* Parameter validation is now consistent and strict.
+* Parameter and return value validation is now consistent and strict.
 
 ## Bugfixes
-* clplot() now passes ... on to plot()
-* hdbscan() and predict() for hdbscan objects now always return integer cluster assignments
+* clplot() now passes ... on to plot() (by m-muecke)
+* hdbscan() and predict() for hdbscan objects now always return integer 
+  cluster assignments (by m-muecke)
 
 # dbscan 1.2.6 (2026-08-24)
 

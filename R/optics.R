@@ -5,7 +5,7 @@
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -30,7 +30,8 @@
 #' While using similar concepts as DBSCAN, `minPts` in OPTICS has a different
 #' effect than in DBSCAN. Since it is also used to calculate the reachability
 #' distance, larger values will make the reachability distance plot smoother.
-#' The parameter `eps` is optional and defaults to `Inf`. It only represents
+#' The parameter `eps` is optional and defaults to `Inf`.
+#' It represents
 #' an upper limit for the neighborhood size used to reduce
 #' computational complexity which is helpful for large data sets.
 #'
@@ -78,8 +79,11 @@
 #' @family clustering functions
 #'
 #' @param x a data matrix or a [dist] object.
-#' @param eps OPTICS uses a maximum epsilon neighborhood size of `Inf`.
-#' The upper limit of the size can be limited to improve performance. If set
+#' @param eps maximum epsilon neighborhood size only used for performance.
+#' When set to `Inf`, then the actual maximal needed
+#' radius is estimated from `minPts` and the data.
+#' The upper limit can be further reduced to improve
+#' performance. If set
 #' too low then many reachability values will erroneously become `Inf`
 #' shown as dashed lines in the reachability plot. `eps` should be increased.
 #' @param minPts the parameter is used to identify dense neighborhoods and the
@@ -190,8 +194,12 @@
 #' @export
 optics <- function(x, eps = Inf, minPts = 5, ...) {
 
-  ### find eps from minPts
-  eps <- eps %||% max(kNNdist(x, k =  minPts))
+  minPts <- .validate_integer_scalar(minPts, "minPts")
+  eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
+
+  ### For infinity we use eps from minPts which gives the same result
+  if (is.infinite(eps))
+    eps <- max(kNNdist(x, k =  minPts))
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
@@ -205,8 +213,8 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
 
   search <- .parse_search(extra$search %||% "kdtree")
   splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
-  bucketSize <- as.integer(extra$bucketSize %||% 10L)
-  approx <- as.integer(extra$approx %||% 0L)
+  bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
+  approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
   ### dist search
   if (search == 3L && !inherits(x, "dist")) {
@@ -236,19 +244,8 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
     storage.mode(x) <- "double"
 
   } else{
-    if (!.matrixlike(x))
-      stop("x needs to be a matrix")
-    ## make sure x is numeric
-    x <- as.matrix(x)
-    if (storage.mode(x) == "integer")
-      storage.mode(x) <- "double"
-    if (storage.mode(x) != "double")
-      stop("x has to be a numeric matrix.")
+    x <- .as_finite_numeric_matrix(x)
   }
-
-  if (length(frNN) == 0 &&
-      anyNA(x))
-    stop("data/distances cannot contain NAs for optics (with kd-tree)!")
 
   ret <-
     optics_int(
@@ -441,255 +438,6 @@ extractDBSCAN <- function(object, eps_cl) {
   object$cluster <- cluster
 
   object
-}
-
-
-#' @rdname optics
-#' @export
-extractXi <-
-  function(object,
-    xi,
-    minimum = FALSE,
-    correctPredecessors = TRUE)
-  {
-    if (!inherits(object, "optics"))
-      stop("extractXi only accepts xs resulting from dbscan::optics!")
-    if (xi >= 1.0 ||
-        xi <= 0.0)
-      stop("The Xi parameter must be (0, 1)")
-
-    # Initial variables
-    object$ord_rd <- object$reachdist[object$order]
-    object$ixi <- (1 - xi)
-    SetOfSteepDownAreas <- list()
-    SetOfClusters <- list()
-    index <- 1
-    mib <- 0
-    sdaset <- list()
-    while (index <= length(object$order))
-    {
-      mib <- max(mib, object$ord_rd[index])
-      if (!valid(index + 1, object))
-        break
-
-      # Test if this is a steep down area
-      if (steepDown(index, object))
-      {
-        # Update mib values with current mib and filter
-        sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
-        startval <- object$ord_rd[index]
-        mib <- 0
-        startsteep <- index
-        endsteep <- index + 1
-        while (!is.na(object$order[index + 1])) {
-          index <- index + 1
-          if (steepDown(index, object)) {
-            endsteep <- index + 1
-            next
-          }
-          if (!steepDown(index, object, ixi = 1.0) ||
-              index - endsteep > object$minPts)
-            break
-        }
-        sda <- list(
-          s = startsteep,
-          e = endsteep,
-          maximum = startval,
-          mib = 0
-        )
-        # print(paste("New steep down area:", toString(sda)))
-        sdaset <- append(sdaset, list(sda))
-        next
-      }
-      if (steepUp(index, object))
-      {
-        sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
-        {
-          startsteep <- index
-          endsteep <- index + 1
-          mib <- object$ord_rd[index]
-          esuccr <-
-            if (!valid(index + 1, object))
-              Inf
-          else
-            object$ord_rd[index + 1]
-          if (!is.infinite(esuccr)) {
-            while (!is.na(object$order[index + 1])) {
-              index <- index + 1
-              if (steepUp(index, object)) {
-                endsteep <- index + 1
-                mib <- object$ord_rd[index]
-                esuccr <-
-                  if (!valid(index + 1, object))
-                    Inf
-                else
-                  object$ord_rd[index + 1]
-                if (is.infinite(esuccr)) {
-                  endsteep <- endsteep - 1
-                  break
-                }
-                next
-              }
-              if (!steepUp(index, object, ixi = 1.0) ||
-                  index - endsteep > object$minPts)
-                break
-            }
-          } else {
-            endsteep <- endsteep - 1
-            index <- index + 1
-          }
-          sua <- list(s = startsteep,
-            e = endsteep,
-            maximum = esuccr)
-          # print(paste("New steep up area:", toString(sua)))
-        }
-        for (sda in rev(sdaset))
-        {
-          # Condition 3B
-          if (mib * object$ixi < sda$mib)
-            next
-
-          # Default values
-          cstart <- sda$s
-          cend <- sua$e
-
-          # Credit to ELKI
-          if (correctPredecessors) {
-            while (cend > cstart && is.infinite(object$ord_rd[cend])) {
-              cend <- cend - 1
-            }
-          }
-
-          # Condition 4
-          {
-            # Case b
-            if (sda$maximum * object$ixi >= sua$maximum) {
-              while (cstart < cend &&
-                  object$ord_rd[cstart + 1] > sua$maximum)
-                cstart <- cstart + 1
-            }
-            # Case c
-            else if (sua$maximum * object$ixi >= sda$maximum) {
-              while (cend > cstart &&
-                  object$ord_rd[cend - 1] > sda$maximum)
-                cend <- cend - 1
-            }
-          }
-
-          # This NOT in the original article - credit to ELKI for finding this.
-          # Ensure that the predecessor is in the current cluster. This filter
-          # removes common artifacts from the Xi method
-          if (correctPredecessors) {
-            while (cend > cstart) {
-              tmp2 <- object$predecessor[object$order[cend]]
-              if (!is.na(tmp2) &&
-                  any(object$order[cstart:(cend - 1)] == tmp2, na.rm = TRUE))
-                break
-              # Not found.
-              cend <- cend - 1
-            }
-          }
-
-          # Ensure the last steep up point is not included if it's xi significant
-          if (steepUp(index - 1, object)) {
-            cend <- cend - 1
-          }
-
-          # obey minpts
-          if (cend - cstart + 1 < object$minPts)
-            next
-          SetOfClusters <-
-            append(SetOfClusters, list(list(
-              start = cstart, end = cend
-            )))
-          next
-        }
-      } else {
-        index <- index + 1
-      }
-    }
-    # Remove aliases
-    object$ord_rd <- NULL
-    object$ixi <- NULL
-
-    # Keep xi parameter, disable any previous flat clustering parameter
-    object$xi <- xi
-    object$eps_cl <- NA_real_
-
-    # Zero-out clusters (only noise) if none found
-    if (length(SetOfClusters) == 0) {
-      warning(paste("No clusters were found with threshold:", xi))
-      object$clusters_xi <- NULL
-      object$cluster <- integer(length(object$order))
-      return(invisible(object))
-    }
-    # Cluster data exists; organize it by starting and ending index, give arbitrary id
-    object$clusters_xi <- do.call(rbind, SetOfClusters)
-    object$clusters_xi <-
-      data.frame(
-        start = unlist(object$clusters_xi[, 1], use.names = FALSE),
-        end = unlist(object$clusters_xi[, 2], use.names = FALSE),
-        check.names = FALSE
-      )
-    object$clusters_xi <-
-      object$clusters_xi[order(object$clusters_xi$start, object$clusters_xi$end), ]
-    object$clusters_xi <-
-      cbind(object$clusters_xi, list(cluster_id = seq_len(nrow(object$clusters_xi))))
-    row.names(object$clusters_xi) <- NULL
-
-    ## Populate cluster vector with either:
-    ## 1. 'top-level' cluster labels to aid in plotting
-    ## 2. 'local' or non-overlapping cluster labels if minimum == TRUE
-    object$cluster <-
-      extractClusterLabels(object$clusters_xi, object$order, minimum = minimum)
-
-    # Remove non-local clusters if minimum was specified
-    if (minimum) {
-      object$clusters_xi <-
-        object$clusters_xi[sort(unique(object$cluster))[-1], ]
-    }
-
-    class(object$cluster) <-
-      unique(append(class(object$cluster), "xics"))
-    class(object$clusters_xi) <-
-      unique(append(class(object$clusters_xi), "xics"))
-    object
-  }
-
-# Removes obsolete steep areas
-updateFilterSDASet <- function(mib, sdaset, ixi) {
-  sdaset <- Filter(function(sda)
-    sda$maximum * ixi > mib, sdaset)
-  lapply(sdaset, function(sda) {
-    if (mib > sda$mib)
-      sda$mib <- mib
-    sda
-  })
-}
-
-# Determines if the reachability distance at the current index 'i' is
-# (xi) significantly lower than the next index
-steepUp <- function(i, object, ixi = object$ixi) {
-  if (is.infinite(object$ord_rd[i]))
-    return(FALSE)
-  if (!valid(i + 1, object))
-    return(TRUE)
-  return(object$ord_rd[i] <= object$ord_rd[i + 1] * ixi)
-}
-
-# Determines if the reachability distance at the current index 'i' is
-# (xi) significantly higher than the next index
-steepDown <- function(i, object, ixi = object$ixi) {
-  if (!valid(i + 1, object))
-    return(FALSE)
-  if (is.infinite(object$ord_rd[i + 1]))
-    return(FALSE)
-  return(object$ord_rd[i] * ixi >= object$ord_rd[i + 1])
-}
-
-# Determines if the reachability distance at the current index 'i' is a valid distance
-valid <- function(index, object) {
-  return(!is.na(object$ord_rd[index]))
 }
 
 ### Extract clusters (minimum == T extracts clusters that do not contain other clusters) from a given ordering of points

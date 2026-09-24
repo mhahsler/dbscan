@@ -5,7 +5,7 @@
 // Copyright (c) 2015 Michael Hahsler, Matt Piekenbrock. All Rights Reserved.
 //
 // This software is provided under the provisions of the
-// GNU General Public License (GPL) Version 3
+// GNU General Public License (GPL) Version 3 or later
 // (see: http://www.gnu.org/licenses/gpl-3.0.en.html)
 
 
@@ -191,4 +191,3 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   ret["predecessor"] = IntegerVector(pre.begin(), pre.end()) + 1;
   return ret;
 }
-

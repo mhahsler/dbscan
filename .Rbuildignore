@@ -11,3 +11,4 @@ data_src
 ignore
 ^\.github$
 TODO
+_config.yml

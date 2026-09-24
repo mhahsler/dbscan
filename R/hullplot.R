@@ -5,7 +5,7 @@
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -197,4 +197,4 @@ clplot <- function(x,
                    main = "Cluster Plot",
                    ...)
   hullplot(x, cl = cl, col = col, pch = pch, cex = cex, main = main,
-          solid = FALSE, hull_lwd = NA)
+          solid = FALSE, hull_lwd = NA, ...)

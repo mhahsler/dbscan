@@ -5,7 +5,7 @@
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -202,9 +202,9 @@ hdbscan <- function(x,
                     gen_hdbscan_tree = FALSE,
                     gen_simplified_tree = FALSE,
                     verbose = FALSE) {
-  if (!inherits(x, "dist") && !.matrixlike(x)) {
-    stop("hdbscan expects a numeric matrix or a dist object.")
-  }
+  minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
+  if (!inherits(x, "dist"))
+    x <- .as_finite_numeric_matrix(x)
 
   ## 1. Calculate the mutual reachability between points
   if (verbose) {

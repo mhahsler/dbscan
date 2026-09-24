@@ -96,6 +96,7 @@ lof <- function(x, minPts = 5, ...) {
     extra[["k"]] <- NULL
     warning("lof: k is now deprecated. use minPts = ", minPts, " instead .")
   }
+  minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
 
   args <- c("search", "bucketSize", "splitRule", "approx")
   m <- pmatch(names(extra), args)
@@ -108,14 +109,8 @@ lof <- function(x, minPts = 5, ...) {
   search <- .parse_search(search)
   splitRule <- extra$splitRule %||% "suggest"
   splitRule <- .parse_splitRule(splitRule)
-  bucketSize <- if (is.null(extra$bucketSize))
-    10L
-  else
-    as.integer(extra$bucketSize)
-  approx <- if (is.null(extra$approx))
-    0
-  else
-    as.double(extra$approx)
+  bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
+  approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
   ### precompute distance matrix for dist search
   if (search == 3 && !inherits(x, "dist")) {
@@ -165,9 +160,7 @@ lof <- function(x, minPts = 5, ...) {
 
   } else{
     ### Use kd-tree
-
-    if (anyNA(x))
-      stop("NAs not allowed for LOF using kdtree!")
+    x <- .as_finite_numeric_matrix(x)
 
     ret <- lof_kNN(
       as.matrix(x),

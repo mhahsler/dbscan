@@ -95,6 +95,8 @@
 #' all(hdbscan(x, minPts = 3)$outlier_scores == glosh(x, k = 3))
 #' @export
 glosh <- function(x, k = 4, ...) {
+  k <- .validate_integer_scalar(k, "k", min = 2)
+
   if (inherits(x, "data.frame"))
     x <- as.matrix(x)
 

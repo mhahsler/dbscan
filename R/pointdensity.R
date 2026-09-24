@@ -100,9 +100,9 @@ pointdensity <- function(x,
   splitRule = "suggest",
   approx = 0) {
   type <- match.arg(type, choices = c("frequency", "density", "gaussian"))
-
-  if (anyNA(x))
-    stop("missing values are not allowed in x.")
+  eps <- .validate_nonnegative_scalar(eps, "eps")
+  bucketSize <- .validate_bucket_size(bucketSize)
+  approx <- .validate_nonnegative_scalar(approx, "approx")
 
   if (type == "gaussian")
     return (.pointdensity_gaussian(x, sd = eps, search = search,
@@ -126,6 +126,7 @@ pointdensity <- function(x,
     # faster implementation for a data matrix
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
+    x <- .as_finite_numeric_matrix(x)
 
     d <- dbscan_density_int(
       as.matrix(x),

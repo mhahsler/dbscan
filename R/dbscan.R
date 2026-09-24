@@ -288,10 +288,12 @@ dbscan <-
       extra$MinPts <- NULL
     }
 
+    minPts <- .validate_integer_scalar(minPts, "minPts")
+    eps <- .validate_nonnegative_scalar(eps, "eps")
     search <- .parse_search(extra$search %||% "kdtree")
     splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
-    bucketSize <- as.integer(extra$bucketSize %||% 10L)
-    approx <- as.integer(extra$approx %||% 0L)
+    bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
+    approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
     ### do dist search
     if (search == 3L && !inherits(x, "dist")) {
@@ -317,18 +319,8 @@ dbscan <-
       x <- matrix(0.0, nrow = 0, ncol = 0)
 
     } else {
-      if (!.matrixlike(x))
-        stop("x needs to be a matrix or data.frame.")
-      ## make sure x is numeric
-      x <- as.matrix(x)
-      if (storage.mode(x) == "integer")
-        storage.mode(x) <- "double"
-      if (storage.mode(x) != "double")
-        stop("all data in x has to be numeric.")
+      x <- .as_finite_numeric_matrix(x)
     }
-
-    if (length(frNN) == 0 && anyNA(x))
-      stop("data/distances cannot contain NAs for dbscan (with kd-tree)!")
 
     ## add self match and use C numbering if frNN is used
     if (length(frNN) > 0L)
@@ -338,15 +330,6 @@ dbscan <-
         FUN = function(i)
           c(i - 1L, frNN[[i]] - 1L)
       )
-
-    if (length(minPts) != 1L ||
-        !is.finite(minPts) ||
-        minPts < 0)
-      stop("minPts need to be a single integer >=0.")
-
-    if (is.null(eps) ||
-        is.na(eps) || eps < 0)
-      stop("eps needs to be >=0.")
 
     ret <- dbscan_int(
       x,
@@ -405,4 +388,7 @@ print.dbscan_fast <- function(x, ...) {
 #' @rdname dbscan
 #' @export
 is.corepoint <- function(x, eps, minPts = 5, ...)
+{
+  minPts <- .validate_integer_scalar(minPts, "minPts")
   lengths(frNN(x, eps = eps, ...)$id) >= (minPts - 1)
+}

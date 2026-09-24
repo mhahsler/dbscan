@@ -96,7 +96,7 @@ test_that("kNN", {
   ## inf
   x_inf <- x
   x_inf[c(1, 3, 5), 2] <- Inf
-  kNN(x_inf, k = 3)
+  expect_error(kNN(x_inf, k = 3), regexp = "infinite")
   kNN(x_inf, k = 3, search = "dist")
   kNN(dist(x_inf), k = 3)
 

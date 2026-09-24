@@ -30,7 +30,8 @@
 #' While using similar concepts as DBSCAN, `minPts` in OPTICS has a different
 #' effect than in DBSCAN. Since it is also used to calculate the reachability
 #' distance, larger values will make the reachability distance plot smoother.
-#' The parameter `eps` is optional and defaults to `Inf`. It only represents
+#' The parameter `eps` is optional and defaults to `Inf`.
+#' It represents
 #' an upper limit for the neighborhood size used to reduce
 #' computational complexity which is helpful for large data sets.
 #'
@@ -78,8 +79,11 @@
 #' @family clustering functions
 #'
 #' @param x a data matrix or a [dist] object.
-#' @param eps OPTICS uses a maximum epsilon neighborhood size of `Inf`.
-#' The upper limit of the size can be limited to improve performance. If set
+#' @param eps maximum epsilon neighborhood size only used for performance.
+#' When set to `Inf`, then the actual maximal needed
+#' radius is estimated from `minPts` and the data.
+#' The upper limit can be further reduced to improve
+#' performance. If set
 #' too low then many reachability values will erroneously become `Inf`
 #' shown as dashed lines in the reachability plot. `eps` should be increased.
 #' @param minPts the parameter is used to identify dense neighborhoods and the
@@ -190,8 +194,12 @@
 #' @export
 optics <- function(x, eps = Inf, minPts = 5, ...) {
 
-  ### find eps from minPts
-  eps <- eps %||% max(kNNdist(x, k =  minPts))
+  minPts <- .validate_integer_scalar(minPts, "minPts")
+  eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
+
+  ### For infinity we use eps from minPts which gives the same result
+  if (is.infinite(eps))
+    eps <- max(kNNdist(x, k =  minPts))
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
@@ -205,8 +213,8 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
 
   search <- .parse_search(extra$search %||% "kdtree")
   splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
-  bucketSize <- as.integer(extra$bucketSize %||% 10L)
-  approx <- as.integer(extra$approx %||% 0L)
+  bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
+  approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
   ### dist search
   if (search == 3L && !inherits(x, "dist")) {
@@ -236,19 +244,8 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
     storage.mode(x) <- "double"
 
   } else{
-    if (!.matrixlike(x))
-      stop("x needs to be a matrix")
-    ## make sure x is numeric
-    x <- as.matrix(x)
-    if (storage.mode(x) == "integer")
-      storage.mode(x) <- "double"
-    if (storage.mode(x) != "double")
-      stop("x has to be a numeric matrix.")
+    x <- .as_finite_numeric_matrix(x)
   }
-
-  if (length(frNN) == 0 &&
-      anyNA(x))
-    stop("data/distances cannot contain NAs for optics (with kd-tree)!")
 
   ret <-
     optics_int(

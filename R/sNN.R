@@ -120,6 +120,7 @@ sNN <- function(x,
   approx = 0) {
   if (missing(k))
     k <- x$k
+  k <- .validate_integer_scalar(k, "k")
 
   if (inherits(x, "kNN")) {
     if (k != x$k) {

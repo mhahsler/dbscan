@@ -202,8 +202,7 @@ extractFOSC <-
     ))
       stop("extractFOSC expects constraints to be either an adjacency list or adjacency matrix.")
 
-    if (!minPts >= 2)
-      stop("minPts must be at least 2.")
+    minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
     if (alpha < 0 ||
         alpha > 1)
       stop("alpha can only takes values between [0, 1].")

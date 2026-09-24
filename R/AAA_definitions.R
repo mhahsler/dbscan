@@ -29,3 +29,65 @@
 
   TRUE
 }
+
+.validate_integer_scalar <- function(x, name, min = 1) {
+  valid <- length(x) == 1L &&
+    is.numeric(x) &&
+    typeof(x) %in% c("integer", "double") &&
+    is.finite(x) &&
+    x == trunc(x) &&
+    x >= min
+
+  if (!valid)
+    stop(
+      name,
+      " must be a single, finite, integer-valued number >= ",
+      min,
+      ".",
+      call. = FALSE
+    )
+
+  x
+}
+
+.validate_nonnegative_scalar <- function(x, name, allow_infinite = FALSE) {
+  valid <- length(x) == 1L &&
+    !is.na(x) &&
+    is.numeric(x) &&
+    typeof(x) %in% c("integer", "double") &&
+    (is.finite(x) || (allow_infinite && x == Inf)) &&
+    x >= 0
+
+  if (!valid)
+    stop(
+      name,
+      " must be a single, ",
+      if (allow_infinite) "nonnegative" else "finite, nonnegative",
+      " number.",
+      call. = FALSE
+    )
+
+  x
+}
+
+.validate_bucket_size <- function(x) {
+  .validate_integer_scalar(x, "bucketSize", min = 1)
+}
+
+.as_finite_numeric_matrix <- function(x, name = "x") {
+  if (!.matrixlike(x))
+    stop(name, " must be a matrix or data.frame.", call. = FALSE)
+
+  x <- as.matrix(x)
+  if (!is.numeric(x) || !typeof(x) %in% c("integer", "double"))
+    stop(name, " must be a numeric matrix.", call. = FALSE)
+  if (any(!is.finite(x)))
+    stop(
+      name,
+      " cannot contain NA, NaN, or infinite values.",
+      call. = FALSE
+    )
+
+  storage.mode(x) <- "double"
+  x
+}

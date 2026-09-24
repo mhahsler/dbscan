@@ -73,14 +73,14 @@ test_that("OPTICS", {
   expect_error(optics(dist(x_na), eps = .2, minPts = 4), regexp = "NA")
 
   ## Create OPTICS-converted and single-linkage dendrograms
-  res <- optics(test_data, eps = Inf,  minPts = 2)
+  res <- optics(test_data, eps = Inf, minPts = 2)
   res_dend <- as.dendrogram(res)
   reference <- as.dendrogram(hclust(dist(test_data), method = "single"))
 
   ## Test dendrogram ordering
   expect_equal(as.integer(unlist(res_dend)), res$order)
 
-  ## Test Single Linkage with minPts=2, eps=INF for strict equivalence
+  ## Test Single Linkage with minPts=2, eps=Inf for strict equivalence
   ## Note: Reordering needed to correct for isomorphisms
   ref_order <- order.dendrogram(reference)
   reference <- reorder(reference, ref_order, agglo.FUN = mean)

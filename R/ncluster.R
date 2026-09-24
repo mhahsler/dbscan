@@ -71,7 +71,7 @@ nnoise <- function(object, ...) {
 #' @export
 nnoise.default <- function(object, ...) {
   if (!is.list(object) || !is.numeric(object$cluster))
-    stop("ncluster() requires a clustering object with a cluster component containing the cluster labels.")
+    stop("nnoise() requires a clustering object with a cluster component containing the cluster labels.")
 
   sum(object$cluster == 0L)
 }

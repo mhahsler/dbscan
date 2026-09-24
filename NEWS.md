@@ -1,5 +1,9 @@
 # dbscan 1.2.6.1 (Unreleased)
 
+## Changes
+* Raised required R version to 4.3.0 to guarantee C++17 support.
+* Parameter validation is now consistent and strict.
+
 ## Bugfixes
 * clplot() now passes ... on to plot()
 

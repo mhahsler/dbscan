@@ -23,15 +23,15 @@ Description: A fast reimplementation of several density-based algorithms
     faster k-nearest neighbor search. An R interface to fast kNN and
     fixed-radius NN search is also provided.  Hahsler, Piekenbrock and
     Doran (2019) <doi:10.18637/jss.v091.i01>.
-License: GPL (>= 2)
+License: GPL (>= 3)
 URL: https://github.com/mhahsler/dbscan
 BugReports: https://github.com/mhahsler/dbscan/issues
 Depends:
-    R (>= 3.2.0)
+    R (>= 4.3.0)
 Imports:
     generics,
     graphics,
-    Rcpp (>= 1.0.0),
+    Rcpp (>= 1.0.11),
     stats
 Suggests:
     dendextend,
@@ -53,3 +53,36 @@ Copyright: ANN library is copyright by University of Maryland, Sunil Arya
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Config/roxygen2/version: 8.1.0
+Collate: 
+    'AAA_dbscan-package.R'
+    'AAA_definitions.R'
+    'DBCV_datasets.R'
+    'DS3.R'
+    'GLOSH.R'
+    'LOF.R'
+    'NN.R'
+    'RcppExports.R'
+    'broom-dbscan-tidiers.R'
+    'comps.R'
+    'dbcv.R'
+    'dbscan.R'
+    'dendrogram.R'
+    'extractFOSC.R'
+    'frNN.R'
+    'hdbscan.R'
+    'hullplot.R'
+    'jpclust.R'
+    'kNN.R'
+    'kNNdist.R'
+    'moons.R'
+    'ncluster.R'
+    'nobs.R'
+    'optics.R'
+    'optics_extractXi.R'
+    'pointdensity.R'
+    'predict.R'
+    'reachability.R'
+    'sNN.R'
+    'sNNclust.R'
+    'utils.R'
+    'zzz.R'

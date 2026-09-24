@@ -5,7 +5,7 @@
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -118,9 +118,7 @@ frNN <-
     bucketSize = 10,
     splitRule = "suggest",
     approx = 0) {
-    if (is.null(eps) ||
-        is.na(eps) || eps < 0)
-      stop("eps needs to be >=0.")
+    eps <- .validate_nonnegative_scalar(eps, "eps")
 
     if (inherits(x, "frNN")) {
       if (x$eps < eps)
@@ -138,6 +136,8 @@ frNN <-
 
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
+    bucketSize <- .validate_bucket_size(bucketSize)
+    approx <- .validate_nonnegative_scalar(approx, "approx")
 
     ### dist search
     if (search == 3 && !inherits(x, "dist")) {
@@ -159,28 +159,13 @@ frNN <-
     }
 
     ## make sure x is numeric
-    if (!.matrixlike(x))
-      stop("x needs to be a matrix or a data.frame.")
-    x <- as.matrix(x)
-    if (storage.mode(x) == "integer")
-      storage.mode(x) <- "double"
-    if (storage.mode(x) != "double")
-      stop("all data in x has to be numeric.")
+    x <- .as_finite_numeric_matrix(x)
 
     if (!is.null(query)) {
-      if (!.matrixlike(query))
-        stop("query needs to be a matrix or a data.frame.")
-      query <- as.matrix(query)
-      if (storage.mode(query) == "integer")
-        storage.mode(query) <- "double"
-      if (storage.mode(query) != "double")
-        stop("query has to be NULL or a numeric matrix or data.frame.")
+      query <- .as_finite_numeric_matrix(query, "query")
       if (ncol(x) != ncol(query))
         stop("x and query need to have the same number of columns!")
     }
-
-    if (anyNA(x))
-      stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
 
     ## returns NO self matches
     if (!is.null(query)) {

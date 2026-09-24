@@ -5,7 +5,7 @@
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -127,6 +127,8 @@ kNN <-
     bucketSize = 10,
     splitRule = "suggest",
     approx = 0) {
+    k <- .validate_integer_scalar(k, "k")
+
     if (inherits(x, "kNN")) {
       if (x$k < k)
         stop("kNN in x has not enough nearest neighbors.")
@@ -143,10 +145,8 @@ kNN <-
 
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
-
-    k <- as.integer(k)
-    if (k < 1)
-      stop("Illegal k: needs to be k>=1!")
+    bucketSize <- .validate_bucket_size(bucketSize)
+    approx <- .validate_nonnegative_scalar(approx, "approx")
 
     ### dist search
     if (search == 3 && !inherits(x, "dist")) {
@@ -168,30 +168,16 @@ kNN <-
     }
 
     ## make sure x is numeric
-    if (!.matrixlike(x))
-      stop("x needs to be a matrix to calculate distances")
-    x <- as.matrix(x)
-    if (storage.mode(x) == "integer")
-      storage.mode(x) <- "double"
-    if (storage.mode(x) != "double")
-      stop("x has to be a numeric matrix.")
+    x <- .as_finite_numeric_matrix(x)
 
     if (!is.null(query)) {
-      query <- as.matrix(query)
-      if (storage.mode(query) == "integer")
-        storage.mode(query) <- "double"
-      if (storage.mode(query) != "double")
-        stop("query has to be NULL or a numeric matrix.")
+      query <- .as_finite_numeric_matrix(query, "query")
       if (ncol(x) != ncol(query))
         stop("x and query need to have the same number of columns!")
     }
 
     if (k >= nrow(x))
       stop("Not enough neighbors in data set!")
-
-
-    if (anyNA(x))
-      stop("data/distances cannot contain NAs for kNN (with kd-tree)!")
 
     ## returns NO self matches
     if (!is.null(query)) {

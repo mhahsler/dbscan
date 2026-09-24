@@ -5,7 +5,7 @@
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -95,6 +95,8 @@
 #' all(hdbscan(x, minPts = 3)$outlier_scores == glosh(x, k = 3))
 #' @export
 glosh <- function(x, k = 4, ...) {
+  k <- .validate_integer_scalar(k, "k", min = 2)
+
   if (inherits(x, "data.frame"))
     x <- as.matrix(x)
 

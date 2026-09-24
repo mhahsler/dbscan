@@ -197,4 +197,4 @@ clplot <- function(x,
                    main = "Cluster Plot",
                    ...)
   hullplot(x, cl = cl, col = col, pch = pch, cex = cex, main = main,
-          solid = FALSE, hull_lwd = NA)
+          solid = FALSE, hull_lwd = NA, ...)

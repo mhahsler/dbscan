@@ -25,25 +25,19 @@ includes:
 - **DBSCAN:** Density-based spatial clustering of applications with
   noise ([<span class="nocase">Ester et al.</span>
   1996](#ref-ester1996density)).
-
 - **FOSC:** Framework for optimal selection of clusters for unsupervised
   and semisupervised clustering of hierarchical cluster trees ([Campello
   et al. 2013](#ref-campello2013density)).
-
 - **HDBSCAN:** Hierarchical DBSCAN with simplified hierarchy extraction
   ([Campello et al. 2015](#ref-campello2015hierarchical)).
-
 - **Jarvis-Patrick Clustering**: Clustering using a similarity measure
   based on shared near neighbors ([Jarvis and Patrick
   1973](#ref-jarvis1973)).
-
 - **OPTICS/OPTICSXi:** Ordering points to identify the clustering
-  structure and cluster extraction methods
-
+  structure and cluster extraction methods ([Ankerst et al.
+  1999](#ref-ankerst1999optics)).
 - **SNN Clustering**: Shared nearest neighbor clustering ([Ertöz et al.
   2003](#ref-erdoz2003)).
-
-  ([Ankerst et al. 1999](#ref-ankerst1999optics)).
 
 **Outlier Detection**
 
@@ -80,6 +74,7 @@ The following R packages use `dbscan`:
 [cordillera](https://CRAN.R-project.org/package=cordillera),
 [CPC](https://CRAN.R-project.org/package=CPC),
 [crosshap](https://CRAN.R-project.org/package=crosshap),
+[crownsegmentr](https://CRAN.R-project.org/package=crownsegmentr),
 [cyclicwave](https://CRAN.R-project.org/package=cyclicwave),
 [daltoolbox](https://CRAN.R-project.org/package=daltoolbox),
 [DataSimilarity](https://CRAN.R-project.org/package=DataSimilarity),
@@ -98,6 +93,7 @@ The following R packages use `dbscan`:
 [fdacluster](https://CRAN.R-project.org/package=fdacluster),
 [flowcluster](https://CRAN.R-project.org/package=flowcluster),
 [flownet](https://CRAN.R-project.org/package=flownet),
+[FORTLS](https://CRAN.R-project.org/package=FORTLS),
 [FuelDeep3D](https://CRAN.R-project.org/package=FuelDeep3D),
 [funtimes](https://CRAN.R-project.org/package=funtimes),
 [HaploVar](https://CRAN.R-project.org/package=HaploVar),
@@ -211,7 +207,7 @@ x <- as.matrix(iris[, 1:4])
 DBSCAN
 
 ``` r
-db <- dbscan(x, eps = .42, minPts = 5)
+db <- dbscan(x, eps = 0.42, minPts = 5)
 db
 ```
 
@@ -249,7 +245,7 @@ Extract DBSCAN-like clustering from OPTICS and create a reachability
 plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 
 ``` r
-opt <- extractDBSCAN(opt, eps_cl = .4)
+opt <- extractDBSCAN(opt, eps_cl = 0.4)
 plot(opt)
 ```
 
@@ -289,7 +285,8 @@ and `glance()` so they can be easily used with tidyverse, ggplot2 and
 
 ``` r
 library(tidyverse)
-db <- x %>% dbscan(eps = .42, minPts = 5)
+db <- x %>%
+    dbscan(eps = 0.42, minPts = 5)
 ```
 
 Get cluster statistics as a tibble
@@ -309,10 +306,9 @@ tidy(db)
 Visualize the clustering with ggplot2 (use an x for noise points)
 
 ``` r
-augment(db, x) %>% 
-  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point(aes(color = .cluster, shape = noise)) +
-    scale_shape_manual(values=c(19, 4))
+augment(db, x) %>%
+    ggplot(aes(x = Petal.Length, y = Petal.Width)) + geom_point(aes(color = .cluster,
+    shape = noise)) + scale_shape_manual(values = c(19, 4))
 ```
 
 ![](inst/README_files/tidyverse3-1.png)<!-- -->
@@ -372,10 +368,14 @@ labels
 ## License
 
 The dbscan package is licensed under the [GNU General Public License
-(GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html). The
-**OPTICSXi** R implementation was directly ported from the ELKI
-framework’s Java implementation (GNU AGPLv3), with permission by the
-original author, Erich Schubert.
+(GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html).
+
+The **OPTICSXi** R implementation in `R/optics_extractXi.R` was directly
+ported from the ELKI framework’s Java implementation with permission by
+the original author, Erich Schubert. This function is redistributed
+under the stricter [GNU
+AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Remove the file
+and function to use the package under the GNU GPL v3 license.
 
 ## Changes
 

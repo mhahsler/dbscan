@@ -18,15 +18,18 @@ The package includes:
  
 __Clustering__
 
-- __DBSCAN:__ Density-based spatial clustering of applications with noise [@ester1996density].
-- __FOSC:__ Framework for optimal selection of clusters for unsupervised and semisupervised clustering of hierarchical cluster trees [@campello2013density].
-- __HDBSCAN:__  Hierarchical DBSCAN with simplified hierarchy extraction [@campello2015hierarchical].
+- __DBSCAN:__ Density-based spatial clustering of applications with 
+  noise [@ester1996density].
+- __FOSC:__ Framework for optimal selection of clusters for unsupervised and 
+  semisupervised clustering of hierarchical cluster trees [@campello2013density].
+- __HDBSCAN:__  Hierarchical DBSCAN with simplified hierarchy 
+  extraction [@campello2015hierarchical].
 - __Jarvis-Patrick Clustering__: Clustering using a similarity measure based
-on shared near neighbors [@jarvis1973].
-- __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure and cluster extraction methods
+  on shared near neighbors [@jarvis1973].
+- __OPTICS/OPTICSXi:__ Ordering points to identify the clustering structure 
+  and cluster extraction methods [@ankerst1999optics].
 - __SNN Clustering__: Shared nearest neighbor clustering [@erdoz2003].
 
-  [@ankerst1999optics].
 
 __Outlier Detection__
 

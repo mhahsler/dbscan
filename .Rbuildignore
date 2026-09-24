@@ -12,3 +12,6 @@ ignore
 ^\.github$
 TODO
 _config.yml
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

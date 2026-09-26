@@ -2,3 +2,50 @@ url: http://michael.hahsler.net/dbscan/
 template:
   bootstrap: 5
 
+reference:
+- title: Clustering Algorithms
+  desc: Cluster data with DBSCAN, HDBSCAN, OPTICS, shared nearest neighbor, and Jarvis-Patrick algorithms.
+  contents:
+  - dbscan
+  - hdbscan
+  - optics
+  - sNNclust
+  - jpclust
+  - has_concept("clustering functions")
+- title: Nearest Neighbor Search
+  desc: Find k-nearest, fixed-radius, and shared nearest neighbors and work with nearest-neighbor graphs.
+  contents:
+  - kNN
+  - frNN
+  - sNN
+  - kNNdist
+  - has_concept("NN functions")
+- title: Outlier Detection
+  desc: Calculate local and hierarchical outlier scores and estimate local point density.
+  contents:
+  - lof
+  - glosh
+  - pointdensity
+  - has_concept("Outlier Detection Functions")
+- title: Clustering Evaluation
+  desc: Evaluate density-based clusterings with the Density-Based Clustering Validation index.
+  contents:
+  - dbcv
+  - has_concept("Evaluation Functions")
+- title: Cluster Visualization and Hierarchies
+  desc: Plot clusters and work with reachability plots and cluster hierarchies.
+  contents:
+  - hullplot
+  - reachability
+  - dendrogram
+- title: Tidiers
+  desc: Turn clustering objects into tidy tibbles and augment the original data.
+  contents:
+  - has_concept("tidiers")
+- title: Data Sets
+  desc: Example and benchmark data sets for density-based clustering.
+  contents:
+  - moons
+  - DS3
+  - DBCV_datasets
+

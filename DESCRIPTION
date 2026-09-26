@@ -39,9 +39,11 @@ Suggests:
     igraph,
     knitr,
     microbenchmark,
+    reticulate (>= 1.41),
     rmarkdown,
     testthat (>= 3.0.0),
-    tibble
+    tibble,
+    tidyverse
 LinkingTo: 
     Rcpp
 VignetteBuilder: 

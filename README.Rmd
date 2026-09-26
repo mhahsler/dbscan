@@ -52,7 +52,6 @@ implementations in [WEKA](https://ml.cms.waikato.ac.nz/weka/), [ELKI](https://el
 
 ```{r echo=FALSE, results = 'asis'}
 pkg_usage(pkg)
-pkg_citation(pkg, 2)
 pkg_install(pkg)
 ```
 
@@ -104,87 +103,10 @@ Visualize the hierarchical clustering as a simplified tree. HDBSCAN finds 2 stab
 plot(hdb, show_flat = TRUE)
 ```
 
-## Using dbscan with tidyverse
+## Additional guides
 
-`dbscan` provides for all clustering algorithms `tidy()`, `augment()`, and `glance()` so they can
-be easily used with tidyverse, ggplot2 and [tidymodels](https://www.tidymodels.org/learn/statistics/k-means/).
-
-```{r tidyverse, message=FALSE, warning=FALSE}
-library(tidyverse)
-db <- x %>% dbscan(eps = .42, minPts = 5)
-```
-
-Get cluster statistics as a tibble
-
-```{r tidyverse2}
-tidy(db)
-```
-
-Visualize the clustering with ggplot2 (use an x for noise points)
-```{r tidyverse3}
-augment(db, x) %>% 
-  ggplot(aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point(aes(color = .cluster, shape = noise)) +
-    scale_shape_manual(values=c(19, 4))
-
-```
-
-
-
-
-## Using dbscan from Python
-R, the R package `dbscan`, and the Python package `rpy2` need to be installed.
-
-```{python, eval = FALSE, python.reticulate = FALSE}
-import pandas as pd
-import numpy as np
-
-### prepare data
-iris = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', 
-                   header = None, 
-                   names = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species'])
-iris_numeric = iris[['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth']]
-
-# get R dbscan package
-from rpy2.robjects import packages
-dbscan = packages.importr('dbscan')
-
-# enable automatic conversion of pandas dataframes to R dataframes
-from rpy2.robjects import pandas2ri
-pandas2ri.activate()
-
-db = dbscan.dbscan(iris_numeric, eps = 0.5, MinPts = 5)
-print(db)
-```
-
-```
-## DBSCAN clustering for 150 objects.
-## Parameters: eps = 0.5, minPts = 5
-## Using euclidean distances and borderpoints = TRUE
-## The clustering contains 2 cluster(s) and 17 noise points.
-## 
-##  0  1  2 
-## 17 49 84 
-## 
-## Available fields: cluster, eps, minPts, dist, borderPoints
-```
-
-```{python, eval = FALSE, python.reticulate = FALSE}
-# get the cluster assignment vector
-labels = np.array(db.rx('cluster'))
-labels
-```
-
-```
-## array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-##         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
-##         1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2, 2, 2, 2, 2,
-##         2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-##         2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 0, 0,
-##         2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-##         2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]],
-##       dtype=int32)
-```
+- [Using dbscan with tidyverse](https://mhahsler.github.io/dbscan/articles/tidyverse.html)
+- [Using dbscan from Python](https://mhahsler.github.io/dbscan/articles/python.html)
 
 ## License 
 The dbscan package is licensed under the [GNU General Public License (GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html). 
@@ -195,7 +117,9 @@ author, Erich Schubert. This function is redistributed under
 the stricter [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). 
 Remove the file and function to use the package under the GNU GPL v3 license.  
 
-## Changes
-* List of changes from [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)
-
+## Citation request
+```{r echo=FALSE, results = 'asis'}
+pkg_citation(pkg, 2)
+```
+  
 ## References

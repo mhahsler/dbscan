@@ -159,23 +159,6 @@ The following R packages use `dbscan`:
 [VIProDesign](https://CRAN.R-project.org/package=VIProDesign),
 [weird](https://CRAN.R-project.org/package=weird)
 
-To cite package ‘dbscan’ in publications use:
-
-> Hahsler M, Piekenbrock M, Doran D (2019). “dbscan: Fast Density-Based
-> Clustering with R.” *Journal of Statistical Software*, *91*(1), 1-30.
-> <doi:10.18637/jss.v091.i01> <https://doi.org/10.18637/jss.v091.i01>.
-
-    @Article{,
-      title = {dbscan: Fast Density-Based Clustering with {R}},
-      author = {Michael Hahsler and Matthew Piekenbrock and Derek Doran},
-      journal = {Journal of Statistical Software},
-      year = {2019},
-      volume = {91},
-      number = {1},
-      pages = {1--30},
-      doi = {10.18637/jss.v091.i01},
-    }
-
 ## Installation
 
 **Stable CRAN version:** Install from within R with
@@ -227,7 +210,7 @@ Visualize the resulting clustering (noise points are shown in black).
 pairs(x, col = db$cluster + 1L)
 ```
 
-![](inst/README_files/dbscan-1.png)<!-- -->
+![](man/figures/README-dbscan-1.png)<!-- -->
 
 OPTICS
 
@@ -249,7 +232,7 @@ opt <- extractDBSCAN(opt, eps_cl = 0.4)
 plot(opt)
 ```
 
-![](inst/README_files/OPTICS_extractDBSCAN-1.png)<!-- -->
+![](man/figures/README-OPTICS_extractDBSCAN-1.png)<!-- -->
 
 HDBSCAN
 
@@ -275,95 +258,14 @@ finds 2 stable clusters.
 plot(hdb, show_flat = TRUE)
 ```
 
-![](inst/README_files/hdbscan-1.png)<!-- -->
+![](man/figures/README-hdbscan-1.png)<!-- -->
 
-## Using dbscan with tidyverse
+## Additional guides
 
-`dbscan` provides for all clustering algorithms `tidy()`, `augment()`,
-and `glance()` so they can be easily used with tidyverse, ggplot2 and
-[tidymodels](https://www.tidymodels.org/learn/statistics/k-means/).
-
-``` r
-library(tidyverse)
-db <- x %>%
-    dbscan(eps = 0.42, minPts = 5)
-```
-
-Get cluster statistics as a tibble
-
-``` r
-tidy(db)
-```
-
-    ## # A tibble: 4 × 3
-    ##   cluster  size noise
-    ##   <fct>   <int> <lgl>
-    ## 1 0          29 TRUE 
-    ## 2 1          48 FALSE
-    ## 3 2          37 FALSE
-    ## 4 3          36 FALSE
-
-Visualize the clustering with ggplot2 (use an x for noise points)
-
-``` r
-augment(db, x) %>%
-    ggplot(aes(x = Petal.Length, y = Petal.Width)) + geom_point(aes(color = .cluster,
-    shape = noise)) + scale_shape_manual(values = c(19, 4))
-```
-
-![](inst/README_files/tidyverse3-1.png)<!-- -->
-
-## Using dbscan from Python
-
-R, the R package `dbscan`, and the Python package `rpy2` need to be
-installed.
-
-``` python
-import pandas as pd
-import numpy as np
-
-### prepare data
-iris = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data', 
-                   header = None, 
-                   names = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species'])
-iris_numeric = iris[['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth']]
-
-# get R dbscan package
-from rpy2.robjects import packages
-dbscan = packages.importr('dbscan')
-
-# enable automatic conversion of pandas dataframes to R dataframes
-from rpy2.robjects import pandas2ri
-pandas2ri.activate()
-
-db = dbscan.dbscan(iris_numeric, eps = 0.5, MinPts = 5)
-print(db)
-```
-
-    ## DBSCAN clustering for 150 objects.
-    ## Parameters: eps = 0.5, minPts = 5
-    ## Using euclidean distances and borderpoints = TRUE
-    ## The clustering contains 2 cluster(s) and 17 noise points.
-    ## 
-    ##  0  1  2 
-    ## 17 49 84 
-    ## 
-    ## Available fields: cluster, eps, minPts, dist, borderPoints
-
-``` python
-# get the cluster assignment vector
-labels = np.array(db.rx('cluster'))
-labels
-```
-
-    ## array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    ##         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
-    ##         1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 0, 2, 2, 2, 2, 2,
-    ##         2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-    ##         2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 0, 0,
-    ##         2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0,
-    ##         2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]],
-    ##       dtype=int32)
+- [Using dbscan with
+  tidyverse](https://mhahsler.github.io/dbscan/articles/tidyverse.html)
+- [Using dbscan from
+  Python](https://mhahsler.github.io/dbscan/articles/python.html)
 
 ## License
 
@@ -377,10 +279,24 @@ under the stricter [GNU
 AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Remove the file
 and function to use the package under the GNU GPL v3 license.
 
-## Changes
+## Citation request
 
-- List of changes from
-  [NEWS.md](https://github.com/mhahsler/dbscan/blob/master/NEWS.md)
+To cite package ‘dbscan’ in publications use:
+
+> Hahsler M, Piekenbrock M, Doran D (2019). “dbscan: Fast Density-Based
+> Clustering with R.” *Journal of Statistical Software*, *91*(1), 1-30.
+> <doi:10.18637/jss.v091.i01> <https://doi.org/10.18637/jss.v091.i01>.
+
+    @Article{,
+      title = {dbscan: Fast Density-Based Clustering with {R}},
+      author = {Michael Hahsler and Matthew Piekenbrock and Derek Doran},
+      journal = {Journal of Statistical Software},
+      year = {2019},
+      volume = {91},
+      number = {1},
+      pages = {1--30},
+      doi = {10.18637/jss.v091.i01},
+    }
 
 ## References
 

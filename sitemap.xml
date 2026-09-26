@@ -1,8 +1,11 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>http://michael.hahsler.net/dbscan/404.html</loc></url>
 <url><loc>http://michael.hahsler.net/dbscan/LICENSE-text.html</loc></url>
+<url><loc>http://michael.hahsler.net/dbscan/articles/dbscan.html</loc></url>
 <url><loc>http://michael.hahsler.net/dbscan/articles/hdbscan.html</loc></url>
 <url><loc>http://michael.hahsler.net/dbscan/articles/index.html</loc></url>
+<url><loc>http://michael.hahsler.net/dbscan/articles/python.html</loc></url>
+<url><loc>http://michael.hahsler.net/dbscan/articles/tidyverse.html</loc></url>
 <url><loc>http://michael.hahsler.net/dbscan/authors.html</loc></url>
 <url><loc>http://michael.hahsler.net/dbscan/index.html</loc></url>
 <url><loc>http://michael.hahsler.net/dbscan/news/index.html</loc></url>

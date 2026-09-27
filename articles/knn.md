@@ -1,7 +1,5 @@
 # Nearest-Neighbor Search and Graphs
 
-## Introduction
-
 Nearest-neighbor search is the computational foundation for the
 clustering and outlier-detection algorithms in **dbscan**. Many
 algorithms define neighborhoods using a `minPts` parameter. The

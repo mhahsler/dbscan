@@ -1,8 +1,8 @@
 ---
-title: "HDBSCAN with the dbscan package"
+title: "Using Hierarchical DBSCAN (HDBSCAN)"
 author: "Matt Piekenbrock, Michael Hahsler"
 vignette: >
-  %\VignetteIndexEntry{Hierarchical DBSCAN (HDBSCAN) with the dbscan package}
+  %\VignetteIndexEntry{Using Hierarchical DBSCAN (HDBSCAN)}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 header-includes: \usepackage{animation}

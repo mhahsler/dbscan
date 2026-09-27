@@ -21,7 +21,8 @@ A data.frame with 8000 observations on the following 2 columns:
 
 ## Source
 
-Obtained from <http://cs.joensuu.fi/sipu/datasets/>
+Obtained from the Clustering Datasets Repository, University of Joensuu,
+Finland.
 
 ## References
 

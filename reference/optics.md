@@ -250,7 +250,7 @@ plot(x, col=rep(1:4, times = 100))
 res <- optics(x, minPts = 10)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.193786846197958, eps_cl = NA, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = NA
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi
 
@@ -293,7 +293,7 @@ polygon(x[res$order, ])
 res <- extractDBSCAN(res, eps_cl = .065)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.193786846197958, eps_cl = 0.065, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = 0.065, xi = NA
 #> The clustering contains 4 cluster(s) and 92 noise points.
 #> 
 #>  0  1  2  3  4 
@@ -311,7 +311,7 @@ hullplot(x, res)
 res <- extractDBSCAN(res, eps_cl = .07)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.193786846197958, eps_cl = 0.07, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = 0.07, xi = NA
 #> The clustering contains 3 cluster(s) and 62 noise points.
 #> 
 #>   0   1   2   3 
@@ -328,7 +328,7 @@ hullplot(x, res)
 res <- extractXi(res, xi = 0.01)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.193786846197958, eps_cl = NA, xi = 0.01
+#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = 0.01
 #> The clustering contains 15 cluster(s) and 1 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,

@@ -4,8 +4,8 @@
 
 - [Getting started with
   dbscan](http://michael.hahsler.net/dbscan/articles/dbscan.md):
-- [HDBSCAN with the dbscan
-  package](http://michael.hahsler.net/dbscan/articles/hdbscan.md):
+- [Using Hierarchical DBSCAN
+  (HDBSCAN)](http://michael.hahsler.net/dbscan/articles/hdbscan.md):
 - [Nearest-Neighbor Clustering with jpclust and
   sNNclust](http://michael.hahsler.net/dbscan/articles/nnclustering.md):
 - [Ordering Points With

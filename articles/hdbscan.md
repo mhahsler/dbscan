@@ -1,4 +1,4 @@
-# HDBSCAN with the dbscan package
+# Using Hierarchical DBSCAN (HDBSCAN)
 
 The dbscan package \[6\] includes a fast implementation of Hierarchical
 DBSCAN (HDBSCAN) and its related algorithm(s) for the R platform. This

@@ -84,7 +84,7 @@
 
 \section{Preamble}
 
-This vignette is an updated version of the article describing the package \pkg{dbscan} published 
+This vignette is an updated version of the article describing the package \pkg{dbscan} published
 as \cite{hahsler2019dbscan}.
 
 
@@ -359,7 +359,7 @@ under certain conditions, the dendrogram produced by the well known hierarchical
 
 \begin{figure}
     \centering
-      \includegraphics{dbscan-opticsReachPlot}
+      \includegraphics{dbscan_paper_vignette-opticsReachPlot}
       \caption{OPTICS reachability plot example for a data set with four clusters of 100 data points each.}
       \label{fig:opticsReachPlot1}
 \end{figure}
@@ -616,7 +616,7 @@ plot(x, col = true_clusters, pch = true_clusters)
 
 \begin{figure}
 \centering
-\includegraphics[width=8cm]{dbscan-sampleData}
+\includegraphics[width=8cm]{dbscan_paper_vignette-sampleData}
 \caption{The sample dataset, consisting of 4 noisy Gaussian distributions with slight overlap.}
 \label{fig:sampleData}
 \end{figure}
@@ -632,7 +632,7 @@ abline(h=.06, col = "red", lty=2)
 @
 \begin{figure}
 \centering
-\includegraphics{dbscan-kNNdistplot}
+\includegraphics{dbscan_paper_vignette-kNNdistplot}
 \caption{$k$-Nearest Neighbor Distance plot.}
 \label{fig:kNNdistplot}
 \end{figure}
@@ -657,7 +657,7 @@ plot(x, col = res$cluster + 1L, pch = res$cluster + 1L)
 @
 \begin{figure}
     \centering
-      \includegraphics[width=9cm]{dbscan-dbscanPlot}
+      \includegraphics[width=9cm]{dbscan_paper_vignette-dbscanPlot}
       \caption{Result of clustering with DBSCAN. Noise is represented as black circles.}
       \label{fig:dbscanPlot}
 \end{figure}
@@ -676,7 +676,7 @@ hullplot(x, res)
 @
 \begin{figure}
     \centering
-    \includegraphics[width=9cm]{dbscan-dbscanHullPlot}
+    \includegraphics[width=9cm]{dbscan_paper_vignette-dbscanHullPlot}
     \caption{Convex hull plot of the DBSCAN clustering. Noise points
 are black.
 Note that noise points and points of another cluster may lie
@@ -722,7 +722,7 @@ plot(res)
 @
 \begin{figure}
     \centering
-      \includegraphics{dbscan-opticsReachPlot}
+      \includegraphics{dbscan_paper_vignette-opticsReachPlot}
       \caption{OPTICS reachability plot. Note that the first reachability value is always UNDEFINED.}
       \label{fig:opticsReachPlot}
 \end{figure}
@@ -739,7 +739,7 @@ polygon(x[res$order,], )
 @
 \begin{figure}
     \centering
-      \includegraphics[width=8cm]{dbscan-opticsOrder}
+      \includegraphics[width=8cm]{dbscan_paper_vignette-opticsOrder}
       \caption{OPTICS order of data points represented as a line.}
       \label{fig:opticsOrder}
 \end{figure}
@@ -760,11 +760,11 @@ hullplot(x, res)
 
 \begin{figure}
   \centering
-  \includegraphics{dbscan-extractDBSCANReachPlot2}
+  \includegraphics{dbscan_paper_vignette-extractDBSCANReachPlot2}
       \caption{Reachability plot for a DBSCAN-type clustering extracted at global $\epsilon = 0.065$ results in four clusters.}
   \label{fig:extractDBSCANReachPlot2}
   \centering
-  \includegraphics[width=9cm]{dbscan-extractDBSCANHullPlot2}
+  \includegraphics[width=9cm]{dbscan_paper_vignette-extractDBSCANHullPlot2}
       \caption{Convex hull plot for a DBSCAN-type clustering extracted at global $\epsilon = 0.065$ results in four clusters.}
   \label{fig:extractDBSCANHullPlot2}
 \end{figure}
@@ -799,14 +799,14 @@ hullplot(x, res)
 
 \begin{figure}
     \centering
-      \includegraphics{dbscan-extractXiReachPlot}
+      \includegraphics{dbscan_paper_vignette-extractXiReachPlot}
       \caption{Reachability plot of a hierarchical clustering
     extracted with Extract-$\xi$.}
       \label{fig:extractXiReachPlot}
 %\end{figure}
 %\begin{figure}[htb]
     \centering
-      \includegraphics[width=9cm]{dbscan-extractXiHullPlot}
+      \includegraphics[width=9cm]{dbscan_paper_vignette-extractXiHullPlot}
       \caption{Convex hull plot of a hierarchical clustering
             extracted with Extract-$\xi$.}
       \label{fig:extractXiHullPlot}
@@ -827,7 +827,7 @@ Figure~\ref{fig:extractXiReachPlot} shows the reachability plot with clusters re
 %@
 %\begin{figure}
 %    \centering
-%    \includegraphics{dbscan-LOF_hist}
+%    \includegraphics{dbscan_paper_vignette-LOF_hist}
 %    \caption{LOF outlier histogram.}
 %    \label{fig:LOF_hist}
 %\end{figure}
@@ -840,7 +840,7 @@ Figure~\ref{fig:extractXiReachPlot} shows the reachability plot with clusters re
 %@
 %\begin{figure}
 %    \centering
-%      \includegraphics[width=9cm]{dbscan-LOF_plot}
+%      \includegraphics[width=9cm]{dbscan_paper_vignette-LOF_plot}
 %      \caption{Visualization of the local outlier factor of each point in the data set.}
 %      \label{fig:LOF_plot}
 %\end{figure}
@@ -866,7 +866,7 @@ plot(dend, ylab = "Reachability dist.", leaflab = "none")
 @
 \begin{figure}[t]
     \centering
-      \includegraphics{dbscan-opticsDendrogram}
+      \includegraphics{dbscan_paper_vignette-opticsDendrogram}
       \caption{Dendrogram structure of OPTICS reordering.}
       \label{fig:opticsDendrogram}
 \end{figure}

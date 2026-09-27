@@ -198,8 +198,11 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
   eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
 
   ### For infinity we use eps from minPts which gives the same result
-  if (is.infinite(eps))
-    eps <- max(kNNdist(x, k =  minPts))
+  if (is.infinite(eps)) {
+    eps <- max(kNNdist(x, k =  minPts - 1L))
+    if (!is.finite(eps))
+      stop("minPts is larger than the number of objects-1 or a distance is infinite distance.")
+  }
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0

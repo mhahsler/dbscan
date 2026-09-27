@@ -4,11 +4,13 @@ pkgdown_sha: ~
 articles:
   dbscan: dbscan.html
   hdbscan: hdbscan.html
+  knn: knn.html
   nnclustering: nnclustering.html
   optics: optics.html
+  outlier: outlier.html
   python: python.html
   tidyverse: tidyverse.html
-last_built: 2026-09-27T17:34Z
+last_built: 2026-09-27T21:25Z
 urls:
   reference: http://michael.hahsler.net/dbscan/reference
   article: http://michael.hahsler.net/dbscan/articles

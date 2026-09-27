@@ -12,6 +12,7 @@
 - clplot() now passes … on to plot() (by m-muecke)
 - hdbscan() and predict() for hdbscan objects now always return integer
   cluster assignments (by m-muecke)
+- OPTICS: Fixed calculation for epsilon when set to infinity.
 
 ## dbscan 1.2.6 (2026-08-24)
 

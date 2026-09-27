@@ -1,11 +1,11 @@
 ---
-title: "OPTICS: Ordering Points to Identify the Clustering Structure"
+title: "Ordering Points With OPTICS"
 author: "Michael Hahsler, Matthew Piekenbrock"
 output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{OPTICS: Ordering Points to Identify the Clustering Structure}
+  %\VignetteIndexEntry{Ordering Points With OPTICS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

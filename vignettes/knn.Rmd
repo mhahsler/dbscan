@@ -1,0 +1,438 @@
+---
+title: "Nearest-Neighbor Search and Graphs"
+author: "Michael Hahsler"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Nearest-Neighbor Search and Graphs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+library(dbscan)
+```
+
+## Introduction
+
+Nearest-neighbor search is the computational foundation for the clustering
+and outlier-detection algorithms in **dbscan**. Many algorithms define 
+neighborhoods using a `minPts` parameter. The neighborhood typically includes 
+the point at the center as well, while `kNN` algorithms do not it in `k`.
+Therefore, we have `k = minPts - 1` when we go from clustering to `kNN` search.
+
+The package exposes `kNN`
+search algorithms and resulting graphs directly:
+
+| Function | Neighborhood | Result structure |
+|:--|:--|:--|
+| `kNN()` | The `k` closest observations | Matrices of neighbor IDs and distances |
+| `frNN()` | All observations no farther than `eps` | Lists of neighbor IDs and distances |
+| `sNN()` | Similarity based on shared nearest neighbors | Matrices of IDs, distances, and shared-neighbor counts |
+| `kNNdist()` | Distance to the kth nearest neighbor | Numeric vector, or a distance matrix for several neighbors |
+| `kNNdistplot()` | Sorted kth-neighbor distances | Diagnostic plot |
+
+Objects returned by the first three functions inherit from class `NN`. They
+support `print()`, `sort()`, `plot()`, `adjacencylist()`, and `comps()` for
+finding connected components.
+
+Nearest neighbor search is optimized for Euclidean distance where it used 
+kd-tree implemented in the ANN library (Mount and Arya, 2010).
+
+## Example data
+
+We use the two-dimensional `moons` data included with the package. Row names
+make it easier to follow neighbor IDs in the output.
+
+```{r data}
+data("moons")
+x <- as.matrix(moons)
+rownames(x) <- paste0("p", seq_len(nrow(x)))
+
+plot(x, pch = 19, asp = 1, main = "Moons data")
+```
+
+For a numeric matrix or data frame, the functions use Euclidean distance.
+Variable scales therefore determine which observations are considered close.
+Standardize variables when their units are not comparable and equal weighting
+is appropriate for the application.
+
+## k nearest neighbors
+
+`kNN()` finds exactly `k` neighbors for every observation. Self-matches are
+removed when searching the rows of `x` against themselves.
+
+```{r knn}
+knn5 <- kNN(x, k = 5)
+knn5
+
+head(knn5$id)
+head(knn5$dist)
+```
+
+Rows correspond to observations in `x`, and columns are ordered from nearest
+to farthest when `sort = TRUE`, the default. IDs are row positions in `x`; row
+names are retained as matrix row names. For example, the neighbors and
+distances for observation 10 are:
+
+```{r inspect-knn}
+i <- 10
+data.frame(
+  id = knn5$id[i, ],
+  row_name = rownames(x)[knn5$id[i, ]],
+  distance = knn5$dist[i, ]
+)
+```
+
+A `kNN` object represents a directed graph: observation `j` can be among the
+nearest neighbors of `i` without `i` being among the nearest neighbors of
+`j`. `adjacencylist()` returns the graph as a list of integer vectors.
+
+```{r knn-adjacency}
+knn_adj <- adjacencylist(knn5)
+knn_adj[1:3]
+```
+
+The graph can be plotted for small, low-dimensional data. The first two data
+columns are used as coordinates.
+
+```{r plot-knn}
+plot(knn5, x, pch = 19, main = "5-nearest-neighbor graph")
+```
+
+### Reuse and reduce a search
+
+A stored search can be reduced without rebuilding the kd-tree. This is useful
+when an analysis needs several values of `k`: calculate the largest required
+neighborhood once and retain its leading columns.
+
+```{r reduce-knn}
+knn10 <- kNN(x, k = 10)
+knn3 <- kNN(knn10, k = 3)
+
+c(stored = knn10$k, reduced = knn3$k)
+head(knn3$id)
+```
+
+The requested `k` cannot exceed the number stored in the input object. A new
+search is required to enlarge it.
+
+### Query new points
+
+Use `query` to find neighbors in reference data `x` for a different set of
+points. The output has one row per query point, and neighbor IDs still refer to
+rows of `x`.
+
+```{r knn-query}
+query <- rbind(
+  left = c(-0.5, 0.5),
+  right = c(1.5, 0.5)
+)
+
+query_knn <- kNN(x, k = 4, query = query)
+query_knn$id
+query_knn$dist
+```
+
+Plotting a query result colors the reference observations selected for each
+query. The query points are added as crosses.
+
+```{r plot-query}
+plot(query_knn, x, col = "grey70", main = "Neighbors of query points")
+points(query, pch = 4, lwd = 2, cex = 1.3)
+```
+
+Self-matches are not automatically removed in query mode. Thus, if a query row
+is identical to a reference row, that reference observation can be returned at
+distance zero.
+
+## Fixed-radius nearest neighbors
+
+`frNN()` finds every observation within radius `eps`. Since neighborhood sizes
+vary, IDs and distances are stored as parallel lists rather than matrices.
+Self-matches are excluded.
+
+```{r frnn}
+fr <- frNN(x, eps = 0.25)
+fr
+
+fr$id[1:3]
+fr$dist[1:3]
+summary(lengths(fr$id))
+```
+
+The adjacency-list representation is already stored in `id`, so
+`adjacencylist(fr)` returns that list. Empty integer vectors identify
+observations with no other point inside the radius.
+
+```{r frnn-adjacency}
+identical(adjacencylist(fr), fr$id)
+which(lengths(fr$id) == 0L)
+```
+
+Like a kNN graph, a fixed-radius graph can be plotted.
+
+```{r plot-frnn}
+plot(fr, x, pch = 19, main = "Fixed-radius graph (eps = 0.25)")
+```
+
+### Reduce a stored radius
+
+A fixed-radius result can be filtered to a smaller radius without repeating
+the search. Start with the largest radius that later analyses will need.
+
+```{r reduce-frnn}
+fr_wide <- frNN(x, eps = 0.30)
+fr_small <- frNN(fr_wide, eps = 0.12)
+
+c(wide_edges = sum(lengths(fr_wide$id)),
+  small_edges = sum(lengths(fr_small$id)))
+```
+
+The new radius cannot exceed the radius stored in the object. Fixed-radius
+queries use the same `query` interface as `kNN()`.
+
+```{r frnn-query}
+query_fr <- frNN(x, eps = 0.25, query = query)
+data.frame(
+  query = rownames(query),
+  neighbors = lengths(query_fr$id)
+)
+```
+
+## Shared nearest neighbors
+
+`sNN()` starts with a k-nearest-neighbor search and counts neighborhood
+overlap. Each observation is treated as belonging to its own neighborhood for
+this calculation. The `shared` matrix aligns with `id`: `shared[i, j]` is the
+similarity between observation `i` and the neighbor stored in `id[i, j]`.
+
+```{r snn}
+snn <- sNN(x, k = 10)
+snn
+
+head(snn$id, 3)
+head(snn$shared, 3)
+table(snn$shared)
+```
+
+By default, rows are sorted by decreasing shared-neighbor count. Distances and
+IDs are rearranged with the counts, so the columns are no longer necessarily
+ordered by Euclidean distance.
+
+Set `kt` to retain only graph edges with at least that many shared neighbors.
+Removed entries are represented by `NA` and are omitted by
+`adjacencylist()`.
+
+```{r threshold-snn}
+snn5 <- sNN(snn, kt = 5)
+snn5$id[1:3, ]
+adjacencylist(snn5)[1:3]
+```
+
+With `jp = TRUE`, an edge receives a nonzero similarity only when the two
+observations are in each other's nearest-neighbor lists. This mutual-neighbor
+rule is used by Jarvis--Patrick clustering and by the package's SNN clustering
+implementation.
+
+```{r mutual-snn}
+snn_mutual <- sNN(knn10, k = 10, jp = TRUE)
+c(
+  all_edges = sum(!is.na(snn$id)),
+  mutual_edges = sum(snn_mutual$shared > 0)
+)
+```
+
+Passing a precomputed `kNN` object, as above, avoids repeating the neighbor
+search. Shared-neighbor clustering is covered separately in the
+`vignette("nnclustering")` vignette.
+
+## Neighbor-distance diagnostics
+
+`kNNdist()` returns the distance from each observation to its kth nearest
+neighbor in original row order.
+
+```{r knndist}
+d5 <- kNNdist(x, k = 5)
+head(d5)
+summary(d5)
+```
+
+Use `all = TRUE` to retain the distances to every neighbor from 1 through `k`.
+
+```{r knndist-all}
+d_all <- kNNdist(x, k = 5, all = TRUE)
+head(d_all)
+```
+
+`kNNdistplot()` sorts these values and plots them. A sharp increase can suggest
+a range for the DBSCAN radius: points before the increase have nearby
+neighbors, while points in the upper tail are relatively isolated.
+
+```{r knndistplot}
+kNNdistplot(x, k = 5)
+```
+
+Several neighborhood sizes can be compared in one plot.
+
+```{r knndistplot-multiple}
+kNNdistplot(x, k = c(1, 5, 10))
+legend("topleft", legend = c("k = 1", "k = 5", "k = 10"),
+       col = 1:3, lty = 1, bty = "n")
+```
+
+For selecting `eps` for DBSCAN, `minPts` can be supplied instead. DBSCAN
+counts the point itself, while `kNNdist()` excludes it, so
+`kNNdistplot(x, minPts = 6)` uses `k = 5`.
+
+```{r knndistplot-minpts}
+kNNdistplot(x, minPts = 6)
+```
+
+The knee is a diagnostic, not an automatic parameter estimate. It may be
+unclear for data containing groups with different densities.
+
+## Connected components
+
+`comps()` finds connected components in an `NN` graph. In a kNN graph,
+`mutual = FALSE` treats a one-directional neighbor relation as sufficient for
+a connection; `mutual = TRUE` requires both observations to list each other.
+
+```{r components-knn}
+comp_directed <- comps(knn3, mutual = FALSE)
+comp_mutual <- comps(knn3, mutual = TRUE)
+
+c(
+  components_any_direction = length(unique(comp_directed)),
+  components_mutual = length(unique(comp_mutual))
+)
+```
+
+Fixed-radius graphs are symmetric, so no `mutual` argument is needed.
+
+```{r components-frnn}
+fr_comp <- comps(fr)
+table(fr_comp)
+
+plot(x, col = fr_comp, pch = 19, asp = 1,
+     main = "Components of the fixed-radius graph")
+```
+
+Thresholded `sNN` graphs can be handled in the same way.
+
+```{r components-snn}
+snn_comp <- comps(snn5)
+table(snn_comp)
+```
+
+`comps()` also accepts a `dist` object and a distance threshold. This is
+equivalent to components in the corresponding fixed-radius graph.
+
+```{r components-dist}
+comp_dist <- comps(dist(x), eps = 0.25)
+comp_fr <- comps(fr)
+
+# Component numbers are arbitrary; compare which pairs share a component.
+all(outer(comp_dist, comp_dist, `==`) ==
+      outer(comp_fr, comp_fr, `==`))
+```
+
+## Sorting results
+
+Sorting can be skipped during a search and applied later. This can save time
+when an algorithm only needs the set of neighbors. For `frNN`, `sort()` orders
+each list by distance; for `kNN`, it orders matrix rows by distance; and for
+`sNN`, it orders rows by decreasing shared-neighbor count.
+
+```{r sorting}
+fr_unsorted <- frNN(x, eps = 0.25, sort = FALSE)
+fr_sorted <- sort(fr_unsorted)
+
+data.frame(
+  id = fr_sorted$id[[1]],
+  distance = fr_sorted$dist[[1]]
+)
+```
+
+Setting `decreasing = TRUE` reverses the normal distance order for `kNN` and
+`frNN`. The default for `sNN` is already decreasing similarity.
+
+## Using non-Euclidean distances
+
+Supplying a `dist` object allows `kNN()`, `frNN()`, and `sNN()` to use another
+dissimilarity measure. However, this means that the efficient kd-tree 
+implementation cannot be used.
+
+```{r other-distance}
+d_manhattan <- dist(x, method = "manhattan")
+
+knn_manhattan <- kNN(d_manhattan, k = 5)
+fr_manhattan <- frNN(d_manhattan, eps = 0.25)
+snn_manhattan <- sNN(d_manhattan, k = 10)
+
+c(
+  knn_metric = knn_manhattan$metric,
+  frnn_metric = fr_manhattan$metric,
+  snn_metric = snn_manhattan$metric
+)
+```
+
+A `dist` object stores all pairwise dissimilarities and therefore requires
+quadratic memory. It also cannot be used with separate query points. Check that
+the selected dissimilarity, transformations, and variable weights are
+meaningful for the application.
+
+## Search strategies and performance
+
+For numeric data, the `search` argument offers three strategies:
+
+* `"kdtree"`, the default, builds a kd-tree and is typically the best starting
+  point for low- or moderate-dimensional data;
+* `"linear"` checks the observations without building a tree; and
+* `"dist"` first calculates all pairwise Euclidean distances.
+
+The strategies should agree apart from the selection of tied observations.
+
+```{r search-strategies}
+knn_tree <- kNN(x, k = 5, search = "kdtree")
+knn_linear <- kNN(x, k = 5, search = "linear")
+knn_dist <- kNN(x, k = 5, search = "dist")
+
+c(
+  tree_vs_linear = isTRUE(all.equal(knn_tree$dist, knn_linear$dist)),
+  tree_vs_dist = isTRUE(all.equal(knn_tree$dist, knn_dist$dist))
+)
+```
+
+`bucketSize` and `splitRule` control construction of the kd-tree. Their
+defaults are appropriate for most uses. Setting `approx` above zero enables
+approximate search, which can improve speed at the cost of omitting some true
+neighbors. Assess the effect on the downstream analysis before using it.
+
+Kd-trees generally become less effective as dimensionality grows. Linear
+search, an application-specific dimension reduction, or a different distance
+representation may be preferable in high-dimensional settings.
+
+## Important details
+
+* Input data and query points must be numeric and finite for kd-tree and linear
+  search.
+* A search of `x` against itself excludes self-matches; query searches do not.
+* `kNN()` returns exactly `k` observations. If multiple candidates tie at the
+  kth distance, one is retained and the others are omitted.
+* `frNN()` returns every observation within `eps`, so neighborhood sizes can
+  differ and may be zero.
+* IDs always refer to row positions in the reference data. Preserve a separate
+  stable identifier if rows may later be reordered.
+
+## Reference
+
+Mount, D. M. and Arya, S. (2010). *ANN: A Library for Approximate Nearest
+Neighbor Searching*. [ANN project page](https://www.cs.umd.edu/~mount/ANN/).

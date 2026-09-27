@@ -25,6 +25,7 @@ Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based Clustering 
 Useful links:
 \itemize{
   \item \url{https://github.com/mhahsler/dbscan}
+  \item \url{http://michael.hahsler.net/dbscan/}
   \item Report bugs at \url{https://github.com/mhahsler/dbscan/issues}
 }
 

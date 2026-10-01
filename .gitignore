@@ -1,6 +1,7 @@
 # Generated files 
 *.o
 *.so
+*.swp
 
 # History files
 .Rhistory

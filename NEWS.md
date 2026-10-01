@@ -1,4 +1,4 @@
-# dbscan 1.2.6.1 (Unreleased)
+# dbscan 1.2.7 (2026-10-01)
 
 ## Changes
 * Raised required R version to 4.3.0 to guarantee C++17 support.

@@ -105,8 +105,8 @@ plot(hdb, show_flat = TRUE)
 
 ## Additional guides
 
-- [Using dbscan with tidyverse](https://mhahsler.github.io/dbscan/articles/tidyverse.html)
-- [Using dbscan from Python](https://mhahsler.github.io/dbscan/articles/python.html)
+- [Using dbscan with tidyverse](https://michael.hahsler.net/dbscan/articles/tidyverse.html)
+- [Using dbscan from Python](https://michael.hahsler.net/dbscan/articles/python.html)
 
 ## License 
 The dbscan package is licensed under the [GNU General Public License (GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html). 

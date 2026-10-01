@@ -115,11 +115,13 @@ The following R packages use `dbscan`:
 [outlierMBC](https://CRAN.R-project.org/package=outlierMBC),
 [pagoda2](https://CRAN.R-project.org/package=pagoda2),
 [parameters](https://CRAN.R-project.org/package=parameters),
+[ParBayesianOptimization](https://CRAN.R-project.org/package=ParBayesianOptimization),
 [performance](https://CRAN.R-project.org/package=performance),
 [pguIMP](https://CRAN.R-project.org/package=pguIMP),
 [phynotype](https://CRAN.R-project.org/package=phynotype),
 [PiC](https://CRAN.R-project.org/package=PiC),
 [quickOutlier](https://CRAN.R-project.org/package=quickOutlier),
+[R4VN](https://CRAN.R-project.org/package=R4VN),
 [rarefun](https://CRAN.R-project.org/package=rarefun),
 [rcrisp](https://CRAN.R-project.org/package=rcrisp),
 [Rhobots](https://CRAN.R-project.org/package=Rhobots),
@@ -130,6 +132,7 @@ The following R packages use `dbscan`:
 [SampleCore](https://CRAN.R-project.org/package=SampleCore),
 [seriation](https://CRAN.R-project.org/package=seriation),
 [sfdep](https://CRAN.R-project.org/package=sfdep),
+[sfhotspot](https://CRAN.R-project.org/package=sfhotspot),
 [sfnetworks](https://CRAN.R-project.org/package=sfnetworks),
 [sharp](https://CRAN.R-project.org/package=sharp),
 [smotefamily](https://CRAN.R-project.org/package=smotefamily),
@@ -275,9 +278,9 @@ plot(hdb, show_flat = TRUE)
 ## Additional guides
 
 - [Using dbscan with
-  tidyverse](https://mhahsler.github.io/dbscan/articles/tidyverse.html)
+  tidyverse](https://michael.hahsler.net/dbscan/articles/tidyverse.html)
 - [Using dbscan from
-  Python](https://mhahsler.github.io/dbscan/articles/python.html)
+  Python](https://michael.hahsler.net/dbscan/articles/python.html)
 
 ## License
 
@@ -301,7 +304,7 @@ To cite package ‘dbscan’ in publications use:
 
 ``` R
 @Article{,
-  title = {dbscan: Fast Density-Based Clustering with {R}},
+  title = {{dbscan}: Fast Density-Based Clustering with {R}},
   author = {Michael Hahsler and Matthew Piekenbrock and Derek Doran},
   journal = {Journal of Statistical Software},
   year = {2019},

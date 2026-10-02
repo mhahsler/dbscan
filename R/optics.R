@@ -195,6 +195,9 @@
 optics <- function(x, eps = Inf, minPts = 5, ...) {
 
   minPts <- .validate_integer_scalar(minPts, "minPts")
+  
+  ### we treat NULL as infinity
+  eps <- eps %||% Inf
   eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
 
   ### For infinity we use eps from minPts which gives the same result

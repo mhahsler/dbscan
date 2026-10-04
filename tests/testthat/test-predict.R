@@ -60,3 +60,11 @@ test_that("predict", {
   #points(newdata, col = ifelse(pr == 0, "gray", pr), pch = 16)
   #points(newdata[res$cluster[idx] != pr,, drop = FALSE], col = "red", pch = 4, lwd = 2)
 })
+
+test_that("predict works with a single column", {
+  x <- cbind(x = c(1:5, 11:15))
+  res <- dbscan(x, eps = 1.5, minPts = 3)
+  expect_identical(predict(res, x, data = x), res$cluster)
+  res <- hdbscan(x, minPts = 3)
+  expect_identical(predict(res, x, data = x), res$cluster)
+})

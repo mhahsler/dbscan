@@ -13,6 +13,8 @@
 - hdbscan() and predict() for hdbscan objects now always return integer
   cluster assignments (by m-muecke)
 - OPTICS: Fixed calculation for epsilon when set to infinity.
+- predict() for dbscan, optics, and hdbscan objects now works with
+  single-column data (by m-muecke)
 
 ## dbscan 1.2.6 (2026-08-24)
 

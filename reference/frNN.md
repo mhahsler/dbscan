@@ -65,10 +65,10 @@ print(x, ...)
 
 - approx:
 
-  use approximate nearest neighbors. All NN up to a distance of a factor
-  of `1 + approx` eps may be used. Some actual NN may be omitted leading
-  to spurious clusters and noise points. However, the algorithm will
-  enjoy a significant speedup.
+  a positive number useed for approximate nearest neighbors. All NN up
+  to a distance of a factor of `1 + approx` eps may be used. Some actual
+  NN may be omitted leading to spurious clusters and noise points.
+  However, the algorithm will enjoy a significant speedup.
 
 - decreasing:
 

@@ -24,7 +24,7 @@ Euclidean distance used in the original DBCV implementation.}
 A list with the DBCV \code{score} for the clustering,
 the density sparseness of cluster (\code{dsc}) values,
 the density separation of pairs of clusters (\code{dspc}) distances,
-and the validity indices of clusters (\code{c_c}).
+and the validity indices of clusters (\code{v_c}).
 }
 \description{
 Calculate the Density-Based Clustering Validation Index (DBCV)  for a

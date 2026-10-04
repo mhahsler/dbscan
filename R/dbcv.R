@@ -65,7 +65,7 @@
 #' @return A list with the DBCV `score` for the clustering,
 #'   the density sparseness of cluster (`dsc`) values,
 #'   the density separation of pairs of clusters (`dspc`) distances,
-#'   and the validity indices of clusters (`c_c`).
+#'   and the validity indices of clusters (`v_c`).
 #'
 #' @author Matt Piekenbrock and Michael Hahsler
 #' @references Davoud Moulavi and Pablo A. Jaskowiak and

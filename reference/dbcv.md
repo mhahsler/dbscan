@@ -38,7 +38,7 @@ dbcv(x, cl, d, metric = "euclidean", sample = NULL)
 
 A list with the DBCV `score` for the clustering, the density sparseness
 of cluster (`dsc`) values, the density separation of pairs of clusters
-(`dspc`) distances, and the validity indices of clusters (`c_c`).
+(`dspc`) distances, and the validity indices of clusters (`v_c`).
 
 ## Details
 

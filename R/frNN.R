@@ -48,7 +48,7 @@
 #' @param splitRule rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
 #' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
 #' ANNs best guess.
-#' @param approx use approximate nearest neighbors. All NN up to a distance of
+#' @param approx a positive number useed for approximate nearest neighbors. All NN up to a distance of
 #' a factor of `1 + approx` eps may be used. Some actual NN may be omitted
 #' leading to spurious clusters and noise points.  However, the algorithm will
 #' enjoy a significant speedup.

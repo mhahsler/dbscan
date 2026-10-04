@@ -47,7 +47,7 @@ done later using \code{sort()}.}
 \code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
 ANNs best guess.}
 
-\item{approx}{use approximate nearest neighbors. All NN up to a distance of
+\item{approx}{a positive number useed for approximate nearest neighbors. All NN up to a distance of
 a factor of \code{1 + approx} eps may be used. Some actual NN may be omitted
 leading to spurious clusters and noise points.  However, the algorithm will
 enjoy a significant speedup.}

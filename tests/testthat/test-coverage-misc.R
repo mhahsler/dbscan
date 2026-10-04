@@ -1,0 +1,127 @@
+test_that("GLOSH accepts hierarchies and data representations", {
+  x <- matrix(c(0, 0.1, 0.2, 2, 2.1, 2.2, 5), ncol = 1)
+  hc <- hclust(dist(x), method = "single")
+
+  scores <- glosh(hc, k = 2)
+  expect_length(scores, nrow(x))
+  expect_true(all(is.finite(scores)))
+  expect_true(all(scores >= 0 & scores <= 1))
+  expect_equal(glosh(x, k = 2), glosh(dist(x), k = 2))
+  expect_error(glosh(x, k = 1), "k")
+  expect_error(glosh(x, k = nrow(x)), "k")
+  expect_error(glosh(1:5), "matrix, dist, or hclust")
+})
+
+test_that("pointdensity returns counts and the documented estimates", {
+  x <- matrix(c(0, 1, 3), ncol = 1)
+  counts <- pointdensity(x, eps = 1, type = "frequency")
+  expect_equal(counts, c(2L, 2L, 1L))
+  expect_equal(pointdensity(dist(x), eps = 1), counts)
+  expect_equal(pointdensity(x, eps = 1, type = "density"), counts / 6)
+
+  gaussian <- pointdensity(x, eps = 1, type = "gaussian")
+  expect_length(gaussian, nrow(x))
+  expect_true(all(is.finite(gaussian) & gaussian > 0))
+  expect_error(pointdensity(x, eps = -1), "eps")
+  expect_error(pointdensity(x, eps = 1, type = "unknown"), "arg")
+})
+
+test_that("Jarvis-Patrick works with data, distances, and kNN results", {
+  x <- matrix(c(0, .1, .2, 3, 3.1, 3.2), ncol = 1)
+  nn <- kNN(x, k = 2)
+  cl <- jpclust(x, k = 2, kt = 1)
+  expect_s3_class(cl, "general_clustering")
+  expect_length(cl$cluster, nrow(x))
+  expect_identical(cl$param, list(k = 2, kt = 1))
+  expect_equal(jpclust(dist(x), k = 2, kt = 1)$cluster, cl$cluster)
+  expect_equal(jpclust(nn, kt = 1)$cluster, cl$cluster)
+  expect_error(jpclust(x, k = 2, kt = 0), "kt")
+  expect_error(jpclust(x, k = 2, kt = 3), "kt")
+  expect_output(print(cl), "Jarvis-Patrick clustering")
+})
+
+test_that("sNN clustering records parameters and handles border points", {
+  x <- matrix(c(0, .1, .2, 3, 3.1, 3.2, 10), ncol = 1)
+  cl <- sNNclust(x, k = 2, eps = 2, minPts = 2)
+  expect_s3_class(cl, "general_clustering")
+  expect_length(cl$cluster, nrow(x))
+  expect_identical(cl$param, list(k = 2, eps = 2, minPts = 2, borderPoints = TRUE))
+  expect_true(any(cl$cluster == 0L))
+  no_border <- sNNclust(x, k = 2, eps = 2, minPts = 2, borderPoints = FALSE)
+  expect_identical(no_border$param$borderPoints, FALSE)
+  expect_equal(length(unique(no_border$cluster[no_border$cluster > 0])),
+               length(unique(cl$cluster[cl$cluster > 0])))
+})
+
+test_that("comps handles distance and nearest-neighbor graph methods", {
+  x <- matrix(c(0, .1, 3, 3.1, 10), ncol = 1)
+  d <- dist(x)
+  expect_equal(comps(d, eps = .2), c(1L, 1L, 2L, 2L, 3L))
+  fr <- frNN(x, eps = .2)
+  expect_equal(comps(fr) == comps(fr)[1], c(TRUE, TRUE, FALSE, FALSE, FALSE))
+  expect_equal(comps(fr)[3] == comps(fr)[4], TRUE)
+  sn <- sNN(x, k = 2)
+  expect_length(comps(sn), nrow(x))
+  kn <- kNN(x, k = 1)
+  directed <- comps(kn, mutual = FALSE)
+  mutual <- comps(kn, mutual = TRUE)
+  expect_length(directed, nrow(x))
+  expect_length(mutual, nrow(x))
+  expect_gte(length(unique(mutual)), length(unique(directed)))
+})
+
+test_that("hullplot and clplot accept vectors and clustering objects", {
+  x <- matrix(c(0, 0, 1, 0, 0, 1, 3, 3, 4, 3, 3, 4), ncol = 2, byrow = TRUE)
+  cl <- c(1L, 1L, 1L, 2L, 2L, 2L)
+  file <- tempfile(fileext = ".pdf")
+  grDevices::pdf(file)
+  expect_silent(hullplot(x, cl, solid = FALSE))
+  expect_warning(hullplot(x, list(cluster = cl), col = "blue", hull_lwd = 0))
+  expect_silent(clplot(x, cl))
+  expect_error(hullplot(x, "bad"), "cluster assignment")
+  grDevices::dev.off()
+  unlink(file)
+
+  x3 <- cbind(x, 1:6)
+  file <- tempfile(fileext = ".pdf")
+  grDevices::pdf(file)
+  expect_silent(hullplot(x3, cl))
+  grDevices::dev.off()
+  unlink(file)
+})
+
+test_that("dbscan tidiers summarize and augment supported clusterings", {
+  skip_if_not_installed("tibble")
+  x <- data.frame(x = c(0, .1, 3, 3.1, 10))
+  db <- dbscan(x, eps = .2, minPts = 2)
+  expect_equal(nobs(db), length(db$cluster))
+  td <- tidy(db)
+  expect_named(td, c("cluster", "size", "noise"))
+  expect_equal(sum(td$size), nrow(x))
+  expect_equal(glance(db)$nobs, nrow(x))
+  aug <- augment(db, data = x)
+  expect_equal(aug$.cluster, factor(db$cluster, levels = 0:max(db$cluster)))
+  newx <- x[1:2, , drop = FALSE]
+  expect_equal(augment(db, data = x, newdata = newx)$.cluster,
+               factor(predict(db, newdata = newx, data = x),
+                      levels = 0:max(db$cluster)))
+  expect_error(augment(db), "Must specify")
+  expect_error(augment(db, data = x[1:2, , drop = FALSE]), "original data")
+
+  hdb <- hdbscan(x, minPts = 2)
+  expect_equal(nobs(hdb), nrow(x))
+  expect_named(tidy(hdb), c("cluster", "size", "cluster_score", "noise"))
+  expect_true(all(c(".coredist", ".membership_prob", ".outlier_scores") %in%
+                    names(augment(hdb, data = x))))
+  expect_true(all(is.na(augment(hdb, data = x, newdata = newx)$.coredist)))
+  expect_error(augment(hdb), "original data")
+
+  jp <- jpclust(x, k = 2, kt = 1)
+  expect_equal(nobs(jp), nrow(x))
+  expect_equal(glance(jp)$n.clusters,
+               length(unique(jp$cluster[jp$cluster != 0])))
+  expect_named(tidy(jp), c("cluster", "size", "noise"))
+  expect_equal(nrow(augment(jp, data = x)), nrow(x))
+  expect_error(augment(jp, data = x, newdata = newx), "not supported")
+  expect_error(augment(jp, data = x[1:2, , drop = FALSE]), "original data")
+})

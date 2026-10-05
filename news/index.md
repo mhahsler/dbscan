@@ -2,6 +2,8 @@
 
 ## dbscan 1.2.7 (2026-10-04)
 
+CRAN release: 2026-10-05
+
 ### Changes
 
 - Raised required R version to 4.3.0 to guarantee C++17 support.

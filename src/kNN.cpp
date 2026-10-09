@@ -52,14 +52,15 @@ List kNN_int(NumericMatrix data, int k,
 
     kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
 
-    // remove self match
+    // remove self match; with duplicate points the query point may not be
+    // among the k+1 hits, in which case we keep the k nearest
     IntegerVector ids = IntegerVector(nnIdx, nnIdx+k+1);
     LogicalVector take = ids != i;
     ids = ids[take];
-    id(i, _) = ids + 1;
+    id(i, _) = head(ids, k) + 1;
 
     NumericVector ndists = NumericVector(dists, dists+k+1)[take];
-    d(i, _) = sqrt(ndists);
+    d(i, _) = sqrt(head(ndists, k));
   }
 
   // cleanup

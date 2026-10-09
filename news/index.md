@@ -1,5 +1,12 @@
 # Changelog
 
+## dbscan 1.2.8 (unpublished)
+
+### Bugfixes
+
+- kNN.cpp: Keep the k nearest hits in kNN_int when the query point is
+  not among them (by Kevin Ushey).
+
 ## dbscan 1.2.7 (2026-10-04)
 
 CRAN release: 2026-10-05

@@ -16,7 +16,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/mhahsler/dbscan/blob/dbscan_1.2.7/inst/CITATION)
+[`inst/CITATION`](https://github.com/mhahsler/dbscan/blob/master/inst/CITATION)
 
 Hahsler M, Piekenbrock M (2026). *dbscan: Density-Based Spatial
 Clustering of Applications with Noise (DBSCAN) and Related Algorithms*.

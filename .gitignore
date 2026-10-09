@@ -1,4 +1,4 @@
-# Generated files 
+# Generated files
 *.o
 *.so
 *.swp
@@ -21,12 +21,16 @@ vignettes/*.html
 vignettes/*.pdf
 .Rproj.user
 
-# OS stuff 
+# OS stuff
 .DS*
 
-# Personal work directories 
+# Personal work directories
 Work
 ignore
 jss
 TODO
 docs
+
+.agents/
+.codex/
+.jekyll-cache/

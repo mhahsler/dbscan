@@ -34,3 +34,11 @@ docs
 .agents/
 .codex/
 .jekyll-cache/
+
+# Python package build and test outputs
+python/build/
+python/dist/
+python/site/
+python/.pytest_cache/
+python/**/__pycache__/
+python/**/*.egg-info/

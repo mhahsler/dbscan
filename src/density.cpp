@@ -9,6 +9,7 @@
 
 
 #include <Rcpp.h>
+#include "ann_raii.h"
 #include "ANN/ANN.h"
 #include "regionQuery.h"
 
@@ -24,15 +25,14 @@ IntegerVector dbscan_density_int(
   // kd-tree uses squared distances
   double eps2 = eps*eps;
 
-  ANNpointSet* kdTree = NULL;
-  ANNpointArray dataPts = NULL;
+  ANNPoints dataPts;
   int nrow = NA_INTEGER;
   int ncol= NA_INTEGER;
 
   // copy data for kd-tree
   nrow = data.nrow();
   ncol = data.ncol();
-  dataPts = annAllocPts(nrow, ncol);
+  dataPts = ANNPoints(nrow, ncol);
   for (int i = 0; i < nrow; i++){
     for (int j = 0; j < ncol; j++){
       (dataPts[i])[j] = data(i, j);
@@ -41,9 +41,8 @@ IntegerVector dbscan_density_int(
   //Rprintf("Points copied.\n");
 
   // create kd-tree (1) or linear search structure (2)
-  if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-    (ANNsplitRule) splitRule);
-  else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+  auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
+    bucketSize, splitRule);
   //Rprintf("kd-tree ready. starting DBSCAN.\n");
 
   std::vector<int> N;
@@ -53,14 +52,9 @@ IntegerVector dbscan_density_int(
     //Rprintf("processing point %d\n", i+1);
     if (!(i % 100)) Rcpp::checkUserInterrupt();
 
-    N = regionQuery(i, dataPts, kdTree, eps2, approx);
+    N = regionQuery(i, dataPts.get(), kdTree.get(), eps2, approx);
     count[i] = N.size();
   }
-
-  // cleanup
-  if (kdTree != NULL) delete kdTree;
-  if (dataPts != NULL)  annDeallocPts(dataPts);
-  // annClose(); is now done globally in the package
 
   return count;
 }

@@ -54,7 +54,7 @@ Copyright: ANN library is copyright by University of Maryland, Sunil Arya
     Matthew Piekenbrock.
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 Collate: 
     'AAA_dbscan-package.R'
     'AAA_definitions.R'

@@ -10,6 +10,7 @@
 
 
 #include <Rcpp.h>
+#include "ann_raii.h"
 #include "ANN/ANN.h"
 #include "regionQuery.h"
 
@@ -63,8 +64,8 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   // kd-tree uses squared distances
   double eps2 = eps*eps;
 
-  ANNpointSet* kdTree = NULL;
-  ANNpointArray dataPts = NULL;
+  ANNPoints dataPts;
+  std::unique_ptr<ANNpointSet> kdTree;
   int nrow = NA_INTEGER;
   int ncol= NA_INTEGER;
 
@@ -76,7 +77,7 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     // copy data for kd-tree
     nrow = data.nrow();
     ncol = data.ncol();
-    dataPts = annAllocPts(nrow, ncol);
+    dataPts = ANNPoints(nrow, ncol);
     for (int i = 0; i < nrow; i++){
       for (int j = 0; j < ncol; j++){
         (dataPts[i])[j] = data(i, j);
@@ -85,9 +86,8 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     //Rprintf("Points copied.\n");
 
     // create kd-tree (1) or linear search structure (2)
-    if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule) splitRule);
-    else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+    kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
+      bucketSize, splitRule);
     //Rprintf("kd-tree ready. starting OPTICS.\n");
 
   }
@@ -110,11 +110,11 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     if (visited[p]) continue;
 
     // ExpandClusterOrder
-    //N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
+    //N = regionQueryDist(p, dataPts.get(), kdTree.get(), eps2, approx);
     if(frNN.size())   N = std::make_pair(
       as<std::vector<int> >(as<List>(frNN["id"])[p]),
       as<std::vector<double> >(as<List>(frNN["dist"])[p]));
-    else              N = regionQueryDist(p, dataPts, kdTree, eps2, approx);
+    else              N = regionQueryDist(p, dataPts.get(), kdTree.get(), eps2, approx);
 
     visited[p] = true;
 
@@ -153,11 +153,11 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       q = *q_it;
       seeds.erase(q_it);
 
-      //N2 = regionQueryDist(q, dataPts, kdTree, eps2, approx);
+      //N2 = regionQueryDist(q, dataPts.get(), kdTree.get(), eps2, approx);
       if(frNN.size())   N = std::make_pair(
         as<std::vector<int> >(as<List>(frNN["id"])[q]),
         as<std::vector<double> >(as<List>(frNN["dist"])[q]));
-      else              N = regionQueryDist(q, dataPts, kdTree, eps2, approx);
+      else              N = regionQueryDist(q, dataPts.get(), kdTree.get(), eps2, approx);
 
       visited[q] = true;
 
@@ -177,11 +177,6 @@ List optics_int(NumericMatrix data, double eps, int minPts,
         reachdist, coredist, pre);
     }
   }
-
-  // cleanup
-  if (kdTree != NULL) delete kdTree;
-  if (dataPts != NULL)  annDeallocPts(dataPts);
-  // annClose(); is now done globally in the package
 
   // prepare results (R index starts with 1)
   List ret;

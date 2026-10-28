@@ -11,6 +11,7 @@
 // Note: does not return self-matches!
 
 #include "kNN.h"
+#include "ann_raii.h"
 
 // returns knn + dist
 List kNN_int(NumericMatrix data, int k,
@@ -19,7 +20,7 @@ List kNN_int(NumericMatrix data, int k,
   // copy data
   int nrow = data.nrow();
   int ncol = data.ncol();
-  ANNpointArray dataPts = annAllocPts(nrow, ncol);
+  ANNPoints dataPts(nrow, ncol);
   for(int i = 0; i < nrow; i++){
     for(int j = 0; j < ncol; j++){
       (dataPts[i])[j] = data(i, j);
@@ -28,13 +29,8 @@ List kNN_int(NumericMatrix data, int k,
   //Rprintf("Points copied.\n");
 
   // create kd-tree (1) or linear search structure (2)
-  ANNpointSet* kdTree = NULL;
-  if (type==1){
-    kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule)  splitRule);
-  } else{
-    kdTree = new ANNbruteForce(dataPts, nrow, ncol);
-  }
+  auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
+    bucketSize, splitRule);
   //Rprintf("kd-tree ready. starting DBSCAN.\n");
 
   NumericMatrix d(nrow, k);
@@ -42,33 +38,26 @@ List kNN_int(NumericMatrix data, int k,
 
   // Note: the search also returns the point itself (as the first hit)!
   // So we have to look for k+1 points.
-  ANNdistArray dists = new ANNdist[k+1];
-  ANNidxArray nnIdx = new ANNidx[k+1];
+  std::vector<ANNdist> dists(k+1);
+  std::vector<ANNidx> nnIdx(k+1);
 
   for (int i=0; i<nrow; i++) {
     if (!(i % 100)) Rcpp::checkUserInterrupt();
 
     ANNpoint queryPt = dataPts[i];
 
-    kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
+    kdTree->annkSearch(queryPt, k+1, nnIdx.data(), dists.data(), approx);
 
     // remove self match; with duplicate points the query point may not be
     // among the k+1 hits, in which case we keep the k nearest
-    IntegerVector ids = IntegerVector(nnIdx, nnIdx+k+1);
+    IntegerVector ids = IntegerVector(nnIdx.begin(), nnIdx.end());
     LogicalVector take = ids != i;
     ids = ids[take];
     id(i, _) = head(ids, k) + 1;
 
-    NumericVector ndists = NumericVector(dists, dists+k+1)[take];
+    NumericVector ndists = NumericVector(dists.begin(), dists.end())[take];
     d(i, _) = sqrt(head(ndists, k));
   }
-
-  // cleanup
-  delete kdTree;
-  delete [] dists;
-  delete [] nnIdx;
-  annDeallocPts(dataPts);
-  // annClose(); is now done globally in the package
 
 
   // prepare results
@@ -90,7 +79,7 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   // copy data
   int nrow = data.nrow();
   int ncol = data.ncol();
-  ANNpointArray dataPts = annAllocPts(nrow, ncol);
+  ANNPoints dataPts(nrow, ncol);
   for(int i = 0; i < nrow; i++){
     for(int j = 0; j < ncol; j++){
       (dataPts[i])[j] = data(i, j);
@@ -100,7 +89,7 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   // copy query
   int nrow_q = query.nrow();
   int ncol_q = query.ncol();
-  ANNpointArray queryPts = annAllocPts(nrow_q, ncol_q);
+  ANNPoints queryPts(nrow_q, ncol_q);
   for(int i = 0; i < nrow_q; i++){
     for(int j = 0; j < ncol_q; j++){
       (queryPts[i])[j] = query(i, j);
@@ -109,42 +98,29 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   //Rprintf("Points copied.\n");
 
   // create kd-tree (1) or linear search structure (2)
-  ANNpointSet* kdTree = NULL;
-  if (type==1){
-    kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule)  splitRule);
-  } else{
-    kdTree = new ANNbruteForce(dataPts, nrow, ncol);
-  }
+  auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
+    bucketSize, splitRule);
   //Rprintf("kd-tree ready. starting DBSCAN.\n");
 
   NumericMatrix d(nrow_q, k);
   IntegerMatrix id(nrow_q, k);
 
   // Note: does not return itself with query
-  ANNdistArray dists = new ANNdist[k];
-  ANNidxArray nnIdx = new ANNidx[k];
+  std::vector<ANNdist> dists(k);
+  std::vector<ANNidx> nnIdx(k);
 
   for (int i=0; i<nrow_q; i++) {
     if (!(i % 100)) Rcpp::checkUserInterrupt();
 
     ANNpoint queryPt = queryPts[i];
-    kdTree->annkSearch(queryPt, k, nnIdx, dists, approx);
+    kdTree->annkSearch(queryPt, k, nnIdx.data(), dists.data(), approx);
 
-    IntegerVector ids = IntegerVector(nnIdx, nnIdx+k);
+    IntegerVector ids = IntegerVector(nnIdx.begin(), nnIdx.end());
     id(i, _) = ids + 1;
 
-    NumericVector ndists = NumericVector(dists, dists+k);
+    NumericVector ndists = NumericVector(dists.begin(), dists.end());
     d(i, _) = sqrt(ndists);
   }
-
-  // cleanup
-  delete kdTree;
-  delete [] dists;
-  delete [] nnIdx;
-  annDeallocPts(dataPts);
-  annDeallocPts(queryPts);
-  // annClose(); is now done globally in the package
 
   // prepare results (ANN returns points sorted by distance)
   List ret;

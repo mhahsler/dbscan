@@ -18,3 +18,5 @@ _config.yml
 ^\.agents$
 ^\.codex$
 ^\.jekyll-cache$
+^python$
+^tools$

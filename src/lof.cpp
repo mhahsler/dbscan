@@ -12,6 +12,7 @@
 // neighborhood.
 
 #include <Rcpp.h>
+#include "ann_raii.h"
 #include "regionQuery.h"
 
 using namespace Rcpp;
@@ -27,7 +28,7 @@ List lof_kNN(NumericMatrix data, int minPts,
   // copy data
   int nrow = data.nrow();
   int ncol = data.ncol();
-  ANNpointArray dataPts = annAllocPts(nrow, ncol);
+  ANNPoints dataPts(nrow, ncol);
   for(int i = 0; i < nrow; i++){
     for(int j = 0; j < ncol; j++){
       (dataPts[i])[j] = data(i, j);
@@ -36,19 +37,14 @@ List lof_kNN(NumericMatrix data, int minPts,
   //Rprintf("Points copied.\n");
 
   // create kd-tree (1) or linear search structure (2)
-  ANNpointSet* kdTree = NULL;
-  if (type==1){
-    kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule)  splitRule);
-  } else{
-    kdTree = new ANNbruteForce(dataPts, nrow, ncol);
-  }
+  auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
+    bucketSize, splitRule);
   //Rprintf("kd-tree ready. starting DBSCAN.\n");
 
   // Note: the search also returns the point itself (as the first hit)!
   // So we have to look for k+1 points.
-  ANNdistArray dists = new ANNdist[k+1];
-  ANNidxArray nnIdx = new ANNidx[k+1];
+  std::vector<ANNdist> dists(k+1);
+  std::vector<ANNidx> nnIdx(k+1);
   nn N;
 
   // results
@@ -63,18 +59,18 @@ List lof_kNN(NumericMatrix data, int minPts,
     ANNpoint queryPt = dataPts[i];
 
     // find k-NN distance
-    kdTree->annkSearch(queryPt, k+1, nnIdx, dists, approx);
+    kdTree->annkSearch(queryPt, k+1, nnIdx.data(), dists.data(), approx);
     k_dist[i] = ANN_ROOT(dists[k]); // this is a squared distance!
 
     // find k-NN neighborhood which can be larger than k with tied distances
     // This works under Linux and Windows, but not under Solaris: The points at the
     // k_distance may not be included.
-    //nn N = regionQueryDist_point(queryPt, dataPts, kdTree, dists[k], approx);
+    //nn N = regionQueryDist_point(queryPt, dataPts.get(), kdTree.get(), dists[k], approx);
 
     // Make the comparison robust.
     // Compare doubles: http://c-faq.com/fp/fpequal.html
     double minPts_dist = dists[k] + DBL_EPSILON * dists[k];
-    nn N = regionQueryDist_point(queryPt, dataPts, kdTree, minPts_dist, approx);
+    nn N = regionQueryDist_point(queryPt, dataPts.get(), kdTree.get(), minPts_dist, approx);
 
     IntegerVector ids = IntegerVector(N.first.begin(), N.first.end());
     NumericVector dists = NumericVector(N.second.begin(), N.second.end());
@@ -88,12 +84,6 @@ List lof_kNN(NumericMatrix data, int minPts,
     dist[i] = sqrt(dists);
   }
 
-  // cleanup
-  delete kdTree;
-  delete [] dists;
-  delete [] nnIdx;
-  annDeallocPts(dataPts);
-  // annClose(); is now done globally in the package
 
   // all k_dists are squared
   //k_dist = sqrt(k_dist);

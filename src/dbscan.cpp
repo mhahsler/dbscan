@@ -10,6 +10,7 @@
 
 
 #include <Rcpp.h>
+#include "ann_raii.h"
 #include "ANN/ANN.h"
 #include "regionQuery.h"
 
@@ -31,8 +32,8 @@ IntegerVector dbscan_int(
 
   bool weighted = FALSE;
   double Nweight = 0.0;
-  ANNpointSet* kdTree = NULL;
-  ANNpointArray dataPts = NULL;
+  ANNPoints dataPts;
+  std::unique_ptr<ANNpointSet> kdTree;
   int nrow = NA_INTEGER;
   int ncol= NA_INTEGER;
 
@@ -44,7 +45,7 @@ IntegerVector dbscan_int(
     // copy data for kd-tree
     nrow = data.nrow();
     ncol = data.ncol();
-    dataPts = annAllocPts(nrow, ncol);
+    dataPts = ANNPoints(nrow, ncol);
     for (int i = 0; i < nrow; i++){
       for (int j = 0; j < ncol; j++){
         (dataPts[i])[j] = data(i, j);
@@ -53,9 +54,8 @@ IntegerVector dbscan_int(
     //Rprintf("Points copied.\n");
 
     // create kd-tree (1) or linear search structure (2)
-    if (type==1) kdTree = new ANNkd_tree(dataPts, nrow, ncol, bucketSize,
-      (ANNsplitRule) splitRule);
-    else kdTree = new ANNbruteForce(dataPts, nrow, ncol);
+    kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
+      bucketSize, splitRule);
     //Rprintf("kd-tree ready. starting DBSCAN.\n");
   }
 
@@ -76,9 +76,9 @@ IntegerVector dbscan_int(
 
     if (visited[i]) continue;
 
-    //N = regionQuery(i, dataPts, kdTree, eps2, approx);
+    //N = regionQuery(i, dataPts.get(), kdTree.get(), eps2, approx);
     if(frNN.size())   N = Rcpp::as< std::vector<int> >(frNN[i]);
-    else              N = regionQuery(i, dataPts, kdTree, eps2, approx);
+    else              N = regionQuery(i, dataPts.get(), kdTree.get(), eps2, approx);
 
     // noise points stay unassigned for now
     //if (weighted) Nweight = sum(weights[IntegerVector(N.begin(), N.end())]) +
@@ -105,9 +105,9 @@ IntegerVector dbscan_int(
       if (visited[j]) continue; // point already processed
       visited[j] = true;
 
-      //N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
+      //N2 = regionQuery(j, dataPts.get(), kdTree.get(), eps2, approx);
       if(frNN.size())   N2 = Rcpp::as< std::vector<int> >(frNN[j]);
-      else              N2 = regionQuery(j, dataPts, kdTree, eps2, approx);
+      else              N2 = regionQuery(j, dataPts.get(), kdTree.get(), eps2, approx);
 
       if (weighted) {
         // Nweight = sum(weights(NumericVector(N2.begin(), N2.end())) +
@@ -139,11 +139,6 @@ IntegerVector dbscan_int(
       id[clusters[i][j]] = i+1;
     }
   }
-
-  // cleanup
-  if (kdTree != NULL) delete kdTree;
-  if (dataPts != NULL)  annDeallocPts(dataPts);
-  // annClose(); is now done globally in the package
 
   return wrap(id);
 }

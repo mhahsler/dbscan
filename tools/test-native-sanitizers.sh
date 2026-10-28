@@ -51,7 +51,9 @@ ASAN_OPTIONS="${ASAN_OPTIONS:-detect_leaks=1:halt_on_error=1}" \
 UBSAN_OPTIONS="${UBSAN_OPTIONS:-print_stacktrace=1:halt_on_error=1}" \
   "$dbscan_work/test-ann-points"
 
+# The direct executable also needs the library path normally set by the launcher.
 R_HOME="$dbscan_r_home" \
+LD_LIBRARY_PATH="$dbscan_r_home/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
 LD_PRELOAD="$dbscan_asan:$dbscan_cxx_runtime${LD_PRELOAD:+:$LD_PRELOAD}" \
 ASAN_OPTIONS="${ASAN_OPTIONS:-detect_leaks=1:halt_on_error=1}" \
 UBSAN_OPTIONS="${UBSAN_OPTIONS:-print_stacktrace=1:halt_on_error=1}" \

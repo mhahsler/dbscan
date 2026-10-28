@@ -37,9 +37,11 @@ sets `NOT_CRAN=true` so these tests always run in sanitizer checks. For manual
 
 The runner uses the C++ compiler configured by R and locates its GCC ASan
 runtime. It invokes R's direct executable so ASan is not injected into the R
-shell launcher's subprocesses. The C++ runtime is also loaded at startup so
-ASan can intercept C++ exception handling. The R executable itself and installed R
-dependencies are not rebuilt with sanitizers; package code and inline Rcpp
+shell launcher's subprocesses. It adds R's library directory to
+`LD_LIBRARY_PATH` so the executable can find `libR.so`, including for R
+installations outside the system library paths. The C++ runtime is also loaded
+at startup so ASan can intercept C++ exception handling. The R executable itself
+and installed R dependencies are not rebuilt with sanitizers; package code and inline Rcpp
 code compiled into dbscan are instrumented. See R's
 [sanitizer guidance](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Using-the-Address-Sanitizer).
 

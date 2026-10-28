@@ -54,7 +54,7 @@ predict(object, newdata, data, ...)
 
   additional arguments are passed on to fixed-radius nearest neighbor
   search algorithm. See
-  [`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) for
+  [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) for
   details on how to control the search strategy.
 
 - cluster, predecessor:
@@ -111,7 +111,7 @@ An object of class `optics` with components:
 
 - reachdist :
 
-  [reachability](http://michael.hahsler.net/dbscan/reference/reachability.md)
+  [reachability](https://michael.hahsler.net/dbscan/reference/reachability.md)
   distance for each data point in `x`.
 
 - coredist :
@@ -163,7 +163,7 @@ spatially closest become neighbors in the ordering. The closest analog
 to this ordering is dendrogram in single-link hierarchical clustering.
 The algorithm also calculates the reachability distance for each point.
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) (see
-[reachability_plot](http://michael.hahsler.net/dbscan/reference/reachability.md))
+[reachability_plot](https://michael.hahsler.net/dbscan/reference/reachability.md))
 produces a reachability plot which shows each points reachability
 distance between two consecutive points where the points are sorted by
 OPTICS. Valleys represent clusters (the deeper the valley, the more
@@ -173,7 +173,7 @@ dense the cluster) and high points indicate points between clusters.
 
 If `x` is specified as a data matrix, then Euclidean distances and fast
 nearest neighbor lookup using a kd-tree are used. See
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) for
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) for
 details on the parameters for the kd-tree.
 
 ### Extracting a Clustering
@@ -198,7 +198,8 @@ OPTICS are implemented:
 
 [`predict()`](https://rdrr.io/r/stats/predict.html) requires an
 extracted DBSCAN clustering with `extractDBSCAN()` and then uses predict
-for [`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md).
+for
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md).
 
 ## References
 
@@ -218,15 +219,15 @@ Extracted from OPTICS Plots. In *Lernen, Wissen, Daten, Analysen (LWDA
 ## See also
 
 Density
-[reachability](http://michael.hahsler.net/dbscan/reference/reachability.md).
+[reachability](https://michael.hahsler.net/dbscan/reference/reachability.md).
 
 Other clustering functions:
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-[`extractFOSC()`](http://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-[`ncluster()`](http://michael.hahsler.net/dbscan/reference/ncluster.md),
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+[`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md),
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 ## Author
 

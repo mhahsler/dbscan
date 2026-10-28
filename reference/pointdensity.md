@@ -2,7 +2,7 @@
 
 Calculate the local density at each data point as either the number of
 points in the eps-neighborhood (as used in
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md)) or
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md)) or
 perform kernel density estimation (KDE) using a uniform kernel. The
 function uses a kd-tree for fast fixed-radius nearest neighbor search.
 
@@ -41,7 +41,7 @@ pointdensity(
 - search, bucketSize, splitRule, approx:
 
   algorithmic parameters for
-  [`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md).
+  [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md).
 
 ## Value
 
@@ -50,7 +50,7 @@ or density values for each data point.
 
 ## Details
 
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md)
 estimates the density around a point as the number of points in the
 eps-neighborhood of the point (including the query point itself). Kernel
 density estimation (KDE) using a uniform kernel, which is just this
@@ -76,13 +76,13 @@ Inc., New York, NY, USA.
 
 ## See also
 
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
 [`stats::density()`](https://rdrr.io/r/stats/density.html).
 
 Other Outlier Detection Functions:
-[`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`lof()`](http://michael.hahsler.net/dbscan/reference/lof.md)
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`lof()`](https://michael.hahsler.net/dbscan/reference/lof.md)
 
 ## Author
 

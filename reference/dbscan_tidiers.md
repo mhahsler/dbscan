@@ -48,7 +48,7 @@ glance(x, ...)
 - x:
 
   An `dbscan` object returned from
-  [`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md).
+  [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md).
 
 - ...:
 
@@ -67,7 +67,7 @@ glance(x, ...)
 [`generics::tidy()`](https://generics.r-lib.org/reference/tidy.html),
 [`generics::augment()`](https://generics.r-lib.org/reference/augment.html),
 [`generics::glance()`](https://generics.r-lib.org/reference/glance.html),
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md)
 
 ## Examples
 

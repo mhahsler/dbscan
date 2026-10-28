@@ -12,18 +12,18 @@ directly:
 
 | Function | Neighborhood | Result structure |
 |:---|:---|:---|
-| [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) | The `k` closest observations | Matrices of neighbor IDs and distances |
-| [`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) | All observations no farther than `eps` | Lists of neighbor IDs and distances |
-| [`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md) | Similarity based on shared nearest neighbors | Matrices of IDs, distances, and shared-neighbor counts |
-| [`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md) | Distance to the kth nearest neighbor | Numeric vector, or a distance matrix for several neighbors |
-| [`kNNdistplot()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md) | Sorted kth-neighbor distances | Diagnostic plot |
+| [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) | The `k` closest observations | Matrices of neighbor IDs and distances |
+| [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) | All observations no farther than `eps` | Lists of neighbor IDs and distances |
+| [`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md) | Similarity based on shared nearest neighbors | Matrices of IDs, distances, and shared-neighbor counts |
+| [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md) | Distance to the kth nearest neighbor | Numeric vector, or a distance matrix for several neighbors |
+| [`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md) | Sorted kth-neighbor distances | Diagnostic plot |
 
 Objects returned by the first three functions inherit from class `NN`.
 They support [`print()`](https://rdrr.io/r/base/print.html),
 [`sort()`](https://rdrr.io/r/base/sort.html),
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html),
-[`adjacencylist()`](http://michael.hahsler.net/dbscan/reference/NN.md),
-and [`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md)
+[`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md),
+and [`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md)
 for finding connected components.
 
 Nearest neighbor search is optimized for Euclidean distance where it
@@ -52,7 +52,7 @@ comparable and equal weighting is appropriate for the application.
 
 ## k nearest neighbors
 
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) finds
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) finds
 exactly `k` neighbors for every observation. Self-matches are removed
 when searching the rows of `x` against themselves.
 
@@ -107,7 +107,7 @@ data.frame(
 A `kNN` object represents a directed graph: observation `j` can be among
 the nearest neighbors of `i` without `i` being among the nearest
 neighbors of `j`.
-[`adjacencylist()`](http://michael.hahsler.net/dbscan/reference/NN.md)
+[`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md)
 returns the graph as a list of integer vectors.
 
 ``` r
@@ -205,7 +205,7 @@ can be returned at distance zero.
 
 ## Fixed-radius nearest neighbors
 
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) finds
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) finds
 every observation within radius `eps`. Since neighborhood sizes vary,
 IDs and distances are stored as parallel lists rather than matrices.
 Self-matches are excluded.
@@ -283,7 +283,7 @@ c(wide_edges = sum(lengths(fr_wide$id)),
 
 The new radius cannot exceed the radius stored in the object.
 Fixed-radius queries use the same `query` interface as
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md).
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
 
 ``` r
 
@@ -299,7 +299,7 @@ data.frame(
 
 ## Shared nearest neighbors
 
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md) starts
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md) starts
 with a k-nearest-neighbor search and counts neighborhood overlap. Each
 observation is treated as belonging to its own neighborhood for this
 calculation. The `shared` matrix aligns with `id`: `shared[i, j]` is the
@@ -335,7 +335,7 @@ longer necessarily ordered by Euclidean distance.
 
 Set `kt` to retain only graph edges with at least that many shared
 neighbors. Removed entries are represented by `NA` and are omitted by
-[`adjacencylist()`](http://michael.hahsler.net/dbscan/reference/NN.md).
+[`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md).
 
 ``` r
 
@@ -377,12 +377,12 @@ c(
 
 Passing a precomputed `kNN` object, as above, avoids repeating the
 neighbor search. Shared-neighbor clustering is covered separately in the
-[`vignette("nnclustering")`](http://michael.hahsler.net/dbscan/articles/nnclustering.md)
+[`vignette("nnclustering")`](https://michael.hahsler.net/dbscan/articles/nnclustering.md)
 vignette.
 
 ## Neighbor-distance diagnostics
 
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
 returns the distance from each observation to its kth nearest neighbor
 in original row order.
 
@@ -413,7 +413,7 @@ head(d_all)
 #> p6 0.14116165 0.1917604 0.2031767 0.2820457 0.3904264
 ```
 
-[`kNNdistplot()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+[`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
 sorts these values and plots them. A sharp increase can suggest a range
 for the DBSCAN radius: points before the increase have nearby neighbors,
 while points in the upper tail are relatively isolated.
@@ -438,7 +438,7 @@ legend("topleft", legend = c("k = 1", "k = 5", "k = 10"),
 
 For selecting `eps` for DBSCAN, `minPts` can be supplied instead. DBSCAN
 counts the point itself, while
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
 excludes it, so `kNNdistplot(x, minPts = 6)` uses `k = 5`.
 
 ``` r
@@ -453,7 +453,7 @@ unclear for data containing groups with different densities.
 
 ## Connected components
 
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md) finds
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md) finds
 connected components in an `NN` graph. In a kNN graph, `mutual = FALSE`
 treats a one-directional neighbor relation as sufficient for a
 connection; `mutual = TRUE` requires both observations to list each
@@ -499,7 +499,7 @@ table(snn_comp)
 #> 50 25 25
 ```
 
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md) also
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md) also
 accepts a `dist` object and a distance threshold. This is equivalent to
 components in the corresponding fixed-radius graph.
 
@@ -542,9 +542,9 @@ and `frNN`. The default for `sNN` is already decreasing similarity.
 ## Using non-Euclidean distances
 
 Supplying a `dist` object allows
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md), and
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md) to use
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md), and
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md) to use
 another dissimilarity measure. However, this means that the efficient
 kd-tree implementation cannot be used.
 
@@ -612,10 +612,10 @@ distance representation may be preferable in high-dimensional settings.
   linear search.
 - A search of `x` against itself excludes self-matches; query searches
   do not.
-- [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) returns
+- [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) returns
   exactly `k` observations. If multiple candidates tie at the kth
   distance, one is retained and the others are omitted.
-- [`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md)
+- [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md)
   returns every observation within `eps`, so neighborhood sizes can
   differ and may be zero.
 - IDs always refer to row positions in the reference data. Preserve a

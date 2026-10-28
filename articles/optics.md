@@ -28,7 +28,7 @@ plot(x, pch = 19, asp = 1, main = "Example data")
 
 ![](optics_files/figure-html/data-1.png)
 
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md)
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)
 accepts a numeric matrix or data frame. For numeric data it uses
 Euclidean distance and a fast kd-tree search.
 
@@ -120,7 +120,7 @@ substantively appropriate.
 
 ## Extract a DBSCAN-like clustering
 
-[`extractDBSCAN()`](http://michael.hahsler.net/dbscan/reference/optics.md)
+[`extractDBSCAN()`](https://michael.hahsler.net/dbscan/reference/optics.md)
 cuts the reachability plot at a global threshold `eps_cl`. This does not
 rerun OPTICS, so several thresholds can be explored using the same
 ordering. The extraction closely resembles DBSCAN with the same `minPts`
@@ -187,7 +187,7 @@ next.
 
 ## Extract clusters with the Xi method
 
-[`extractXi()`](http://michael.hahsler.net/dbscan/reference/optics.md)
+[`extractXi()`](https://michael.hahsler.net/dbscan/reference/optics.md)
 identifies relative steep-down and steep-up regions in the reachability
 plot. The `xi` value is the minimum relative change in reachability used
 to recognize a boundary. This can find nested clusters and clusters at
@@ -278,7 +278,7 @@ default before converting.
 ## Predict labels for new observations
 
 Prediction is available only after
-[`extractDBSCAN()`](http://michael.hahsler.net/dbscan/reference/optics.md),
+[`extractDBSCAN()`](https://michael.hahsler.net/dbscan/reference/optics.md),
 because prediction needs a flat clustering and its global `eps_cl`
 threshold. Supply the original training data along with the new
 observations.
@@ -303,7 +303,7 @@ transformations used for the training data to new observations.
 
 To use a distance other than Euclidean distance, calculate a `dist`
 object and pass it to
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md).
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md).
 This uses the supplied pairwise distances rather than the kd-tree
 search.
 

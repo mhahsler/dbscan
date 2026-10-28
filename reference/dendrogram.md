@@ -4,8 +4,8 @@ Provides a new generic function to coerce objects to dendrograms with
 [`stats::as.dendrogram()`](https://rdrr.io/r/stats/dendrogram.html) as
 the default. Additional methods for
 [hclust](https://rdrr.io/r/stats/hclust.html),
-[hdbscan](http://michael.hahsler.net/dbscan/reference/hdbscan.md) and
-[reachability](http://michael.hahsler.net/dbscan/reference/reachability.md)
+[hdbscan](https://michael.hahsler.net/dbscan/reference/hdbscan.md) and
+[reachability](https://michael.hahsler.net/dbscan/reference/reachability.md)
 objects are provided.
 
 ## Usage
@@ -39,8 +39,8 @@ as.dendrogram(object, ...)
 ## Details
 
 Coercion methods for [hclust](https://rdrr.io/r/stats/hclust.html),
-[hdbscan](http://michael.hahsler.net/dbscan/reference/hdbscan.md) and
-[reachability](http://michael.hahsler.net/dbscan/reference/reachability.md)
+[hdbscan](https://michael.hahsler.net/dbscan/reference/hdbscan.md) and
+[reachability](https://michael.hahsler.net/dbscan/reference/reachability.md)
 objects to dendrogram are provided.
 
 The coercion from `hclust` is a faster C++ reimplementation of the
@@ -49,5 +49,5 @@ using
 [`stats::as.dendrogram()`](https://rdrr.io/r/stats/dendrogram.html).
 
 The coercion from
-[hdbscan](http://michael.hahsler.net/dbscan/reference/hdbscan.md) builds
-the non-simplified HDBSCAN hierarchy as a dendrogram object.
+[hdbscan](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+builds the non-simplified HDBSCAN hierarchy as a dendrogram object.

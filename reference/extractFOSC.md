@@ -29,7 +29,7 @@ extractFOSC(
 
   a valid [hclust](https://rdrr.io/r/stats/hclust.html) object created
   via [`hclust()`](https://rdrr.io/r/stats/hclust.html) or
-  [`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md).
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md).
 
 - constraints:
 
@@ -186,16 +186,16 @@ Discovery* 27(3): 344-371.
 ## See also
 
 [`hclust()`](https://rdrr.io/r/stats/hclust.html),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
 [`stats::cutree()`](https://rdrr.io/r/stats/cutree.html)
 
 Other clustering functions:
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-[`ncluster()`](http://michael.hahsler.net/dbscan/reference/ncluster.md),
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md),
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+[`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md),
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 ## Author
 

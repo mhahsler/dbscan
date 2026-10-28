@@ -3,9 +3,9 @@
 The **dbscan** package implements two clustering algorithms based on
 shared nearest neighbors:
 
-- [`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md)
+- [`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md)
   implements Jarvis–Patrick clustering; and
-- [`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+- [`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
   implements shared nearest neighbor (SNN) clustering with a
   DBSCAN-style density step.
 
@@ -27,14 +27,14 @@ The algorithms use this information differently:
 
 | Function | Link or neighborhood rule | Cluster formation | Noise model |
 |:---|:---|:---|:---|
-| [`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md) | Mutual nearest neighbors sharing at least `kt` neighbors | Connected components | No; isolated observations form small clusters |
-| [`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md) | Mutual nearest neighbors sharing at least `eps` neighbors | DBSCAN-style core, border, and density-connected points | Yes; label `0` denotes noise |
+| [`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md) | Mutual nearest neighbors sharing at least `kt` neighbors | Connected components | No; isolated observations form small clusters |
+| [`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md) | Mutual nearest neighbors sharing at least `eps` neighbors | DBSCAN-style core, border, and density-connected points | Yes; label `0` denotes noise |
 
 The thresholds `kt` and `eps` are counts of shared neighbors. In
 particular, `eps` in
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 is not a distance radius and has a different meaning from `eps` in
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md).
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md).
 
 ## Example data
 
@@ -95,7 +95,7 @@ head(jp$cluster)
 ```
 
 The convenience function
-[`clplot()`](http://michael.hahsler.net/dbscan/reference/hullplot.md)
+[`clplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
 marks observations by cluster. It uses the first two columns when the
 data have more than two dimensions.
 
@@ -148,7 +148,7 @@ tiny clusters.
 
 ## Shared nearest neighbor clustering
 
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 adds a density model to the shared-neighbor graph:
 
 1.  Build `k`-nearest-neighbor lists and their shared-neighbor
@@ -263,14 +263,14 @@ c(
 
 When the full stored neighborhood should be used, `k` may be omitted
 from
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md)
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md)
 because it can be recovered from the `kNN` object. Keep `k` explicit
 when using only the first part of a larger precomputed neighborhood.
 
 ## Inspect the shared-neighbor graph
 
 The lower-level
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md) function
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md) function
 exposes the shared-neighbor calculation. Its `shared` matrix gives the
 similarity between each observation and each of its `k` nearest
 neighbors.
@@ -291,13 +291,14 @@ table(shared_nn$shared)
 
 Using `jp = TRUE` reproduces the mutual-neighbor similarity used
 internally by
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md).
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md).
 Use this distribution as a diagnostic when selecting a shared-neighbor
-threshold. [`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
-can also apply a threshold directly and its graph can be inspected with
-[`adjacencylist()`](http://michael.hahsler.net/dbscan/reference/NN.md)
+threshold.
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md) can also
+apply a threshold directly and its graph can be inspected with
+[`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md)
 or plotted for small data sets; see
-[`?sNN`](http://michael.hahsler.net/dbscan/reference/sNN.md).
+[`?sNN`](https://michael.hahsler.net/dbscan/reference/sNN.md).
 
 ## Use a precomputed distance matrix
 
@@ -320,11 +321,11 @@ rather than solely on the resulting number of clusters.
 ## Which method should you use?
 
 Use
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md)
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md)
 when a simple connected-components interpretation of mutual
 shared-neighbor links is appropriate and small components are
 meaningful. Use
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 when the analysis needs an explicit density requirement, noise labels,
 or control over core and border points. For either method, `k` sets the
 neighborhood scale and should reflect the smallest local structure that

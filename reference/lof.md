@@ -23,7 +23,7 @@ lof(x, minPts = 5, ...)
 - ...:
 
   further arguments are passed on to
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md). Note:
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md). Note:
   `sort` cannot be specified here since `lof()` uses always
   `sort = TRUE`.
 
@@ -64,9 +64,9 @@ Management of Data,* pages 93-104.
 ## See also
 
 Other Outlier Detection Functions:
-[`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`pointdensity()`](http://michael.hahsler.net/dbscan/reference/pointdensity.md)
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
 
 ## Author
 

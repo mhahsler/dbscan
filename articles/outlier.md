@@ -3,15 +3,15 @@
 The **dbscan** package provides several related approaches to
 unsupervised outlier detection:
 
-- [`pointdensity()`](http://michael.hahsler.net/dbscan/reference/pointdensity.md)
+- [`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
   finds observations in low-density regions;
-- [`lof()`](http://michael.hahsler.net/dbscan/reference/lof.md) compares
-  the density around an observation with the densities around its
-  neighbors; and
-- [`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md) uses
-  a density hierarchy to find both local and global outliers. The same
-  GLOSH scores are returned by
-  [`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md).
+- [`lof()`](https://michael.hahsler.net/dbscan/reference/lof.md)
+  compares the density around an observation with the densities around
+  its neighbors; and
+- [`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md)
+  uses a density hierarchy to find both local and global outliers. The
+  same GLOSH scores are returned by
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md).
 
 These functions return an outlier *score* for every observation, not a
 final yes/no decision. This distinction is useful because the number and
@@ -76,7 +76,7 @@ plot_scores <- function(x, score, main, n = 8) {
 
 ## Low point density
 
-[`pointdensity()`](http://michael.hahsler.net/dbscan/reference/pointdensity.md)
+[`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
 counts observations inside a fixed-radius neighborhood. The count
 includes the query point itself, so its minimum is one. Small counts
 indicate isolated observations.
@@ -223,7 +223,7 @@ former describes the strength of membership in the selected flat HDBSCAN
 clusters; the latter is calculated from the density hierarchy. They need
 not be exact complements.
 
-[`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md) can
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md) can
 also score an existing `hclust` object. This permits other hierarchies
 to be explored, although the resulting scores depend on the linkage used
 to construct that hierarchy.

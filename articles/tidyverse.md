@@ -1,10 +1,10 @@
 # Using dbscan with tidyverse
 
 The **dbscan** package provides
-[`tidy()`](http://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md),
-[`augment()`](http://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md),
+[`tidy()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md),
+[`augment()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md),
 and
-[`glance()`](http://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
+[`glance()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
 methods for its clustering algorithms, making them easy to use with
 tidyverse, ggplot2, and
 [tidymodels](https://www.tidymodels.org/learn/statistics/k-means/).

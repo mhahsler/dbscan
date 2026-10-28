@@ -15,21 +15,21 @@ is also provided. Hahsler, Piekenbrock and Doran (2019)
 ## Key functions
 
 - Clustering:
-  [`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-  [`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-  [`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md),
-  [`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-  [`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+  [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+  [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
+  [`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+  [`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 - Outliers:
-  [`lof()`](http://michael.hahsler.net/dbscan/reference/lof.md),
-  [`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md),
-  [`pointdensity()`](http://michael.hahsler.net/dbscan/reference/pointdensity.md)
+  [`lof()`](https://michael.hahsler.net/dbscan/reference/lof.md),
+  [`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md),
+  [`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
 
 - Nearest Neighbors:
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-  [`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
-  [`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+  [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
+  [`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## References
 

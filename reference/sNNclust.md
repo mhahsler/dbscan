@@ -16,7 +16,7 @@ sNNclust(x, k, eps, minPts, borderPoints = TRUE, ...)
   a data matrix/data.frame (Euclidean distance is used), a precomputed
   [dist](https://rdrr.io/r/stats/dist.html) object or a kNN object
   created with
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md).
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
 
 - k:
 
@@ -37,13 +37,13 @@ sNNclust(x, k, eps, minPts, borderPoints = TRUE, ...)
 - borderPoints:
 
   should border points be assigned to clusters like in
-  [DBSCAN](http://michael.hahsler.net/dbscan/reference/dbscan.md)?
+  [DBSCAN](https://michael.hahsler.net/dbscan/reference/dbscan.md)?
 
 - ...:
 
   additional arguments are passed on to the k nearest neighbor search
   algorithm. See
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) for
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) for
   details on how to control the search strategy.
 
 ## Value
@@ -82,10 +82,10 @@ A object of class `general_clustering` with the following components:
     point).
 
 Note that steps 2-4 are equivalent to the DBSCAN algorithm (see
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md)) and
-that `eps` has a different meaning than for DBSCAN. Here it is a
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md))
+and that `eps` has a different meaning than for DBSCAN. Here it is a
 threshold on the number of shared neighbors (see
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)) which
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)) which
 defines a similarity.
 
 ## References
@@ -98,12 +98,12 @@ Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data,
 ## See also
 
 Other clustering functions:
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-[`extractFOSC()`](http://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-[`ncluster()`](http://michael.hahsler.net/dbscan/reference/ncluster.md),
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+[`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md),
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)
 
 ## Author
 

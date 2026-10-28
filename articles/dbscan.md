@@ -123,7 +123,7 @@ Whether scaling is appropriate depends on the meaning of the variables.
 Do not include identifiers, labels, or unordered factors as numeric
 features. For a non-Euclidean distance, calculate a `dist` object first
 and pass it to
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md);
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md);
 this does not use the fast kd-tree search.
 
 ## Choose `minPts` and `eps`
@@ -140,7 +140,7 @@ starting point is:
 3.  Choose `eps` near a visible bend where the distances begin to
     increase rapidly.
 
-[`kNNdistplot()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+[`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
 performs the second step. Supplying `minPts` automatically uses
 `k = minPts - 1` because a DBSCAN neighborhood also counts the point
 itself.
@@ -210,9 +210,9 @@ The package contains several related algorithms:
 
 | Algorithm | Useful when |
 |:---|:---|
-| [`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md) | Clusters have roughly similar density and one meaningful neighborhood radius can be chosen. |
-| [`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md) | Clusters may have different densities or you want to avoid choosing a global `eps`. |
-| [`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md) | You want to explore clustering structure over a range of neighborhood radii. |
+| [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md) | Clusters have roughly similar density and one meaningful neighborhood radius can be chosen. |
+| [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md) | Clusters may have different densities or you want to avoid choosing a global `eps`. |
+| [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md) | You want to explore clustering structure over a range of neighborhood radii. |
 
 HDBSCAN requires only `minPts` for a basic analysis and extracts stable
 clusters from a density hierarchy:
@@ -244,7 +244,7 @@ plot(
 
 The HDBSCAN result also contains membership strengths, outlier scores,
 and a cluster hierarchy. See
-[`vignette("hdbscan", package = "dbscan")`](http://michael.hahsler.net/dbscan/articles/hdbscan.md)
+[`vignette("hdbscan", package = "dbscan")`](https://michael.hahsler.net/dbscan/articles/hdbscan.md)
 for a more detailed introduction.
 
 OPTICS creates an ordering whose reachability plot exposes clustering
@@ -274,18 +274,19 @@ table(opt_cl$cluster)
 
 Useful help pages include:
 
-- [`?dbscan`](http://michael.hahsler.net/dbscan/reference/dbscan.md) for
-  DBSCAN options, core-point detection, and more examples;
-- [`?hdbscan`](http://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  and [`?optics`](http://michael.hahsler.net/dbscan/reference/optics.md)
+- [`?dbscan`](https://michael.hahsler.net/dbscan/reference/dbscan.md)
+  for DBSCAN options, core-point detection, and more examples;
+- [`?hdbscan`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  and
+  [`?optics`](https://michael.hahsler.net/dbscan/reference/optics.md)
   for hierarchical and multi-scale clustering;
-- [`?kNN`](http://michael.hahsler.net/dbscan/reference/kNN.md) and
-  [`?frNN`](http://michael.hahsler.net/dbscan/reference/frNN.md) for
+- [`?kNN`](https://michael.hahsler.net/dbscan/reference/kNN.md) and
+  [`?frNN`](https://michael.hahsler.net/dbscan/reference/frNN.md) for
   fast nearest-neighbor search;
-- [`?lof`](http://michael.hahsler.net/dbscan/reference/lof.md) and
-  [`?glosh`](http://michael.hahsler.net/dbscan/reference/glosh.md) for
+- [`?lof`](https://michael.hahsler.net/dbscan/reference/lof.md) and
+  [`?glosh`](https://michael.hahsler.net/dbscan/reference/glosh.md) for
   outlier scoring; and
-- [`?dbcv`](http://michael.hahsler.net/dbscan/reference/dbcv.md) for
+- [`?dbcv`](https://michael.hahsler.net/dbscan/reference/dbcv.md) for
   density-based cluster validation.
 
 For a citable description of the algorithms and implementation, use

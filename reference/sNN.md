@@ -30,7 +30,7 @@ print(x, ...)
 - x:
 
   a data matrix, a [dist](https://rdrr.io/r/stats/dist.html) object or a
-  [kNN](http://michael.hahsler.net/dbscan/reference/kNN.md) object.
+  [kNN](https://michael.hahsler.net/dbscan/reference/kNN.md) object.
 
 - k:
 
@@ -89,8 +89,8 @@ print(x, ...)
 ## Value
 
 An object of class `sNN` (subclass of
-[kNN](http://michael.hahsler.net/dbscan/reference/kNN.md) and
-[NN](http://michael.hahsler.net/dbscan/reference/NN.md)) containing a
+[kNN](https://michael.hahsler.net/dbscan/reference/kNN.md) and
+[NN](https://michael.hahsler.net/dbscan/reference/NN.md)) containing a
 list with the following components:
 
 - id :
@@ -139,11 +139,11 @@ Measure Based on Shared Near Neighbors. *IEEE Trans. Comput.* 22, 11
 ## See also
 
 Other NN functions:
-[`NN`](http://michael.hahsler.net/dbscan/reference/NN.md),
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+[`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
 
 ## Author
 

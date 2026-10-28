@@ -25,7 +25,7 @@ comps(x, ...)
 
 - x:
 
-  the [NN](http://michael.hahsler.net/dbscan/reference/NN.md) object
+  the [NN](https://michael.hahsler.net/dbscan/reference/NN.md) object
   representing the graph or a [dist](https://rdrr.io/r/stats/dist.html)
   object
 
@@ -54,11 +54,11 @@ other's kNN.
 ## See also
 
 Other NN functions:
-[`NN`](http://michael.hahsler.net/dbscan/reference/NN.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
+[`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## Author
 

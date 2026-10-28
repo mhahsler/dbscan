@@ -2,6 +2,16 @@
 
 ## dbscan 1.2.8 (unpublished)
 
+### Changes
+
+- Added RAII model for ANN. ANN searches now release point storage,
+  trees, and search buffers automatically when C++ exceptions or user
+  interrupts unwind a call.
+- Added seeded randomized comparisons of native and distance-matrix
+  search backends and a Linux ASan/LSan/UBSan runner and CI workflow.
+  Native backend tests are skipped on CRAN and enabled explicitly by the
+  sanitizer driver.
+
 ### Bugfixes
 
 - kNN.cpp: Keep the k nearest hits in kNN_int when the query point is

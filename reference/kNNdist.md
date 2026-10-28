@@ -5,7 +5,7 @@ represented as a matrix of points. The kNN distance is defined as the
 distance from a point to its k nearest neighbor. The kNN distance plot
 displays the kNN distance of all points sorted from smallest to largest.
 The plot can be used to help find suitable parameter values for
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md).
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md).
 
 ## Usage
 
@@ -36,12 +36,12 @@ kNNdistplot(x, k, minPts, ...)
 - ...:
 
   further arguments (e.g., kd-tree related parameters) are passed on to
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md).
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
 
 - minPts:
 
   to use a k-NN plot to determine a suitable `eps` value for
-  [`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
+  [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
   `minPts` used in dbscan can be specified and will set
   `k = minPts - 1`.
 
@@ -55,16 +55,16 @@ instead.
 ## See also
 
 Other Outlier Detection Functions:
-[`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md),
-[`lof()`](http://michael.hahsler.net/dbscan/reference/lof.md),
-[`pointdensity()`](http://michael.hahsler.net/dbscan/reference/pointdensity.md)
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md),
+[`lof()`](https://michael.hahsler.net/dbscan/reference/lof.md),
+[`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
 
 Other NN functions:
-[`NN`](http://michael.hahsler.net/dbscan/reference/NN.md),
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
+[`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## Author
 

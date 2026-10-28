@@ -178,7 +178,7 @@ HDBSCAN performs the following steps:
 Additional, related algorithms including the "Global-Local Outlier Score
 from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015) is
 available in function
-[`glosh()`](http://michael.hahsler.net/dbscan/reference/glosh.md) and
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md) and
 the ability to cluster based on instance-level constraints (see section
 5.3 of Campello et al. 2015) are supported. The algorithms only need the
 parameter `minPts`.
@@ -204,7 +204,7 @@ higher levels.
 `coredist()`: The core distance is defined for each point as the
 distance to the `MinPts - 1`'s neighbor. It is a density estimate
 equivalent to
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
 with `k = MinPts -1`.
 
 `mrdist()`: The mutual reachability distance is defined between two
@@ -239,12 +239,12 @@ on Multisensor Fusion and Integration for Intelligent Systems (MFI), pp.
 ## See also
 
 Other clustering functions:
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-[`extractFOSC()`](http://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-[`ncluster()`](http://michael.hahsler.net/dbscan/reference/ncluster.md),
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md),
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+[`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md),
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 ## Author
 

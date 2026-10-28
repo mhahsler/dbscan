@@ -84,7 +84,7 @@ print(x, ...)
 ## Value
 
 An object of class `kNN` (subclass of
-[NN](http://michael.hahsler.net/dbscan/reference/NN.md)) containing a
+[NN](https://michael.hahsler.net/dbscan/reference/NN.md)) containing a
 list with the following components:
 
 - dist :
@@ -140,11 +140,11 @@ Nearest Neighbor Searching, <http://www.cs.umd.edu/~mount/ANN/>.
 ## See also
 
 Other NN functions:
-[`NN`](http://michael.hahsler.net/dbscan/reference/NN.md),
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
+[`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## Author
 

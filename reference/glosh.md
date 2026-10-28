@@ -23,7 +23,7 @@ glosh(x, k = 4, ...)
 - ...:
 
   further arguments are passed on to
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md).
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
 
 ## Value
 
@@ -58,9 +58,9 @@ outlier detection. *ACM Transactions on Knowledge Discovery from Data
 ## See also
 
 Other Outlier Detection Functions:
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`lof()`](http://michael.hahsler.net/dbscan/reference/lof.md),
-[`pointdensity()`](http://michael.hahsler.net/dbscan/reference/pointdensity.md)
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`lof()`](https://michael.hahsler.net/dbscan/reference/lof.md),
+[`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
 
 ## Author
 

@@ -1,9 +1,9 @@
 # NN — Nearest Neighbors Superclass
 
 NN is an abstract S3 superclass for the classes of the objects returned
-by [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) and
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md). Methods
+by [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) and
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md). Methods
 for sorting, plotting and getting an adjacency list are defined.
 
 ## Usage
@@ -58,18 +58,18 @@ plot(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...)
 
 ## Subclasses
 
-[kNN](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[frNN](http://michael.hahsler.net/dbscan/reference/frNN.md) and
-[sNN](http://michael.hahsler.net/dbscan/reference/sNN.md)
+[kNN](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[frNN](https://michael.hahsler.net/dbscan/reference/frNN.md) and
+[sNN](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## See also
 
 Other NN functions:
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md),
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md),
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md),
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md),
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## Author
 

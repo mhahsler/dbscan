@@ -81,7 +81,7 @@ print(x, ...)
 ## Value
 
 `frNN()` returns an object of class frNN (subclass of
-[NN](http://michael.hahsler.net/dbscan/reference/NN.md)) containing a
+[NN](https://michael.hahsler.net/dbscan/reference/NN.md)) containing a
 list with the following components:
 
 - id :
@@ -101,7 +101,7 @@ list with the following components:
 
   used distance metric.
 
-[`adjacencylist()`](http://michael.hahsler.net/dbscan/reference/NN.md)
+[`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md)
 returns a list with one entry per data point in `x`. Each entry contains
 the id of the nearest neighbors.
 
@@ -124,11 +124,11 @@ Nearest Neighbor Searching, <http://www.cs.umd.edu/~mount/ANN/>.
 ## See also
 
 Other NN functions:
-[`NN`](http://michael.hahsler.net/dbscan/reference/NN.md),
-[`comps()`](http://michael.hahsler.net/dbscan/reference/comps.md),
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md),
-[`kNNdist()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md),
-[`sNN()`](http://michael.hahsler.net/dbscan/reference/sNN.md)
+[`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
+[`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md),
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md),
+[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md),
+[`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md)
 
 ## Author
 

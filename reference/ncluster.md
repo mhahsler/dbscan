@@ -31,12 +31,12 @@ returns the number if clusters or noise points.
 ## See also
 
 Other clustering functions:
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-[`extractFOSC()`](http://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md),
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 ## Examples
 

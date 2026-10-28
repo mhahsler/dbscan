@@ -20,7 +20,7 @@ predict(object, newdata, data, ...)
 
   a data matrix, a data.frame, a
   [dist](https://rdrr.io/r/stats/dist.html) object or a
-  [frNN](http://michael.hahsler.net/dbscan/reference/frNN.md) object
+  [frNN](https://michael.hahsler.net/dbscan/reference/frNN.md) object
   with fixed-radius nearest neighbors.
 
 - eps:
@@ -48,7 +48,7 @@ predict(object, newdata, data, ...)
 
   additional arguments are passed on to the fixed-radius nearest
   neighbor search algorithm. See
-  [`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) for
+  [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) for
   details on how to control the search strategy.
 
 - object:
@@ -130,8 +130,8 @@ as noise points. This is implemented with `borderPoints = FALSE`.
 If `x` is a matrix or a data.frame, then fast fixed-radius nearest
 neighbor computation using a kd-tree is performed using Euclidean
 distance. See
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) for more
-information on the parameters related to nearest neighbor search.
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) for
+more information on the parameters related to nearest neighbor search.
 **Note** that only numerical values are allowed in `x`.
 
 Any precomputed distance matrix (dist object) can be specified as `x`.
@@ -140,7 +140,7 @@ You may run into memory issues since distance matrices are large.
 A precomputed frNN object can be supplied as `x`. In this case `eps`
 does not need to be specified. This option is useful for large data
 sets, where a sparse distance matrix is available. See
-[`frNN()`](http://michael.hahsler.net/dbscan/reference/frNN.md) how to
+[`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) how to
 create frNN objects.
 
 ### Setting Parameters for DBSCAN
@@ -165,7 +165,7 @@ the size of the data set with larger datasets requiring a larger
 
 - `eps:` A suitable neighborhood size parameter `eps` given a fixed
   value for `minPts` can be found visually by inspecting the
-  [`kNNdistplot()`](http://michael.hahsler.net/dbscan/reference/kNNdist.md)
+  [`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
   of the data using \\k = \text{minPts} - 1\\ (`minPts` includes the
   point itself, while the k-nearest neighbors distance does not). The
   k-nearest neighbor distance plot sorts all data points by their
@@ -215,12 +215,12 @@ Applications. *Data Mining and Knowledge Discovery* 2, 169-194.
 ## See also
 
 Other clustering functions:
-[`extractFOSC()`](http://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`jpclust()`](http://michael.hahsler.net/dbscan/reference/jpclust.md),
-[`ncluster()`](http://michael.hahsler.net/dbscan/reference/ncluster.md),
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md),
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+[`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md),
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 ## Author
 

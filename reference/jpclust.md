@@ -19,7 +19,7 @@ jpclust(x, k, kt, ...)
   a data matrix/data.frame (Euclidean distance is used), a precomputed
   [dist](https://rdrr.io/r/stats/dist.html) object or a kNN object
   created with
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md).
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
 
 - k:
 
@@ -35,7 +35,7 @@ jpclust(x, k, kt, ...)
 
   additional arguments are passed on to the k nearest neighbor search
   algorithm. See
-  [`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) for
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) for
   details on how to control the search strategy.
 
 ## Value
@@ -66,7 +66,7 @@ constructed as the k neighbors plus the point itself (as neighbor zero).
 Therefore, the threshold `kt` needs to be in the range \\\[1, k\]\\.
 
 Fast nearest neighbors search with
-[`kNN()`](http://michael.hahsler.net/dbscan/reference/kNN.md) is only
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) is only
 used if `x` is a matrix. In this case Euclidean distance is used.
 
 ## References
@@ -79,12 +79,12 @@ Measure Based on Shared Near Neighbors. *IEEE Trans. Comput. 22,* 11
 ## See also
 
 Other clustering functions:
-[`dbscan()`](http://michael.hahsler.net/dbscan/reference/dbscan.md),
-[`extractFOSC()`](http://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-[`hdbscan()`](http://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`ncluster()`](http://michael.hahsler.net/dbscan/reference/ncluster.md),
-[`optics()`](http://michael.hahsler.net/dbscan/reference/optics.md),
-[`sNNclust()`](http://michael.hahsler.net/dbscan/reference/sNNclust.md)
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md),
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
 ## Author
 

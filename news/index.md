@@ -11,6 +11,12 @@
   search backends and a Linux ASan/LSan/UBSan runner and CI workflow.
   Native backend tests are skipped on CRAN and enabled explicitly by the
   sanitizer driver.
+- [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  now records `minPts` in its `hc` component.
+  [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+  uses it as the default for `minPts`. Documentation of `minPts` in
+  [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+  was clarified.
 
 ### Bugfixes
 

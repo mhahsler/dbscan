@@ -101,8 +101,8 @@ plot(cl$hc, main="HDBSCAN* Hierarchy")
 
 As the name implies, the fascinating thing about the HDBSCAN\* hierarchy
 is that any global ‘cut’ is equivalent to running DBSCAN\* (DBSCAN w/o
-border points) at the tree’s cutting threshold $`eps`$ (assuming the
-same $`minPts`$ parameter setting was used). But can this be verified
+border points) at the tree’s cutting threshold \\eps\\ (assuming the
+same \\minPts\\ parameter setting was used). But can this be verified
 manually? Using a modified function to distinguish noise using core
 distance as 0 (since the stats cutree method *does not* assign
 singletons with 0), the results can be shown to be identical.
@@ -140,7 +140,7 @@ overly cumbersome since every data point is represented as a leaf
 somewhere in the hierarchy. The hdbscan object comes with a powerful
 visualization tool that plots the ‘simplified’ hierarchy(see \[2\] for
 more details), which shows **cluster-wide** changes over an infinite
-number of $`eps`$ thresholds. It is the default visualization dispatched
+number of \\eps\\ thresholds. It is the default visualization dispatched
 by the ‘plot’ method
 
 ``` r

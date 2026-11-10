@@ -17,7 +17,7 @@ extractFOSC(
   x,
   constraints,
   alpha = 0,
-  minPts = 2L,
+  minPts = NULL,
   prune_unstable = FALSE,
   validate_constraints = FALSE
 )
@@ -44,8 +44,10 @@ extractFOSC(
 
 - minPts:
 
-  numeric; Defaults to 2. Only needed if class-less noise is a valid
-  label in the model.
+  integer; minimum cluster size to extract (must be at least 2). The
+  default value of `NULL` uses for an `x` that was created by
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  its stored `minPts` value, otherwise 2 is used.
 
 - prune_unstable:
 
@@ -93,16 +95,26 @@ Rather than partitioning a hierarchy based on the number of the cluster
 one expects to find (\\k\\) or based on some linkage distance threshold
 (\\H\\), the FOSC proposes that the optimal clusters may exist at
 varying distance thresholds in the hierarchy. To enable this idea, FOSC
-requires one parameter (minPts) that represents *the minimum number of
-points that constitute a valid cluster.* The first step of the FOSC
-algorithm is to traverse the given cluster hierarchy divisively,
-recording new clusters at each split if both branches represent more
-than or equal to minPts. Branches that contain less than minPts points
-at one or both branches inherit the parent clusters identity. Note that
-using FOSC, due to the constraint that minPts must be greater than or
-equal to 2, it is possible that the optimal cluster solution chosen
-makes local cuts that render parent branches of sizes less than minPts
-as noise, which are denoted as 0 in the final solution.
+uses the `minPts` parameter. It represents *the minimum number of points
+that constitute a valid cluster.* The first step of the FOSC algorithm
+is to traverse the given cluster hierarchy divisively, recording new
+clusters at each split if both branches represent more than or equal to
+minPts. Branches that contain less than minPts points at one or both
+branches inherit the parent clusters identity. Note that using FOSC, due
+to the constraint that minPts must be greater than or equal to 2, points
+that leave a cluster in a branch with fewer than minPts points are not
+part of any new cluster. Depending on the local cuts chosen by the
+optimal solution, such points can end up as noise, which is denoted as 0
+in the final solution.
+
+Note that for a hierarchy created by
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+`minPts` typically is the same value that was used to build it (it is
+recorded in the hierarchy and used as the default). However, different
+values can be specified where `minPts` in
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+controls noise and smoothing while `minPts` in `extractFOSC()` controls
+cluster scale.
 
 Traversing the original cluster tree using minPts creates a new,
 simplified cluster tree that is then post-processed recursively to

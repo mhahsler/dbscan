@@ -10,7 +10,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -148,14 +154,11 @@ plotting method from the stats package</p>
 </h2>
 <p>As the name implies, the fascinating thing about the HDBSCAN*
 hierarchy is that any global ‘cut’ is equivalent to running DBSCAN*
-(DBSCAN w/o border points) at the tree’s cutting threshold
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mi>p</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">eps</annotation></semantics></math>
-(assuming the same
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mi>i</mi><mi>n</mi><mi>P</mi><mi>t</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">minPts</annotation></semantics></math>
-parameter setting was used). But can this be verified manually? Using a
-modified function to distinguish noise using core distance as 0 (since
-the stats cutree method <em>does not</em> assign singletons with 0), the
-results can be shown to be identical.</p>
+(DBSCAN w/o border points) at the tree’s cutting threshold <span class="math inline">\(eps\)</span> (assuming the same <span class="math inline">\(minPts\)</span> parameter setting was used). But
+can this be verified manually? Using a modified function to distinguish
+noise using core distance as 0 (since the stats cutree method <em>does
+not</em> assign singletons with 0), the results can be shown to be
+identical.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hdbscan.html">hdbscan</a></span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">check</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">moons</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
@@ -187,10 +190,8 @@ become overly cumbersome since every data point is represented as a leaf
 somewhere in the hierarchy. The hdbscan object comes with a powerful
 visualization tool that plots the ‘simplified’ hierarchy(see [2] for
 more details), which shows <strong>cluster-wide</strong> changes over an
-infinite number of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mi>p</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">eps</annotation></semantics></math>
-thresholds. It is the default visualization dispatched by the ‘plot’
-method</p>
+infinite number of <span class="math inline">\(eps\)</span> thresholds.
+It is the default visualization dispatched by the ‘plot’ method</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>

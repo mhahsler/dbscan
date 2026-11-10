@@ -35,16 +35,19 @@
 #'
 #' 1. Estimate the density
 #'   around each data point by counting the number of points in a user-specified
-#'   eps-neighborhood and applies a used-specified minPts thresholds to identify
-#'      - core points (points with more than minPts points in their neighborhood),
+#'   eps-neighborhood and applies a user-specified minPts threshold to identify
+#'      - core points (points with at least minPts points in their neighborhood,
+#'        including the point itself),
 #'      - border points (non-core points with a core point in their neighborhood) and
 #'      - noise points (all other points).
 #' 2. Core points form the backbone of clusters by joining them into
 #'   a cluster if they are density-reachable from each other (i.e., there is a chain of core
 #'   points where one falls inside the eps-neighborhood of the next).
-#' 3. Border points are assigned to clusters. The algorithm needs parameters
-#'   `eps` (the radius of the epsilon neighborhood) and `minPts` (the
-#'   density threshold).
+#' 3. Border points are assigned to clusters.
+#'
+#' The algorithm needs the parameters
+#' `eps` (the radius of the epsilon neighborhood) and `minPts` (the
+#' density threshold).
 #'
 #' Border points are arbitrarily assigned to clusters in the original
 #' algorithm. DBSCAN* (see Campello et al 2013) treats all border points as
@@ -119,7 +122,8 @@
 #' @param minPts number of minimum points required in the eps neighborhood for
 #' core points (including the point itself).
 #' @param weights numeric; weights for the data points. Only needed to perform
-#' weighted clustering.
+#' weighted clustering. The sum of the weights of the points in an eps
+#' neighborhood (instead of their number) is compared to `minPts`.
 #' @param borderPoints logical; should border points be assigned to clusters.
 #' The default is `TRUE` for regular DBSCAN. If `FALSE` then border
 #' points are considered noise (see DBSCAN* in Campello et al, 2013).

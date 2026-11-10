@@ -29,26 +29,25 @@
 #' then uses a stability-based extraction method to find optimal cuts in the
 #' hierarchy, thus producing a flat solution.
 #'
-#' HDBSCAN performs the following steps:
+#' ## The algorithm
 #'
-#' 1. Compute mutual reachability distance mrd between points
-#'    (based on distances and core distances).
-#' 2. Use mdr as a distance measure to construct a minimum spanning tree.
-#' 3. Prune the tree using stability.
-#' 4. Extract the clusters.
+#' The algorithm uses as the main parameter `minPts` which is used in several
+#' of the HDBSCAN steps:
 #'
-#' Additional, related algorithms including the "Global-Local Outlier Score
-#' from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015)
-#' is available in function [glosh()]
-#' and the ability to cluster based on instance-level constraints (see
-#' section 5.3 of Campello et al. 2015) are supported. The algorithms only need
-#' the parameter `minPts`.
+#' 1. Compute core distances as a density estimates around points.
+#'    Here `minPts` is a smoothing parameter for the density estimates;
+#'    larger values for `minPts` give larger and smoother density estimates.
+#' 2. Compute mutual reachability distances from core distances.
+#' 3. Construct a minimum spanning tree from the mutual reachability distances.
+#' 4. Prune the tree using stability. Here `minPts` controls the minimum
+#'    cluster size because splits are only allowed when both branches
+#'    have at least `minPts` points.
+#' 5. Extract the clusters from the pruned tree.
 #'
-#' Note that `minPts` not only acts as a minimum cluster size to detect,
-#' but also as a "smoothing" factor of the density estimates implicitly
-#' computed from HDBSCAN.
 #'
-#' When using the optional parameter `cluster_selection_epsilon`,
+#' ## Cluster selection using epsilon
+#'
+#' When using a value greater than 0.0 for `cluster_selection_epsilon`,
 #' a combination between DBSCAN* and HDBSCAN* can be achieved
 #' (see Malzer & Baum 2020). This means that part of the
 #' tree is affected by `cluster_selection_epsilon` as if
@@ -60,22 +59,38 @@
 #' the parameter value is chosen too large, or if there aren't
 #' enough clusters of variable densities. In this case, the result
 #' will be equal to DBSCAN*.
-# `cluster_selection_epsilon` is especially useful for cases
+#' `cluster_selection_epsilon` is especially useful for cases
 #' where HDBSCAN* produces too many small clusters that
 #' need to be merged, while still being able to extract clusters
 #' of variable densities at higher levels.
 #'
+#' ## Helper Functions
+#'
 #' `coredist()`: The core distance is defined for each point as
-#' the distance to the `MinPts - 1`'s neighbor.
-#' It is a density estimate equivalent to `kNNdist()` with `k = MinPts -1`.
+#' the distance to the (`minPts - 1`)-th nearest neighbor.
+#' It is a density estimate equivalent to `kNNdist()` with `k = minPts -1`.
+#' Larger values for `minPts` lead to larger and smoother estimates.
 #'
 #' `mrdist()`: The mutual reachability distance is defined between two points as
 #' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This distance metric is used by
-#' HDBSCAN. It has the effect of increasing distances in low density areas.
+#' HDBSCAN. It has the effect of increasing distances in low density areas, separating
+#' clusters better.
 #'
 #' `predict()` assigns each new data point to the same cluster as the nearest point
 #' if it is not more than that points core distance away. Otherwise the new point
 #' is classified as a noise point (i.e., cluster ID 0).
+#'
+#' ## Related Methods
+#'
+#' Clusters can be extracted from the hierarchy created by HDBSCAN
+#' or any other hierarchical clustering in a more flexible way
+#' using [extractFOSC()].
+#'
+#' The Global-Local Outlier Score
+#' from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
+#' is available in function [glosh()]. Clusters can also be extracted based on
+#' instance-level constraints (see section 5.3 of Campello et al. 2015) using
+#' [extractFOSC()].
 #' @aliases hdbscan HDBSCAN print.hdbscan
 #'
 #' @family HDBSCAN functions
@@ -83,9 +98,12 @@
 #'
 #' @param x a data matrix (Euclidean distances are used) or a [dist] object
 #' calculated with an arbitrary distance metric.
-#' @param minPts integer; Minimum size of clusters. See details.
+#' @param minPts integer; Main parameter to control density estimate smoothing
+#'   and the minimum clusters size. See details.
 #' @param cluster_selection_epsilon double; a distance threshold below which
-#  no clusters should be selected (see Malzer & Baum 2020)
+#'  no clusters should be selected (see Malzer & Baum 2020). The threshold is
+#'  specified in mutual reachability distance (see `mrdist()`). The default of
+#'  0.0 means this feature is not used.
 #' @param gen_hdbscan_tree logical; should the robust single linkage tree be
 #' explicitly computed (see cluster tree in Chaudhuri et al, 2010).
 #' @param gen_simplified_tree logical; should the simplified hierarchy be
@@ -111,7 +129,15 @@
 #' \item{membership_prob }{The probability or individual stability of a
 #' point within its clusters. Between 0 and 1.}
 #' \item{outlier_scores }{The GLOSH outlier score of each point. }
-#' \item{hc }{An [hclust] object of the HDBSCAN hierarchy. }
+#' \item{coredist }{ The core distance of each data point (see `coredist()`).}
+#' \item{hc }{An [hclust] object of the HDBSCAN hierarchy (the single-linkage
+#' hierarchy of the minimum spanning tree of the mutual reachability
+#' distances before condensing). It also stores the used `minPts` value
+#' and can be used as input for [extractFOSC()].}
+#' \item{hdbscan_tree }{ A [dendrogram] of the hierarchy. Only present if
+#' `gen_hdbscan_tree = TRUE`.}
+#' \item{simplified_tree }{ A [dendrogram] of the simplified hierarchy.
+#' Only present if `gen_simplified_tree = TRUE`.}
 #'
 #' `coredist()` returns a vector with the core distance for each data point.
 #'
@@ -233,8 +259,10 @@ hdbscan <- function(x,
   if (verbose) {
     cat("Tree pruning...\n")
   }
+
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
   res <- extractUnsupervised(res, cluster_selection_epsilon = cluster_selection_epsilon)
+
   cl <- attr(res, "cluster")
 
   ## 4. Extract the clusters

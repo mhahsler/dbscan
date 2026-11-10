@@ -83,3 +83,21 @@ test_that("extractFOSC uses the minPts of an hdbscan hierarchy", {
   # a different minPts can be specified without a warning
   expect_silent(extractFOSC(res$hc, minPts = 10))
 })
+
+test_that("extractFOSC accepts an hdbscan object", {
+  data("moons")
+  res <- hdbscan(moons, minPts = 5)
+  expect_equal(extractFOSC(res), extractFOSC(res$hc))
+  expect_equal(extractFOSC(res, minPts = 10), extractFOSC(res$hc, minPts = 10))
+})
+
+test_that("extractFOSC validates the length of a constraint vector", {
+  x <- iris[1:20, 1:4]
+  x_sl <- hclust(dist(x), "single")
+  expect_error(
+    extractFOSC(x_sl, constraints = c(1, -1, 0), validate_constraints = TRUE),
+    "n\\(n-1\\)/2"
+  )
+  expect_silent(extractFOSC(x_sl, constraints = rep(0, choose(20, 2)),
+    validate_constraints = TRUE))
+})

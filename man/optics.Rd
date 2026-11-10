@@ -12,7 +12,7 @@
 \alias{predict.optics}
 \title{Ordering Points to Identify the Clustering Structure (OPTICS)}
 \usage{
-optics(x, eps = Inf, minPts = 5, ...)
+optics(x, eps = NULL, minPts = 5, ...)
 
 \method{print}{optics}(x, ...)
 
@@ -32,17 +32,15 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 \item{x}{a data matrix or a \link{dist} object.}
 
 \item{eps}{maximum epsilon neighborhood size only used for performance.
-When set to \code{Inf}, then the actual maximal needed
-radius is estimated from \code{minPts} and the data.
-The upper limit can be further reduced to improve
-performance. If set
-too low then many reachability values will erroneously become \code{Inf}
-shown as dashed lines in the reachability plot. \code{eps} should be increased.}
+The default \code{NULL} estimates the smallest radius that gives every point a
+core distance. This is fast, but setting eps to \code{Inf} can give
+a different result.}
 
-\item{minPts}{the parameter is used to identify dense neighborhoods and the
-reachability distance is calculated as the distance to the minPts nearest
-neighbor. Controls the smoothness of the reachability distribution. Default
-is 5 points.}
+\item{minPts}{the parameter is used to identify dense neighborhoods. The
+core distance of a point is the distance to its (\code{minPts - 1})-th nearest
+neighbor (\code{minPts} includes the point itself). It is used to calculate the
+reachability distances and controls the smoothness of the reachability
+plot. Default is 5 points.}
 
 \item{...}{additional arguments are passed on to fixed-radius nearest
 neighbor search algorithm. See \code{\link[=frNN]{frNN()}} for details on how to
@@ -54,15 +52,15 @@ control the search strategy.}
 
 \item{eps_cl}{Threshold to identify clusters (\code{eps_cl <= eps}).}
 
-\item{xi}{Steepness threshold to identify clusters hierarchically using the
-Xi method.}
+\item{xi}{Steepness threshold between 0 and 1 (exclusive) to identify
+clusters hierarchically using the Xi method.}
 
 \item{minimum}{logical, representing whether or not to extract the minimal
 (non-overlapping) clusters in the Xi clustering algorithm.}
 
 \item{correctPredecessors}{logical, correct a common artifact by pruning
 the steep up area for points that have predecessors not in the
-cluster--found by the ELKI framework, see details below.}
+cluster--found by the ELKI framework, see details for \code{extractXi()}.}
 
 \item{newdata}{new data points for which the cluster membership should be
 predicted.}
@@ -102,10 +100,13 @@ algorithm with methods to extract a clustering from the ordering.
 While using similar concepts as DBSCAN, \code{minPts} in OPTICS has a different
 effect than in DBSCAN. Since it is also used to calculate the reachability
 distance, larger values will make the reachability distance plot smoother.
-The parameter \code{eps} is optional and defaults to \code{Inf}.
-It represents
+The parameter \code{eps} is optional. It represents
 an upper limit for the neighborhood size used to reduce
 computational complexity which is helpful for large data sets.
+By default (\code{eps = NULL}), it is estimated from \code{minPts} and the data. If the
+data contain well-separated groups, the estimate can result in several
+undefined (\code{Inf}) reachability distances. Use \code{eps = Inf} to
+not limit the neighborhood size.
 
 OPTICS linearly orders the data points such that points which are spatially
 closest become neighbors in the ordering. The closest analog to this
@@ -126,6 +127,24 @@ nearest neighbor lookup using a kd-tree are used. See \code{\link[=kNN]{kNN()}} 
 details on the parameters for the kd-tree.
 }
 
+\subsection{The effect of eps}{
+
+The \code{eps} parameter can be used to restrict the considered maximum epsilon
+neighborhood size which improves performance significantly. Setting
+\code{eps = Inf} does not restrict the neighborhood and results in the complete
+reachability structure (only the first reachability distance is undefined).
+However, this is can be slower for large data sets.
+
+To improve speed, the default value of \code{NULL}
+calculates a reasonable eps as the largest distance to a (\code{minPts - 1})-th
+nearest neighbor from \code{minPts} and the data. This gives every point
+a valid core distance, but if the data contain very well-separated groups,
+then this radius can result in
+several undefined reachability distances (shown as dashed lines in the
+reachability plot). If the plot shows too many dashed lines then
+\code{eps} should be increased.
+}
+
 \subsection{Extracting a Clustering}{
 
 Several methods to extract a clustering from the order returned by OPTICS are
@@ -141,7 +160,11 @@ noise.
 of the \code{xi} parameter is that it classifies clusters by change in
 relative cluster density. The used algorithm was originally contributed by
 the ELKI framework and is explained in Schubert et al (2018), but contains a
-set of fixes.
+set of fixes. With \code{correctPredecessors = TRUE} (the default), the end of
+each cluster is additionally shortened so that the predecessor of its last
+point is inside the cluster and the cluster does not end in points with
+infinite reachability distance. This step is not part of the original
+algorithm and removes a common artifact (found by the ELKI framework).
 }
 }
 
@@ -207,7 +230,7 @@ plot(res)
 \references{
 Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg
 Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure.
-\emph{ACM SIGMOD international conference on Management of data.} ACM Press. pp.
+\emph{ACM SIGMOD international conference on Management of data.} ACM Press. pp. 49-60.
 \doi{10.1145/304181.304187}
 
 Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based
@@ -219,7 +242,7 @@ Extracted from OPTICS Plots. In \emph{Lernen, Wissen, Daten, Analysen (LWDA 2018
 pp. 318-329.
 }
 \seealso{
-Density \link{reachability}.
+\link{reachability}, \code{\link[=dbscan]{dbscan()}}, \code{\link[=hdbscan]{hdbscan()}}.
 
 Other clustering functions:
 \code{\link[=dbscan]{dbscan()}},

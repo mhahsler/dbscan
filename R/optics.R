@@ -30,10 +30,13 @@
 #' While using similar concepts as DBSCAN, `minPts` in OPTICS has a different
 #' effect than in DBSCAN. Since it is also used to calculate the reachability
 #' distance, larger values will make the reachability distance plot smoother.
-#' The parameter `eps` is optional and defaults to `Inf`.
-#' It represents
+#' The parameter `eps` is optional. It represents
 #' an upper limit for the neighborhood size used to reduce
 #' computational complexity which is helpful for large data sets.
+#' By default (`eps = NULL`), it is estimated from `minPts` and the data. If the
+#' data contain well-separated groups, the estimate can result in several
+#' undefined (`Inf`) reachability distances. Use `eps = Inf` to
+#' not limit the neighborhood size.
 #'
 #' OPTICS linearly orders the data points such that points which are spatially
 #' closest become neighbors in the ordering. The closest analog to this
@@ -52,6 +55,23 @@
 #' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
 #' details on the parameters for the kd-tree.
 #'
+#' ## The effect of eps
+#'
+#' The `eps` parameter can be used to restrict the considered maximum epsilon
+#' neighborhood size which improves performance significantly. Setting
+#' `eps = Inf` does not restrict the neighborhood and results in the complete
+#' reachability structure (only the first reachability distance is undefined).
+#' However, this is can be slower for large data sets.
+#'
+#' To improve speed, the default value of `NULL`
+#' calculates a reasonable eps as the largest distance to a (`minPts - 1`)-th
+#' nearest neighbor from `minPts` and the data. This gives every point
+#' a valid core distance, but if the data contain very well-separated groups,
+#' then this radius can result in
+#' several undefined reachability distances (shown as dashed lines in the
+#' reachability plot). If the plot shows too many dashed lines then
+#' `eps` should be increased.
+#'
 #' ## Extracting a Clustering
 #'
 #' Several methods to extract a clustering from the order returned by OPTICS are
@@ -68,7 +88,11 @@
 #'   of the `xi` parameter is that it classifies clusters by change in
 #'   relative cluster density. The used algorithm was originally contributed by
 #'   the ELKI framework and is explained in Schubert et al (2018), but contains a
-#'   set of fixes.
+#'   set of fixes. With `correctPredecessors = TRUE` (the default), the end of
+#'   each cluster is additionally shortened so that the predecessor of its last
+#'   point is inside the cluster and the cluster does not end in points with
+#'   infinite reachability distance. This step is not part of the original
+#'   algorithm and removes a common artifact (found by the ELKI framework).
 #'
 #' ## Predict Cluster Memberships
 #'
@@ -80,25 +104,23 @@
 #'
 #' @param x a data matrix or a [dist] object.
 #' @param eps maximum epsilon neighborhood size only used for performance.
-#' When set to `Inf`, then the actual maximal needed
-#' radius is estimated from `minPts` and the data.
-#' The upper limit can be further reduced to improve
-#' performance. If set
-#' too low then many reachability values will erroneously become `Inf`
-#' shown as dashed lines in the reachability plot. `eps` should be increased.
-#' @param minPts the parameter is used to identify dense neighborhoods and the
-#' reachability distance is calculated as the distance to the minPts nearest
-#' neighbor. Controls the smoothness of the reachability distribution. Default
-#' is 5 points.
+#' The default `NULL` estimates the smallest radius that gives every point a
+#' core distance. This is fast, but setting eps to `Inf` can give
+#' a different result.
+#' @param minPts the parameter is used to identify dense neighborhoods. The
+#' core distance of a point is the distance to its (`minPts - 1`)-th nearest
+#' neighbor (`minPts` includes the point itself). It is used to calculate the
+#' reachability distances and controls the smoothness of the reachability
+#' plot. Default is 5 points.
 #' @param eps_cl Threshold to identify clusters (`eps_cl <= eps`).
-#' @param xi Steepness threshold to identify clusters hierarchically using the
-#' Xi method.
+#' @param xi Steepness threshold between 0 and 1 (exclusive) to identify
+#' clusters hierarchically using the Xi method.
 #' @param object an object of class `optics`.
 #' @param minimum logical, representing whether or not to extract the minimal
 #' (non-overlapping) clusters in the Xi clustering algorithm.
 #' @param correctPredecessors logical, correct a common artifact by pruning
 #' the steep up area for points that have predecessors not in the
-#' cluster--found by the ELKI framework, see details below.
+#' cluster--found by the ELKI framework, see details for `extractXi()`.
 #' @param ...  additional arguments are passed on to fixed-radius nearest
 #' neighbor search algorithm. See [frNN()] for details on how to
 #' control the search strategy.
@@ -124,11 +146,11 @@
 #' found in the OPTICS ordering. }
 #'
 #' @author Michael Hahsler and Matthew Piekenbrock
-#' @seealso Density [reachability].
+#' @seealso [reachability], [dbscan()], [hdbscan()].
 #'
 #' @references Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg
 #' Sander (1999). OPTICS: Ordering Points To Identify the Clustering Structure.
-#' _ACM SIGMOD international conference on Management of data._ ACM Press. pp.
+#' _ACM SIGMOD international conference on Management of data._ ACM Press. pp. 49-60.
 #' \doi{10.1145/304181.304187}
 #'
 #' Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based
@@ -192,19 +214,28 @@
 #' res <- optics(d, minPts = 10)
 #' plot(res)
 #' @export
-optics <- function(x, eps = Inf, minPts = 5, ...) {
+optics <- function(x, eps = NULL, minPts = 5, ...) {
 
   minPts <- .validate_integer_scalar(minPts, "minPts")
-  
-  ### we treat NULL as infinity
-  eps <- eps %||% Inf
-  eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
 
-  ### For infinity we use eps from minPts which gives the same result
-  if (is.infinite(eps)) {
+  ### eps = Inf uses an unlimited neighborhood. For NULL (the default), we
+  ### estimate eps from minPts and the data to reduce computational cost.
+  if (!is.null(eps)) {
+    eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
+  } else {
+    ### We use the largest core distance (the distance to the
+    ### (minPts - 1)-th neighbor) as eps. This is the smallest radius that gives
+    ### every point a core distance and avoids unnecessary neighborhood searches.
     eps <- max(kNNdist(x, k =  minPts - 1L))
     if (!is.finite(eps))
       stop("minPts is larger than the number of objects-1 or a distance is infinite distance.")
+
+    ### The point with the largest core distance has its (minPts - 1)-th
+    ### neighbor at exactly distance eps. The C++ code compares squared
+    ### distances to eps * eps, and rounding errors can then exclude this
+    ### neighbor. The point would not be a core point and its core distance
+    ### would be Inf. We increase eps by a tiny relative amount to avoid this.
+    eps <- eps * (1 + sqrt(.Machine$double.eps))
   }
 
   ### extra contains settings for frNN
@@ -233,7 +264,8 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
   ## for dist we provide the R code with a frNN list and no x
   frNN <- list()
   if (inherits(x, "dist")) {
-    frNN <- frNN(x, eps, ...)
+    ### frNN needs a finite radius. The largest distance includes all points.
+    frNN <- frNN(x, if (is.infinite(eps)) max(x) else eps, ...)
     ## add self match and use C numbering
     frNN$id <- lapply(
       seq_along(frNN$id),

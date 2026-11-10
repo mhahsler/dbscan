@@ -40,6 +40,8 @@
 #' settings are inherently limited in that they cannot capture patterns within
 #' the cluster hierarchy at varying _local_ levels of granularity.
 #'
+#' ## The role of minPts for condensing the clustering tree
+#'
 #' Rather than partitioning a hierarchy based on the number of the cluster one
 #' expects to find (\eqn{k}) or based on some linkage distance threshold
 #' (\eqn{H}), the FOSC proposes that the optimal clusters may exist at varying
@@ -55,15 +57,16 @@
 #' Depending on the local cuts chosen by the optimal solution, such points can
 #' end up as noise, which is denoted as 0 in the final solution.
 #'
-#' Note that for a hierarchy created by [hdbscan()], `minPts` typically is the
-#' same value that was used to build it (it is recorded in the hierarchy
-#' and used as the default). However, different values can be specified where
-#' `minPts` in `hdbscan()` controls noise and smoothing while `minPts` in
-#' `extractFOSC()` controls cluster scale.
+#' For a hierarchy created by [hdbscan()], `extractFOSC()` recomputes the
+#' stability on the raw hierarchy using `minPts`. By default, the `minPts` value
+#' stored in the hierarchy is used, but a different value can be specified:
+#' `minPts` in `hdbscan()` controls noise and density estimate smoothing,
+#' while `minPts` in `extractFOSC()` controls the cluster scale.
 #'
-#' Traversing the original cluster tree using minPts creates a new, simplified
-#' cluster tree that is then post-processed recursively to extract clusters
-#' that maximize for each cluster \eqn{C_i}{Ci} the cost function
+#' ## Cluster extraction
+#'
+#' The simplified cluster tree is then post-processed recursively to extract
+#' clusters that maximize for each cluster \eqn{C_i}{Ci} the cost function
 #'
 #' \deqn{\max_{\delta_2, \dots, \delta_k} J = \sum\limits_{i=2}^{k} \delta_i
 #' S(C_i)}{ J = \sum \delta S(Ci) for all i clusters, } where
@@ -96,12 +99,12 @@
 #' solutions where no constraints were given), the unsupervised solution is
 #' used as a tiebreaker. See Campello et al (2013) for more details.
 #'
-#' As a third option, if one wishes to prioritize the degree at which the
+#' To prioritize the degree at which the
 #' unsupervised and semisupervised solutions contribute to the overall optimal
 #' solution, the parameter \eqn{\alpha} can be set to enable the extraction of
 #' clusters that maximize the `mixed` objective function
 #'
-#' \deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))}{J = \alpha S(Ci) + (1 -
+#' \deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i)}{J = \alpha S(Ci) + (1 -
 #' \alpha) \gamma(Ci).}
 #'
 #' FOSC expects the pairwise constraints to be passed as either 1) an
@@ -115,15 +118,12 @@
 #' should-link, negative indices for should-not-link). Again, see the examples
 #' section for a demonstration of this.
 #'
-#' The parameters to the input function correspond to the concepts discussed
-#' above. The `minPts` parameter to represent the minimum cluster size to
-#' extract. The optional `constraints` parameter contains the pairwise,
-#' instance-level constraints of the data. The optional `alpha` parameters
-#' controls whether the mixed objective function is used (if `alpha` is
-#' greater than 0). If the `validate_constraints` parameter is set to
-#' true, the constraints are checked (and fixed) for symmetry (if point A has a
-#' should-link constraint with point B, point B should also have the same
-#' constraint). Asymmetric constraints are not supported.
+#' If `validate_constraints` is `TRUE`, the constraints are checked (and fixed)
+#' for symmetry (if point A has a should-link constraint with point B, point B
+#' should also have the same constraint). Asymmetric constraints are not
+#' supported. The mixed objective function is used if `alpha` is greater than 0.
+#'
+#' ## Unstable branch pruning
 #'
 #' Unstable branch pruning was not discussed by Campello et al (2013), however
 #' in some data sets it may be the case that specific subbranches scores are
@@ -136,9 +136,11 @@
 #'
 #' @family clustering functions
 #'
-#' @param x a valid [hclust] object created via [hclust()] or [hdbscan()].
-#' @param constraints Either a list or matrix of pairwise constraints. If
-#' missing, an unsupervised measure of stability is used to make local cuts and
+#' @param x a valid [hclust] object created via [hclust()] or the result of
+#' [hdbscan()]. For an [hdbscan()] result, its hierarchy (the `hc` component)
+#' is used.
+#' @param constraints Pairwise constraints given as a list, a vector (like a
+#' [dist] object) or a matrix. If missing, an unsupervised measure of stability is used to make local cuts and
 #' extract the optimal clusters. See details.
 #' @param alpha numeric; weight between \eqn{[0, 1]} for mixed-objective
 #' semi-supervised extraction. Defaults to 0.
@@ -156,9 +158,12 @@
 #' @returns A list with the elements:
 #'
 #' \item{cluster }{A integer vector with cluster assignments. Zero
-#' indicates noise points (if any).}
+#' indicates noise points (if any). The cluster ids are the ids of the clusters
+#' in the simplified cluster tree and are therefore not necessarily
+#' consecutive.}
 #' \item{hc }{The original [hclust] object with additional list elements
-#' `"stability"`, `"constraint"`, and `"total"`
+#' `"cluster"` (the id of the cluster assigned to each of the \eqn{n - 1}
+#' merge steps), `"stability"`, `"constraint"`, and `"total"`
 #' for the \eqn{n - 1} cluster-wide objective scores from the extraction.}
 #'
 #' @author Matt Piekenbrock
@@ -198,6 +203,10 @@ extractFOSC <-
     minPts = NULL,
     prune_unstable = FALSE,
     validate_constraints = FALSE) {
+    ## use the hierarchy of an hdbscan object
+    if (inherits(x, "hdbscan"))
+      x <- x$hc
+
     if (!inherits(x, "hclust"))
       stop("extractFOSC expects 'x' to be a valid hclust object.")
 
@@ -258,7 +267,8 @@ extractFOSC <-
         }
         ## Checks for proper integer labels, symmetry of constraints, length of vector, etc.
         if (validate_constraints) {
-          is_valid <- length(constraints) == choose(n, 2)
+          if (length(constraints) != choose(n, 2))
+            stop("The constraint vector needs to have n(n-1)/2 elements.")
           constraints_list <-
             validateConstraintList(distToAdjacency(constraints, n), n)
         } else {
@@ -278,14 +288,13 @@ extractFOSC <-
           stop("Given matrix is not square.")
         }
         warning(
-          "Full nxn matrix given; extractFOCS does not support asymmetric relational constraints. Using lower triangular."
+          "Full nxn matrix given; extractFOSC does not support asymmetric relational constraints. Using lower triangular."
         )
 
         constraints <- constraints[lower.tri(constraints)]
 
         ## Checks for proper integer labels, symmetry of constraints, length of vector, etc.
         if (validate_constraints) {
-          is_valid <- length(constraints) == choose(n, 2)
           constraints_list <-
             validateConstraintList(distToAdjacency(constraints, n), n)
         } else {

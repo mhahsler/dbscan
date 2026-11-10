@@ -14,10 +14,12 @@ extractFOSC(
 )
 }
 \arguments{
-\item{x}{a valid \link{hclust} object created via \code{\link[=hclust]{hclust()}} or \code{\link[=hdbscan]{hdbscan()}}.}
+\item{x}{a valid \link{hclust} object created via \code{\link[=hclust]{hclust()}} or the result of
+\code{\link[=hdbscan]{hdbscan()}}. For an \code{\link[=hdbscan]{hdbscan()}} result, its hierarchy (the \code{hc} component)
+is used.}
 
-\item{constraints}{Either a list or matrix of pairwise constraints. If
-missing, an unsupervised measure of stability is used to make local cuts and
+\item{constraints}{Pairwise constraints given as a list, a vector (like a
+\link{dist} object) or a matrix. If missing, an unsupervised measure of stability is used to make local cuts and
 extract the optimal clusters. See details.}
 
 \item{alpha}{numeric; weight between \eqn{[0, 1]} for mixed-objective
@@ -40,9 +42,12 @@ validity? See details for what are considered valid constraints.}
 A list with the elements:
 
 \item{cluster }{A integer vector with cluster assignments. Zero
-indicates noise points (if any).}
+indicates noise points (if any). The cluster ids are the ids of the clusters
+in the simplified cluster tree and are therefore not necessarily
+consecutive.}
 \item{hc }{The original \link{hclust} object with additional list elements
-\code{"stability"}, \code{"constraint"}, and \code{"total"}
+\code{"cluster"} (the id of the cluster assigned to each of the \eqn{n - 1}
+merge steps), \code{"stability"}, \code{"constraint"}, and \code{"total"}
 for the \eqn{n - 1} cluster-wide objective scores from the extraction.}
 }
 \description{
@@ -67,6 +72,7 @@ clusters. This is implemented in R in function \code{\link[stats:cutree]{stats::
 Although such methods are widespread, using global parameter
 settings are inherently limited in that they cannot capture patterns within
 the cluster hierarchy at varying \emph{local} levels of granularity.
+\subsection{The role of minPts for condensing the clustering tree}{
 
 Rather than partitioning a hierarchy based on the number of the cluster one
 expects to find (\eqn{k}) or based on some linkage distance threshold
@@ -83,15 +89,17 @@ a branch with fewer than minPts points are not part of any new cluster.
 Depending on the local cuts chosen by the optimal solution, such points can
 end up as noise, which is denoted as 0 in the final solution.
 
-Note that for a hierarchy created by \code{\link[=hdbscan]{hdbscan()}}, \code{minPts} typically is the
-same value that was used to build it (it is recorded in the hierarchy
-and used as the default). However, different values can be specified where
-\code{minPts} in \code{hdbscan()} controls noise and smoothing while \code{minPts} in
-\code{extractFOSC()} controls cluster scale.
+For a hierarchy created by \code{\link[=hdbscan]{hdbscan()}}, \code{extractFOSC()} recomputes the
+stability on the raw hierarchy using \code{minPts}. By default, the \code{minPts} value
+stored in the hierarchy is used, but a different value can be specified:
+\code{minPts} in \code{hdbscan()} controls noise and density estimate smoothing,
+while \code{minPts} in \code{extractFOSC()} controls the cluster scale.
+}
 
-Traversing the original cluster tree using minPts creates a new, simplified
-cluster tree that is then post-processed recursively to extract clusters
-that maximize for each cluster \eqn{C_i}{Ci} the cost function
+\subsection{Cluster extraction}{
+
+The simplified cluster tree is then post-processed recursively to extract
+clusters that maximize for each cluster \eqn{C_i}{Ci} the cost function
 
 \deqn{\max_{\delta_2, \dots, \delta_k} J = \sum\limits_{i=2}^{k} \delta_i
 S(C_i)}{ J = \sum \delta S(Ci) for all i clusters, } where
@@ -124,12 +132,12 @@ object \eqn{x_j}{Xj} that are satisfied. In the case of ties (such as
 solutions where no constraints were given), the unsupervised solution is
 used as a tiebreaker. See Campello et al (2013) for more details.
 
-As a third option, if one wishes to prioritize the degree at which the
+To prioritize the degree at which the
 unsupervised and semisupervised solutions contribute to the overall optimal
 solution, the parameter \eqn{\alpha} can be set to enable the extraction of
 clusters that maximize the \code{mixed} objective function
 
-\deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))}{J = \alpha S(Ci) + (1 -
+\deqn{J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i)}{J = \alpha S(Ci) + (1 -
 \alpha) \gamma(Ci).}
 
 FOSC expects the pairwise constraints to be passed as either 1) an
@@ -143,15 +151,13 @@ correspond to integer vectors of constraints (positive indices for
 should-link, negative indices for should-not-link). Again, see the examples
 section for a demonstration of this.
 
-The parameters to the input function correspond to the concepts discussed
-above. The \code{minPts} parameter to represent the minimum cluster size to
-extract. The optional \code{constraints} parameter contains the pairwise,
-instance-level constraints of the data. The optional \code{alpha} parameters
-controls whether the mixed objective function is used (if \code{alpha} is
-greater than 0). If the \code{validate_constraints} parameter is set to
-true, the constraints are checked (and fixed) for symmetry (if point A has a
-should-link constraint with point B, point B should also have the same
-constraint). Asymmetric constraints are not supported.
+If \code{validate_constraints} is \code{TRUE}, the constraints are checked (and fixed)
+for symmetry (if point A has a should-link constraint with point B, point B
+should also have the same constraint). Asymmetric constraints are not
+supported. The mixed objective function is used if \code{alpha} is greater than 0.
+}
+
+\subsection{Unstable branch pruning}{
 
 Unstable branch pruning was not discussed by Campello et al (2013), however
 in some data sets it may be the case that specific subbranches scores are
@@ -161,6 +167,7 @@ lower than the parents. This can happen in extremely nonhomogeneous data
 sets, where there exists locally very stable branches surrounded by unstable
 branches that contain more than \code{minPts} points.
 \code{prune_unstable = TRUE} will remove the unstable branches.
+}
 }
 \examples{
 data("moons")

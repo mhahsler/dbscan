@@ -104,8 +104,10 @@ values reveal finer structure but are more sensitive to local variation.
 
 In OPTICS, `eps` is the maximum neighborhood radius explored by the algorithm.
 It is primarily a computational upper bound, not usually the density threshold
-used to define the final clusters. The default `eps = Inf` lets the package
-estimate a sufficient finite radius from the data and `minPts`.
+used to define the final clusters. The default `eps = NULL` lets the package
+estimate a sufficient finite radius from the data and `minPts`. If the data
+contain well-separated groups, this estimate can leave several reachability
+distances undefined. Use `eps = Inf` to not limit the neighborhood size.
 
 For large data sets, supplying a smaller upper bound can reduce computation,
 but it must not exclude structure of interest. Multiple dashed bars in the

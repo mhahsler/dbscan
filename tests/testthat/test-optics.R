@@ -98,3 +98,52 @@ test_that("OPTICS", {
   expect_equal(as.reachability(as.dendrogram(res))$reachdist, res$reachdist)
   expect_equal(as.reachability(as.dendrogram(res))$order, res$order)
 })
+
+test_that("optics with the estimated eps gives every point a core distance", {
+  # The estimated eps equals the largest core distance. Rounding errors in the
+  # squared distance comparison used to leave one point without a core distance.
+  data("moons")
+  x_iris <- unique(as.matrix(iris[, 1:4]))
+
+  for (x in list(as.matrix(moons), x_iris)) {
+    for (minPts in c(3, 5, 10)) {
+      res <- optics(x, minPts = minPts)
+      expect_true(all(is.finite(res$coredist)))
+      expect_equal(res$coredist, kNNdist(x, k = minPts - 1))
+    }
+  }
+})
+
+test_that("optics with eps = Inf uses an unlimited neighborhood", {
+  x <- unique(as.matrix(iris[, 1:4]))
+  minPts <- 5
+
+  # the default is an estimated finite eps
+  res_est <- optics(x, minPts = minPts)
+  expect_true(is.finite(res_est$eps))
+  expect_equal(res_est$eps, max(kNNdist(x, k = minPts - 1)), tolerance = 1e-6)
+
+  # Inf is used as is and gives the same result as a very large eps
+  res_inf <- optics(x, eps = Inf, minPts = minPts)
+  res_large <- optics(x, eps = 1e6, minPts = minPts)
+  expect_identical(res_inf$eps, Inf)
+  expect_identical(res_inf$order, res_large$order)
+  expect_equal(res_inf$reachdist, res_large$reachdist)
+  expect_equal(res_inf$coredist, res_large$coredist)
+
+  # only the first reachability distance is undefined
+  expect_equal(sum(is.infinite(res_inf$reachdist)), 1L)
+
+  # the estimated eps can leave more undefined reachability distances
+  expect_gt(sum(is.infinite(res_est$reachdist)), 1L)
+
+  # distance matrix and distance search give the same result
+  res_dist <- optics(dist(x), eps = Inf, minPts = minPts)
+  expect_identical(res_dist$order, res_inf$order)
+  expect_equal(res_dist$reachdist, res_inf$reachdist)
+  res_search <- optics(x, eps = Inf, minPts = minPts, search = "dist")
+  expect_equal(res_search$reachdist, res_inf$reachdist)
+
+  # the complete structure can be converted to a dendrogram
+  expect_s3_class(as.dendrogram(res_inf), "dendrogram")
+})

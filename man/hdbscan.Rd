@@ -42,9 +42,13 @@ mrdist(x, minPts, coredist = NULL)
 \item{x}{a data matrix (Euclidean distances are used) or a \link{dist} object
 calculated with an arbitrary distance metric.}
 
-\item{minPts}{integer; Minimum size of clusters. See details.}
+\item{minPts}{integer; Main parameter to control density estimate smoothing
+and the minimum clusters size. See details.}
 
-\item{cluster_selection_epsilon}{double; a distance threshold below which}
+\item{cluster_selection_epsilon}{double; a distance threshold below which
+no clusters should be selected (see Malzer & Baum 2020). The threshold is
+specified in mutual reachability distance (see \code{mrdist()}). The default of
+0.0 means this feature is not used.}
 
 \item{gen_hdbscan_tree}{logical; should the robust single linkage tree be
 explicitly computed (see cluster tree in Chaudhuri et al, 2010).}
@@ -92,7 +96,15 @@ noise points.}
 \item{membership_prob }{The probability or individual stability of a
 point within its clusters. Between 0 and 1.}
 \item{outlier_scores }{The GLOSH outlier score of each point. }
-\item{hc }{An \link{hclust} object of the HDBSCAN hierarchy. }
+\item{coredist }{ The core distance of each data point (see \code{coredist()}).}
+\item{hc }{An \link{hclust} object of the HDBSCAN hierarchy (the single-linkage
+hierarchy of the minimum spanning tree of the mutual reachability
+distances before condensing). It also stores the used \code{minPts} value
+and can be used as input for \code{\link[=extractFOSC]{extractFOSC()}}.}
+\item{hdbscan_tree }{ A \link{dendrogram} of the hierarchy. Only present if
+\code{gen_hdbscan_tree = TRUE}.}
+\item{simplified_tree }{ A \link{dendrogram} of the simplified hierarchy.
+Only present if \code{gen_simplified_tree = TRUE}.}
 
 \code{coredist()} returns a vector with the core distance for each data point.
 
@@ -109,28 +121,26 @@ stability-based flat cluster extraction. HDBSCAN essentially computes the
 hierarchy of all DBSCAN* clusterings, and
 then uses a stability-based extraction method to find optimal cuts in the
 hierarchy, thus producing a flat solution.
+\subsection{The algorithm}{
 
-HDBSCAN performs the following steps:
+The algorithm uses as the main parameter \code{minPts} which is used in several
+of the HDBSCAN steps:
 \enumerate{
-\item Compute mutual reachability distance mrd between points
-(based on distances and core distances).
-\item Use mdr as a distance measure to construct a minimum spanning tree.
-\item Prune the tree using stability.
-\item Extract the clusters.
+\item Compute core distances as a density estimates around points.
+Here \code{minPts} is a smoothing parameter for the density estimates;
+larger values for \code{minPts} give larger and smoother density estimates.
+\item Compute mutual reachability distances from core distances.
+\item Construct a minimum spanning tree from the mutual reachability distances.
+\item Prune the tree using stability. Here \code{minPts} controls the minimum
+cluster size because splits are only allowed when both branches
+have at least \code{minPts} points.
+\item Extract the clusters from the pruned tree.
+}
 }
 
-Additional, related algorithms including the "Global-Local Outlier Score
-from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015)
-is available in function \code{\link[=glosh]{glosh()}}
-and the ability to cluster based on instance-level constraints (see
-section 5.3 of Campello et al. 2015) are supported. The algorithms only need
-the parameter \code{minPts}.
+\subsection{Cluster selection using epsilon}{
 
-Note that \code{minPts} not only acts as a minimum cluster size to detect,
-but also as a "smoothing" factor of the density estimates implicitly
-computed from HDBSCAN.
-
-When using the optional parameter \code{cluster_selection_epsilon},
+When using a value greater than 0.0 for \code{cluster_selection_epsilon},
 a combination between DBSCAN* and HDBSCAN* can be achieved
 (see Malzer & Baum 2020). This means that part of the
 tree is affected by \code{cluster_selection_epsilon} as if
@@ -142,21 +152,41 @@ Note that there is not always a remaining part, especially if
 the parameter value is chosen too large, or if there aren't
 enough clusters of variable densities. In this case, the result
 will be equal to DBSCAN*.
+\code{cluster_selection_epsilon} is especially useful for cases
 where HDBSCAN* produces too many small clusters that
 need to be merged, while still being able to extract clusters
 of variable densities at higher levels.
+}
+
+\subsection{Helper Functions}{
 
 \code{coredist()}: The core distance is defined for each point as
-the distance to the \code{MinPts - 1}'s neighbor.
-It is a density estimate equivalent to \code{kNNdist()} with \code{k = MinPts -1}.
+the distance to the (\code{minPts - 1})-th nearest neighbor.
+It is a density estimate equivalent to \code{kNNdist()} with \code{k = minPts -1}.
+Larger values for \code{minPts} lead to larger and smoother estimates.
 
 \code{mrdist()}: The mutual reachability distance is defined between two points as
 \code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}. This distance metric is used by
-HDBSCAN. It has the effect of increasing distances in low density areas.
+HDBSCAN. It has the effect of increasing distances in low density areas, separating
+clusters better.
 
 \code{predict()} assigns each new data point to the same cluster as the nearest point
 if it is not more than that points core distance away. Otherwise the new point
 is classified as a noise point (i.e., cluster ID 0).
+}
+
+\subsection{Related Methods}{
+
+Clusters can be extracted from the hierarchy created by HDBSCAN
+or any other hierarchical clustering in a more flexible way
+using \code{\link[=extractFOSC]{extractFOSC()}}.
+
+The Global-Local Outlier Score
+from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
+is available in function \code{\link[=glosh]{glosh()}}. Clusters can also be extracted based on
+instance-level constraints (see section 5.3 of Campello et al. 2015) using
+\code{\link[=extractFOSC]{extractFOSC()}}.
+}
 }
 \examples{
 ## cluster the moons data set with HDBSCAN

@@ -7,6 +7,9 @@
 * Added seeded randomized comparisons of native and distance-matrix search
   backends and a Linux ASan/LSan/UBSan runner and CI workflow. Native backend
   tests are skipped on CRAN and enabled explicitly by the sanitizer driver.
+* `hdbscan()` now records `minPts` in its `hc` component. `extractFOSC()` uses it
+  as the default for `minPts`.
+  Documentation of `minPts` in `extractFOSC()` was clarified.
 
 ## Bugfixes
 * kNN.cpp: Keep the k nearest hits in kNN_int when the query point 

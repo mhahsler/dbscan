@@ -226,6 +226,7 @@ hdbscan <- function(x,
   mst <- mst(mrd, n)
   hc <- hclustMergeOrder(mst, order(mst[, 3]))
   hc$call <- match.call()
+  hc$minPts <- minPts # needed by extractFOSC() to check/default minPts
 
   ## 3. Prune the tree
   ## Process the hierarchy to retrieve all the necessary info needed by HDBSCAN

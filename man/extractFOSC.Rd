@@ -8,7 +8,7 @@ extractFOSC(
   x,
   constraints,
   alpha = 0,
-  minPts = 2L,
+  minPts = NULL,
   prune_unstable = FALSE,
   validate_constraints = FALSE
 )
@@ -23,8 +23,10 @@ extract the optimal clusters. See details.}
 \item{alpha}{numeric; weight between \eqn{[0, 1]} for mixed-objective
 semi-supervised extraction. Defaults to 0.}
 
-\item{minPts}{numeric; Defaults to 2. Only needed if class-less noise is a
-valid label in the model.}
+\item{minPts}{integer; minimum cluster size to extract (must be at least 2).
+The default
+value of \code{NULL} uses for an \code{x} that was created by \code{\link[=hdbscan]{hdbscan()}}
+its stored \code{minPts} value, otherwise 2 is used.}
 
 \item{prune_unstable}{logical; should significantly unstable subtrees be
 pruned? The default is \code{FALSE} for the original optimal extraction
@@ -69,17 +71,23 @@ the cluster hierarchy at varying \emph{local} levels of granularity.
 Rather than partitioning a hierarchy based on the number of the cluster one
 expects to find (\eqn{k}) or based on some linkage distance threshold
 (\eqn{H}), the FOSC proposes that the optimal clusters may exist at varying
-distance thresholds in the hierarchy. To enable this idea, FOSC requires one
-parameter (minPts) that represents \emph{the minimum number of points that
+distance thresholds in the hierarchy. To enable this idea, FOSC uses the
+\code{minPts} parameter. It represents \emph{the minimum number of points that
 constitute a valid cluster.} The first step of the FOSC algorithm is to
 traverse the given cluster hierarchy divisively, recording new clusters at
 each split if both branches represent more than or equal to minPts. Branches
 that contain less than minPts points at one or both branches inherit the
 parent clusters identity. Note that using FOSC, due to the constraint that
-minPts must be greater than or equal to 2, it is possible that the optimal
-cluster solution chosen makes local cuts that render parent branches of
-sizes less than minPts as noise, which are denoted as 0 in the final
-solution.
+minPts must be greater than or equal to 2, points that leave a cluster in
+a branch with fewer than minPts points are not part of any new cluster.
+Depending on the local cuts chosen by the optimal solution, such points can
+end up as noise, which is denoted as 0 in the final solution.
+
+Note that for a hierarchy created by \code{\link[=hdbscan]{hdbscan()}}, \code{minPts} typically is the
+same value that was used to build it (it is recorded in the hierarchy
+and used as the default). However, different values can be specified where
+\code{minPts} in \code{hdbscan()} controls noise and smoothing while \code{minPts} in
+\code{extractFOSC()} controls cluster scale.
 
 Traversing the original cluster tree using minPts creates a new, simplified
 cluster tree that is then post-processed recursively to extract clusters

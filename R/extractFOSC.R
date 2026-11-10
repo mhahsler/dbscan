@@ -43,17 +43,23 @@
 #' Rather than partitioning a hierarchy based on the number of the cluster one
 #' expects to find (\eqn{k}) or based on some linkage distance threshold
 #' (\eqn{H}), the FOSC proposes that the optimal clusters may exist at varying
-#' distance thresholds in the hierarchy. To enable this idea, FOSC requires one
-#' parameter (minPts) that represents _the minimum number of points that
+#' distance thresholds in the hierarchy. To enable this idea, FOSC uses the
+#' `minPts` parameter. It represents _the minimum number of points that
 #' constitute a valid cluster._ The first step of the FOSC algorithm is to
 #' traverse the given cluster hierarchy divisively, recording new clusters at
 #' each split if both branches represent more than or equal to minPts. Branches
 #' that contain less than minPts points at one or both branches inherit the
 #' parent clusters identity. Note that using FOSC, due to the constraint that
-#' minPts must be greater than or equal to 2, it is possible that the optimal
-#' cluster solution chosen makes local cuts that render parent branches of
-#' sizes less than minPts as noise, which are denoted as 0 in the final
-#' solution.
+#' minPts must be greater than or equal to 2, points that leave a cluster in
+#' a branch with fewer than minPts points are not part of any new cluster.
+#' Depending on the local cuts chosen by the optimal solution, such points can
+#' end up as noise, which is denoted as 0 in the final solution.
+#'
+#' Note that for a hierarchy created by [hdbscan()], `minPts` typically is the
+#' same value that was used to build it (it is recorded in the hierarchy
+#' and used as the default). However, different values can be specified where
+#' `minPts` in `hdbscan()` controls noise and smoothing while `minPts` in
+#' `extractFOSC()` controls cluster scale.
 #'
 #' Traversing the original cluster tree using minPts creates a new, simplified
 #' cluster tree that is then post-processed recursively to extract clusters
@@ -136,8 +142,10 @@
 #' extract the optimal clusters. See details.
 #' @param alpha numeric; weight between \eqn{[0, 1]} for mixed-objective
 #' semi-supervised extraction. Defaults to 0.
-#' @param minPts numeric; Defaults to 2. Only needed if class-less noise is a
-#' valid label in the model.
+#' @param minPts integer; minimum cluster size to extract (must be at least 2).
+#' The default
+#' value of `NULL` uses for an `x` that was created by [hdbscan()]
+#' its stored `minPts` value, otherwise 2 is used.
 #' @param prune_unstable logical; should significantly unstable subtrees be
 #' pruned? The default is `FALSE` for the original optimal extraction
 #' framework (see Campello et al, 2013). See details for what `TRUE`
@@ -187,7 +195,7 @@ extractFOSC <-
   function(x,
     constraints,
     alpha = 0,
-    minPts = 2L,
+    minPts = NULL,
     prune_unstable = FALSE,
     validate_constraints = FALSE) {
     if (!inherits(x, "hclust"))
@@ -202,6 +210,15 @@ extractFOSC <-
     ))
       stop("extractFOSC expects constraints to be either an adjacency list or adjacency matrix.")
 
+    ## Use the minPts the hierarchy was built with (hdbscan) as the default.
+    minPts_hc <- x$minPts
+    if (is.null(minPts)) {
+      if (!is.null(minPts_hc)) {
+        minPts <- minPts_hc
+      } else {
+        minPts <- 2L
+      }
+    }
     minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
     if (alpha < 0 ||
         alpha > 1)

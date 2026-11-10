@@ -1,6 +1,7 @@
 url: https://michael.hahsler.net/dbscan/
 template:
   bootstrap: 5
+  math-rendering: mathjax
 
 reference:
 - title: Clustering Algorithms

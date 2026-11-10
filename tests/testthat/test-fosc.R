@@ -70,3 +70,16 @@ test_that("FOSC", {
   ## Test unstable pruning
   expect_silent(extractFOSC(x_sl, constraints = il_constraints2, prune_unstable = TRUE))
 })
+
+test_that("extractFOSC uses the minPts of an hdbscan hierarchy", {
+  data("moons")
+  res <- hdbscan(moons, minPts = 5)
+  expect_equal(res$hc$minPts, 5)
+
+  # default is the minPts of the hierarchy
+  expect_silent(def <- extractFOSC(res$hc))
+  expect_equal(def$cluster, extractFOSC(res$hc, minPts = 5)$cluster)
+
+  # a different minPts can be specified without a warning
+  expect_silent(extractFOSC(res$hc, minPts = 10))
+})

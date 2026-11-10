@@ -100,11 +100,15 @@ calculated with an arbitrary distance metric.</p></dd>
 
 
 <dt id="arg-minpts">minPts<a class="anchor" aria-label="anchor" href="#arg-minpts"></a></dt>
-<dd><p>integer; Minimum size of clusters. See details.</p></dd>
+<dd><p>integer; Main parameter to control density estimate smoothing
+and the minimum clusters size. See details.</p></dd>
 
 
 <dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
-<dd><p>double; a distance threshold below which</p></dd>
+<dd><p>double; a distance threshold below which
+no clusters should be selected (see Malzer &amp; Baum 2020). The threshold is
+specified in mutual reachability distance (see <code>mrdist()</code>). The default of
+0.0 means this feature is not used.</p></dd>
 
 
 <dt id="arg-gen-hdbscan-tree">gen_hdbscan_tree<a class="anchor" aria-label="anchor" href="#arg-gen-hdbscan-tree"></a></dt>
@@ -191,8 +195,22 @@ point within its clusters. Between 0 and 1.</p></dd>
 <dt>outlier_scores </dt>
 <dd><p>The GLOSH outlier score of each point.</p></dd>
 
+<dt>coredist </dt>
+<dd><p>The core distance of each data point (see <code>coredist()</code>).</p></dd>
+
 <dt>hc </dt>
-<dd><p>An <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a> object of the HDBSCAN hierarchy.</p></dd>
+<dd><p>An <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a> object of the HDBSCAN hierarchy (the single-linkage
+hierarchy of the minimum spanning tree of the mutual reachability
+distances before condensing). It also stores the used <code>minPts</code> value
+and can be used as input for <code><a href="extractFOSC.html">extractFOSC()</a></code>.</p></dd>
+
+<dt>hdbscan_tree </dt>
+<dd><p>A <a href="dendrogram.html">dendrogram</a> of the hierarchy. Only present if
+<code>gen_hdbscan_tree = TRUE</code>.</p></dd>
+
+<dt>simplified_tree </dt>
+<dd><p>A <a href="dendrogram.html">dendrogram</a> of the simplified hierarchy.
+Only present if <code>gen_simplified_tree = TRUE</code>.</p></dd>
 
 
 </dl><p><code>coredist()</code> returns a vector with the core distance for each data point.</p>
@@ -205,22 +223,27 @@ hierarchical cluster tree representing density estimates along with the
 stability-based flat cluster extraction. HDBSCAN essentially computes the
 hierarchy of all DBSCAN* clusterings, and
 then uses a stability-based extraction method to find optimal cuts in the
-hierarchy, thus producing a flat solution.</p>
-<p>HDBSCAN performs the following steps:</p><ol><li><p>Compute mutual reachability distance mrd between points
-(based on distances and core distances).</p></li>
-<li><p>Use mdr as a distance measure to construct a minimum spanning tree.</p></li>
-<li><p>Prune the tree using stability.</p></li>
-<li><p>Extract the clusters.</p></li>
-</ol><p>Additional, related algorithms including the "Global-Local Outlier Score
-from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015)
-is available in function <code><a href="glosh.html">glosh()</a></code>
-and the ability to cluster based on instance-level constraints (see
-section 5.3 of Campello et al. 2015) are supported. The algorithms only need
-the parameter <code>minPts</code>.</p>
-<p>Note that <code>minPts</code> not only acts as a minimum cluster size to detect,
-but also as a "smoothing" factor of the density estimates implicitly
-computed from HDBSCAN.</p>
-<p>When using the optional parameter <code>cluster_selection_epsilon</code>,
+hierarchy, thus producing a flat solution.</p><div class="section">
+<h3 id="the-algorithm">The algorithm<a class="anchor" aria-label="anchor" href="#the-algorithm"></a></h3>
+
+
+<p>The algorithm uses as the main parameter <code>minPts</code> which is used in several
+of the HDBSCAN steps:</p><ol><li><p>Compute core distances as a density estimates around points.
+Here <code>minPts</code> is a smoothing parameter for the density estimates;
+larger values for <code>minPts</code> give larger and smoother density estimates.</p></li>
+<li><p>Compute mutual reachability distances from core distances.</p></li>
+<li><p>Construct a minimum spanning tree from the mutual reachability distances.</p></li>
+<li><p>Prune the tree using stability. Here <code>minPts</code> controls the minimum
+cluster size because splits are only allowed when both branches
+have at least <code>minPts</code> points.</p></li>
+<li><p>Extract the clusters from the pruned tree.</p></li>
+</ol></div>
+
+<div class="section">
+<h3 id="cluster-selection-using-epsilon">Cluster selection using epsilon<a class="anchor" aria-label="anchor" href="#cluster-selection-using-epsilon"></a></h3>
+
+
+<p>When using a value greater than 0.0 for <code>cluster_selection_epsilon</code>,
 a combination between DBSCAN* and HDBSCAN* can be achieved
 (see Malzer &amp; Baum 2020). This means that part of the
 tree is affected by <code>cluster_selection_epsilon</code> as if
@@ -232,18 +255,43 @@ Note that there is not always a remaining part, especially if
 the parameter value is chosen too large, or if there aren't
 enough clusters of variable densities. In this case, the result
 will be equal to DBSCAN*.
+<code>cluster_selection_epsilon</code> is especially useful for cases
 where HDBSCAN* produces too many small clusters that
 need to be merged, while still being able to extract clusters
 of variable densities at higher levels.</p>
+</div>
+
+<div class="section">
+<h3 id="helper-functions">Helper Functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a></h3>
+
+
 <p><code>coredist()</code>: The core distance is defined for each point as
-the distance to the <code>MinPts - 1</code>'s neighbor.
-It is a density estimate equivalent to <code><a href="kNNdist.html">kNNdist()</a></code> with <code>k = MinPts -1</code>.</p>
+the distance to the (<code>minPts - 1</code>)-th nearest neighbor.
+It is a density estimate equivalent to <code><a href="kNNdist.html">kNNdist()</a></code> with <code>k = minPts -1</code>.
+Larger values for <code>minPts</code> lead to larger and smoother estimates.</p>
 <p><code>mrdist()</code>: The mutual reachability distance is defined between two points as
 <code>mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))</code>. This distance metric is used by
-HDBSCAN. It has the effect of increasing distances in low density areas.</p>
+HDBSCAN. It has the effect of increasing distances in low density areas, separating
+clusters better.</p>
 <p><code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> assigns each new data point to the same cluster as the nearest point
 if it is not more than that points core distance away. Otherwise the new point
 is classified as a noise point (i.e., cluster ID 0).</p>
+</div>
+
+<div class="section">
+<h3 id="related-methods">Related Methods<a class="anchor" aria-label="anchor" href="#related-methods"></a></h3>
+
+
+<p>Clusters can be extracted from the hierarchy created by HDBSCAN
+or any other hierarchical clustering in a more flexible way
+using <code><a href="extractFOSC.html">extractFOSC()</a></code>.</p>
+<p>The Global-Local Outlier Score
+from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
+is available in function <code><a href="glosh.html">glosh()</a></code>. Clusters can also be extracted based on
+instance-level constraints (see section 5.3 of Campello et al. 2015) using
+<code><a href="extractFOSC.html">extractFOSC()</a></code>.</p>
+</div>
+
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

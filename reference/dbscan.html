@@ -87,7 +87,8 @@ core points (including the point itself).</p></dd>
 
 <dt id="arg-weights">weights<a class="anchor" aria-label="anchor" href="#arg-weights"></a></dt>
 <dd><p>numeric; weights for the data points. Only needed to perform
-weighted clustering.</p></dd>
+weighted clustering. The sum of the weights of the points in an eps
+neighborhood (instead of their number) is compared to <code>minPts</code>.</p></dd>
 
 
 <dt id="arg-borderpoints">borderPoints<a class="anchor" aria-label="anchor" href="#arg-borderpoints"></a></dt>
@@ -146,17 +147,19 @@ call this implementation when you also load package <span class="pkg">fpc</span>
 <p>This implementation of DBSCAN follows the original
 algorithm as described by Ester et al (1996). DBSCAN performs the following steps:</p><ol><li><p>Estimate the density
 around each data point by counting the number of points in a user-specified
-eps-neighborhood and applies a used-specified minPts thresholds to identify</p><ul><li><p>core points (points with more than minPts points in their neighborhood),</p></li>
+eps-neighborhood and applies a user-specified minPts threshold to identify</p><ul><li><p>core points (points with at least minPts points in their neighborhood,
+including the point itself),</p></li>
 <li><p>border points (non-core points with a core point in their neighborhood) and</p></li>
 <li><p>noise points (all other points).</p></li>
 </ul></li>
 <li><p>Core points form the backbone of clusters by joining them into
 a cluster if they are density-reachable from each other (i.e., there is a chain of core
 points where one falls inside the eps-neighborhood of the next).</p></li>
-<li><p>Border points are assigned to clusters. The algorithm needs parameters
+<li><p>Border points are assigned to clusters.</p></li>
+</ol><p>The algorithm needs the parameters
 <code>eps</code> (the radius of the epsilon neighborhood) and <code>minPts</code> (the
-density threshold).</p></li>
-</ol><p>Border points are arbitrarily assigned to clusters in the original
+density threshold).</p>
+<p>Border points are arbitrarily assigned to clusters in the original
 algorithm. DBSCAN* (see Campello et al 2013) treats all border points as
 noise points. This is implemented with <code>borderPoints = FALSE</code>.</p>
 </div>

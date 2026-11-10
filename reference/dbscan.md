@@ -36,7 +36,8 @@ predict(object, newdata, data, ...)
 - weights:
 
   numeric; weights for the data points. Only needed to perform weighted
-  clustering.
+  clustering. The sum of the weights of the points in an eps
+  neighborhood (instead of their number) is compared to `minPts`.
 
 - borderPoints:
 
@@ -102,10 +103,10 @@ described by Ester et al (1996). DBSCAN performs the following steps:
 
 1.  Estimate the density around each data point by counting the number
     of points in a user-specified eps-neighborhood and applies a
-    used-specified minPts thresholds to identify
+    user-specified minPts threshold to identify
 
-    - core points (points with more than minPts points in their
-      neighborhood),
+    - core points (points with at least minPts points in their
+      neighborhood, including the point itself),
 
     - border points (non-core points with a core point in their
       neighborhood) and
@@ -117,9 +118,10 @@ described by Ester et al (1996). DBSCAN performs the following steps:
     is a chain of core points where one falls inside the
     eps-neighborhood of the next).
 
-3.  Border points are assigned to clusters. The algorithm needs
-    parameters `eps` (the radius of the epsilon neighborhood) and
-    `minPts` (the density threshold).
+3.  Border points are assigned to clusters.
+
+The algorithm needs the parameters `eps` (the radius of the epsilon
+neighborhood) and `minPts` (the density threshold).
 
 Border points are arbitrarily assigned to clusters in the original
 algorithm. DBSCAN\* (see Campello et al 2013) treats all border points

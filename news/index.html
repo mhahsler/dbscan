@@ -56,10 +56,14 @@
 <li>Added seeded randomized comparisons of native and distance-matrix search backends and a Linux ASan/LSan/UBSan runner and CI workflow. Native backend tests are skipped on CRAN and enabled explicitly by the sanitizer driver.</li>
 <li>
 <code><a href="../reference/hdbscan.html">hdbscan()</a></code> now records <code>minPts</code> in its <code>hc</code> component. <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> uses it as the default for <code>minPts</code>. Documentation of <code>minPts</code> in <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> was clarified.</li>
+<li>
+<code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> now also accepts the result of <code><a href="../reference/hdbscan.html">hdbscan()</a></code> as <code>x</code> and uses its hierarchy.</li>
+<li>optics(): The default for <code>eps</code> is now <code>NULL</code>, which estimates the neighborhood size from <code>minPts</code> and the data (as before). Specifying <code>eps = Inf</code> now uses an unlimited neighborhood instead of the estimate and gives the complete reachability structure. The estimate can leave several reachability distances undefined (<code>Inf</code>) when the data contain well-separated groups.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bugfixes-1-2-8">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-1-2-8"></a></h3>
-<ul><li>kNN.cpp: Keep the k nearest hits in kNN_int when the query point is not among them (by Kevin Ushey).</li>
+<ul><li>optics(): With the estimated <code>eps</code>, rounding errors could leave the point with the largest core distance without a core distance (<code>Inf</code>). The estimated <code>eps</code> is now increased by a tiny relative amount.</li>
+<li>kNN.cpp: Keep the k nearest hits in kNN_int when the query point is not among them (by Kevin Ushey).</li>
 </ul></div>
 </div>
     <div class="section level2">

@@ -37,7 +37,7 @@ Euclidean distance and a fast kd-tree search.
 opt <- optics(x, minPts = 10)
 opt
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = NA
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi
 ```
@@ -106,8 +106,10 @@ sensitive to local variation.
 In OPTICS, `eps` is the maximum neighborhood radius explored by the
 algorithm. It is primarily a computational upper bound, not usually the
 density threshold used to define the final clusters. The default
-`eps = Inf` lets the package estimate a sufficient finite radius from
-the data and `minPts`.
+`eps = NULL` lets the package estimate a sufficient finite radius from
+the data and `minPts`. If the data contain well-separated groups, this
+estimate can leave several reachability distances undefined. Use
+`eps = Inf` to not limit the neighborhood size.
 
 For large data sets, supplying a smaller upper bound can reduce
 computation, but it must not exclude structure of interest. Multiple
@@ -132,7 +134,7 @@ unassigned.
 opt_db <- extractDBSCAN(opt, eps_cl = 0.065)
 opt_db
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = 0.065, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA
 #> The clustering contains 4 cluster(s) and 92 noise points.
 #> 
 #>  0  1  2  3  4 
@@ -199,7 +201,7 @@ threshold.
 opt_xi <- extractXi(opt, xi = 0.05)
 opt_xi
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = 0.05
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05
 #> The clustering contains 7 cluster(s) and 1 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
@@ -246,7 +248,7 @@ solution is needed.
 opt_xi_min <- extractXi(opt, xi = 0.05, minimum = TRUE)
 opt_xi_min
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = 0.05
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05
 #> The clustering contains 4 cluster(s) and 250 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,

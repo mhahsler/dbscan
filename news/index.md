@@ -17,9 +17,22 @@
   uses it as the default for `minPts`. Documentation of `minPts` in
   [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
   was clarified.
+- [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+  now also accepts the result of
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  as `x` and uses its hierarchy.
+- optics(): The default for `eps` is now `NULL`, which estimates the
+  neighborhood size from `minPts` and the data (as before). Specifying
+  `eps = Inf` now uses an unlimited neighborhood instead of the estimate
+  and gives the complete reachability structure. The estimate can leave
+  several reachability distances undefined (`Inf`) when the data contain
+  well-separated groups.
 
 ### Bugfixes
 
+- optics(): With the estimated `eps`, rounding errors could leave the
+  point with the largest core distance without a core distance (`Inf`).
+  The estimated `eps` is now increased by a tiny relative amount.
 - kNN.cpp: Keep the k nearest hits in kNN_int when the query point is
   not among them (by Kevin Ushey).
 

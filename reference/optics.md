@@ -6,7 +6,7 @@ structure) point ordering algorithm using a kd-tree.
 ## Usage
 
 ``` r
-optics(x, eps = Inf, minPts = 5, ...)
+optics(x, eps = NULL, minPts = 5, ...)
 
 # S3 method for class 'optics'
 print(x, ...)
@@ -36,19 +36,18 @@ predict(object, newdata, data, ...)
 
 - eps:
 
-  maximum epsilon neighborhood size only used for performance. When set
-  to `Inf`, then the actual maximal needed radius is estimated from
-  `minPts` and the data. The upper limit can be further reduced to
-  improve performance. If set too low then many reachability values will
-  erroneously become `Inf` shown as dashed lines in the reachability
-  plot. `eps` should be increased.
+  maximum epsilon neighborhood size only used for performance. The
+  default `NULL` estimates the smallest radius that gives every point a
+  core distance. This is fast, but setting eps to `Inf` can give a
+  different result.
 
 - minPts:
 
-  the parameter is used to identify dense neighborhoods and the
-  reachability distance is calculated as the distance to the minPts
-  nearest neighbor. Controls the smoothness of the reachability
-  distribution. Default is 5 points.
+  the parameter is used to identify dense neighborhoods. The core
+  distance of a point is the distance to its (`minPts - 1`)-th nearest
+  neighbor (`minPts` includes the point itself). It is used to calculate
+  the reachability distances and controls the smoothness of the
+  reachability plot. Default is 5 points.
 
 - ...:
 
@@ -71,8 +70,8 @@ predict(object, newdata, data, ...)
 
 - xi:
 
-  Steepness threshold to identify clusters hierarchically using the Xi
-  method.
+  Steepness threshold between 0 and 1 (exclusive) to identify clusters
+  hierarchically using the Xi method.
 
 - minimum:
 
@@ -83,7 +82,7 @@ predict(object, newdata, data, ...)
 
   logical, correct a common artifact by pruning the steep up area for
   points that have predecessors not in the cluster–found by the ELKI
-  framework, see details below.
+  framework, see details for `extractXi()`.
 
 - newdata:
 
@@ -154,9 +153,12 @@ methods to extract a clustering from the ordering. While using similar
 concepts as DBSCAN, `minPts` in OPTICS has a different effect than in
 DBSCAN. Since it is also used to calculate the reachability distance,
 larger values will make the reachability distance plot smoother. The
-parameter `eps` is optional and defaults to `Inf`. It represents an
-upper limit for the neighborhood size used to reduce computational
-complexity which is helpful for large data sets.
+parameter `eps` is optional. It represents an upper limit for the
+neighborhood size used to reduce computational complexity which is
+helpful for large data sets. By default (`eps = NULL`), it is estimated
+from `minPts` and the data. If the data contain well-separated groups,
+the estimate can result in several undefined (`Inf`) reachability
+distances. Use `eps = Inf` to not limit the neighborhood size.
 
 OPTICS linearly orders the data points such that points which are
 spatially closest become neighbors in the ordering. The closest analog
@@ -176,6 +178,23 @@ nearest neighbor lookup using a kd-tree are used. See
 [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) for
 details on the parameters for the kd-tree.
 
+### The effect of eps
+
+The `eps` parameter can be used to restrict the considered maximum
+epsilon neighborhood size which improves performance significantly.
+Setting `eps = Inf` does not restrict the neighborhood and results in
+the complete reachability structure (only the first reachability
+distance is undefined). However, this is can be slower for large data
+sets.
+
+To improve speed, the default value of `NULL` calculates a reasonable
+eps as the largest distance to a (`minPts - 1`)-th nearest neighbor from
+`minPts` and the data. This gives every point a valid core distance, but
+if the data contain very well-separated groups, then this radius can
+result in several undefined reachability distances (shown as dashed
+lines in the reachability plot). If the plot shows too many dashed lines
+then `eps` should be increased.
+
 ### Extracting a Clustering
 
 Several methods to extract a clustering from the order returned by
@@ -192,7 +211,12 @@ OPTICS are implemented:
   interpretation of the `xi` parameter is that it classifies clusters by
   change in relative cluster density. The used algorithm was originally
   contributed by the ELKI framework and is explained in Schubert et al
-  (2018), but contains a set of fixes.
+  (2018), but contains a set of fixes. With `correctPredecessors = TRUE`
+  (the default), the end of each cluster is additionally shortened so
+  that the predecessor of its last point is inside the cluster and the
+  cluster does not end in points with infinite reachability distance.
+  This step is not part of the original algorithm and removes a common
+  artifact (found by the ELKI framework).
 
 ### Predict Cluster Memberships
 
@@ -206,7 +230,8 @@ for
 Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, Joerg Sander
 (1999). OPTICS: Ordering Points To Identify the Clustering Structure.
 *ACM SIGMOD international conference on Management of data.* ACM Press.
-pp. [doi:10.1145/304181.304187](https://doi.org/10.1145/304181.304187)
+pp. 49-60.
+[doi:10.1145/304181.304187](https://doi.org/10.1145/304181.304187)
 
 Hahsler M, Piekenbrock M, Doran D (2019). dbscan: Fast Density-Based
 Clustering with R. *Journal of Statistical Software*, 91(1), 1-30.
@@ -218,8 +243,9 @@ Extracted from OPTICS Plots. In *Lernen, Wissen, Daten, Analysen (LWDA
 
 ## See also
 
-Density
-[reachability](https://michael.hahsler.net/dbscan/reference/reachability.md).
+[reachability](https://michael.hahsler.net/dbscan/reference/reachability.md),
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md).
 
 Other clustering functions:
 [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
@@ -251,7 +277,7 @@ plot(x, col=rep(1:4, times = 100))
 res <- optics(x, minPts = 10)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = NA
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi
 
@@ -294,7 +320,7 @@ polygon(x[res$order, ])
 res <- extractDBSCAN(res, eps_cl = .065)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = 0.065, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA
 #> The clustering contains 4 cluster(s) and 92 noise points.
 #> 
 #>  0  1  2  3  4 
@@ -312,7 +338,7 @@ hullplot(x, res)
 res <- extractDBSCAN(res, eps_cl = .07)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = 0.07, xi = NA
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.07, xi = NA
 #> The clustering contains 3 cluster(s) and 62 noise points.
 #> 
 #>   0   1   2   3 
@@ -329,7 +355,7 @@ hullplot(x, res)
 res <- extractXi(res, xi = 0.01)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510979570566, eps_cl = NA, xi = 0.01
+#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.01
 #> The clustering contains 15 cluster(s) and 1 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,

@@ -48,11 +48,15 @@ predict(object, newdata, data, ...)
 
 - minPts:
 
-  integer; Minimum size of clusters. See details.
+  integer; Main parameter to control density estimate smoothing and the
+  minimum clusters size. See details.
 
 - cluster_selection_epsilon:
 
-  double; a distance threshold below which
+  double; a distance threshold below which no clusters should be
+  selected (see Malzer & Baum 2020). The threshold is specified in
+  mutual reachability distance (see `mrdist()`). The default of 0.0
+  means this feature is not used.
 
 - gen_hdbscan_tree:
 
@@ -144,10 +148,30 @@ components:
 
   The GLOSH outlier score of each point.
 
+- coredist :
+
+  The core distance of each data point (see `coredist()`).
+
 - hc :
 
   An [hclust](https://rdrr.io/r/stats/hclust.html) object of the HDBSCAN
-  hierarchy.
+  hierarchy (the single-linkage hierarchy of the minimum spanning tree
+  of the mutual reachability distances before condensing). It also
+  stores the used `minPts` value and can be used as input for
+  [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
+
+- hdbscan_tree :
+
+  A
+  [dendrogram](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
+  of the hierarchy. Only present if `gen_hdbscan_tree = TRUE`.
+
+- simplified_tree :
+
+  A
+  [dendrogram](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
+  of the simplified hierarchy. Only present if
+  `gen_simplified_tree = TRUE`.
 
 `coredist()` returns a vector with the core distance for each data
 point.
@@ -164,30 +188,29 @@ the hierarchy of all DBSCAN\* clusterings, and then uses a
 stability-based extraction method to find optimal cuts in the hierarchy,
 thus producing a flat solution.
 
-HDBSCAN performs the following steps:
+### The algorithm
 
-1.  Compute mutual reachability distance mrd between points (based on
-    distances and core distances).
+The algorithm uses as the main parameter `minPts` which is used in
+several of the HDBSCAN steps:
 
-2.  Use mdr as a distance measure to construct a minimum spanning tree.
+1.  Compute core distances as a density estimates around points. Here
+    `minPts` is a smoothing parameter for the density estimates; larger
+    values for `minPts` give larger and smoother density estimates.
 
-3.  Prune the tree using stability.
+2.  Compute mutual reachability distances from core distances.
 
-4.  Extract the clusters.
+3.  Construct a minimum spanning tree from the mutual reachability
+    distances.
 
-Additional, related algorithms including the "Global-Local Outlier Score
-from Hierarchies" (GLOSH; see section 6 of Campello et al., 2015) is
-available in function
-[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md) and
-the ability to cluster based on instance-level constraints (see section
-5.3 of Campello et al. 2015) are supported. The algorithms only need the
-parameter `minPts`.
+4.  Prune the tree using stability. Here `minPts` controls the minimum
+    cluster size because splits are only allowed when both branches have
+    at least `minPts` points.
 
-Note that `minPts` not only acts as a minimum cluster size to detect,
-but also as a "smoothing" factor of the density estimates implicitly
-computed from HDBSCAN.
+5.  Extract the clusters from the pruned tree.
 
-When using the optional parameter `cluster_selection_epsilon`, a
+### Cluster selection using epsilon
+
+When using a value greater than 0.0 for `cluster_selection_epsilon`, a
 combination between DBSCAN\* and HDBSCAN\* can be achieved (see Malzer &
 Baum 2020). This means that part of the tree is affected by
 `cluster_selection_epsilon` as if running DBSCAN\* with `eps` =
@@ -197,25 +220,42 @@ algorithm and can therefore return clusters of variable densities. Note
 that there is not always a remaining part, especially if the parameter
 value is chosen too large, or if there aren't enough clusters of
 variable densities. In this case, the result will be equal to DBSCAN\*.
-where HDBSCAN\* produces too many small clusters that need to be merged,
-while still being able to extract clusters of variable densities at
-higher levels.
+`cluster_selection_epsilon` is especially useful for cases where
+HDBSCAN\* produces too many small clusters that need to be merged, while
+still being able to extract clusters of variable densities at higher
+levels.
+
+### Helper Functions
 
 `coredist()`: The core distance is defined for each point as the
-distance to the `MinPts - 1`'s neighbor. It is a density estimate
-equivalent to
+distance to the (`minPts - 1`)-th nearest neighbor. It is a density
+estimate equivalent to
 [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
-with `k = MinPts -1`.
+with `k = minPts -1`. Larger values for `minPts` lead to larger and
+smoother estimates.
 
 `mrdist()`: The mutual reachability distance is defined between two
 points as `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This
 distance metric is used by HDBSCAN. It has the effect of increasing
-distances in low density areas.
+distances in low density areas, separating clusters better.
 
 [`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
 data point to the same cluster as the nearest point if it is not more
 than that points core distance away. Otherwise the new point is
 classified as a noise point (i.e., cluster ID 0).
+
+### Related Methods
+
+Clusters can be extracted from the hierarchy created by HDBSCAN or any
+other hierarchical clustering in a more flexible way using
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
+
+The Global-Local Outlier Score from Hierarchies (GLOSH; see section 6 of
+Campello et al., 2015) is available in function
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md).
+Clusters can also be extracted based on instance-level constraints (see
+section 5.3 of Campello et al. 2015) using
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
 
 ## References
 

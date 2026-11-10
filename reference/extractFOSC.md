@@ -28,14 +28,18 @@ extractFOSC(
 - x:
 
   a valid [hclust](https://rdrr.io/r/stats/hclust.html) object created
-  via [`hclust()`](https://rdrr.io/r/stats/hclust.html) or
+  via [`hclust()`](https://rdrr.io/r/stats/hclust.html) or the result of
   [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md).
+  For an
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  result, its hierarchy (the `hc` component) is used.
 
 - constraints:
 
-  Either a list or matrix of pairwise constraints. If missing, an
-  unsupervised measure of stability is used to make local cuts and
-  extract the optimal clusters. See details.
+  Pairwise constraints given as a list, a vector (like a
+  [dist](https://rdrr.io/r/stats/dist.html) object) or a matrix. If
+  missing, an unsupervised measure of stability is used to make local
+  cuts and extract the optimal clusters. See details.
 
 - alpha:
 
@@ -67,13 +71,16 @@ A list with the elements:
 - cluster :
 
   A integer vector with cluster assignments. Zero indicates noise points
-  (if any).
+  (if any). The cluster ids are the ids of the clusters in the
+  simplified cluster tree and are therefore not necessarily consecutive.
 
 - hc :
 
   The original [hclust](https://rdrr.io/r/stats/hclust.html) object with
-  additional list elements `"stability"`, `"constraint"`, and `"total"`
-  for the \\n - 1\\ cluster-wide objective scores from the extraction.
+  additional list elements `"cluster"` (the id of the cluster assigned
+  to each of the \\n - 1\\ merge steps), `"stability"`, `"constraint"`,
+  and `"total"` for the \\n - 1\\ cluster-wide objective scores from the
+  extraction.
 
 ## Details
 
@@ -91,6 +98,8 @@ methods are widespread, using global parameter settings are inherently
 limited in that they cannot capture patterns within the cluster
 hierarchy at varying *local* levels of granularity.
 
+### The role of minPts for condensing the clustering tree
+
 Rather than partitioning a hierarchy based on the number of the cluster
 one expects to find (\\k\\) or based on some linkage distance threshold
 (\\H\\), the FOSC proposes that the optimal clusters may exist at
@@ -107,17 +116,18 @@ part of any new cluster. Depending on the local cuts chosen by the
 optimal solution, such points can end up as noise, which is denoted as 0
 in the final solution.
 
-Note that for a hierarchy created by
+For a hierarchy created by
 [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
-`minPts` typically is the same value that was used to build it (it is
-recorded in the hierarchy and used as the default). However, different
-values can be specified where `minPts` in
+`extractFOSC()` recomputes the stability on the raw hierarchy using
+`minPts`. By default, the `minPts` value stored in the hierarchy is
+used, but a different value can be specified: `minPts` in
 [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-controls noise and smoothing while `minPts` in `extractFOSC()` controls
-cluster scale.
+controls noise and density estimate smoothing, while `minPts` in
+`extractFOSC()` controls the cluster scale.
 
-Traversing the original cluster tree using minPts creates a new,
-simplified cluster tree that is then post-processed recursively to
+### Cluster extraction
+
+The simplified cluster tree is then post-processed recursively to
 extract clusters that maximize for each cluster \\C_i\\ the cost
 function
 
@@ -150,12 +160,12 @@ satisfied. In the case of ties (such as solutions where no constraints
 were given), the unsupervised solution is used as a tiebreaker. See
 Campello et al (2013) for more details.
 
-As a third option, if one wishes to prioritize the degree at which the
-unsupervised and semisupervised solutions contribute to the overall
-optimal solution, the parameter \\\alpha\\ can be set to enable the
-extraction of clusters that maximize the `mixed` objective function
+To prioritize the degree at which the unsupervised and semisupervised
+solutions contribute to the overall optimal solution, the parameter
+\\\alpha\\ can be set to enable the extraction of clusters that maximize
+the `mixed` objective function
 
-\$\$J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))\$\$
+\$\$J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i)\$\$
 
 FOSC expects the pairwise constraints to be passed as either 1) an
 \\n(n-1)/2\\ vector of integers representing the constraints, where 1
@@ -168,15 +178,13 @@ correspond to integer vectors of constraints (positive indices for
 should-link, negative indices for should-not-link). Again, see the
 examples section for a demonstration of this.
 
-The parameters to the input function correspond to the concepts
-discussed above. The `minPts` parameter to represent the minimum cluster
-size to extract. The optional `constraints` parameter contains the
-pairwise, instance-level constraints of the data. The optional `alpha`
-parameters controls whether the mixed objective function is used (if
-`alpha` is greater than 0). If the `validate_constraints` parameter is
-set to true, the constraints are checked (and fixed) for symmetry (if
-point A has a should-link constraint with point B, point B should also
-have the same constraint). Asymmetric constraints are not supported.
+If `validate_constraints` is `TRUE`, the constraints are checked (and
+fixed) for symmetry (if point A has a should-link constraint with point
+B, point B should also have the same constraint). Asymmetric constraints
+are not supported. The mixed objective function is used if `alpha` is
+greater than 0.
+
+### Unstable branch pruning
 
 Unstable branch pruning was not discussed by Campello et al (2013),
 however in some data sets it may be the case that specific subbranches

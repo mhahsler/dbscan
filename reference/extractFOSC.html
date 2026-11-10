@@ -91,12 +91,14 @@ stability-based objective extraction.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>a valid <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a> object created via <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust()</a></code> or <code><a href="hdbscan.html">hdbscan()</a></code>.</p></dd>
+<dd><p>a valid <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a> object created via <code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust()</a></code> or the result of
+<code><a href="hdbscan.html">hdbscan()</a></code>. For an <code><a href="hdbscan.html">hdbscan()</a></code> result, its hierarchy (the <code>hc</code> component)
+is used.</p></dd>
 
 
 <dt id="arg-constraints">constraints<a class="anchor" aria-label="anchor" href="#arg-constraints"></a></dt>
-<dd><p>Either a list or matrix of pairwise constraints. If
-missing, an unsupervised measure of stability is used to make local cuts and
+<dd><p>Pairwise constraints given as a list, a vector (like a
+<a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object) or a matrix. If missing, an unsupervised measure of stability is used to make local cuts and
 extract the optimal clusters. See details.</p></dd>
 
 
@@ -129,11 +131,14 @@ validity? See details for what are considered valid constraints.</p></dd>
     <p>A list with the elements:</p>
 <dl><dt>cluster </dt>
 <dd><p>A integer vector with cluster assignments. Zero
-indicates noise points (if any).</p></dd>
+indicates noise points (if any). The cluster ids are the ids of the clusters
+in the simplified cluster tree and are therefore not necessarily
+consecutive.</p></dd>
 
 <dt>hc </dt>
 <dd><p>The original <a href="https://rdrr.io/r/stats/hclust.html" class="external-link">hclust</a> object with additional list elements
-<code>"stability"</code>, <code>"constraint"</code>, and <code>"total"</code>
+<code>"cluster"</code> (the id of the cluster assigned to each of the \(n - 1\)
+merge steps), <code>"stability"</code>, <code>"constraint"</code>, and <code>"total"</code>
 for the \(n - 1\) cluster-wide objective scores from the extraction.</p></dd>
 
 </dl></div>
@@ -149,7 +154,10 @@ which are used to partition a cluster hierarchy into a set of disjoint, flat
 clusters. This is implemented in R in function <code><a href="https://rdrr.io/r/stats/cutree.html" class="external-link">stats::cutree()</a></code>.
 Although such methods are widespread, using global parameter
 settings are inherently limited in that they cannot capture patterns within
-the cluster hierarchy at varying <em>local</em> levels of granularity.</p>
+the cluster hierarchy at varying <em>local</em> levels of granularity.</p><div class="section">
+<h3 id="the-role-of-minpts-for-condensing-the-clustering-tree">The role of minPts for condensing the clustering tree<a class="anchor" aria-label="anchor" href="#the-role-of-minpts-for-condensing-the-clustering-tree"></a></h3>
+
+
 <p>Rather than partitioning a hierarchy based on the number of the cluster one
 expects to find (\(k\)) or based on some linkage distance threshold
 (\(H\)), the FOSC proposes that the optimal clusters may exist at varying
@@ -164,14 +172,19 @@ minPts must be greater than or equal to 2, points that leave a cluster in
 a branch with fewer than minPts points are not part of any new cluster.
 Depending on the local cuts chosen by the optimal solution, such points can
 end up as noise, which is denoted as 0 in the final solution.</p>
-<p>Note that for a hierarchy created by <code><a href="hdbscan.html">hdbscan()</a></code>, <code>minPts</code> typically is the
-same value that was used to build it (it is recorded in the hierarchy
-and used as the default). However, different values can be specified where
-<code>minPts</code> in <code><a href="hdbscan.html">hdbscan()</a></code> controls noise and smoothing while <code>minPts</code> in
-<code>extractFOSC()</code> controls cluster scale.</p>
-<p>Traversing the original cluster tree using minPts creates a new, simplified
-cluster tree that is then post-processed recursively to extract clusters
-that maximize for each cluster \(C_i\) the cost function</p>
+<p>For a hierarchy created by <code><a href="hdbscan.html">hdbscan()</a></code>, <code>extractFOSC()</code> recomputes the
+stability on the raw hierarchy using <code>minPts</code>. By default, the <code>minPts</code> value
+stored in the hierarchy is used, but a different value can be specified:
+<code>minPts</code> in <code><a href="hdbscan.html">hdbscan()</a></code> controls noise and density estimate smoothing,
+while <code>minPts</code> in <code>extractFOSC()</code> controls the cluster scale.</p>
+</div>
+
+<div class="section">
+<h3 id="cluster-extraction">Cluster extraction<a class="anchor" aria-label="anchor" href="#cluster-extraction"></a></h3>
+
+
+<p>The simplified cluster tree is then post-processed recursively to extract
+clusters that maximize for each cluster \(C_i\) the cost function</p>
 <p>$$\max_{\delta_2, \dots, \delta_k} J = \sum\limits_{i=2}^{k} \delta_i
 S(C_i)$$ where
 \(S(C_i)\) is the stability-based measure as $$ S(C_i) =
@@ -198,11 +211,11 @@ is maximized:</p>
 object \(x_j\) that are satisfied. In the case of ties (such as
 solutions where no constraints were given), the unsupervised solution is
 used as a tiebreaker. See Campello et al (2013) for more details.</p>
-<p>As a third option, if one wishes to prioritize the degree at which the
+<p>To prioritize the degree at which the
 unsupervised and semisupervised solutions contribute to the overall optimal
 solution, the parameter \(\alpha\) can be set to enable the extraction of
 clusters that maximize the <code>mixed</code> objective function</p>
-<p>$$J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i))$$</p>
+<p>$$J = \alpha S(C_i) + (1 - \alpha) \gamma(C_i)$$</p>
 <p>FOSC expects the pairwise constraints to be passed as either 1) an
 \(n(n-1)/2\) vector of integers representing the constraints, where 1
 represents should-link, -1 represents should-not-link, and 0 represents no
@@ -213,15 +226,16 @@ correspond to indices of the points in the original data, and the values
 correspond to integer vectors of constraints (positive indices for
 should-link, negative indices for should-not-link). Again, see the examples
 section for a demonstration of this.</p>
-<p>The parameters to the input function correspond to the concepts discussed
-above. The <code>minPts</code> parameter to represent the minimum cluster size to
-extract. The optional <code>constraints</code> parameter contains the pairwise,
-instance-level constraints of the data. The optional <code>alpha</code> parameters
-controls whether the mixed objective function is used (if <code>alpha</code> is
-greater than 0). If the <code>validate_constraints</code> parameter is set to
-true, the constraints are checked (and fixed) for symmetry (if point A has a
-should-link constraint with point B, point B should also have the same
-constraint). Asymmetric constraints are not supported.</p>
+<p>If <code>validate_constraints</code> is <code>TRUE</code>, the constraints are checked (and fixed)
+for symmetry (if point A has a should-link constraint with point B, point B
+should also have the same constraint). Asymmetric constraints are not
+supported. The mixed objective function is used if <code>alpha</code> is greater than 0.</p>
+</div>
+
+<div class="section">
+<h3 id="unstable-branch-pruning">Unstable branch pruning<a class="anchor" aria-label="anchor" href="#unstable-branch-pruning"></a></h3>
+
+
 <p>Unstable branch pruning was not discussed by Campello et al (2013), however
 in some data sets it may be the case that specific subbranches scores are
 significantly greater than sibling and parent branches, and thus sibling
@@ -230,6 +244,8 @@ lower than the parents. This can happen in extremely nonhomogeneous data
 sets, where there exists locally very stable branches surrounded by unstable
 branches that contain more than <code>minPts</code> points.
 <code>prune_unstable = TRUE</code> will remove the unstable branches.</p>
+</div>
+
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

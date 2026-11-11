@@ -14,6 +14,7 @@ Jarvis-Patrick algorithms.
   [`plot(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   [`coredist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   [`mrdist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  [`minimum_spanning_tree()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   [`predict(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   : Hierarchical DBSCAN (HDBSCAN)
 - [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)

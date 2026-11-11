@@ -17,6 +17,8 @@
   uses it as the default for `minPts`. Documentation of `minPts` in
   [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
   was clarified.
+- [`minimum_spanning_tree()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  is now exposed to the user.
 - [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
   now also accepts the result of
   [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)

@@ -57,6 +57,8 @@
 <li>
 <code><a href="../reference/hdbscan.html">hdbscan()</a></code> now records <code>minPts</code> in its <code>hc</code> component. <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> uses it as the default for <code>minPts</code>. Documentation of <code>minPts</code> in <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> was clarified.</li>
 <li>
+<code><a href="../reference/hdbscan.html">minimum_spanning_tree()</a></code> is now exposed to the user.</li>
+<li>
 <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> now also accepts the result of <code><a href="../reference/hdbscan.html">hdbscan()</a></code> as <code>x</code> and uses its hierarchy.</li>
 <li>optics(): The default for <code>eps</code> is now <code>NULL</code>, which estimates the neighborhood size from <code>minPts</code> and the data (as before). Specifying <code>eps = Inf</code> now uses an unlimited neighborhood instead of the estimate and gives the complete reachability structure. The estimate can leave several reachability distances undefined (<code>Inf</code>) when the data contain well-separated groups.</li>
 </ul></div>

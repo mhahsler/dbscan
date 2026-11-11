@@ -77,7 +77,7 @@ cl$hc
 
     ## 
     ## Call:
-    ## hdbscan(x = moons, minPts = 5)
+    ## minimum_spanning_tree(x = mrd)
     ## 
     ## Cluster method   : robust single 
     ## Distance         : mutual reachability 

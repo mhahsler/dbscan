@@ -34,6 +34,8 @@ coredist(x, minPts)
 
 mrdist(x, minPts, coredist = NULL)
 
+minimum_spanning_tree(x)
+
 # S3 method for class 'hdbscan'
 predict(object, newdata, data, ...)
 ```
@@ -179,6 +181,9 @@ point.
 `mrdist()` returns a [dist](https://rdrr.io/r/stats/dist.html) object
 containing pairwise mutual reachability distances.
 
+`minimum_spanning_tree()` returns the minimum spanning tree as an
+`hclust` object.
+
 ## Details
 
 This fast implementation of HDBSCAN (Campello et al., 2013) computes the
@@ -193,20 +198,19 @@ thus producing a flat solution.
 The algorithm uses as the main parameter `minPts` which is used in
 several of the HDBSCAN steps:
 
-1.  Compute core distances as a density estimates around points. Here
-    `minPts` is a smoothing parameter for the density estimates; larger
-    values for `minPts` give larger and smoother density estimates.
+1.  Compute mutual reachability distances from core distances. For core
+    distances, `minPts` is a smoothing parameter for the density
+    estimates; larger values for `minPts` give larger and smoother
+    density estimates.
 
-2.  Compute mutual reachability distances from core distances.
-
-3.  Construct a minimum spanning tree from the mutual reachability
+2.  Construct a minimum spanning tree from the mutual reachability
     distances.
 
-4.  Prune the tree using stability. Here `minPts` controls the minimum
+3.  Prune the tree using stability. Here `minPts` controls the minimum
     cluster size because splits are only allowed when both branches have
     at least `minPts` points.
 
-5.  Extract the clusters from the pruned tree.
+4.  Extract the clusters from the pruned tree.
 
 ### Cluster selection using epsilon
 
@@ -227,28 +231,33 @@ levels.
 
 ### Helper Functions
 
-`coredist()`: The core distance is defined for each point as the
-distance to the (`minPts - 1`)-th nearest neighbor. It is a density
-estimate equivalent to
-[`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
-with `k = minPts -1`. Larger values for `minPts` lead to larger and
-smoother estimates.
+- `coredist()`: The core distance is defined for each point as the
+  distance to the (`minPts - 1`)-th nearest neighbor. It is a density
+  estimate equivalent to
+  [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
+  with `k = minPts -1`. Larger values for `minPts` lead to larger and
+  smoother estimates.
 
-`mrdist()`: The mutual reachability distance is defined between two
-points as `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This
-distance metric is used by HDBSCAN. It has the effect of increasing
-distances in low density areas, separating clusters better.
+- `mrdist()`: The mutual reachability distance is defined between two
+  points as `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`.
+  This distance metric is used by HDBSCAN. It has the effect of
+  increasing distances in low density areas, separating clusters better.
 
-[`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
-data point to the same cluster as the nearest point if it is not more
-than that points core distance away. Otherwise the new point is
-classified as a noise point (i.e., cluster ID 0).
+- `minimal_spanning_tree()`: Computes the minimum spanning tree (MST) of
+  a graph defined by a [dist](https://rdrr.io/r/stats/dist.html) object
+  with Prim's algorithm.
+
+- [`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
+  data point to the same cluster as the nearest point if it is not more
+  than that points core distance away. Otherwise the new point is
+  classified as a noise point (i.e., cluster ID 0).
 
 ### Related Methods
 
-Clusters can be extracted from the hierarchy created by HDBSCAN or any
-other hierarchical clustering in a more flexible way using
-[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
+Clusters can be extracted from the MST created by HDBSCAN or any other
+hierarchical clustering in a more flexible way using
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+and using the default parameters for unsupervised cluster extraction.
 
 The Global-Local Outlier Score from Hierarchies (GLOSH; see section 6 of
 Campello et al., 2015) is available in function
@@ -369,4 +378,12 @@ hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
 plot(hdbe, show_flat = TRUE)
 
 hullplot(X, hdbe, main = "HDBSCAN(e)")
+
+
+## Manually perform the steps of HDBSCAN
+d <- mrdist(X, minPts = 3)
+mst_hc <- minimum_spanning_tree(d)
+cl <- extractFOSC(mst_hc)
+hullplot(X, cl$cluster, main = "HDBSCAN(e)")
+#> Warning: Not enough colors. Some colors will be reused.
 ```

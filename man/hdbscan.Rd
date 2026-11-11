@@ -7,6 +7,7 @@
 \alias{plot.hdbscan}
 \alias{coredist}
 \alias{mrdist}
+\alias{minimum_spanning_tree}
 \alias{predict.hdbscan}
 \title{Hierarchical DBSCAN (HDBSCAN)}
 \usage{
@@ -35,6 +36,8 @@ hdbscan(
 coredist(x, minPts)
 
 mrdist(x, minPts, coredist = NULL)
+
+minimum_spanning_tree(x)
 
 \method{predict}{hdbscan}(object, newdata, data, ...)
 }
@@ -109,6 +112,9 @@ Only present if \code{gen_simplified_tree = TRUE}.}
 \code{coredist()} returns a vector with the core distance for each data point.
 
 \code{mrdist()} returns a \link{dist} object containing pairwise mutual reachability distances.
+
+\code{minimum_spanning_tree()} returns the minimum spanning tree as an \code{hclust}
+object.
 }
 \description{
 Fast C++ implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
@@ -126,10 +132,9 @@ hierarchy, thus producing a flat solution.
 The algorithm uses as the main parameter \code{minPts} which is used in several
 of the HDBSCAN steps:
 \enumerate{
-\item Compute core distances as a density estimates around points.
-Here \code{minPts} is a smoothing parameter for the density estimates;
+\item Compute mutual reachability distances from core distances. For core distances,
+\code{minPts} is a smoothing parameter for the density estimates;
 larger values for \code{minPts} give larger and smoother density estimates.
-\item Compute mutual reachability distances from core distances.
 \item Construct a minimum spanning tree from the mutual reachability distances.
 \item Prune the tree using stability. Here \code{minPts} controls the minimum
 cluster size because splits are only allowed when both branches
@@ -159,27 +164,29 @@ of variable densities at higher levels.
 }
 
 \subsection{Helper Functions}{
-
-\code{coredist()}: The core distance is defined for each point as
+\itemize{
+\item \code{coredist()}: The core distance is defined for each point as
 the distance to the (\code{minPts - 1})-th nearest neighbor.
 It is a density estimate equivalent to \code{kNNdist()} with \code{k = minPts -1}.
 Larger values for \code{minPts} lead to larger and smoother estimates.
-
-\code{mrdist()}: The mutual reachability distance is defined between two points as
+\item \code{mrdist()}: The mutual reachability distance is defined between two points as
 \code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}. This distance metric is used by
 HDBSCAN. It has the effect of increasing distances in low density areas, separating
 clusters better.
-
-\code{predict()} assigns each new data point to the same cluster as the nearest point
+\item \code{minimal_spanning_tree()}: Computes the minimum spanning tree (MST) of a
+graph defined by a \link{dist} object with Prim's algorithm.
+\item \code{predict()} assigns each new data point to the same cluster as the nearest point
 if it is not more than that points core distance away. Otherwise the new point
 is classified as a noise point (i.e., cluster ID 0).
+}
 }
 
 \subsection{Related Methods}{
 
-Clusters can be extracted from the hierarchy created by HDBSCAN
+Clusters can be extracted from the MST created by HDBSCAN
 or any other hierarchical clustering in a more flexible way
-using \code{\link[=extractFOSC]{extractFOSC()}}.
+using \code{\link[=extractFOSC]{extractFOSC()}} and using the default parameters for unsupervised
+cluster extraction.
 
 The Global-Local Outlier Score
 from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
@@ -245,6 +252,12 @@ hullplot(X, db, main = "DBSCAN*")
 hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
 plot(hdbe, show_flat = TRUE)
 hullplot(X, hdbe, main = "HDBSCAN(e)")
+
+## Manually perform the steps of HDBSCAN
+d <- mrdist(X, minPts = 3)
+mst_hc <- minimum_spanning_tree(d)
+cl <- extractFOSC(mst_hc)
+hullplot(X, cl$cluster, main = "HDBSCAN(e)")
 }
 \references{
 Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on

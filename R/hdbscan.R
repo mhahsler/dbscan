@@ -34,15 +34,14 @@
 #' The algorithm uses as the main parameter `minPts` which is used in several
 #' of the HDBSCAN steps:
 #'
-#' 1. Compute core distances as a density estimates around points.
-#'    Here `minPts` is a smoothing parameter for the density estimates;
+#' 1. Compute mutual reachability distances from core distances. For core distances,
+#'    `minPts` is a smoothing parameter for the density estimates;
 #'    larger values for `minPts` give larger and smoother density estimates.
-#' 2. Compute mutual reachability distances from core distances.
-#' 3. Construct a minimum spanning tree from the mutual reachability distances.
-#' 4. Prune the tree using stability. Here `minPts` controls the minimum
+#' 2. Construct a minimum spanning tree from the mutual reachability distances.
+#' 3. Prune the tree using stability. Here `minPts` controls the minimum
 #'    cluster size because splits are only allowed when both branches
 #'    have at least `minPts` points.
-#' 5. Extract the clusters from the pruned tree.
+#' 4. Extract the clusters from the pruned tree.
 #'
 #'
 #' ## Cluster selection using epsilon
@@ -66,25 +65,29 @@
 #'
 #' ## Helper Functions
 #'
-#' `coredist()`: The core distance is defined for each point as
+#' * `coredist()`: The core distance is defined for each point as
 #' the distance to the (`minPts - 1`)-th nearest neighbor.
 #' It is a density estimate equivalent to `kNNdist()` with `k = minPts -1`.
 #' Larger values for `minPts` lead to larger and smoother estimates.
 #'
-#' `mrdist()`: The mutual reachability distance is defined between two points as
+#' * `mrdist()`: The mutual reachability distance is defined between two points as
 #' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This distance metric is used by
 #' HDBSCAN. It has the effect of increasing distances in low density areas, separating
 #' clusters better.
 #'
-#' `predict()` assigns each new data point to the same cluster as the nearest point
+#' * `minimal_spanning_tree()`: Computes the minimum spanning tree (MST) of a
+#'  graph defined by a [dist] object with Prim's algorithm.
+#'
+#' * `predict()` assigns each new data point to the same cluster as the nearest point
 #' if it is not more than that points core distance away. Otherwise the new point
 #' is classified as a noise point (i.e., cluster ID 0).
 #'
 #' ## Related Methods
 #'
-#' Clusters can be extracted from the hierarchy created by HDBSCAN
+#' Clusters can be extracted from the MST created by HDBSCAN
 #' or any other hierarchical clustering in a more flexible way
-#' using [extractFOSC()].
+#' using [extractFOSC()] and using the default parameters for unsupervised
+#' cluster extraction.
 #'
 #' The Global-Local Outlier Score
 #' from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
@@ -142,6 +145,9 @@
 #' `coredist()` returns a vector with the core distance for each data point.
 #'
 #' `mrdist()` returns a [dist] object containing pairwise mutual reachability distances.
+#'
+#' `minimum_spanning_tree()` returns the minimum spanning tree as an `hclust`
+#'  object.
 #'
 #' @author Matt Piekenbrock
 #' @author Claudia Malzer (added cluster_selection_epsilon)
@@ -221,6 +227,12 @@
 #' hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
 #' plot(hdbe, show_flat = TRUE)
 #' hullplot(X, hdbe, main = "HDBSCAN(e)")
+#'
+#' ## Manually perform the steps of HDBSCAN
+#' d <- mrdist(X, minPts = 3)
+#' mst_hc <- minimum_spanning_tree(d)
+#' cl <- extractFOSC(mst_hc)
+#' hullplot(X, cl$cluster, main = "HDBSCAN(e)")
 #' @export
 hdbscan <- function(x,
                     minPts,
@@ -243,15 +255,12 @@ hdbscan <- function(x,
     cat("Calculating the mutual reachability matrix distances...\n")
   }
   mrd <- mrdist(x, minPts, coredist = coredist)
-  n <- attr(mrd, "Size")
 
   ## 2. Construct a minimum spanning tree and convert to RSL representation
   if (verbose) {
     cat("Constructing the minimum spanning tree...\n")
   }
-  mst <- mst(mrd, n)
-  hc <- hclustMergeOrder(mst, order(mst[, 3]))
-  hc$call <- match.call()
+  hc <- minimum_spanning_tree(mrd)
   hc$minPts <- minPts # needed by extractFOSC() to check/default minPts
 
   ## 3. Prune the tree
@@ -540,4 +549,21 @@ mrdist <- function(x, minPts, coredist = NULL) {
   attr(mr_dist, "Upper") <- FALSE
   attr(mr_dist, "method") <- paste0("mutual reachability (", attr(x_dist, "method"), ")")
   mr_dist
+}
+
+#' @rdname hdbscan
+#' @export
+minimum_spanning_tree <- function(x) {
+  .check_dist(x)
+  n <- attr(x, "Size")
+  if (n < 2L)
+    stop("x needs to contain at least 2 objects.")
+  if (!all(is.finite(x)))
+    stop("x needs to contain only finite distances.")
+
+  m <- mst(x, n)
+
+  hc <- hclustMergeOrder(m, order(m[, 3]))
+  hc$call <- match.call()
+  return(hc)
 }

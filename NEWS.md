@@ -10,6 +10,7 @@
 * `hdbscan()` now records `minPts` in its `hc` component. `extractFOSC()` uses it
   as the default for `minPts`.
   Documentation of `minPts` in `extractFOSC()` was clarified.
+* `minimum_spanning_tree()` is now exposed to the user.
 * `extractFOSC()` now also accepts the result of `hdbscan()` as `x` and uses its
   hierarchy.
 * optics(): The default for `eps` is now `NULL`, which estimates the neighborhood

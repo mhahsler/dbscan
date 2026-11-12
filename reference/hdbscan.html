@@ -223,7 +223,8 @@ hierarchical cluster tree representing density estimates along with the
 stability-based flat cluster extraction. HDBSCAN essentially computes the
 hierarchy of all DBSCAN* clusterings, and
 then uses a stability-based extraction method to find optimal cuts in the
-hierarchy, thus producing a flat solution.</p><div class="section">
+hierarchy, thus producing a flat solution. It uses Prim's algorithm and
+saves memory by avoiding to creating a complete distance matrix.</p><div class="section">
 <h3 id="the-algorithm">The algorithm<a class="anchor" aria-label="anchor" href="#the-algorithm"></a></h3>
 
 
@@ -330,6 +331,8 @@ and Integration for Intelligent Systems (MFI), pp. 223-228.
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other HDBSCAN functions:
+<code><a href="extractFOSC.html">extractFOSC()</a></code>,
+<code><a href="glosh.html">glosh()</a></code>,
 <code><a href="mst_dist.html">mst_dist()</a></code></p>
 <p>Other clustering functions:
 <code><a href="dbscan.html">dbscan()</a></code>,

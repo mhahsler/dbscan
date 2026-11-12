@@ -62,6 +62,11 @@ Other Outlier Detection Functions:
 [`lof()`](https://michael.hahsler.net/dbscan/reference/lof.md),
 [`pointdensity()`](https://michael.hahsler.net/dbscan/reference/pointdensity.md)
 
+Other HDBSCAN functions:
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+
 ## Author
 
 Matt Piekenbrock

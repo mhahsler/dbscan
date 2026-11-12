@@ -225,6 +225,11 @@ Other clustering functions:
 [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md),
 [`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
 
+Other HDBSCAN functions:
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md),
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
+[`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+
 ## Author
 
 Matt Piekenbrock

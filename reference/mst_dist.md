@@ -73,15 +73,13 @@ MSTs are not unique if there are ties in the distances. Many ties are
 very likely for mutual reachability distances constructed as
 `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. Ties in this
 implementation are broken in order of the rows in the input data which
-is consistent with many otehr implementations.
+is consistent with many other implementations.
 
 ## See also
 
-[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`mrdist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md),
-[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
-
 Other HDBSCAN functions:
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md),
 [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
 
 ## Examples

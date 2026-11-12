@@ -8,8 +8,19 @@
 # the stricter [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 #
 # The package can be redistributed and modified under GNU AGPL v3.
-# Remove the file and function to modify and redistribute the package
-# under the GNU GPL v3 license.
+# To modify and redistribute the package under the GNU GPL v3 license,
+# uncomment the following and remove the rest of the file:
+##' @include optics.R
+##' @rdname optics
+##' @export
+#extractXi <-
+#  function(object,
+#           xi,
+#           minimum = FALSE,
+#           correctPredecessors = TRUE)
+#  {
+#     stop("This version of the dbscan package is not licensed to use extractXi.")
+#  }
 
 #' @include optics.R
 #' @rdname optics

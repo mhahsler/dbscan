@@ -275,12 +275,12 @@ plot(hdb, show_flat = TRUE)
 The dbscan package is licensed under the [GNU General Public License
 (GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-The **OPTICSXi** R implementation in `R/optics_extractXi.R` was directly
+The **OPTICSXi** R implementation was directly
 ported from the ELKI framework’s Java implementation with permission by
 the original author, Erich Schubert. This function is redistributed
 under the stricter [GNU
-AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Remove the file
-and function to use the package under the GNU GPL v3 license.
+AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Follow the instruction 
+in the in `R/optics_extractXi.R` to use the package under the GNU GPL v3 license.
 
 ## Citation request
 

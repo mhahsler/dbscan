@@ -25,10 +25,6 @@ reference:
   contents:
   - sNNclust
   - jpclust
-- subtitle: Cluster Summaries
-  desc: Count clusters, noise points, and observations.
-  contents:
-  - ncluster
 - title: Nearest Neighbor Search
   desc: Find k-nearest, fixed-radius, and shared nearest neighbors and work with nearest-neighbor graphs.
   contents:
@@ -44,18 +40,16 @@ reference:
   - glosh
   - pointdensity
   - has_concept("Outlier Detection Functions")
-- title: Clustering Evaluation
-  desc: Evaluate density-based clusterings with the Density-Based Clustering Validation index.
+- title: Cluster Validation
+  desc: Summarize, evaluate, and visualize clusterings, including reachability plots and cluster hierarchies.
   contents:
+  - ncluster
   - dbcv
   - has_concept("Evaluation Functions")
-- title: Cluster Visualization and Hierarchies
-  desc: Plot clusters and work with reachability plots and cluster hierarchies.
-  contents:
   - hullplot
   - reachability
   - dendrogram
-- title: Tidiers
+- title: Tidyverse Tidiers
   desc: Turn clustering objects into tidy tibbles and augment the original data.
   contents:
   - has_concept("tidiers")

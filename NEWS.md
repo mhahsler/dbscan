@@ -1,4 +1,4 @@
-# dbscan 1.2.8 (unpublished)
+# dbscan 1.2.8 (2026-11-12)
 
 ## Changes
 * Added RAII model for ANN. ANN searches now release point storage, trees, 

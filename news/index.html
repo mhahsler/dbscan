@@ -56,7 +56,8 @@
 <li>New <code><a href="../reference/mst_dist.html">mst_dist()</a></code> (single-linkage hierarchy of the minimum spanning tree of a <code>dist</code> object as an <code>hclust</code> object) and <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> (MST of the mutual reachability graph computed directly from a data matrix and <code>minPts</code>).</li>
 <li>
 <code><a href="../reference/hdbscan.html">hdbscan()</a></code> with a data matrix now builds the minimum spanning tree with <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> avoiding creating a full distance matrix.</li>
-<li>optics(): The default for <code>eps</code> is now <code>NULL</code>, which estimates the neighborhood size from <code>minPts</code> and the data improving speed but may lead to incomplete results. Specifying <code>eps = Inf</code> now uses an unlimited neighborhood instead of the estimate and gives the complete reachability structure.</li>
+<li>optics(): The default <code>eps = Inf</code> uses an unlimited neighborhood and gives the complete reachability structure. It is computed exactly with a memory efficient Prim-style scan.</li>
+<li>optics() now gives a warning if a finite <code>eps</code> results in undefined reachability distances in addition to the first one.</li>
 <li>optics(): Ties in the reachability distance are now broken in favor of the point with the lower id (row number), following the current ELKI implementation. The <code>predecessor</code> component also is now consistent with ELKI 0.8.0.</li>
 <li>extractXi(): The implementation was updated to follow the OPTICS Xi cluster extraction in ELKI 0.8.0 (Schubert and Gertz, 2018).</li>
 <li>
@@ -67,8 +68,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bugfixes-1-2-8">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-1-2-8"></a></h3>
-<ul><li>optics(): With the estimated <code>eps</code>, rounding errors could leave the point with the largest core distance without a core distance (<code>Inf</code>). The estimated <code>eps</code> is now increased by a tiny relative amount.</li>
-<li>kNN.cpp: Keep the k nearest hits in kNN_int when the query point is not among them (by Kevin Ushey).</li>
+<ul><li>kNN.cpp: Keep the k nearest hits in kNN_int when the query point is not among them (by Kevin Ushey).</li>
 </ul></div>
 </div>
     <div class="section level2">

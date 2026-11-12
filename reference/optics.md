@@ -6,7 +6,7 @@ structure) point ordering algorithm using a kd-tree.
 ## Usage
 
 ``` r
-optics(x, eps = NULL, minPts = 5, ...)
+optics(x, eps = Inf, minPts = 5, ...)
 
 # S3 method for class 'optics'
 print(x, ...)
@@ -37,9 +37,9 @@ predict(object, newdata, data, ...)
 - eps:
 
   maximum epsilon neighborhood size only used for performance. The
-  default `NULL` estimates the smallest radius that gives every point a
-  core distance. This is fast, but setting eps to `Inf` can give a
-  different result.
+  default `Inf` does not restrict the neighborhood and gives the
+  complete reachability structure. `NULL` is treated as `Inf`. See
+  details.
 
 - minPts:
 
@@ -154,11 +154,9 @@ concepts as DBSCAN, `minPts` in OPTICS has a different effect than in
 DBSCAN. Since it is also used to calculate the reachability distance,
 larger values will make the reachability distance plot smoother. The
 parameter `eps` is optional. It represents an upper limit for the
-neighborhood size used to reduce computational complexity which is
-helpful for large data sets. By default (`eps = NULL`), it is estimated
-from `minPts` and the data. If the data contain well-separated groups,
-the estimate can result in several undefined (`Inf`) reachability
-distances. Use `eps = Inf` to not limit the neighborhood size.
+neighborhood size that can be used to reduce computational complexity
+for large data sets. The default `eps = Inf` does not limit the
+neighborhood size and gives the complete reachability structure.
 
 OPTICS linearly orders the data points such that points which are
 spatially closest become neighbors in the ordering. The closest analog
@@ -180,20 +178,24 @@ details on the parameters for the kd-tree.
 
 ### The effect of eps
 
-The `eps` parameter can be used to restrict the considered maximum
-epsilon neighborhood size which improves performance significantly.
-Setting `eps = Inf` does not restrict the neighborhood and results in
-the complete reachability structure (only the first reachability
-distance is undefined). However, this is can be slower for large data
-sets.
+The default `eps = Inf` (`NULL` is also treated as `Inf`) does not
+restrict the neighborhood and results in the complete reachability
+structure (only the first reachability distance is undefined). This is
+the original OPTICS behavior. Computation in this implementation uses
+Prim's algorithm on the reachability graph using core distances and
+distances that are calculated on the fly. This needs only \\O(n)\\
+additional memory, but the running time is quadratic in the number of
+data points, so it can still be slow for large data sets.
 
-To improve speed, the default value of `NULL` calculates a reasonable
-eps as the largest distance to a (`minPts - 1`)-th nearest neighbor from
-`minPts` and the data. This gives every point a valid core distance, but
-if the data contain very well-separated groups, then this radius can
-result in several undefined reachability distances (shown as dashed
-lines in the reachability plot). If the plot shows too many dashed lines
-then `eps` should be increased.
+A finite `eps` restricts the maximum epsilon neighborhood size, which
+can improve performance significantly for large data sets. If `eps` is
+too small, then points can have undefined core distances (they are
+noise) and reachability distances. Undefined reachability distances are
+shown as dashed lines in the reachability plot, and the ordering can
+differ from the one for `eps = Inf`. `optics()` gives a warning if a
+finite `eps` results in undefined reachability distances in addition to
+the first one. If the plot shows too many dashed lines then `eps` should
+be increased.
 
 ### Ties
 
@@ -284,11 +286,11 @@ x <- cbind(
 plot(x, col=rep(1:4, times = 100))
 
 
-### run OPTICS (Note: we use the default eps calculation)
+### run OPTICS (Note: we use the default eps = Inf)
 res <- optics(x, minPts = 10)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = NA
+#> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = NA
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi
 
@@ -331,7 +333,7 @@ polygon(x[res$order, ])
 res <- extractDBSCAN(res, eps_cl = .065)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA
+#> Parameters: minPts = 10, eps = Inf, eps_cl = 0.065, xi = NA
 #> The clustering contains 4 cluster(s) and 95 noise points.
 #> 
 #>  0  1  2  3  4 
@@ -349,7 +351,7 @@ hullplot(x, res)
 res <- extractDBSCAN(res, eps_cl = .07)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.07, xi = NA
+#> Parameters: minPts = 10, eps = Inf, eps_cl = 0.07, xi = NA
 #> The clustering contains 3 cluster(s) and 60 noise points.
 #> 
 #>   0   1   2   3 
@@ -366,7 +368,7 @@ hullplot(x, res)
 res <- extractXi(res, xi = 0.01)
 res
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.01
+#> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = 0.01
 #> The clustering contains 18 cluster(s) and 0 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,

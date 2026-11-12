@@ -103,7 +103,7 @@ and how to extract flat or hierarchical clusters from it.</p>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, pch <span class="op">=</span> <span class="fl">19</span>, asp <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"Example data"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, asp <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"Example data"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optics_files/figure-html/data-1.png" class="r-plt" alt="" width="576"></p>
 <p><code><a href="../reference/optics.html">optics()</a></code> accepts a numeric matrix or data frame. For
 numeric data it uses Euclidean distance and a fast kd-tree search.</p>
@@ -111,7 +111,7 @@ numeric data it uses Euclidean distance and a fast kd-tree search.</p>
 <code class="sourceCode R"><span><span class="va">opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">optics</a></span><span class="op">(</span><span class="va">x</span>, minPts <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">opt</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
-<span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = NA</span></span>
+<span><span class="co">#&gt; Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = NA</span></span>
 <span><span class="co">#&gt; Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span></span>
 <span><span class="co">#&gt;                   eps_cl, xi</span></span></code></pre></div>
 <p>The most important result components are:</p>
@@ -159,7 +159,7 @@ plot is usually clearer for real data.</p>
 <p><img src="optics_files/figure-html/order-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level2">
-<h2 id="choose-minpts-and-eps">Choose <code>minPts</code> and <code>eps</code><a class="anchor" aria-label="anchor" href="#choose-minpts-and-eps"></a>
+<h2 id="choose-minpts">Choose <code>minPts</code><a class="anchor" aria-label="anchor" href="#choose-minpts"></a>
 </h2>
 <p><code>minPts</code> controls the scale at which density is evaluated.
 It includes the point itself, so <code>minPts = 10</code> uses the
@@ -167,22 +167,49 @@ distance to the ninth other nearest neighbor for the core-distance
 calculation. Larger values average over larger neighborhoods and
 generally produce a smoother reachability plot; smaller values reveal
 finer structure but are more sensitive to local variation.</p>
-<p>In OPTICS, <code>eps</code> is the maximum neighborhood radius
-explored by the algorithm. It is primarily a computational upper bound,
-not usually the density threshold used to define the final clusters. The
-default <code>eps = NULL</code> lets the package estimate a sufficient
-finite radius from the data and <code>minPts</code>. If the data contain
-well-separated groups, this estimate can leave several reachability
-distances undefined. Use <code>eps = Inf</code> to not limit the
-neighborhood size.</p>
-<p>For large data sets, supplying a smaller upper bound can reduce
-computation, but it must not exclude structure of interest. Multiple
-dashed bars in the reachability plot indicate undefined distances and
-usually mean that <code>eps</code> is too small. The first dashed bar is
-expected.</p>
-<p>As with other distance-based methods, variable scales matter.
-Standardize variables when their units are not comparable and scaling is
-substantively appropriate.</p>
+</div>
+<div class="section level2">
+<h2 id="considerations-for-eps">Considerations for <code>eps</code><a class="anchor" aria-label="anchor" href="#considerations-for-eps"></a>
+</h2>
+<p>OPTICS does not restrict <code>eps</code>, the maximum neighborhood
+radius explored by the algorithm. This is implemented by the default
+<code>eps = Inf</code> and typically should not be changed.</p>
+<p>The standard OPTICS algorithm runs an <span class="math inline">\(\epsilon\)</span>-range query for every point that
+it visits, sorts the returned distances to obtain the core distance, and
+then updates the reachability distances of the unvisited neighbors. With
+<code>eps = Inf</code>, each query returns all <span class="math inline">\(n\)</span> points, so this costs <span class="math inline">\(O(n^2 \log n)\)</span> time and repeatedly
+allocates neighbor lists of size <span class="math inline">\(n\)</span>.</p>
+<p>An unlimited neighborhood makes these queries unnecessary. If there
+are at least <code>minPts</code> points, every point is a core point,
+and the reachability distance of an unvisited point <span class="math inline">\(o\)</span> from a visited point <span class="math inline">\(p\)</span> is</p>
+<p><span class="math display">\[\mathrm{reach}(p, o) =
+\max\left(\mathrm{coredist}(p),\, d(p, o)\right).\]</span></p>
+<p>OPTICS always visits next the unvisited point with the smallest
+reachability distance. This is exactly Prim’s algorithm for a minimum
+spanning tree with the weights above, starting from the first
+observation. The order of the observations is the order in which Prim’s
+algorithm adds them, the reachability distance is the weight of the
+added edge, and the predecessor is the visited point that provided the
+smallest weight. As in the general implementation, ties are resolved in
+favor of the observation with the lower row number.</p>
+<p>This implementaion of <code><a href="../reference/optics.html">optics()</a></code> therefore proceeds in two
+steps if <code>eps = Inf</code> (the default):</p>
+<ol style="list-style-type: decimal">
+<li>The core distances of all points are computed with a <span class="math inline">\(k\)</span>-nearest-neighbor search (<span class="math inline">\(k = \mathtt{minPts} - 1\)</span>, using the
+kd-tree).</li>
+<li>Prim’s algorithm scans the unvisited points once for every visited
+point and calculates the needed distances on the fly. A distance matrix
+is never created, so only <span class="math inline">\(O(n)\)</span>
+memory is needed in addition to the data. For data given as a
+<code>dist</code> object, the existing distances are used.</li>
+</ol>
+<p>The running time is still quadratic in <span class="math inline">\(n\)</span>, but without the sorting and neighbor
+lists.</p>
+<p>For large data sets, manually supplying a smaller upper bound can
+reduce computation, but may lead to missing reachability distances and
+warnings. Multiple dashed bars in the reachability plot indicate
+undefined distances and usually mean that <code>eps</code> is too small.
+The first dashed bar is expected.</p>
 </div>
 <div class="section level2">
 <h2 id="extract-a-dbscan-like-clustering">Extract a DBSCAN-like clustering<a class="anchor" aria-label="anchor" href="#extract-a-dbscan-like-clustering"></a>
@@ -196,7 +223,7 @@ although OPTICS can leave some DBSCAN border points unassigned.</p>
 <code class="sourceCode R"><span><span class="va">opt_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">extractDBSCAN</a></span><span class="op">(</span><span class="va">opt</span>, eps_cl <span class="op">=</span> <span class="fl">0.065</span><span class="op">)</span></span>
 <span><span class="va">opt_db</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
-<span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA</span></span>
+<span><span class="co">#&gt; Parameters: minPts = 10, eps = Inf, eps_cl = 0.065, xi = NA</span></span>
 <span><span class="co">#&gt; The clustering contains 4 cluster(s) and 95 noise points.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0  1  2  3  4 </span></span>
@@ -216,10 +243,9 @@ data order.</p>
 <span><span class="co">#&gt;  0  1  2  3  4 </span></span>
 <span><span class="co">#&gt; 95 78 83 73 71</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="../reference/hullplot.html">hullplot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  col <span class="op">=</span> <span class="va">opt_db</span><span class="op">$</span><span class="va">cluster</span> <span class="op">+</span> <span class="fl">1L</span>,</span>
-<span>  pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">opt_db</span><span class="op">$</span><span class="va">cluster</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">19</span><span class="op">)</span>,</span>
+<span>  <span class="va">opt_db</span>,</span>
 <span>  asp <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Clusters extracted at eps_cl = 0.065"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -251,7 +277,7 @@ without selecting one global distance threshold.</p>
 <code class="sourceCode R"><span><span class="va">opt_xi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">extractXi</a></span><span class="op">(</span><span class="va">opt</span>, xi <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="va">opt_xi</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
-<span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05</span></span>
+<span><span class="co">#&gt; Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = 0.05</span></span>
 <span><span class="co">#&gt; The clustering contains 15 cluster(s) and 0 noise points.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span></span>
@@ -281,13 +307,9 @@ The colored line segments below the reachability plot show the
 intervals, while <code>cluster</code> contains a convenient non-nested
 labeling in original data order for plotting.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
-<span>  col <span class="op">=</span> <span class="va">opt_xi</span><span class="op">$</span><span class="va">cluster</span> <span class="op">+</span> <span class="fl">1L</span>,</span>
-<span>  pch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">opt_xi</span><span class="op">$</span><span class="va">cluster</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">19</span><span class="op">)</span>,</span>
-<span>  asp <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  main <span class="op">=</span> <span class="st">"Top-level Xi cluster labels"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">opt_xi</span>, asp <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"Optics Xi Clusters"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in hullplot(x, opt_xi, asp = 1, main = "Optics Xi Clusters"): Not</span></span>
+<span><span class="co">#&gt; enough colors. Some colors will be reused.</span></span></code></pre></div>
 <p><img src="optics_files/figure-html/plot-xi-1.png" class="r-plt" alt="" width="576"></p>
 <p>Set <code>minimum = TRUE</code> to retain minimal clusters that do
 not contain other Xi clusters. This is useful when a non-overlapping,
@@ -296,11 +318,19 @@ fine-grained solution is needed.</p>
 <code class="sourceCode R"><span><span class="va">opt_xi_min</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">extractXi</a></span><span class="op">(</span><span class="va">opt</span>, xi <span class="op">=</span> <span class="fl">0.05</span>, minimum <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">opt_xi_min</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
-<span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05</span></span>
+<span><span class="co">#&gt; Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = 0.05</span></span>
 <span><span class="co">#&gt; The clustering contains 6 cluster(s) and 308 noise points.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span></span>
-<span><span class="co">#&gt;                   eps_cl, xi, clusters_xi, cluster</span></span></code></pre></div>
+<span><span class="co">#&gt;                   eps_cl, xi, clusters_xi, cluster</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">opt_xi_min</span><span class="op">)</span></span></code></pre></div>
+<p><img src="optics_files/figure-html/minimum-xi-1.png" class="r-plt" alt="" width="576"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="../reference/hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">opt_xi_min</span>, asp <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"Optics Xi (minimal clusters)"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in hullplot(x, opt_xi_min, asp = 1, main = "Optics Xi (minimal</span></span>
+<span><span class="co">#&gt; clusters)"): Not enough colors. Some colors will be reused.</span></span></code></pre></div>
+<p><img src="optics_files/figure-html/minimum-xi-2.png" class="r-plt" alt="" width="576"></p>
 <p>The predecessor correction is enabled by default and removes a known
 artifact of the original Xi extraction procedure. It should normally
 remain enabled.</p>
@@ -311,7 +341,7 @@ remain enabled.</p>
 <p>An OPTICS reachability structure can be represented as a dendrogram.
 This is often convenient for smaller data sets or for code that works
 with standard R dendrogram objects.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dend</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/dendrogram.html">as.dendrogram</a></span><span class="op">(</span><span class="va">opt</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dend</span>, leaflab <span class="op">=</span> <span class="st">"none"</span>, ylab <span class="op">=</span> <span class="st">"Reachability distance"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optics_files/figure-html/dendrogram-1.png" class="r-plt" alt="" width="576"></p>
@@ -326,7 +356,7 @@ value or the default before converting.</p>
 because prediction needs a flat clustering and its global
 <code>eps_cl</code> threshold. Supply the original training data along
 with the new observations.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">new_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.3</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.8</span><span class="op">)</span>,</span>
@@ -346,7 +376,7 @@ data to new observations.</p>
 <p>To use a distance other than Euclidean distance, calculate a
 <code>dist</code> object and pass it to <code><a href="../reference/optics.html">optics()</a></code>. This uses
 the supplied pairwise distances rather than the kd-tree search.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"manhattan"</span><span class="op">)</span></span>
 <span><span class="va">opt_manhattan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">optics</a></span><span class="op">(</span><span class="va">d</span>, minPts <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">opt_manhattan</span><span class="op">)</span></span></code></pre></div>

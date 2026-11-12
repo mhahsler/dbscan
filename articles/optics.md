@@ -23,7 +23,7 @@ x <- cbind(
   y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
 )
 
-plot(x, pch = 19, asp = 1, main = "Example data")
+plot(x, asp = 1, main = "Example data")
 ```
 
 ![](optics_files/figure-html/data-1.png)
@@ -37,7 +37,7 @@ Euclidean distance and a fast kd-tree search.
 opt <- optics(x, minPts = 10)
 opt
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = NA
+#> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = NA
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi
 ```
@@ -94,7 +94,7 @@ points(x[opt$order[1], , drop = FALSE], pch = 19, col = 2)
 
 ![](optics_files/figure-html/order-1.png)
 
-## Choose `minPts` and `eps`
+## Choose `minPts`
 
 `minPts` controls the scale at which density is evaluated. It includes
 the point itself, so `minPts = 10` uses the distance to the ninth other
@@ -103,22 +103,57 @@ average over larger neighborhoods and generally produce a smoother
 reachability plot; smaller values reveal finer structure but are more
 sensitive to local variation.
 
-In OPTICS, `eps` is the maximum neighborhood radius explored by the
-algorithm. It is primarily a computational upper bound, not usually the
-density threshold used to define the final clusters. The default
-`eps = NULL` lets the package estimate a sufficient finite radius from
-the data and `minPts`. If the data contain well-separated groups, this
-estimate can leave several reachability distances undefined. Use
-`eps = Inf` to not limit the neighborhood size.
+## Considerations for `eps`
 
-For large data sets, supplying a smaller upper bound can reduce
-computation, but it must not exclude structure of interest. Multiple
-dashed bars in the reachability plot indicate undefined distances and
-usually mean that `eps` is too small. The first dashed bar is expected.
+OPTICS does not restrict `eps`, the maximum neighborhood radius explored
+by the algorithm. This is implemented by the default `eps = Inf` and
+typically should not be changed.
 
-As with other distance-based methods, variable scales matter.
-Standardize variables when their units are not comparable and scaling is
-substantively appropriate.
+The standard OPTICS algorithm runs an \\\epsilon\\-range query for every
+point that it visits, sorts the returned distances to obtain the core
+distance, and then updates the reachability distances of the unvisited
+neighbors. With `eps = Inf`, each query returns all \\n\\ points, so
+this costs \\O(n^2 \log n)\\ time and repeatedly allocates neighbor
+lists of size \\n\\.
+
+An unlimited neighborhood makes these queries unnecessary. If there are
+at least `minPts` points, every point is a core point, and the
+reachability distance of an unvisited point \\o\\ from a visited point
+\\p\\ is
+
+\\\mathrm{reach}(p, o) = \max\left(\mathrm{coredist}(p),\\ d(p,
+o)\right).\\
+
+OPTICS always visits next the unvisited point with the smallest
+reachability distance. This is exactly Prim’s algorithm for a minimum
+spanning tree with the weights above, starting from the first
+observation. The order of the observations is the order in which Prim’s
+algorithm adds them, the reachability distance is the weight of the
+added edge, and the predecessor is the visited point that provided the
+smallest weight. As in the general implementation, ties are resolved in
+favor of the observation with the lower row number.
+
+This implementaion of
+[`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)
+therefore proceeds in two steps if `eps = Inf` (the default):
+
+1.  The core distances of all points are computed with a
+    \\k\\-nearest-neighbor search (\\k = \mathtt{minPts} - 1\\, using
+    the kd-tree).
+2.  Prim’s algorithm scans the unvisited points once for every visited
+    point and calculates the needed distances on the fly. A distance
+    matrix is never created, so only \\O(n)\\ memory is needed in
+    addition to the data. For data given as a `dist` object, the
+    existing distances are used.
+
+The running time is still quadratic in \\n\\, but without the sorting
+and neighbor lists.
+
+For large data sets, manually supplying a smaller upper bound can reduce
+computation, but may lead to missing reachability distances and
+warnings. Multiple dashed bars in the reachability plot indicate
+undefined distances and usually mean that `eps` is too small. The first
+dashed bar is expected.
 
 ## Extract a DBSCAN-like clustering
 
@@ -134,7 +169,7 @@ unassigned.
 opt_db <- extractDBSCAN(opt, eps_cl = 0.065)
 opt_db
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA
+#> Parameters: minPts = 10, eps = Inf, eps_cl = 0.065, xi = NA
 #> The clustering contains 4 cluster(s) and 95 noise points.
 #> 
 #>  0  1  2  3  4 
@@ -158,10 +193,9 @@ table(opt_db$cluster)
 #>  0  1  2  3  4 
 #> 95 78 83 73 71
 
-plot(
+hullplot(
   x,
-  col = opt_db$cluster + 1L,
-  pch = ifelse(opt_db$cluster == 0, 4, 19),
+  opt_db,
   asp = 1,
   main = "Clusters extracted at eps_cl = 0.065"
 )
@@ -201,7 +235,7 @@ threshold.
 opt_xi <- extractXi(opt, xi = 0.05)
 opt_xi
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05
+#> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = 0.05
 #> The clustering contains 15 cluster(s) and 0 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
@@ -236,13 +270,9 @@ plotting.
 
 ``` r
 
-plot(
-  x,
-  col = opt_xi$cluster + 1L,
-  pch = ifelse(opt_xi$cluster == 0, 4, 19),
-  asp = 1,
-  main = "Top-level Xi cluster labels"
-)
+hullplot(x, opt_xi, asp = 1, main = "Optics Xi Clusters")
+#> Warning in hullplot(x, opt_xi, asp = 1, main = "Optics Xi Clusters"): Not
+#> enough colors. Some colors will be reused.
 ```
 
 ![](optics_files/figure-html/plot-xi-1.png)
@@ -256,12 +286,25 @@ solution is needed.
 opt_xi_min <- extractXi(opt, xi = 0.05, minimum = TRUE)
 opt_xi_min
 #> OPTICS ordering/clustering for 400 objects.
-#> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05
+#> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = 0.05
 #> The clustering contains 6 cluster(s) and 308 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, clusters_xi, cluster
+plot(opt_xi_min)
 ```
+
+![](optics_files/figure-html/minimum-xi-1.png)
+
+``` r
+
+
+hullplot(x, opt_xi_min, asp = 1, main = "Optics Xi (minimal clusters)")
+#> Warning in hullplot(x, opt_xi_min, asp = 1, main = "Optics Xi (minimal
+#> clusters)"): Not enough colors. Some colors will be reused.
+```
+
+![](optics_files/figure-html/minimum-xi-2.png)
 
 The predecessor correction is enabled by default and removes a known
 artifact of the original Xi extraction procedure. It should normally

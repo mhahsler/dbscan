@@ -58,7 +58,7 @@ structure) point ordering algorithm using a kd-tree.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">optics</span><span class="op">(</span><span class="va">x</span>, eps <span class="op">=</span> <span class="cn">NULL</span>, minPts <span class="op">=</span> <span class="fl">5</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">optics</span><span class="op">(</span><span class="va">x</span>, eps <span class="op">=</span> <span class="cn">Inf</span>, minPts <span class="op">=</span> <span class="fl">5</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'optics'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -90,9 +90,8 @@ structure) point ordering algorithm using a kd-tree.</p>
 
 <dt id="arg-eps">eps<a class="anchor" aria-label="anchor" href="#arg-eps"></a></dt>
 <dd><p>maximum epsilon neighborhood size only used for performance.
-The default <code>NULL</code> estimates the smallest radius that gives every point a
-core distance. This is fast, but setting eps to <code>Inf</code> can give
-a different result.</p></dd>
+The default <code>Inf</code> does not restrict the neighborhood and gives the complete
+reachability structure. <code>NULL</code> is treated as <code>Inf</code>. See details.</p></dd>
 
 
 <dt id="arg-minpts">minPts<a class="anchor" aria-label="anchor" href="#arg-minpts"></a></dt>
@@ -201,12 +200,10 @@ While using similar concepts as DBSCAN, <code>minPts</code> in OPTICS has a diff
 effect than in DBSCAN. Since it is also used to calculate the reachability
 distance, larger values will make the reachability distance plot smoother.
 The parameter <code>eps</code> is optional. It represents
-an upper limit for the neighborhood size used to reduce
-computational complexity which is helpful for large data sets.
-By default (<code>eps = NULL</code>), it is estimated from <code>minPts</code> and the data. If the
-data contain well-separated groups, the estimate can result in several
-undefined (<code>Inf</code>) reachability distances. Use <code>eps = Inf</code> to
-not limit the neighborhood size.</p>
+an upper limit for the neighborhood size that can be used to reduce
+computational complexity for large data sets. The default <code>eps = Inf</code> does
+not limit the neighborhood size and gives the complete reachability
+structure.</p>
 <p>OPTICS linearly orders the data points such that points which are spatially
 closest become neighbors in the ordering. The closest analog to this
 ordering is dendrogram in single-link hierarchical clustering. The algorithm
@@ -232,19 +229,22 @@ details on the parameters for the kd-tree.</p>
 <h3 id="the-effect-of-eps">The effect of eps<a class="anchor" aria-label="anchor" href="#the-effect-of-eps"></a></h3>
 
 
-<p>The <code>eps</code> parameter can be used to restrict the considered maximum epsilon
-neighborhood size which improves performance significantly. Setting
-<code>eps = Inf</code> does not restrict the neighborhood and results in the complete
-reachability structure (only the first reachability distance is undefined).
-However, this is can be slower for large data sets.</p>
-<p>To improve speed, the default value of <code>NULL</code>
-calculates a reasonable eps as the largest distance to a (<code>minPts - 1</code>)-th
-nearest neighbor from <code>minPts</code> and the data. This gives every point
-a valid core distance, but if the data contain very well-separated groups,
-then this radius can result in
-several undefined reachability distances (shown as dashed lines in the
-reachability plot). If the plot shows too many dashed lines then
-<code>eps</code> should be increased.</p>
+<p>The default <code>eps = Inf</code> (<code>NULL</code> is also treated as <code>Inf</code>) does not restrict
+the neighborhood and results in the complete reachability structure (only
+the first reachability distance is undefined). This is the original OPTICS
+behavior. Computation in this implementation uses
+Prim's algorithm on the reachability graph using core distances
+and distances that are calculated on the fly. This needs only \(O(n)\)
+additional memory, but the running time is quadratic in the number of data
+points, so it can still be slow for large data sets.</p>
+<p>A finite <code>eps</code> restricts the maximum epsilon neighborhood size, which can
+improve performance significantly for large data sets. If <code>eps</code> is too small,
+then points can have undefined core distances (they are noise) and
+reachability distances. Undefined reachability distances are
+shown as dashed lines in the reachability plot, and the ordering can
+differ from the one for <code>eps = Inf</code>. <code>optics()</code> gives a warning if a finite
+<code>eps</code> results in undefined reachability distances in addition to the first
+one. If the plot shows too many dashed lines then <code>eps</code> should be increased.</p>
 </div>
 
 <div class="section">
@@ -335,11 +335,11 @@ pp. 318-329.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, times <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">### run OPTICS (Note: we use the default eps calculation)</span></span></span>
+<span class="r-in"><span><span class="co">### run OPTICS (Note: we use the default eps = Inf)</span></span></span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">optics</span><span class="op">(</span><span class="va">x</span>, minPts <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OPTICS ordering/clustering for 400 objects.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   eps_cl, xi</span>
 <span class="r-in"><span></span></span>
@@ -382,7 +382,7 @@ pp. 318-329.</p>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">extractDBSCAN</span><span class="op">(</span><span class="va">res</span>, eps_cl <span class="op">=</span> <span class="fl">.065</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OPTICS ordering/clustering for 400 objects.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = Inf, eps_cl = 0.065, xi = NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The clustering contains 4 cluster(s) and 95 noise points.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4 </span>
@@ -400,7 +400,7 @@ pp. 318-329.</p>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">extractDBSCAN</span><span class="op">(</span><span class="va">res</span>, eps_cl <span class="op">=</span> <span class="fl">.07</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OPTICS ordering/clustering for 400 objects.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.07, xi = NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = Inf, eps_cl = 0.07, xi = NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The clustering contains 3 cluster(s) and 60 noise points.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0   1   2   3 </span>
@@ -417,7 +417,7 @@ pp. 318-329.</p>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">extractXi</span><span class="op">(</span><span class="va">res</span>, xi <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OPTICS ordering/clustering for 400 objects.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Parameters: minPts = 10, eps = Inf, eps_cl = NA, xi = 0.01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The clustering contains 18 cluster(s) and 0 noise points.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span>

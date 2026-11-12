@@ -14,6 +14,7 @@ reference:
   desc: Ordering points to identify the clustering structure.
   contents:
   - optics
+  - reachability
 - subtitle: HDBSCAN
   desc: Hierarchical DBSCAN, its minimum spanning tree hierarchy, and the extraction of clusters from hierarchies.
   contents:
@@ -47,7 +48,6 @@ reference:
   - dbcv
   - has_concept("Evaluation Functions")
   - hullplot
-  - reachability
   - dendrogram
 - title: Tidyverse Tidiers
   desc: Turn clustering objects into tidy tibbles and augment the original data.

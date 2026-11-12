@@ -425,15 +425,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mst
-Rcpp::NumericMatrix mst(const NumericVector x_dist, const R_xlen_t n);
-RcppExport SEXP _dbscan_mst(SEXP x_distSEXP, SEXP nSEXP) {
+// mst_dist_cpp
+Rcpp::NumericMatrix mst_dist_cpp(const NumericVector x_dist, const R_xlen_t n);
+RcppExport SEXP _dbscan_mst_dist_cpp(SEXP x_distSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const NumericVector >::type x_dist(x_distSEXP);
     Rcpp::traits::input_parameter< const R_xlen_t >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(mst(x_dist, n));
+    rcpp_result_gen = Rcpp::wrap(mst_dist_cpp(x_dist, n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mst_mrd
+Rcpp::NumericMatrix mst_mrd(const NumericMatrix x, const NumericVector coredist);
+RcppExport SEXP _dbscan_mst_mrd(SEXP xSEXP, SEXP coredistSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type coredist(coredistSEXP);
+    rcpp_result_gen = Rcpp::wrap(mst_mrd(x, coredist));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -511,7 +523,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 6},
     {"_dbscan_lof_kNN", (DL_FUNC) &_dbscan_lof_kNN, 6},
     {"_dbscan_mrd", (DL_FUNC) &_dbscan_mrd, 2},
-    {"_dbscan_mst", (DL_FUNC) &_dbscan_mst, 2},
+    {"_dbscan_mst_dist_cpp", (DL_FUNC) &_dbscan_mst_dist_cpp, 2},
+    {"_dbscan_mst_mrd", (DL_FUNC) &_dbscan_mst_mrd, 2},
     {"_dbscan_hclustMergeOrder", (DL_FUNC) &_dbscan_hclustMergeOrder, 2},
     {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},
     {"_dbscan_lowerTri", (DL_FUNC) &_dbscan_lowerTri, 1},

@@ -7,7 +7,6 @@
 \alias{plot.hdbscan}
 \alias{coredist}
 \alias{mrdist}
-\alias{minimum_spanning_tree}
 \alias{predict.hdbscan}
 \title{Hierarchical DBSCAN (HDBSCAN)}
 \usage{
@@ -33,11 +32,9 @@ hdbscan(
   ...
 )
 
-coredist(x, minPts)
+coredist(x, minPts, ...)
 
 mrdist(x, minPts, coredist = NULL)
-
-minimum_spanning_tree(x)
 
 \method{predict}{hdbscan}(object, newdata, data, ...)
 }
@@ -112,9 +109,6 @@ Only present if \code{gen_simplified_tree = TRUE}.}
 \code{coredist()} returns a vector with the core distance for each data point.
 
 \code{mrdist()} returns a \link{dist} object containing pairwise mutual reachability distances.
-
-\code{minimum_spanning_tree()} returns the minimum spanning tree as an \code{hclust}
-object.
 }
 \description{
 Fast C++ implementation of the HDBSCAN (Hierarchical DBSCAN) and its related
@@ -143,13 +137,43 @@ have at least \code{minPts} points.
 }
 }
 
-\subsection{Cluster selection using epsilon}{
+\subsection{Core and mutual reachability distances}{
 
-When using a value greater than 0.0 for \code{cluster_selection_epsilon},
+These can be calculated using the following two exposed functions:
+\itemize{
+\item \code{coredist()}: The core distance is defined for each point as
+the distance to the (\code{minPts - 1})-th nearest neighbor.
+It is a density estimate equivalent to \code{kNNdist()} with \code{k = minPts -1}.
+Larger values for \code{minPts} lead to larger and smoother estimates.
+\item \code{mrdist()}: The mutual reachability distance is defined between two points as
+\code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}.
+It has the effect of increasing distances in low density areas, separating
+clusters better.
+}
+}
+
+\subsection{Minimum spanning tree construction}{
+
+\code{\link[=mst_dist]{mst_dist()}} constructs a MST from the mutual reachability distance matrix.
+
+\strong{Note:} If \code{x} is a data matrix, then \code{\link[=mst_mrdist]{mst_mrdist()}} is used which computes
+the mutual reachability distance MST directly using Prim's algorithm
+without the expensive distance matrix creating.
+This reduces memory complexity from \eqn{O(n^2)} to
+\eqn{O(d n)} and speeds up the calculation.
+This only works with Euclidean distances.
+}
+
+\subsection{Tree pruning and cluster selection}{
+
+The MST is pruned using stability and clusters are extracted
+in an unsupervised version using \code{\link[=extractFOSC]{extractFOSC()}}.
+
+Malzer and Baum (2020) describe that
 a combination between DBSCAN* and HDBSCAN* can be achieved
-(see Malzer & Baum 2020). This means that part of the
-tree is affected by \code{cluster_selection_epsilon} as if
-running DBSCAN* with \code{eps} = \code{cluster_selection_epsilon}.
+by using a \code{cluster_selection_epsilon} greater than 0.0.
+The tree below \code{cluster_selection_epsilon} produces
+a result identical to DBSCAN* with \code{eps = cluster_selection_epsilon}.
 The remaining part (on levels above the threshold) is still
 processed by HDBSCAN*'s stability-based selection algorithm
 and can therefore return clusters of variable densities.
@@ -163,36 +187,22 @@ need to be merged, while still being able to extract clusters
 of variable densities at higher levels.
 }
 
-\subsection{Helper Functions}{
-\itemize{
-\item \code{coredist()}: The core distance is defined for each point as
-the distance to the (\code{minPts - 1})-th nearest neighbor.
-It is a density estimate equivalent to \code{kNNdist()} with \code{k = minPts -1}.
-Larger values for \code{minPts} lead to larger and smoother estimates.
-\item \code{mrdist()}: The mutual reachability distance is defined between two points as
-\code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}. This distance metric is used by
-HDBSCAN. It has the effect of increasing distances in low density areas, separating
-clusters better.
-\item \code{minimal_spanning_tree()}: Computes the minimum spanning tree (MST) of a
-graph defined by a \link{dist} object with Prim's algorithm.
-\item \code{predict()} assigns each new data point to the same cluster as the nearest point
+\subsection{Cluster membership prediction for new points}{
+
+\code{predict()} assigns each new data point to the same cluster as the nearest point
 if it is not more than that points core distance away. Otherwise the new point
 is classified as a noise point (i.e., cluster ID 0).
 }
-}
 
 \subsection{Related Methods}{
-
-Clusters can be extracted from the MST created by HDBSCAN
-or any other hierarchical clustering in a more flexible way
-using \code{\link[=extractFOSC]{extractFOSC()}} and using the default parameters for unsupervised
-cluster extraction.
-
-The Global-Local Outlier Score
-from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
-is available in function \code{\link[=glosh]{glosh()}}. Clusters can also be extracted based on
-instance-level constraints (see section 5.3 of Campello et al. 2015) using
-\code{\link[=extractFOSC]{extractFOSC()}}.
+\itemize{
+\item \code{\link[=extractFOSC]{extractFOSC()}} implements a more general framework for clusters
+selection from hierarchies (i.e., dendrograms)
+In addition to HDBSCAN's unsupervised
+cluster extraction, it also provides semisupervised methods with cluster
+constraints.
+\item \code{\link[=glosh]{glosh()}} implements the GLOSH outlier score.
+}
 }
 }
 \examples{
@@ -255,9 +265,9 @@ hullplot(X, hdbe, main = "HDBSCAN(e)")
 
 ## Manually perform the steps of HDBSCAN
 d <- mrdist(X, minPts = 3)
-mst_hc <- minimum_spanning_tree(d)
+mst_hc <- mst_dist(d)
 cl <- extractFOSC(mst_hc)
-hullplot(X, cl$cluster, main = "HDBSCAN(e)")
+hullplot(X, cl$cluster, main = "HDBSCAN")
 }
 \references{
 Campello RJGB, Moulavi D, Sander J (2013). Density-Based Clustering Based on
@@ -278,6 +288,9 @@ and Integration for Intelligent Systems (MFI), pp. 223-228.
 \doi{10.1109/MFI49285.2020.9235263}
 }
 \seealso{
+Other HDBSCAN functions:
+\code{\link[=mst_dist]{mst_dist()}}
+
 Other clustering functions:
 \code{\link[=dbscan]{dbscan()}},
 \code{\link[=extractFOSC]{extractFOSC()}},

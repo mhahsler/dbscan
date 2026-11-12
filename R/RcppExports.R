@@ -125,8 +125,12 @@ mrd <- function(dm, cd) {
     .Call(`_dbscan_mrd`, dm, cd)
 }
 
-mst <- function(x_dist, n) {
-    .Call(`_dbscan_mst`, x_dist, n)
+mst_dist_cpp <- function(x_dist, n) {
+    .Call(`_dbscan_mst_dist_cpp`, x_dist, n)
+}
+
+mst_mrd <- function(x, coredist) {
+    .Call(`_dbscan_mst_mrd`, x, coredist)
 }
 
 hclustMergeOrder <- function(mst, o) {

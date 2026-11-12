@@ -19,7 +19,7 @@
 
 #' Plot Clusters
 #'
-#' This function produces a two-dimensional scatter plot of data points
+#' `clplot()` produces a two-dimensional scatter plot of data points
 #' and colors the data points according to a supplied clustering. Noise points
 #' are marked as `x`. `hullplot()` also adds convex hulls to clusters.
 #'
@@ -36,6 +36,7 @@
 #' @param pch a vector of plotting characters. By default `o` is used for
 #'   points and `x` for noise points.
 #' @param cex expansion factor for symbols.
+#' @param hull logical; calculate and show convex hulls for clusters.
 #' @param hull_lwd,hull_lty line width and line type used for the convex hull.
 #' @param main main title.
 #' @param solid,alpha draw filled polygons instead of just lines for the convex
@@ -53,14 +54,16 @@
 #'   )
 #' cl <- rep(1:4, times = 100)
 #'
-#'
 #' ### original data with true clustering
 #' clplot(x, cl, main = "True clusters")
 #' hullplot(x, cl, main = "True clusters")
-#' ### use different symbols
-#' hullplot(x, cl, main = "True clusters", pch = cl)
-#' ### just the hulls
+#'
+#' ### use different symbols for each cluster
+#' clplot(x, cl, main = "True clusters", pch = cl)
+#'
+#' ### plot just the hulls
 #' hullplot(x, cl, main = "True clusters", pch = NA)
+#'
 #' ### a version suitable for b/w printing)
 #' hullplot(x, cl, main = "True clusters", solid = FALSE,
 #'   col = c("grey", "black"), pch = cl)
@@ -93,6 +96,7 @@ hullplot <- function(x,
   col = NULL,
   pch = NULL,
   cex = 0.5,
+  hull = TRUE,
   hull_lwd = 1,
   hull_lty = 1,
   solid = TRUE,
@@ -159,30 +163,32 @@ hullplot <- function(x,
     ci_order <- seq_len(max(cl))
   }
 
-  for (i in seq_along(ci_order)) {
-    ### use all the points for xICSXi's hierarchical structure
-    if (is.null(clusters_xi)) {
-      d <- x[cl == i, , drop = FALSE]
-    } else {
-      d <-
-        x[cl_order[clusters_xi$start[i]:clusters_xi$end[i]], , drop = FALSE]
-    }
+  if (hull) {
+    for (i in seq_along(ci_order)) {
+      ### use all the points for xICSXi's hierarchical structure
+      if (is.null(clusters_xi)) {
+        d <- x[cl == i, , drop = FALSE]
+      } else {
+        d <-
+          x[cl_order[clusters_xi$start[i]:clusters_xi$end[i]], , drop = FALSE]
+      }
 
-    ch <- chull(d)
-    ch <- c(ch, ch[1])
-    if (!solid) {
-      lines(d[ch, ],
-            col = border[ci_order[i]],
-            lwd = hull_lwd,
-            lty = hull_lty)
-    } else {
-      polygon(
-        d[ch, ],
-        col = col_poly[ci_order[i]],
-        lwd = hull_lwd,
-        lty = hull_lty,
-        border = border[ci_order[i]]
-      )
+      ch <- chull(d)
+      ch <- c(ch, ch[1])
+      if (!solid) {
+        lines(d[ch, ],
+              col = border[ci_order[i]],
+              lwd = hull_lwd,
+              lty = hull_lty)
+      } else {
+        polygon(
+          d[ch, ],
+          col = col_poly[ci_order[i]],
+          lwd = hull_lwd,
+          lty = hull_lty,
+          border = border[ci_order[i]]
+        )
+      }
     }
   }
 }
@@ -197,4 +203,5 @@ clplot <- function(x,
                    main = "Cluster Plot",
                    ...)
   hullplot(x, cl = cl, col = col, pch = pch, cex = cex, main = main,
-          solid = FALSE, hull_lwd = NA, ...)
+           hull = FALSE, ...)
+

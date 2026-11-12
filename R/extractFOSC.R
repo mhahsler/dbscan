@@ -154,6 +154,10 @@
 #' implies.
 #' @param validate_constraints logical; should constraints be checked for
 #' validity? See details for what are considered valid constraints.
+#' @param cluster_selection_epsilon double; a distance threshold below which
+#' no clusters should be selected (see Malzer & Baum 2020, and
+#' [hdbscan()]).
+#' The default of 0.0 means this feature is not used.
 #'
 #' @returns A list with the elements:
 #'
@@ -195,6 +199,9 @@
 #'                 ifelse(dist_moons > 1, -1L, 0L)))
 #'
 #' cl_con2$cluster # same as the second example
+#'
+#' ## Unsupervised extraction with a distance threshold (HDBSCAN(e))
+#' extractFOSC(cl$hc, cluster_selection_epsilon = 0.5)$cluster
 #' @export
 extractFOSC <-
   function(x,
@@ -202,7 +209,8 @@ extractFOSC <-
     alpha = 0,
     minPts = NULL,
     prune_unstable = FALSE,
-    validate_constraints = FALSE) {
+    validate_constraints = FALSE,
+    cluster_selection_epsilon = 0.0) {
     ## use the hierarchy of an hdbscan object
     if (inherits(x, "hdbscan"))
       x <- x$hc
@@ -229,6 +237,11 @@ extractFOSC <-
       }
     }
     minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
+    if (!is.numeric(cluster_selection_epsilon) ||
+        length(cluster_selection_epsilon) != 1L ||
+        is.na(cluster_selection_epsilon) ||
+        cluster_selection_epsilon < 0)
+      stop("cluster_selection_epsilon needs to be a single number >= 0.")
     if (alpha < 0 ||
         alpha > 1)
       stop("alpha can only takes values between [0, 1].")
@@ -239,7 +252,7 @@ extractFOSC <-
 
     ## Unsupervised Extraction
     if (missing(constraints)) {
-      cl_tree <- extractUnsupervised(cl_tree, prune_unstable)
+      cl_tree <- extractUnsupervised(cl_tree, prune_unstable, cluster_selection_epsilon)
     }
     ## Semi-supervised Extraction
     else {
@@ -256,7 +269,8 @@ extractFOSC <-
           constraints <- validateConstraintList(constraints, n)
         }
         cl_tree <-
-          extractSemiSupervised(cl_tree, constraints, alpha, prune_unstable)
+          extractSemiSupervised(cl_tree, constraints, alpha, prune_unstable,
+                                cluster_selection_epsilon)
       }
       ## Adjacency matrix given (probably from dist object), retrieve adjacency list form
       else if (is.vector(constraints)) {
@@ -275,7 +289,8 @@ extractFOSC <-
           constraints_list <-  distToAdjacency(constraints, n)
         }
         cl_tree <-
-          extractSemiSupervised(cl_tree, constraints_list, alpha, prune_unstable)
+          extractSemiSupervised(cl_tree, constraints_list, alpha, prune_unstable,
+                                cluster_selection_epsilon)
       }
       ## Full nxn adjacency-matrix given, give warning and retrieve adjacency list form
       else if (is.matrix(constraints)) {
@@ -301,7 +316,8 @@ extractFOSC <-
           constraints_list <- distToAdjacency(constraints, n)
         }
         cl_tree <-
-          extractSemiSupervised(cl_tree, constraints_list, alpha, prune_unstable)
+          extractSemiSupervised(cl_tree, constraints_list, alpha, prune_unstable,
+                                cluster_selection_epsilon)
       } else {
         stop(
           "'extractFOSC' doesn't know how to handle constraints of type ",

@@ -198,7 +198,7 @@ dbcv <- function(x,
 
   ## mst is a matrix with columns: from to and weight
   mrd_graphs <- lapply(cl_idx_list, function(idx) {
-    mst(x_dist = dist_subset(all_mrd, idx), n = length(idx))
+    mst_dist_cpp(x_dist = dist_subset(all_mrd, idx), n = length(idx))
   })
 
   ## 3. Density Sparseness of a Cluster (DSC):

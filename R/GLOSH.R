@@ -118,8 +118,8 @@ glosh <- function(x, k = 4, ...) {
     mrd <- mrd(x_dist, d$dist[, k - 1])
 
     # need to assemble hclust object manually
-    mst <- mst(mrd, n)
-    hc <- hclustMergeOrder(mst, order(mst[, 3]))
+    m <- mst_dist_cpp(mrd, n)
+    hc <- hclustMergeOrder(m, order(m[, 3]))
   } else if (inherits(x, "hclust")) {
     hc <- x
     n <- nrow(hc$merge) + 1

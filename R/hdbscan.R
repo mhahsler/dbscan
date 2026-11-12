@@ -43,14 +43,41 @@
 #'    have at least `minPts` points.
 #' 4. Extract the clusters from the pruned tree.
 #'
+#' ## Core and mutual reachability distances
 #'
-#' ## Cluster selection using epsilon
+#' These can be calculated using the following two exposed functions:
 #'
-#' When using a value greater than 0.0 for `cluster_selection_epsilon`,
+#' * `coredist()`: The core distance is defined for each point as
+#' the distance to the (`minPts - 1`)-th nearest neighbor.
+#' It is a density estimate equivalent to `kNNdist()` with `k = minPts -1`.
+#' Larger values for `minPts` lead to larger and smoother estimates.
+#'
+#' * `mrdist()`: The mutual reachability distance is defined between two points as
+#' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`.
+#' It has the effect of increasing distances in low density areas, separating
+#' clusters better.
+#'
+#' ## Minimum spanning tree construction
+#'
+#' [`mst_dist()`] constructs a MST from the mutual reachability distance matrix.
+#'
+#' **Note:** If `x` is a data matrix, then [`mst_mrdist()`] is used which computes
+#' the mutual reachability distance MST directly using Prim's algorithm
+#' without the expensive distance matrix creating.
+#' This reduces memory complexity from \eqn{O(n^2)} to
+#' \eqn{O(d n)} and speeds up the calculation.
+#' This only works with Euclidean distances.
+#'
+#' ## Tree pruning and cluster selection
+#'
+#' The MST is pruned using stability and clusters are extracted
+#' in an unsupervised version using [`extractFOSC()`].
+#'
+#' Malzer and Baum (2020) describe that
 #' a combination between DBSCAN* and HDBSCAN* can be achieved
-#' (see Malzer & Baum 2020). This means that part of the
-#' tree is affected by `cluster_selection_epsilon` as if
-#' running DBSCAN* with `eps` = `cluster_selection_epsilon`.
+#' by using a `cluster_selection_epsilon` greater than 0.0.
+#' The tree below `cluster_selection_epsilon` produces
+#' a result identical to DBSCAN* with `eps = cluster_selection_epsilon`.
 #' The remaining part (on levels above the threshold) is still
 #' processed by HDBSCAN*'s stability-based selection algorithm
 #' and can therefore return clusters of variable densities.
@@ -63,37 +90,21 @@
 #' need to be merged, while still being able to extract clusters
 #' of variable densities at higher levels.
 #'
-#' ## Helper Functions
+#' ## Cluster membership prediction for new points
 #'
-#' * `coredist()`: The core distance is defined for each point as
-#' the distance to the (`minPts - 1`)-th nearest neighbor.
-#' It is a density estimate equivalent to `kNNdist()` with `k = minPts -1`.
-#' Larger values for `minPts` lead to larger and smoother estimates.
-#'
-#' * `mrdist()`: The mutual reachability distance is defined between two points as
-#' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. This distance metric is used by
-#' HDBSCAN. It has the effect of increasing distances in low density areas, separating
-#' clusters better.
-#'
-#' * `minimal_spanning_tree()`: Computes the minimum spanning tree (MST) of a
-#'  graph defined by a [dist] object with Prim's algorithm.
-#'
-#' * `predict()` assigns each new data point to the same cluster as the nearest point
+#' `predict()` assigns each new data point to the same cluster as the nearest point
 #' if it is not more than that points core distance away. Otherwise the new point
 #' is classified as a noise point (i.e., cluster ID 0).
 #'
 #' ## Related Methods
 #'
-#' Clusters can be extracted from the MST created by HDBSCAN
-#' or any other hierarchical clustering in a more flexible way
-#' using [extractFOSC()] and using the default parameters for unsupervised
-#' cluster extraction.
+#' * [extractFOSC()] implements a more general framework for clusters
+#'   selection from hierarchies (i.e., dendrograms)
+#'   In addition to HDBSCAN's unsupervised
+#'   cluster extraction, it also provides semisupervised methods with cluster
+#'   constraints.
 #'
-#' The Global-Local Outlier Score
-#' from Hierarchies (GLOSH; see section 6 of Campello et al., 2015)
-#' is available in function [glosh()]. Clusters can also be extracted based on
-#' instance-level constraints (see section 5.3 of Campello et al. 2015) using
-#' [extractFOSC()].
+#' * [glosh()] implements the GLOSH outlier score.
 #' @aliases hdbscan HDBSCAN print.hdbscan
 #'
 #' @family HDBSCAN functions
@@ -145,9 +156,6 @@
 #' `coredist()` returns a vector with the core distance for each data point.
 #'
 #' `mrdist()` returns a [dist] object containing pairwise mutual reachability distances.
-#'
-#' `minimum_spanning_tree()` returns the minimum spanning tree as an `hclust`
-#'  object.
 #'
 #' @author Matt Piekenbrock
 #' @author Claudia Malzer (added cluster_selection_epsilon)
@@ -230,9 +238,9 @@
 #'
 #' ## Manually perform the steps of HDBSCAN
 #' d <- mrdist(X, minPts = 3)
-#' mst_hc <- minimum_spanning_tree(d)
+#' mst_hc <- mst_dist(d)
 #' cl <- extractFOSC(mst_hc)
-#' hullplot(X, cl$cluster, main = "HDBSCAN(e)")
+#' hullplot(X, cl$cluster, main = "HDBSCAN")
 #' @export
 hdbscan <- function(x,
                     minPts,
@@ -251,16 +259,17 @@ hdbscan <- function(x,
   coredist <- coredist(x, minPts)
 
 
-  if (verbose) {
-    cat("Calculating the mutual reachability matrix distances...\n")
-  }
-  mrd <- mrdist(x, minPts, coredist = coredist)
-
-  ## 2. Construct a minimum spanning tree and convert to RSL representation
+  ## 2. Construct a minimum spanning tree of the mutual reachability graph and
+  ## convert to RSL representation
   if (verbose) {
     cat("Constructing the minimum spanning tree...\n")
   }
-  hc <- minimum_spanning_tree(mrd)
+  if (inherits(x, "dist")) {
+    hc <- mst_dist(mrdist(x, minPts, coredist = coredist))
+  } else {
+    ## data matrix: no n x n distance matrix is needed
+    hc <- mst_mrdist(x, minPts, coredist = coredist)
+  }
   hc$minPts <- minPts # needed by extractFOSC() to check/default minPts
 
   ## 3. Prune the tree
@@ -269,6 +278,8 @@ hdbscan <- function(x,
     cat("Tree pruning...\n")
   }
 
+  # this is the same as extractFOCS(hc, minPts=minPts, cluster_selection_epsilon = cluster_selection_epsilon)
+  # but it also computes GLOSH scores.
   res <- computeStability(hc, minPts, compute_glosh = TRUE)
   res <- extractUnsupervised(res, cluster_selection_epsilon = cluster_selection_epsilon)
 
@@ -520,8 +531,8 @@ plot.hdbscan <-
 
 #' @rdname hdbscan
 #' @export
-coredist <- function(x, minPts)
-  kNNdist(x, k = minPts - 1)
+coredist <- function(x, minPts, ...)
+  kNNdist(x, k = minPts - 1, ...)
 
 #' @rdname hdbscan
 #' @export
@@ -545,25 +556,9 @@ mrdist <- function(x, minPts, coredist = NULL) {
   mr_dist <- mrd(x_dist, coredist)
   class(mr_dist) <- "dist"
   attr(mr_dist, "Size") <- attr(x_dist, "Size")
+  attr(mr_dist, "Labels") <- attr(x_dist, "Labels")
   attr(mr_dist, "Diag") <- FALSE
   attr(mr_dist, "Upper") <- FALSE
   attr(mr_dist, "method") <- paste0("mutual reachability (", attr(x_dist, "method"), ")")
   mr_dist
-}
-
-#' @rdname hdbscan
-#' @export
-minimum_spanning_tree <- function(x) {
-  .check_dist(x)
-  n <- attr(x, "Size")
-  if (n < 2L)
-    stop("x needs to contain at least 2 objects.")
-  if (!all(is.finite(x)))
-    stop("x needs to contain only finite distances.")
-
-  m <- mst(x, n)
-
-  hc <- hclustMergeOrder(m, order(m[, 3]))
-  hc$call <- match.call()
-  return(hc)
 }

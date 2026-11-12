@@ -39,6 +39,7 @@ reference:
   - hullplot
   - reachability
   - dendrogram
+  - mst_dist
 - title: Tidiers
   desc: Turn clustering objects into tidy tibbles and augment the original data.
   contents:

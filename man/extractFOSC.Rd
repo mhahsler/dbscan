@@ -10,7 +10,8 @@ extractFOSC(
   alpha = 0,
   minPts = NULL,
   prune_unstable = FALSE,
-  validate_constraints = FALSE
+  validate_constraints = FALSE,
+  cluster_selection_epsilon = 0
 )
 }
 \arguments{
@@ -37,6 +38,11 @@ implies.}
 
 \item{validate_constraints}{logical; should constraints be checked for
 validity? See details for what are considered valid constraints.}
+
+\item{cluster_selection_epsilon}{double; a distance threshold below which
+no clusters should be selected (see Malzer & Baum 2020, and
+\code{\link[=hdbscan]{hdbscan()}}).
+The default of 0.0 means this feature is not used.}
 }
 \value{
 A list with the elements:
@@ -190,6 +196,9 @@ cl_con2 <- extractFOSC(cl$hc, minPts = 5,
                 ifelse(dist_moons > 1, -1L, 0L)))
 
 cl_con2$cluster # same as the second example
+
+## Unsupervised extraction with a distance threshold (HDBSCAN(e))
+extractFOSC(cl$hc, cluster_selection_epsilon = 0.5)$cluster
 }
 \references{
 Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg

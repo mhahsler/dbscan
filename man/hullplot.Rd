@@ -11,6 +11,7 @@ hullplot(
   col = NULL,
   pch = NULL,
   cex = 0.5,
+  hull = TRUE,
   hull_lwd = 1,
   hull_lty = 1,
   solid = TRUE,
@@ -37,6 +38,8 @@ points and \code{x} for noise points.}
 
 \item{cex}{expansion factor for symbols.}
 
+\item{hull}{logical; calculate and show convex hulls for clusters.}
+
 \item{hull_lwd, hull_lty}{line width and line type used for the convex hull.}
 
 \item{solid, alpha}{draw filled polygons instead of just lines for the convex
@@ -47,7 +50,7 @@ hulls? alpha controls the level of alpha shading.}
 \item{...}{additional arguments passed on to plot.}
 }
 \description{
-This function produces a two-dimensional scatter plot of data points
+\code{clplot()} produces a two-dimensional scatter plot of data points
 and colors the data points according to a supplied clustering. Noise points
 are marked as \code{x}. \code{hullplot()} also adds convex hulls to clusters.
 }
@@ -61,14 +64,16 @@ x <- cbind(
   )
 cl <- rep(1:4, times = 100)
 
-
 ### original data with true clustering
 clplot(x, cl, main = "True clusters")
 hullplot(x, cl, main = "True clusters")
-### use different symbols
-hullplot(x, cl, main = "True clusters", pch = cl)
-### just the hulls
+
+### use different symbols for each cluster
+clplot(x, cl, main = "True clusters", pch = cl)
+
+### plot just the hulls
 hullplot(x, cl, main = "True clusters", pch = NA)
+
 ### a version suitable for b/w printing)
 hullplot(x, cl, main = "True clusters", solid = FALSE,
   col = c("grey", "black"), pch = cl)

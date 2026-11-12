@@ -42,7 +42,7 @@ x <- cbind(
   y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
 )
 
-plot(x, pch = 19, asp = 1, main = "Example data")
+plot(x, asp = 1, main = "Example data")
 ```
 
 `optics()` accepts a numeric matrix or data frame. For numeric data it uses
@@ -94,7 +94,7 @@ lines(x[opt$order, ], col = "grey40")
 points(x[opt$order[1], , drop = FALSE], pch = 19, col = 2)
 ```
 
-## Choose `minPts` and `eps`
+## Choose `minPts`
 
 `minPts` controls the scale at which density is evaluated. It includes the
 point itself, so `minPts = 10` uses the distance to the ninth other nearest
@@ -102,21 +102,52 @@ neighbor for the core-distance calculation. Larger values average over larger
 neighborhoods and generally produce a smoother reachability plot; smaller
 values reveal finer structure but are more sensitive to local variation.
 
-In OPTICS, `eps` is the maximum neighborhood radius explored by the algorithm.
-It is primarily a computational upper bound, not usually the density threshold
-used to define the final clusters. The default `eps = NULL` lets the package
-estimate a sufficient finite radius from the data and `minPts`. If the data
-contain well-separated groups, this estimate can leave several reachability
-distances undefined. Use `eps = Inf` to not limit the neighborhood size.
+## Considerations for `eps`
 
-For large data sets, supplying a smaller upper bound can reduce computation,
-but it must not exclude structure of interest. Multiple dashed bars in the
+OPTICS does not restrict `eps`, the maximum neighborhood radius explored 
+by the algorithm. This is implemented by the default `eps = Inf` and typically 
+should not be changed.
+
+The standard OPTICS algorithm runs an $\epsilon$-range query for every point
+that it visits, sorts the returned distances to obtain the core distance, and
+then updates the reachability distances of the unvisited neighbors. With
+`eps = Inf`, each query returns all $n$ points, so this costs
+$O(n^2 \log n)$ time and repeatedly allocates neighbor lists of size $n$.
+
+An unlimited neighborhood makes these queries unnecessary. If there are at
+least `minPts` points, every point is a core point, and the reachability
+distance of an unvisited point $o$ from a visited point $p$ is
+
+$$\mathrm{reach}(p, o) = \max\left(\mathrm{coredist}(p),\, d(p, o)\right).$$
+
+OPTICS always visits next the unvisited point with the smallest reachability
+distance. This is exactly Prim's algorithm for a minimum spanning tree with the
+weights above, starting from the first observation. The order of the
+observations is the order in which Prim's algorithm adds them, the
+reachability distance is the weight of the added edge, and the predecessor is
+the visited point that provided the smallest weight. As in the general
+implementation, ties are resolved in favor of the observation with the lower
+row number.
+
+This implementaion of `optics()` therefore proceeds in two steps 
+if `eps = Inf` (the default):
+
+1. The core distances of all points are computed with a $k$-nearest-neighbor
+   search ($k = \mathtt{minPts} - 1$, using the kd-tree).
+2. Prim's algorithm scans the unvisited points once for every visited point
+   and calculates the needed distances on the fly. A distance matrix is
+   never created, so only $O(n)$ memory is needed in addition to the data.
+   For data given as a `dist` object, the existing distances are used.
+
+The running time is still quadratic in $n$, but without the sorting and
+neighbor lists.
+
+For large data sets, manually supplying a smaller upper bound can reduce 
+computation,
+but may lead to missing reachability distances and warnings. 
+Multiple dashed bars in the
 reachability plot indicate undefined distances and usually mean that `eps` is
 too small. The first dashed bar is expected.
-
-As with other distance-based methods, variable scales matter. Standardize
-variables when their units are not comparable and scaling is substantively
-appropriate.
 
 ## Extract a DBSCAN-like clustering
 
@@ -139,10 +170,9 @@ Cluster assignments are stored in original data order.
 ```{r plot-dbscan}
 table(opt_db$cluster)
 
-plot(
+hullplot(
   x,
-  col = opt_db$cluster + 1L,
-  pch = ifelse(opt_db$cluster == 0, 4, 19),
+  opt_db,
   asp = 1,
   main = "Clusters extracted at eps_cl = 0.065"
 )
@@ -183,13 +213,7 @@ the reachability plot show the intervals, while `cluster` contains a convenient
 non-nested labeling in original data order for plotting.
 
 ```{r plot-xi}
-plot(
-  x,
-  col = opt_xi$cluster + 1L,
-  pch = ifelse(opt_xi$cluster == 0, 4, 19),
-  asp = 1,
-  main = "Top-level Xi cluster labels"
-)
+hullplot(x, opt_xi, asp = 1, main = "Optics Xi Clusters")
 ```
 
 Set `minimum = TRUE` to retain minimal clusters that do not contain other Xi
@@ -199,6 +223,9 @@ needed.
 ```{r minimum-xi}
 opt_xi_min <- extractXi(opt, xi = 0.05, minimum = TRUE)
 opt_xi_min
+plot(opt_xi_min)
+
+hullplot(x, opt_xi_min, asp = 1, main = "Optics Xi (minimal clusters)")
 ```
 
 The predecessor correction is enabled by default and removes a known artifact

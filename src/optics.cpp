@@ -13,6 +13,7 @@
 #include "ann_raii.h"
 #include "ANN/ANN.h"
 #include "regionQuery.h"
+#include "lt.h"
 
 using namespace Rcpp;
 
@@ -186,4 +187,120 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   ret["coredist"] = sqrt(NumericVector(coredist.begin(), coredist.end()));
   ret["predecessor"] = IntegerVector(pre.begin(), pre.end()) + 1;
   return ret;
+}
+
+
+// ---------------------------------------------------------------------------
+// OPTICS for eps = Inf
+//
+// For an unrestricted neighborhood, OPTICS does not need neighborhood queries.
+// Every point is a core point and the reachability distance of an unvisited
+// point o from the visited core point p is max(coredist(p), d(p, o)). OPTICS
+// repeatedly visits the unvisited point with the smallest reachability
+// distance (ties: lowest id), which is Prim's algorithm with these weights
+// (starting with the first point). The predecessor is the first visited point
+// that gave the smallest reachability distance.
+//
+// The distances are computed on the fly, so memory use is O(n) (+ O(n*d)
+// for a data matrix) and time is O(n^2 * d). The original implementation
+// optics_int() is kept for finite eps.
+//
+// coredist: core distances for all points (finite).
+// dist_fn(i, j): distance between points i and j (0-based, not squared).
+template <typename DistFun>
+static List optics_prim_impl(const R_xlen_t n, const NumericVector &coredist,
+                             DistFun dist_fn) {
+  if (coredist.length() != n)
+    stop("coredist needs to have one value for each point.");
+  for (R_xlen_t i = 0; i < n; ++i)
+    if (!R_FINITE(coredist[i]))
+      stop("optics_prim needs finite core distances.");
+
+  std::vector<int> order; order.reserve(n);
+  std::vector<int> pre(n, NA_INTEGER);
+  std::vector<double> reach(n, INFINITY);   // reachability distance (Inf = undefined)
+  std::vector<double> weight(n, INFINITY);  // best reachability so far
+  std::vector<bool> visited(n, false);
+
+  int cur = 0;
+  for (R_xlen_t k = 0; k < n; ++k) {
+    if (!(k % 256)) Rcpp::checkUserInterrupt();
+
+    order.push_back(cur);
+    visited[cur] = true;
+    if (k == n - 1) break;
+
+    const double cd = coredist[cur];
+    int next = -1;
+    double next_weight = INFINITY;
+
+    for (int i = 0; i < n; ++i) {
+      if (visited[i]) continue;
+
+      double w = std::max(cd, dist_fn(cur, i));
+      if (w < weight[i]) {
+        weight[i] = w;
+        pre[i] = cur;
+      }
+      // strict '<' in ascending order of i: the lowest id wins ties
+      if (weight[i] < next_weight) {
+        next_weight = weight[i];
+        next = i;
+      }
+    }
+
+    if (next < 0) stop("optics_prim could not find the next point (non-finite distances?).");
+    reach[next] = next_weight;
+    cur = next;
+  }
+
+  IntegerVector order_r(order.begin(), order.end());
+  IntegerVector pre_r(n);
+  for (R_xlen_t i = 0; i < n; ++i)
+    pre_r[i] = (pre[i] == NA_INTEGER) ? NA_INTEGER : pre[i] + 1;
+
+  List ret;
+  ret["order"] = order_r + 1;  // R index starts with 1
+  ret["reachdist"] = NumericVector(reach.begin(), reach.end());
+  ret["coredist"] = clone(coredist);
+  ret["predecessor"] = pre_r;
+  return ret;
+}
+
+// Data matrix: Euclidean distances are computed on the fly.
+// [[Rcpp::export]]
+List optics_prim(const NumericMatrix x, const NumericVector coredist) {
+  const R_xlen_t n = x.nrow();
+  const R_xlen_t d = x.ncol();
+  if (n < 1) stop("x needs to contain at least 1 object.");
+
+  // row-major copy of the data for cache-friendly access to a point
+  std::vector<double> pts(n * d);
+  for (R_xlen_t j = 0; j < d; ++j)
+    for (R_xlen_t i = 0; i < n; ++i)
+      pts[i * d + j] = x(i, j);
+
+  return optics_prim_impl(n, coredist, [&](int a, int b) {
+    const double *pa = &pts[(R_xlen_t) a * d];
+    const double *pb = &pts[(R_xlen_t) b * d];
+    double sum = 0.0;
+    for (R_xlen_t j = 0; j < d; ++j) {
+      double diff = pa[j] - pb[j];
+      sum += diff * diff;
+    }
+    return std::sqrt(sum);
+  });
+}
+
+// dist object (lower triangle vector) with n points.
+// [[Rcpp::export]]
+List optics_prim_dist(const NumericVector x_dist, const R_xlen_t n,
+                      const NumericVector coredist) {
+  if (n < 1) stop("x needs to contain at least 1 object.");
+  if (x_dist.length() != n * (n - 1) / 2)
+    stop("the length of the dist object does not match n.");
+
+  return optics_prim_impl(n, coredist, [&](int a, int b) {
+    return (double) x_dist[LT_POS0((R_xlen_t) n, (R_xlen_t) a, (R_xlen_t) b)];
+  });
 }

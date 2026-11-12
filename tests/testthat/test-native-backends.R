@@ -29,7 +29,9 @@ test_that("randomized exact searches agree across native and distance backends",
     reference_weighted <- dbscan(distances, eps, min_pts, weights = weights,
                                 borderPoints = FALSE)
     reference_clusters <- dbscan(distances, eps, min_pts)
-    reference_optics <- optics(distances, eps = eps, minPts = min_pts)
+    # a small random eps can leave undefined reachability distances (warning)
+    reference_optics <- suppressWarnings(
+      optics(distances, eps = eps, minPts = min_pts))
 
     for (search in c("kdtree", "linear", "dist")) {
       nearest <- kNN(x, k, search = search, bucketSize = bucket, splitRule = rule)
@@ -54,8 +56,9 @@ test_that("randomized exact searches agree across native and distance backends",
       expect_identical(clusters$cluster == 0L, reference_clusters$cluster == 0L)
       core <- reference_star$cluster != 0L
       same_partition(clusters$cluster[core], reference_clusters$cluster[core])
-      ordering <- optics(x, eps, min_pts, search = search, bucketSize = bucket,
-                         splitRule = rule)
+      ordering <- suppressWarnings(
+        optics(x, eps, min_pts, search = search, bucketSize = bucket,
+               splitRule = rule))
       expect_equal(ordering$order, reference_optics$order)
       expect_equal(ordering$coredist, reference_optics$coredist, tolerance = 1e-12)
       expect_equal(ordering$reachdist, reference_optics$reachdist, tolerance = 1e-12)

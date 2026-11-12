@@ -12,7 +12,7 @@
 \alias{predict.optics}
 \title{Ordering Points to Identify the Clustering Structure (OPTICS)}
 \usage{
-optics(x, eps = NULL, minPts = 5, ...)
+optics(x, eps = Inf, minPts = 5, ...)
 
 \method{print}{optics}(x, ...)
 
@@ -32,9 +32,8 @@ extractXi(object, xi, minimum = FALSE, correctPredecessors = TRUE)
 \item{x}{a data matrix or a \link{dist} object.}
 
 \item{eps}{maximum epsilon neighborhood size only used for performance.
-The default \code{NULL} estimates the smallest radius that gives every point a
-core distance. This is fast, but setting eps to \code{Inf} can give
-a different result.}
+The default \code{Inf} does not restrict the neighborhood and gives the complete
+reachability structure. \code{NULL} is treated as \code{Inf}. See details.}
 
 \item{minPts}{the parameter is used to identify dense neighborhoods. The
 core distance of a point is the distance to its (\code{minPts - 1})-th nearest
@@ -101,12 +100,10 @@ While using similar concepts as DBSCAN, \code{minPts} in OPTICS has a different
 effect than in DBSCAN. Since it is also used to calculate the reachability
 distance, larger values will make the reachability distance plot smoother.
 The parameter \code{eps} is optional. It represents
-an upper limit for the neighborhood size used to reduce
-computational complexity which is helpful for large data sets.
-By default (\code{eps = NULL}), it is estimated from \code{minPts} and the data. If the
-data contain well-separated groups, the estimate can result in several
-undefined (\code{Inf}) reachability distances. Use \code{eps = Inf} to
-not limit the neighborhood size.
+an upper limit for the neighborhood size that can be used to reduce
+computational complexity for large data sets. The default \code{eps = Inf} does
+not limit the neighborhood size and gives the complete reachability
+structure.
 
 OPTICS linearly orders the data points such that points which are spatially
 closest become neighbors in the ordering. The closest analog to this
@@ -129,20 +126,23 @@ details on the parameters for the kd-tree.
 
 \subsection{The effect of eps}{
 
-The \code{eps} parameter can be used to restrict the considered maximum epsilon
-neighborhood size which improves performance significantly. Setting
-\code{eps = Inf} does not restrict the neighborhood and results in the complete
-reachability structure (only the first reachability distance is undefined).
-However, this is can be slower for large data sets.
+The default \code{eps = Inf} (\code{NULL} is also treated as \code{Inf}) does not restrict
+the neighborhood and results in the complete reachability structure (only
+the first reachability distance is undefined). This is the original OPTICS
+behavior. Computation in this implementation uses
+Prim's algorithm on the reachability graph using core distances
+and distances that are calculated on the fly. This needs only \eqn{O(n)}
+additional memory, but the running time is quadratic in the number of data
+points, so it can still be slow for large data sets.
 
-To improve speed, the default value of \code{NULL}
-calculates a reasonable eps as the largest distance to a (\code{minPts - 1})-th
-nearest neighbor from \code{minPts} and the data. This gives every point
-a valid core distance, but if the data contain very well-separated groups,
-then this radius can result in
-several undefined reachability distances (shown as dashed lines in the
-reachability plot). If the plot shows too many dashed lines then
-\code{eps} should be increased.
+A finite \code{eps} restricts the maximum epsilon neighborhood size, which can
+improve performance significantly for large data sets. If \code{eps} is too small,
+then points can have undefined core distances (they are noise) and
+reachability distances. Undefined reachability distances are
+shown as dashed lines in the reachability plot, and the ordering can
+differ from the one for \code{eps = Inf}. \code{optics()} gives a warning if a finite
+\code{eps} results in undefined reachability distances in addition to the first
+one. If the plot shows too many dashed lines then \code{eps} should be increased.
 }
 
 \subsection{Ties}{
@@ -198,7 +198,7 @@ x <- cbind(
 
 plot(x, col=rep(1:4, times = 100))
 
-### run OPTICS (Note: we use the default eps calculation)
+### run OPTICS (Note: we use the default eps = Inf)
 res <- optics(x, minPts = 10)
 res
 

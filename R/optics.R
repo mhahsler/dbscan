@@ -31,12 +31,10 @@
 #' effect than in DBSCAN. Since it is also used to calculate the reachability
 #' distance, larger values will make the reachability distance plot smoother.
 #' The parameter `eps` is optional. It represents
-#' an upper limit for the neighborhood size used to reduce
-#' computational complexity which is helpful for large data sets.
-#' By default (`eps = NULL`), it is estimated from `minPts` and the data. If the
-#' data contain well-separated groups, the estimate can result in several
-#' undefined (`Inf`) reachability distances. Use `eps = Inf` to
-#' not limit the neighborhood size.
+#' an upper limit for the neighborhood size that can be used to reduce
+#' computational complexity for large data sets. The default `eps = Inf` does
+#' not limit the neighborhood size and gives the complete reachability
+#' structure.
 #'
 #' OPTICS linearly orders the data points such that points which are spatially
 #' closest become neighbors in the ordering. The closest analog to this
@@ -57,20 +55,23 @@
 #'
 #' ## The effect of eps
 #'
-#' The `eps` parameter can be used to restrict the considered maximum epsilon
-#' neighborhood size which improves performance significantly. Setting
-#' `eps = Inf` does not restrict the neighborhood and results in the complete
-#' reachability structure (only the first reachability distance is undefined).
-#' However, this is can be slower for large data sets.
+#' The default `eps = Inf` (`NULL` is also treated as `Inf`) does not restrict
+#' the neighborhood and results in the complete reachability structure (only
+#' the first reachability distance is undefined). This is the original OPTICS
+#' behavior. Computation in this implementation uses
+#' Prim's algorithm on the reachability graph using core distances
+#' and distances that are calculated on the fly. This needs only \eqn{O(n)}
+#' additional memory, but the running time is quadratic in the number of data
+#' points, so it can still be slow for large data sets.
 #'
-#' To improve speed, the default value of `NULL`
-#' calculates a reasonable eps as the largest distance to a (`minPts - 1`)-th
-#' nearest neighbor from `minPts` and the data. This gives every point
-#' a valid core distance, but if the data contain very well-separated groups,
-#' then this radius can result in
-#' several undefined reachability distances (shown as dashed lines in the
-#' reachability plot). If the plot shows too many dashed lines then
-#' `eps` should be increased.
+#' A finite `eps` restricts the maximum epsilon neighborhood size, which can
+#' improve performance significantly for large data sets. If `eps` is too small,
+#' then points can have undefined core distances (they are noise) and
+#' reachability distances. Undefined reachability distances are
+#' shown as dashed lines in the reachability plot, and the ordering can
+#' differ from the one for `eps = Inf`. `optics()` gives a warning if a finite
+#' `eps` results in undefined reachability distances in addition to the first
+#' one. If the plot shows too many dashed lines then `eps` should be increased.
 #'
 #' ## Ties
 #'
@@ -116,9 +117,8 @@
 #'
 #' @param x a data matrix or a [dist] object.
 #' @param eps maximum epsilon neighborhood size only used for performance.
-#' The default `NULL` estimates the smallest radius that gives every point a
-#' core distance. This is fast, but setting eps to `Inf` can give
-#' a different result.
+#' The default `Inf` does not restrict the neighborhood and gives the complete
+#' reachability structure. `NULL` is treated as `Inf`. See details.
 #' @param minPts the parameter is used to identify dense neighborhoods. The
 #' core distance of a point is the distance to its (`minPts - 1`)-th nearest
 #' neighbor (`minPts` includes the point itself). It is used to calculate the
@@ -184,7 +184,7 @@
 #'
 #' plot(x, col=rep(1:4, times = 100))
 #'
-#' ### run OPTICS (Note: we use the default eps calculation)
+#' ### run OPTICS (Note: we use the default eps = Inf)
 #' res <- optics(x, minPts = 10)
 #' res
 #'
@@ -226,29 +226,13 @@
 #' res <- optics(d, minPts = 10)
 #' plot(res)
 #' @export
-optics <- function(x, eps = NULL, minPts = 5, ...) {
+optics <- function(x, eps = Inf, minPts = 5, ...) {
 
   minPts <- .validate_integer_scalar(minPts, "minPts")
 
-  ### eps = Inf uses an unlimited neighborhood. For NULL (the default), we
-  ### estimate eps from minPts and the data to reduce computational cost.
-  if (!is.null(eps)) {
-    eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
-  } else {
-    ### We use the largest core distance (the distance to the
-    ### (minPts - 1)-th neighbor) as eps. This is the smallest radius that gives
-    ### every point a core distance and avoids unnecessary neighborhood searches.
-    eps <- max(kNNdist(x, k =  minPts - 1L))
-    if (!is.finite(eps))
-      stop("minPts is larger than the number of objects-1 or a distance is infinite distance.")
-
-    ### The point with the largest core distance has its (minPts - 1)-th
-    ### neighbor at exactly distance eps. The C++ code compares squared
-    ### distances to eps * eps, and rounding errors can then exclude this
-    ### neighbor. The point would not be a core point and its core distance
-    ### would be Inf. We increase eps by a tiny relative amount to avoid this.
-    eps <- eps * (1 + sqrt(.Machine$double.eps))
-  }
+  ### we treat NULL as infinity
+  eps <- eps %||% Inf
+  eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
 
   ### extra contains settings for frNN
   ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
@@ -264,6 +248,40 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
   bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
   approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
+
+  ### eps = Inf (unlimited neighborhood): OPTICS is equivalent to Prim's
+  ### algorithm on the reachability graph. We can compute it exactly without
+  ### neighborhood queries, using only O(n) additional memory. The
+  ### general code below is used for a finite eps (and approximate search).
+  if (is.infinite(eps) && approx == 0) {
+    if (inherits(x, "dist")) {
+      .check_dist(x)
+      if (!all(is.finite(x)))
+        stop("x needs to contain only finite distances.")
+      n <- attr(x, "Size")
+    } else {
+      x <- .as_finite_numeric_matrix(x)
+      n <- nrow(x)
+    }
+
+    # every point needs a core distance (minPts points including the point)
+    if (n >= minPts) {
+      knn_args <- extra[intersect(names(extra), c("search", "bucketSize", "splitRule"))]
+      cd <- do.call(kNNdist, c(list(x, k = minPts - 1L), knn_args))
+
+      ret <- if (inherits(x, "dist"))
+        optics_prim_dist(x, as.double(n), as.double(cd))
+      else
+        optics_prim(x, as.double(cd))
+
+      ret$minPts <- as.integer(minPts)
+      ret$eps <- as.double(eps)
+      ret$eps_cl <- NA_real_
+      ret$xi <- NA_real_
+      class(ret) <- "optics"
+      return(ret)
+    }
+  }
 
   ### dist search
   if (search == 3L && !inherits(x, "dist")) {
@@ -314,6 +332,20 @@ optics <- function(x, eps = NULL, minPts = 5, ...) {
   ret$eps_cl <- NA_real_
   ret$xi <- NA_real_
   class(ret) <- "optics"
+
+  ### The first point always has an undefined reachability distance. Additional
+  ### undefined values mean that the neighborhood is too small.
+  if (is.finite(eps)) {
+    n_undefined <- sum(is.infinite(ret$reachdist)) - 1L
+    if (n_undefined > 0L)
+      warning(
+        "optics: ", n_undefined, " of ", length(ret$order),
+        " points have an undefined reachability distance in addition to the",
+        " first point (eps = ", format(eps), " is too small). The ordering can",
+        " differ from the one for eps = Inf. Use a larger eps or eps = Inf.",
+        call. = FALSE
+      )
+  }
 
   ret
 }

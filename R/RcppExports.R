@@ -141,6 +141,14 @@ optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, f
     .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
 }
 
+optics_prim <- function(x, coredist) {
+    .Call(`_dbscan_optics_prim`, x, coredist)
+}
+
+optics_prim_dist <- function(x_dist, n, coredist) {
+    .Call(`_dbscan_optics_prim_dist`, x_dist, n, coredist)
+}
+
 lowerTri <- function(m) {
     .Call(`_dbscan_lowerTri`, m)
 }

@@ -50,7 +50,8 @@ test_that("eps and approx are finite nonnegative scalars", {
   expect_s3_class(kNN(x, k = 1, approx = 0), "kNN")
   expect_error(dbscan(x, eps = Inf, minPts = 2), "eps must be")
   expect_s3_class(optics(x, eps = Inf, minPts = 2), "optics")
-  expect_true(is.finite(optics(x, minPts = 2)$eps))
+  expect_identical(optics(x, minPts = 2)$eps, Inf)
+  expect_identical(optics(x, eps = NULL, minPts = 2)$eps, Inf)
 
   for (value in list(numeric(), c(0, 1), NA_real_, NaN, -Inf, -1, "0", FALSE)) {
     expect_error(optics(x, eps = value, minPts = 2), "eps must be")

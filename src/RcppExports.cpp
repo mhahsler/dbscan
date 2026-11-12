@@ -479,6 +479,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// optics_prim
+List optics_prim(const NumericMatrix x, const NumericVector coredist);
+RcppExport SEXP _dbscan_optics_prim(SEXP xSEXP, SEXP coredistSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type coredist(coredistSEXP);
+    rcpp_result_gen = Rcpp::wrap(optics_prim(x, coredist));
+    return rcpp_result_gen;
+END_RCPP
+}
+// optics_prim_dist
+List optics_prim_dist(const NumericVector x_dist, const R_xlen_t n, const NumericVector coredist);
+RcppExport SEXP _dbscan_optics_prim_dist(SEXP x_distSEXP, SEXP nSEXP, SEXP coredistSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericVector >::type x_dist(x_distSEXP);
+    Rcpp::traits::input_parameter< const R_xlen_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type coredist(coredistSEXP);
+    rcpp_result_gen = Rcpp::wrap(optics_prim_dist(x_dist, n, coredist));
+    return rcpp_result_gen;
+END_RCPP
+}
 // lowerTri
 IntegerVector lowerTri(IntegerMatrix m);
 RcppExport SEXP _dbscan_lowerTri(SEXP mSEXP) {
@@ -527,6 +552,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_mst_mrd", (DL_FUNC) &_dbscan_mst_mrd, 2},
     {"_dbscan_hclustMergeOrder", (DL_FUNC) &_dbscan_hclustMergeOrder, 2},
     {"_dbscan_optics_int", (DL_FUNC) &_dbscan_optics_int, 8},
+    {"_dbscan_optics_prim", (DL_FUNC) &_dbscan_optics_prim, 2},
+    {"_dbscan_optics_prim_dist", (DL_FUNC) &_dbscan_optics_prim_dist, 3},
     {"_dbscan_lowerTri", (DL_FUNC) &_dbscan_lowerTri, 1},
     {NULL, NULL, 0}
 };

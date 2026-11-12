@@ -41,9 +41,9 @@ done later using \code{sort()}.}
 \item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"} or
 \code{"dist"}).}
 
-\item{bucketSize}{max size of the kd-tree leafs.}
+\item{bucketSize}{max size of the k-d tree leafs.}
 
-\item{splitRule}{rule to split the kd-tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
+\item{splitRule}{rule to split the k-d tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
 \code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
 ANNs best guess.}
 
@@ -71,12 +71,12 @@ neighbors. }
 contains the id of the nearest neighbors.
 }
 \description{
-This function uses a kd-tree to find the fixed radius nearest neighbors
+This function uses a k-d tree to find the fixed radius nearest neighbors
 (including distances) fast.
 }
 \details{
 If \code{x} is specified as a data matrix, then Euclidean distances and fast
-nearest neighbor lookup using a kd-tree are used.
+nearest neighbor lookup using a k-d tree are used.
 
 To create a frNN object from scratch, you need to supply at least the
 elements \code{id} with a list of integer vectors with the nearest neighbor

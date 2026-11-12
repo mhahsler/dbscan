@@ -36,10 +36,10 @@ List lof_kNN(NumericMatrix data, int minPts,
   }
   //Rprintf("Points copied.\n");
 
-  // create kd-tree (1) or linear search structure (2)
+  // create k-d tree (1) or linear search structure (2)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
     bucketSize, splitRule);
-  //Rprintf("kd-tree ready. starting DBSCAN.\n");
+  //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   // Note: the search also returns the point itself (as the first hit)!
   // So we have to look for k+1 points.

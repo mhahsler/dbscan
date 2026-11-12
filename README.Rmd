@@ -40,13 +40,13 @@ __Cluster Evaluation__
 
 - __DBCV:__ Density-based clustering validation [@moulavi2014].
 
-__Fast Nearest-Neighbor Search (using kd-trees)__
+__Fast Nearest-Neighbor Search (using k-d trees)__
 
 - __kNN search__
 - __Fixed-radius NN search__
 
 
-The implementations use the kd-tree data structure (from library ANN) for faster k-nearest neighbor search, and are
+The implementations use the k-d tree data structure (from library ANN) for faster k-nearest neighbor search, and are
 for Euclidean distance typically faster than the native R implementations (e.g., dbscan in package `fpc`), or the 
 implementations in [WEKA](https://ml.cms.waikato.ac.nz/weka/), [ELKI](https://elki-project.github.io/) and [Python's scikit-learn](https://scikit-learn.org/).
 

@@ -20,11 +20,11 @@
 
 #' Find the Fixed Radius Nearest Neighbors
 #'
-#' This function uses a kd-tree to find the fixed radius nearest neighbors
+#' This function uses a k-d tree to find the fixed radius nearest neighbors
 #' (including distances) fast.
 #'
 #' If `x` is specified as a data matrix, then Euclidean distances and fast
-#' nearest neighbor lookup using a kd-tree are used.
+#' nearest neighbor lookup using a k-d tree are used.
 #'
 #' To create a frNN object from scratch, you need to supply at least the
 #' elements `id` with a list of integer vectors with the nearest neighbor
@@ -44,8 +44,8 @@
 #' done later using `sort()`.
 #' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
 #' `"dist"`).
-#' @param bucketSize max size of the kd-tree leafs.
-#' @param splitRule rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+#' @param bucketSize max size of the k-d tree leafs.
+#' @param splitRule rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
 #' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
 #' ANNs best guess.
 #' @param approx a positive number useed for approximate nearest neighbors. All NN up to a distance of
@@ -153,7 +153,7 @@ frNN <-
         stop("query can only be used if x contains the data.")
 
       if (anyNA(x))
-        stop("data/distances cannot contain NAs for frNN (with kd-tree)!")
+        stop("data/distances cannot contain NAs for frNN (with k-d tree)!")
 
       return(dist_to_frNN(x, eps = eps, sort = sort))
     }

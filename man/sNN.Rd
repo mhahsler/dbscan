@@ -45,9 +45,9 @@ sorted using \code{sort()}.}
 \item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"} or
 \code{"dist"}).}
 
-\item{bucketSize}{max size of the kd-tree leafs.}
+\item{bucketSize}{max size of the k-d tree leafs.}
 
-\item{splitRule}{rule to split the kd-tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
+\item{splitRule}{rule to split the k-d tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
 \code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
 ANNs best guess.}
 

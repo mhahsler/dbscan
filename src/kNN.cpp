@@ -28,10 +28,10 @@ List kNN_int(NumericMatrix data, int k,
   }
   //Rprintf("Points copied.\n");
 
-  // create kd-tree (1) or linear search structure (2)
+  // create k-d tree (1) or linear search structure (2)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
     bucketSize, splitRule);
-  //Rprintf("kd-tree ready. starting DBSCAN.\n");
+  //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   NumericMatrix d(nrow, k);
   IntegerMatrix id(nrow, k);
@@ -97,10 +97,10 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   }
   //Rprintf("Points copied.\n");
 
-  // create kd-tree (1) or linear search structure (2)
+  // create k-d tree (1) or linear search structure (2)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
     bucketSize, splitRule);
-  //Rprintf("kd-tree ready. starting DBSCAN.\n");
+  //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   NumericMatrix d(nrow_q, k);
   IntegerMatrix id(nrow_q, k);

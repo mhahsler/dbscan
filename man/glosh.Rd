@@ -20,7 +20,7 @@ set containing GLOSH values for all data points.
 }
 \description{
 Calculate the Global-Local Outlier Score from Hierarchies (GLOSH) score for
-each data point using a kd-tree to speed up kNN search.
+each data point using a k-d tree to speed up kNN search.
 }
 \details{
 GLOSH compares the density of a point to densities of any points associated

@@ -20,7 +20,7 @@
 #' Ordering Points to Identify the Clustering Structure (OPTICS)
 #'
 #' Implementation of the OPTICS (Ordering points to identify the clustering
-#' structure) point ordering algorithm using a kd-tree.
+#' structure) point ordering algorithm using a k-d tree.
 #'
 #' ## The Algorithm
 #'
@@ -50,8 +50,8 @@
 #' ## Specifying the Data
 #'
 #' If `x` is specified as a data matrix, then Euclidean distances and fast
-#' nearest neighbor lookup using a kd-tree are used. See [kNN()] for
-#' details on the parameters for the kd-tree.
+#' nearest neighbor lookup using a k-d tree are used. See [kNN()] for
+#' details on the parameters for the k-d tree.
 #'
 #' ## The effect of eps
 #'
@@ -182,7 +182,7 @@
 #'   y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
 #'   )
 #'
-#' plot(x, col=rep(1:4, times = 100))
+#' plot(x, col=rep(1:4, times = 100), asp = 1)
 #'
 #' ### run OPTICS (Note: we use the default eps = Inf)
 #' res <- optics(x, minPts = 10)
@@ -195,7 +195,7 @@
 #' plot(res)
 #'
 #' ### plot the order of points in the reachability plot
-#' plot(x, col = "grey")
+#' plot(x, col = "grey", pch = 19, asp = 1)
 #' polygon(x[res$order, ])
 #'
 #' ### extract a DBSCAN clustering by cutting the reachability plot at eps_cl
@@ -203,20 +203,20 @@
 #' res
 #'
 #' plot(res)  ## black is noise
-#' hullplot(x, res)
+#' hullplot(x, res, asp = 1)
 #'
 #' ### re-cut at a higher eps threshold
 #' res <- extractDBSCAN(res, eps_cl = .07)
 #' res
 #' plot(res)
-#' hullplot(x, res)
+#' hullplot(x, res, asp = 1)
 #'
 #' ### extract hierarchical clustering of varying density using the Xi method
 #' res <- extractXi(res, xi = 0.01)
 #' res
 #'
 #' plot(res)
-#' hullplot(x, res)
+#' hullplot(x, res, asp = 1)
 #'
 #' # Xi cluster structure
 #' res$clusters_xi

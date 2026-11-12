@@ -21,7 +21,7 @@
 #' Local Outlier Factor Score
 #'
 #' Calculate the Local Outlier Factor (LOF) score for each data point using a
-#' kd-tree to speed up kNN search.
+#' k-d tree to speed up kNN search.
 #'
 #' LOF compares the local reachability density (lrd) of a point to the lrd of
 #' its neighbors. A LOF score of approximately 1 indicates that the lrd around
@@ -31,7 +31,7 @@
 #' than 1.
 #'
 #' If a data matrix is specified, then Euclidean distances and fast nearest
-#' neighbor search using a kd-tree is used.
+#' neighbor search using a k-d tree is used.
 #'
 #' **Note on duplicate points:** If there are more than `minPts`
 #' duplicates of a point in the data, then LOF the local readability distance
@@ -159,7 +159,7 @@ lof <- function(x, minPts = 5, ...) {
       dist = dist)
 
   } else{
-    ### Use kd-tree
+    ### Use k-d tree
     x <- .as_finite_numeric_matrix(x)
 
     ret <- lof_kNN(

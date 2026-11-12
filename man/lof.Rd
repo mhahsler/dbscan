@@ -23,7 +23,7 @@ all data points.
 }
 \description{
 Calculate the Local Outlier Factor (LOF) score for each data point using a
-kd-tree to speed up kNN search.
+k-d tree to speed up kNN search.
 }
 \details{
 LOF compares the local reachability density (lrd) of a point to the lrd of
@@ -34,7 +34,7 @@ neighbors are considered outliers and produce scores significantly larger
 than 1.
 
 If a data matrix is specified, then Euclidean distances and fast nearest
-neighbor search using a kd-tree is used.
+neighbor search using a k-d tree is used.
 
 \strong{Note on duplicate points:} If there are more than \code{minPts}
 duplicates of a point in the data, then LOF the local readability distance

@@ -133,7 +133,7 @@ ANNdist inv_density(ANNdist cdist){
 //     }
 //   }
 //
-//   // create kd-tree (1) or linear search structure (2)
+//   // create k-d tree (1) or linear search structure (2)
 //   ANNpointSet* kdTree = new ANNkd_tree(dataPts, nrow, ncol, 30, (ANNsplitRule)  5);
 //
 //   // The all core dists to

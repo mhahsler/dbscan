@@ -20,7 +20,7 @@
 #' Global-Local Outlier Score from Hierarchies
 #'
 #' Calculate the Global-Local Outlier Score from Hierarchies (GLOSH) score for
-#' each data point using a kd-tree to speed up kNN search.
+#' each data point using a k-d tree to speed up kNN search.
 #'
 #' GLOSH compares the density of a point to densities of any points associated
 #' within current and child clusters (if any). Points that have a substantially

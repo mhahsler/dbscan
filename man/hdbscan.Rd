@@ -149,7 +149,7 @@ These can be calculated using the following two exposed functions:
 the distance to the (\code{minPts - 1})-th nearest neighbor.
 It produces a density estimate where larger values for \code{minPts} lead to
 larger and smoother estimates. The core distance is
-For matrix data, a fast kd tree based on Euclidean distance is used.
+For matrix data, a fast k-d tree based on Euclidean distance is used.
 Additional parameters to \code{coredist()} are passed on to \code{kNNdist()}. A
 core distance vector is returned.
 \item \code{mrdist()}: The mutual reachability distance is defined between two points as

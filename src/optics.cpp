@@ -63,7 +63,7 @@ void update(
 List optics_int(NumericMatrix data, double eps, int minPts,
   int type, int bucketSize, int splitRule, double approx, List frNN) {
 
-  // kd-tree uses squared distances
+  // k-d tree uses squared distances
   double eps2 = eps*eps;
 
   ANNPoints dataPts;
@@ -72,11 +72,11 @@ List optics_int(NumericMatrix data, double eps, int minPts,
   int ncol= NA_INTEGER;
 
   if(frNN.size()) {
-    // no kd-tree
+    // no k-d tree
     nrow = (as<List>(frNN["id"])).size();
   }else{
 
-    // copy data for kd-tree
+    // copy data for k-d tree
     nrow = data.nrow();
     ncol = data.ncol();
     dataPts = ANNPoints(nrow, ncol);
@@ -87,10 +87,10 @@ List optics_int(NumericMatrix data, double eps, int minPts,
     }
     //Rprintf("Points copied.\n");
 
-    // create kd-tree (1) or linear search structure (2)
+    // create k-d tree (1) or linear search structure (2)
     kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
       bucketSize, splitRule);
-    //Rprintf("kd-tree ready. starting OPTICS.\n");
+    //Rprintf("k-d tree ready. starting OPTICS.\n");
 
   }
 

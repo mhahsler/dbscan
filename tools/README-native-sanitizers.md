@@ -14,7 +14,7 @@ It unloads dbscan before exit to release ANN's package-global KD_TRIVIAL.
 Build logs and the installed package stay in the printed temporary directory
 for inspection. The working tree's compiled objects are not changed.
 
-The randomized backend tests compare exact kd-tree, linear, and distance-matrix
+The randomized backend tests compare exact k-d tree, linear, and distance-matrix
 searches for kNN, fixed-radius neighborhoods, DBSCAN/DBSCAN*, weighted DBSCAN,
 LOF, OPTICS, and point density. Explicit query searches are checked against
 independent cross-distances. Additional cases cover tied distances, duplicate

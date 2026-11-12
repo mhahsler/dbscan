@@ -27,7 +27,7 @@ IntegerVector dbscan_int(
     int borderPoints, int type, int bucketSize, int splitRule, double approx,
     List frNN) {
 
-  // kd-tree uses squared distances
+  // k-d tree uses squared distances
   double eps2 = eps*eps;
 
   bool weighted = FALSE;
@@ -38,11 +38,11 @@ IntegerVector dbscan_int(
   int ncol= NA_INTEGER;
 
   if(frNN.size()) {
-    // no kd-tree but use frNN list from distances
+    // no k-d tree but use frNN list from distances
     nrow = frNN.size();
   }else{
 
-    // copy data for kd-tree
+    // copy data for k-d tree
     nrow = data.nrow();
     ncol = data.ncol();
     dataPts = ANNPoints(nrow, ncol);
@@ -53,10 +53,10 @@ IntegerVector dbscan_int(
     }
     //Rprintf("Points copied.\n");
 
-    // create kd-tree (1) or linear search structure (2)
+    // create k-d tree (1) or linear search structure (2)
     kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
       bucketSize, splitRule);
-    //Rprintf("kd-tree ready. starting DBSCAN.\n");
+    //Rprintf("k-d tree ready. starting DBSCAN.\n");
   }
 
   if (weights.size() != 0) {

@@ -56,7 +56,7 @@ core point.
 }
 \description{
 Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-applications with noise) clustering algorithm using a kd-tree.
+applications with noise) clustering algorithm using a k-d tree.
 }
 \details{
 The
@@ -95,7 +95,7 @@ noise points. This is implemented with \code{borderPoints = FALSE}.
 \subsection{Specifying the Data}{
 
 If \code{x} is a matrix or a data.frame, then fast fixed-radius nearest
-neighbor computation using a kd-tree is performed using Euclidean distance.
+neighbor computation using a k-d tree is performed using Euclidean distance.
 See \code{\link[=frNN]{frNN()}} for more information on the parameters related to
 nearest neighbor search. \strong{Note} that only numerical values are allowed in \code{x}.
 
@@ -228,7 +228,7 @@ if (requireNamespace("fpc", quietly = TRUE) &&
     names = c('fpc', 'dbscan (dist)', 'dbscan (linear)', 'dbscan (kdtree)'),
     main = "Runtime comparison in ms")
 
-  ## speedup of the kd-tree-based version compared to the fpc implementation
+  ## speedup of the k-d tree-based version compared to the fpc implementation
   median(t_fpc$time) / median(t_dbscan$time)
 }}
 

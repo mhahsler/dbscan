@@ -19,7 +19,7 @@ a precalculated \link{dist} object.}
 \item{all}{should a matrix with the distances to all k nearest neighbors be
 returned?}
 
-\item{...}{further arguments (e.g., kd-tree related parameters) are passed
+\item{...}{further arguments (e.g., k-d tree related parameters) are passed
 on to \code{\link[=kNN]{kNN()}}.}
 
 \item{minPts}{to use a k-NN plot to determine a suitable \code{eps} value for \code{\link[=dbscan]{dbscan()}},

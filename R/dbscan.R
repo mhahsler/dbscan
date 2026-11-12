@@ -21,7 +21,7 @@
 #' Density-based Spatial Clustering of Applications with Noise (DBSCAN)
 #'
 #' Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-#' applications with noise) clustering algorithm using a kd-tree.
+#' applications with noise) clustering algorithm using a k-d tree.
 #'
 #' The
 #' implementation is significantly faster and can work with larger data sets
@@ -56,7 +56,7 @@
 #' ## Specifying the Data
 #'
 #' If `x` is a matrix or a data.frame, then fast fixed-radius nearest
-#' neighbor computation using a kd-tree is performed using Euclidean distance.
+#' neighbor computation using a k-d tree is performed using Euclidean distance.
 #' See [frNN()] for more information on the parameters related to
 #' nearest neighbor search. **Note** that only numerical values are allowed in `x`.
 #'
@@ -241,7 +241,7 @@
 #'     names = c('fpc', 'dbscan (dist)', 'dbscan (linear)', 'dbscan (kdtree)'),
 #'     main = "Runtime comparison in ms")
 #'
-#'   ## speedup of the kd-tree-based version compared to the fpc implementation
+#'   ## speedup of the k-d tree-based version compared to the fpc implementation
 #'   median(t_fpc$time) / median(t_dbscan$time)
 #' }}
 #'

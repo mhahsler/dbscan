@@ -59,8 +59,8 @@
 #' @param sort sort by the number of shared nearest neighbors? Note that this
 #' is expensive and `sort = FALSE` is much faster. sNN objects can be
 #' sorted using `sort()`.
-#' @param bucketSize max size of the kd-tree leafs.
-#' @param splitRule rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+#' @param bucketSize max size of the k-d tree leafs.
+#' @param splitRule rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
 #' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
 #' ANNs best guess.
 #' @param approx use approximate nearest neighbors. All NN up to a distance of

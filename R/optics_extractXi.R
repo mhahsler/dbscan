@@ -10,9 +10,9 @@
 # The package can be redistributed and modified under GNU AGPL v3.
 # To modify and redistribute the package under the GNU GPL v3 license,
 # uncomment the following and remove the rest of the file:
-##' @include optics.R
-##' @rdname optics
-##' @export
+# #' @include optics.R
+# #' @rdname optics
+# #' @export
 #extractXi <-
 #  function(object,
 #           xi,

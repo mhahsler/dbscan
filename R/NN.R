@@ -45,7 +45,7 @@
 #' data(iris)
 #' x <- iris[, -5]
 #'
-#' # finding kNN directly in data (using a kd-tree)
+#' # finding kNN directly in data (using a k-d tree)
 #' nn <- kNN(x, k=5)
 #' nn
 #'

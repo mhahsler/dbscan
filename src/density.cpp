@@ -16,20 +16,20 @@
 using namespace Rcpp;
 
 // faster implementation of counting point densities from a matrix
-// using a kd-tree
+// using a k-d tree
 // [[Rcpp::export]]
 IntegerVector dbscan_density_int(
     NumericMatrix data, double eps,
     int type, int bucketSize, int splitRule, double approx) {
 
-  // kd-tree uses squared distances
+  // k-d tree uses squared distances
   double eps2 = eps*eps;
 
   ANNPoints dataPts;
   int nrow = NA_INTEGER;
   int ncol= NA_INTEGER;
 
-  // copy data for kd-tree
+  // copy data for k-d tree
   nrow = data.nrow();
   ncol = data.ncol();
   dataPts = ANNPoints(nrow, ncol);
@@ -40,10 +40,10 @@ IntegerVector dbscan_density_int(
   }
   //Rprintf("Points copied.\n");
 
-  // create kd-tree (1) or linear search structure (2)
+  // create k-d tree (1) or linear search structure (2)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
     bucketSize, splitRule);
-  //Rprintf("kd-tree ready. starting DBSCAN.\n");
+  //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   std::vector<int> N;
   IntegerVector count(nrow);

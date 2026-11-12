@@ -55,7 +55,7 @@
 #' It produces a density estimate where larger values for `minPts` lead to
 #' larger and smoother estimates. The core distance is
 #  calculated using [`kNNdist()`] with `k = minPts -1`.
-#' For matrix data, a fast kd tree based on Euclidean distance is used.
+#' For matrix data, a fast k-d tree based on Euclidean distance is used.
 #' Additional parameters to `coredist()` are passed on to `kNNdist()`. A
 #' core distance vector is returned.
 #'

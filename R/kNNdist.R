@@ -36,7 +36,7 @@
 #'    `minPts` used in dbscan can be specified and will set `k = minPts - 1`.
 #' @param all should a matrix with the distances to all k nearest neighbors be
 #' returned?
-#' @param ... further arguments (e.g., kd-tree related parameters) are passed
+#' @param ... further arguments (e.g., k-d tree related parameters) are passed
 #' on to [kNN()].
 #'
 #' @return `kNNdist()` returns a numeric vector with the distance to its k

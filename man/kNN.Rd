@@ -42,9 +42,9 @@ be much faster for some search methods. kNN objects can be sorted using
 \item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"} or
 \code{"dist"}).}
 
-\item{bucketSize}{max size of the kd-tree leafs.}
+\item{bucketSize}{max size of the k-d tree leafs.}
 
-\item{splitRule}{rule to split the kd-tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
+\item{splitRule}{rule to split the k-d tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
 \code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
 ANNs best guess.}
 
@@ -66,7 +66,7 @@ list with the following components:
 \item{metric }{ used distance metric. }
 }
 \description{
-This function uses a kd-tree to find all k nearest neighbors in a data
+This function uses a k-d tree to find all k nearest neighbors in a data
 matrix (including distances) fast.
 }
 \details{
@@ -81,13 +81,13 @@ removed.
 Details on the search parameters:
 \itemize{
 \item \code{search} controls if
-a kd-tree or linear search (both implemented in the ANN library; see Mount
+a k-d tree or linear search (both implemented in the ANN library; see Mount
 and Arya, 2010). Note, that these implementations cannot handle NAs.
 \code{search = "dist"} precomputes Euclidean distances first using R. NAs are
 handled, but the resulting distance matrix cannot contain NAs. To use other
 distance measures, a precomputed distance matrix can be provided as \code{x}
 (\code{search} is ignored).
-\item \code{bucketSize} and \code{splitRule} influence how the kd-tree is
+\item \code{bucketSize} and \code{splitRule} influence how the k-d tree is
 built. \code{approx} uses the approximate nearest neighbor search
 implemented in ANN. All nearest neighbors up to a distance of
 \code{eps / (1 + approx)} will be considered and all with a distance
@@ -102,7 +102,7 @@ Arya (2010).
 data(iris)
 x <- iris[, -5]
 
-# Example 1: finding kNN for all points in a data matrix (using a kd-tree)
+# Example 1: finding kNN for all points in a data matrix (using a k-d tree)
 nn <- kNN(x, k = 5)
 nn
 

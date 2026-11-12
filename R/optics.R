@@ -72,6 +72,17 @@
 #' reachability plot). If the plot shows too many dashed lines then
 #' `eps` should be increased.
 #'
+#' ## Ties
+#'
+#' OPTICS repeatedly processes the unprocessed point with the smallest
+#' reachability distance. If several points have the same reachability distance,
+#' ties are broken by the position of the point in the data: the point with the
+#' lower id (row number) is processed first. This follows the ELKI
+#' implementation. With ties, the returned order (and therefore the
+#' reachability plot and extracted clusters) can depend on the row order of
+#' the data. Ties are common for data with repeated values or for
+#' data on a regular grid.
+#'
 #' ## Extracting a Clustering
 #'
 #' Several methods to extract a clustering from the order returned by OPTICS are
@@ -86,13 +97,14 @@
 #' * `extractXi()` extract clusters hierarchically specified in Ankerst et al
 #'   (1999) based on the steepness of the reachability plot. One interpretation
 #'   of the `xi` parameter is that it classifies clusters by change in
-#'   relative cluster density. The used algorithm was originally contributed by
-#'   the ELKI framework and is explained in Schubert et al (2018), but contains a
-#'   set of fixes. With `correctPredecessors = TRUE` (the default), the end of
-#'   each cluster is additionally shortened so that the predecessor of its last
-#'   point is inside the cluster and the cluster does not end in points with
-#'   infinite reachability distance. This step is not part of the original
+#'   relative cluster density. The algorithm is a port of the implementation in
+#'   the ELKI framework (version 0.8.0). It follows Ankerst et al (1999) with the
+#'   improvements described in Schubert and Gertz (2018).
+#'   With `correctPredecessors = TRUE` (the default), the end of
+#'   each cluster is shortened so that the predecessor of its last
+#'   point is inside the cluster. This step is not part of the original
 #'   algorithm and removes a common artifact (found by the ELKI framework).
+#'   Clusters with fewer than `minPts` points are not reported.
 #'
 #' ## Predict Cluster Memberships
 #'

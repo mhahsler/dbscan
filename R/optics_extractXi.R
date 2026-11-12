@@ -3,8 +3,8 @@
 #          and Related Algorithms
 #
 # The __OPTICSXi__ R implementation was directly ported
-# from the ELKI framework's Java implementation with permission by the original
-# author, Erich Schubert. This function is redistributed under
+# from the ELKI framework's (version 0.8.0) Java implementation with permission
+# by the original author, Erich Schubert. This function is redistributed under
 # the stricter [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 #
 # The package can be redistributed and modified under GNU AGPL v3.
@@ -26,177 +26,32 @@ extractXi <-
         xi <= 0.0)
       stop("The Xi parameter must be (0, 1)")
 
-    # Initial variables
-    object$ord_rd <- object$reachdist[object$order]
-    object$ixi <- (1 - xi)
-    SetOfSteepDownAreas <- list()
-    SetOfClusters <- list()
-    index <- 1
-    mib <- 0
-    sdaset <- list()
-    while (index <= length(object$order))
-    {
-      mib <- max(mib, object$ord_rd[index])
-      if (!valid(index + 1, object))
-        break
-
-      # Test if this is a steep down area
-      if (steepDown(index, object))
-      {
-        # Update mib values with current mib and filter
-        sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
-        startval <- object$ord_rd[index]
-        mib <- 0
-        startsteep <- index
-        endsteep <- index + 1
-        while (!is.na(object$order[index + 1])) {
-          index <- index + 1
-          if (steepDown(index, object)) {
-            endsteep <- index + 1
-            next
-          }
-          if (!steepDown(index, object, ixi = 1.0) ||
-              index - endsteep > object$minPts)
-            break
-        }
-        sda <- list(
-          s = startsteep,
-          e = endsteep,
-          maximum = startval,
-          mib = 0
-        )
-        # print(paste("New steep down area:", toString(sda)))
-        sdaset <- append(sdaset, list(sda))
-        next
-      }
-      if (steepUp(index, object))
-      {
-        sdaset <- updateFilterSDASet(mib, sdaset, object$ixi)
-        {
-          startsteep <- index
-          endsteep <- index + 1
-          mib <- object$ord_rd[index]
-          esuccr <-
-            if (!valid(index + 1, object))
-              Inf
-          else
-            object$ord_rd[index + 1]
-          if (!is.infinite(esuccr)) {
-            while (!is.na(object$order[index + 1])) {
-              index <- index + 1
-              if (steepUp(index, object)) {
-                endsteep <- index + 1
-                mib <- object$ord_rd[index]
-                esuccr <-
-                  if (!valid(index + 1, object))
-                    Inf
-                else
-                  object$ord_rd[index + 1]
-                if (is.infinite(esuccr)) {
-                  endsteep <- endsteep - 1
-                  break
-                }
-                next
-              }
-              if (!steepUp(index, object, ixi = 1.0) ||
-                  index - endsteep > object$minPts)
-                break
-            }
-          } else {
-            endsteep <- endsteep - 1
-            index <- index + 1
-          }
-          sua <- list(s = startsteep,
-                      e = endsteep,
-                      maximum = esuccr)
-          # print(paste("New steep up area:", toString(sua)))
-        }
-        for (sda in rev(sdaset))
-        {
-          # Condition 3B
-          if (mib * object$ixi < sda$mib)
-            next
-
-          # Default values
-          cstart <- sda$s
-          cend <- sua$e
-
-          # Credit to ELKI
-          if (correctPredecessors) {
-            while (cend > cstart && is.infinite(object$ord_rd[cend])) {
-              cend <- cend - 1
-            }
-          }
-
-          # Condition 4
-          {
-            # Case b
-            if (sda$maximum * object$ixi >= sua$maximum) {
-              while (cstart < cend &&
-                     object$ord_rd[cstart + 1] > sua$maximum)
-                cstart <- cstart + 1
-            }
-            # Case c
-            else if (sua$maximum * object$ixi >= sda$maximum) {
-              while (cend > cstart &&
-                     object$ord_rd[cend - 1] > sda$maximum)
-                cend <- cend - 1
-            }
-          }
-
-          # This NOT in the original article - credit to ELKI for finding this.
-          # Ensure that the predecessor is in the current cluster. This filter
-          # removes common artifacts from the Xi method
-          if (correctPredecessors) {
-            while (cend > cstart) {
-              tmp2 <- object$predecessor[object$order[cend]]
-              if (!is.na(tmp2) &&
-                  any(object$order[cstart:(cend - 1)] == tmp2, na.rm = TRUE))
-                break
-              # Not found.
-              cend <- cend - 1
-            }
-          }
-
-          # Ensure the last steep up point is not included if it's xi significant
-          if (steepUp(index - 1, object)) {
-            cend <- cend - 1
-          }
-
-          # obey minpts
-          if (cend - cstart + 1 < object$minPts)
-            next
-          SetOfClusters <-
-            append(SetOfClusters, list(list(
-              start = cstart, end = cend
-            )))
-          next
-        }
-      } else {
-        index <- index + 1
-      }
-    }
-    # Remove aliases
-    object$ord_rd <- NULL
-    object$ixi <- NULL
+    SetOfClusters <-
+      .xi_clusters(
+        reach = object$reachdist[object$order],
+        order = object$order,
+        predecessor = object$predecessor,
+        xi = xi,
+        minPts = object$minPts,
+        correctPredecessors = correctPredecessors
+      )
 
     # Keep xi parameter, disable any previous flat clustering parameter
     object$xi <- xi
     object$eps_cl <- NA_real_
 
     # Zero-out clusters (only noise) if none found
-    if (length(SetOfClusters) == 0) {
+    if (nrow(SetOfClusters) == 0) {
       warning(paste("No clusters were found with threshold:", xi))
       object$clusters_xi <- NULL
       object$cluster <- integer(length(object$order))
       return(invisible(object))
     }
     # Cluster data exists; organize it by starting and ending index, give arbitrary id
-    object$clusters_xi <- do.call(rbind, SetOfClusters)
     object$clusters_xi <-
       data.frame(
-        start = unlist(object$clusters_xi[, 1], use.names = FALSE),
-        end = unlist(object$clusters_xi[, 2], use.names = FALSE),
+        start = SetOfClusters[, 1L],
+        end = SetOfClusters[, 2L],
         check.names = FALSE
       )
     object$clusters_xi <-
@@ -224,38 +79,162 @@ extractXi <-
     object
   }
 
-# Removes obsolete steep areas
-updateFilterSDASet <- function(mib, sdaset, ixi) {
-  sdaset <- Filter(function(sda)
-    sda$maximum * ixi > mib, sdaset)
-  lapply(sdaset, function(sda) {
-    if (mib > sda$mib)
-      sda$mib <- mib
-    sda
-  })
-}
+# Xi cluster extraction (Ankerst et al, 1999) with the filtering technique of
+# Schubert and Gertz (2018).
+#
+# This is a port of OPTICSXi.extractClusters() in ELKI 0.8.0 (Java; 0-based
+# indices there, 1-based here).
+#
+# reach: reachability distances in the cluster order
+# order: the cluster order (point ids)
+# predecessor: the predecessor of each point (indexed by point id)
+#
+# Returns a matrix with the columns start and end (positions in the order).
+.xi_clusters <- function(reach, order, predecessor, xi, minPts, correctPredecessors = TRUE) {
+  n <- length(order)
+  ixi <- 1 - xi
 
-# Determines if the reachability distance at the current index 'i' is
-# (xi) significantly lower than the next index
-steepUp <- function(i, object, ixi = object$ixi) {
-  if (is.infinite(object$ord_rd[i]))
-    return(FALSE)
-  if (!valid(i + 1, object))
-    return(TRUE)
-  return(object$ord_rd[i] <= object$ord_rd[i + 1] * ixi)
-}
+  # steep up/down tests at position i for a steepness factor of ixi
+  next_reach <- function(i) if (i < n) reach[i + 1L] else Inf
+  steepUp <- function(i, ixi) {
+    r <- reach[i]
+    is.finite(r) && (i >= n || r <= reach[i + 1L] * ixi)
+  }
+  steepDown <- function(i, ixi) {
+    nr <- next_reach(i)
+    is.finite(nr) && nr <= reach[i] * ixi
+  }
 
-# Determines if the reachability distance at the current index 'i' is
-# (xi) significantly higher than the next index
-steepDown <- function(i, object, ixi = object$ixi) {
-  if (!valid(i + 1, object))
-    return(FALSE)
-  if (is.infinite(object$ord_rd[i + 1]))
-    return(FALSE)
-  return(object$ord_rd[i] * ixi >= object$ord_rd[i + 1])
-}
+  # Remove obsolete steep down areas and update their maximum-in-between values
+  update_sdaset <- function(mib, sdaset) {
+    sdaset <- Filter(function(sda) sda$maximum * ixi > mib, sdaset)
+    lapply(sdaset, function(sda) {
+      if (mib > sda$mib)
+        sda$mib <- mib
+      sda
+    })
+  }
 
-# Determines if the reachability distance at the current index 'i' is a valid distance
-valid <- function(index, object) {
-  return(!is.na(object$ord_rd[index]))
+  # Remove trailing points from a cluster if their predecessor is not in the
+  # cluster (Schubert and Gertz, 2018).
+  predecessor_filter <- function(cstart, cend) {
+    startval <- reach[cstart]
+    while (cend > cstart) {
+      # If the reachability is less than the one of the first point, then there
+      # must be a point in between that "reached" the current point.
+      if (reach[cend] < startval)
+        break
+      p <- predecessor[order[cend]]
+      if (!is.na(p) && any(order[cstart:(cend - 1L)] == p))
+        break
+      cend <- cend - 1L
+    }
+    cend
+  }
+
+  mib <- 0
+  sdaset <- list()
+  clusters <- list()
+  index <- 1L
+
+  while (index <= n) {
+    # Update the maximum-in-between
+    mib <- max(mib, reach[index])
+
+    # Steep down area
+    if (steepDown(index, ixi)) {
+      sdaset <- update_sdaset(mib, sdaset)
+      startval <- reach[index]
+      mib <- 0
+      startsteep <- index
+      endsteep <- index
+      index <- index + 1L
+      while (index <= n) {
+        if (steepDown(index, ixi)) {
+          endsteep <- index
+        } else if (!steepDown(index, 1.0) || index - endsteep > minPts) {
+          # not going downward at all or more than minPts flat steps
+          break
+        }
+        index <- index + 1L
+      }
+      sdaset <- append(sdaset,
+                       list(list(s = startsteep, e = endsteep,
+                                 maximum = startval, mib = 0)))
+      next
+    }
+
+    # Steep up area
+    if (steepUp(index, ixi)) {
+      sdaset <- update_sdaset(mib, sdaset)
+      endsteep <- index
+      mib <- reach[index]
+      esuccr <- next_reach(index)
+      # find the end of the steep up area, update mib again
+      while (!is.infinite(esuccr) && index <= n) {
+        index <- index + 1L
+        if (index > n)
+          break
+        if (steepUp(index, ixi)) {
+          endsteep <- index
+          mib <- reach[index]
+          esuccr <- next_reach(index)
+        } else if (!steepUp(index, 1.0) || index - endsteep > minPts) {
+          # not going upward at all or more than minPts flat steps
+          break
+        }
+      }
+      if (is.infinite(esuccr))
+        index <- index + 1L
+
+      # validate and compute clusters. Iterate backwards for the correct
+      # hierarchy.
+      for (sda in rev(sdaset)) {
+        cstart <- sda$s
+        cend <- endsteep
+        if (correctPredecessors)
+          cend <- predecessor_filter(cstart, cend)
+
+        # end of the steep up area (use the next value)
+        eU <- if (cend < n) reach[cend + 1L] else Inf
+
+        # Condition 3b: maximum-in-between < end-of-steep-up * ixi
+        if (sda$mib > min(sda$maximum, eU) * ixi)
+          next
+
+        # Condition 4 (case a is the default)
+        if (sda$maximum * ixi >= eU) {
+          # Case b
+          while (cstart < cend && reach[cstart + 1L] * ixi > eU)
+            cstart <- cstart + 1L
+        } else if (eU * ixi >= sda$maximum) {
+          # Case c
+          while (cend > cstart && reach[cend] * ixi > sda$maximum)
+            cend <- cend - 1L
+        }
+
+        # Filter again, mostly in case cstart was modified
+        if (correctPredecessors)
+          cend <- predecessor_filter(cstart, cend)
+
+        # Condition 3a: obey minPts
+        if (cend - cstart + 1L < minPts)
+          next
+
+        clusters <- append(clusters, list(c(as.numeric(cstart), as.numeric(cend))))
+      }
+      next
+    }
+
+    # flat: advance
+    index <- index + 1L
+  }
+
+  if (length(clusters) == 0L)
+    return(matrix(numeric(0), ncol = 2L, dimnames = list(NULL, c("start", "end"))))
+
+  # remove duplicates
+  res <- unique(do.call(rbind, clusters))
+  colnames(res) <- c("start", "end")
+  res
 }

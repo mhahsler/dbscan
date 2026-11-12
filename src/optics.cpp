@@ -44,6 +44,7 @@ void update(
 
     if(reachdist[o] == INFINITY) {
       reachdist[o] = newreachdist;
+      pre[o] = p;
       seeds.push_back(o);
     } else {
       // o was not visited and has a reachability distance must be
@@ -145,10 +146,10 @@ List optics_int(NumericMatrix data, double eps, int minPts,
       for (std::vector<int>::iterator it = seeds.begin();
         it!=seeds.end(); ++it) {
         // Note: The second part of the if statement ensures that ties are
-        // always broken consistently (higher ID wins to produce the same
-        // results as the elki implementation)!
+        // always broken consistently (lower ID wins to produce the same
+        // results as the current elki implementation)!
         if (reachdist[*it] < reachdist[*q_it] ||
-          (reachdist[*it] == reachdist[*q_it] && *q_it < *it)) q_it = it;
+          (reachdist[*it] == reachdist[*q_it] && *it < *q_it)) q_it = it;
       }
       q = *q_it;
       seeds.erase(q_it);

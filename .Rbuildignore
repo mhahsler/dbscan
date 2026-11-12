@@ -20,3 +20,4 @@ _config.yml
 ^\.jekyll-cache$
 ^python$
 ^tools$
+^tmp$

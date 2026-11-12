@@ -29,6 +29,7 @@ test_that("OPTICS", {
   ### compare with elki's result
   expect_equal(res$order, elki$ID)
   expect_equal(round(res$reachdist[res$order], 3), round(elki$reachability, 3))
+  expect_equal(res$predecessor[res$order], elki$predecessor)
 
   ### compare result with DBSCAN
   ### "clustering created from a cluster-ordered is nearly indistinguishable
@@ -146,4 +147,20 @@ test_that("optics with eps = Inf uses an unlimited neighborhood", {
 
   # the complete structure can be converted to a dendrogram
   expect_s3_class(as.dendrogram(res_inf), "dendrogram")
+})
+
+test_that("OPTICS breaks ties by lower id", {
+  # points 2 and 3 have the same reachability distance from point 1
+  x <- matrix(c(0, -1, 1), ncol = 1)
+  expect_equal(optics(x, eps = 2, minPts = 2)$order, 1:3)
+  expect_equal(optics(dist(x), eps = 2, minPts = 2)$order, 1:3)
+
+  # the point with the lower id is processed first (not the one that is
+  # first found): swapping the ids of the two tied points swaps their order
+  x2 <- matrix(c(0, 1, -1), ncol = 1)
+  expect_equal(optics(x2, eps = 2, minPts = 2)$order, 1:3)
+
+  # tied reachability distances are reported
+  res <- optics(x, eps = 2, minPts = 2)
+  expect_equal(res$reachdist[res$order], c(Inf, 1, 1))
 })

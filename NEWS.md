@@ -13,6 +13,12 @@
   size from `minPts` and the data improving speed but may lead to incomplete 
   results.  Specifying `eps = Inf` now uses an unlimited neighborhood instead of 
   the estimate and gives the complete reachability structure. 
+* optics(): Ties in the reachability distance are now broken in favor of the
+  point with the lower id (row number), following the current ELKI
+  implementation. The `predecessor` component also is now consistent 
+  with ELKI 0.8.0.
+* extractXi(): The implementation was updated to follow the OPTICS Xi cluster
+  extraction in ELKI 0.8.0 (Schubert and Gertz, 2018). 
 * `extractFOSC()` gained the argument `cluster_selection_epsilon` (as in
   `hdbscan()`) and now also accepts the result of `hdbscan()` as `x`.
 * `hdbscan()` now records `minPts` in its `hc` component. `extractFOSC()` uses it

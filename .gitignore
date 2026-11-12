@@ -42,3 +42,6 @@ python/site/
 python/.pytest_cache/
 python/**/__pycache__/
 python/**/*.egg-info/
+
+# local scratch files (e.g., ELKI jar and outputs)
+/tmp/

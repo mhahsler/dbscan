@@ -91,9 +91,15 @@ Other Outlier Detection Functions:
 \code{\link[=kNNdist]{kNNdist()}},
 \code{\link[=lof]{lof()}},
 \code{\link[=pointdensity]{pointdensity()}}
+
+Other HDBSCAN functions:
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=mst_dist]{mst_dist()}}
 }
 \author{
 Matt Piekenbrock
 }
+\concept{HDBSCAN functions}
 \concept{Outlier Detection Functions}
 \keyword{model}

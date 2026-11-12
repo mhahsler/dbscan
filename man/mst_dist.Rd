@@ -55,7 +55,7 @@ MSTs are not unique if there are ties in the distances. Many ties are very
 likely for mutual reachability distances constructed as
 \code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}.
 Ties in this implementation are broken in order of the rows in the
-input data which is consistent with many otehr implementations.
+input data which is consistent with many other implementations.
 }
 \examples{
 data("moons")
@@ -76,9 +76,9 @@ cl <- extractFOSC(hc_mr)
 hullplot(moons, cl$cluster, main = "HDBSCAN")
 }
 \seealso{
-\code{\link[=hdbscan]{hdbscan()}}, \code{\link[=mrdist]{mrdist()}}, \code{\link[=extractFOSC]{extractFOSC()}}
-
 Other HDBSCAN functions:
+\code{\link[=extractFOSC]{extractFOSC()}},
+\code{\link[=glosh]{glosh()}},
 \code{\link[=hdbscan]{hdbscan()}}
 }
 \concept{HDBSCAN functions}

@@ -217,10 +217,16 @@ Other clustering functions:
 \code{\link[=ncluster]{ncluster()}},
 \code{\link[=optics]{optics()}},
 \code{\link[=sNNclust]{sNNclust()}}
+
+Other HDBSCAN functions:
+\code{\link[=glosh]{glosh()}},
+\code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=mst_dist]{mst_dist()}}
 }
 \author{
 Matt Piekenbrock
 }
+\concept{HDBSCAN functions}
 \concept{clustering functions}
 \keyword{clustering}
 \keyword{model}

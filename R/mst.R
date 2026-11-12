@@ -37,7 +37,9 @@
 #' likely for mutual reachability distances constructed as
 #' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`.
 #' Ties in this implementation are broken in order of the rows in the
-#' input data which is consistent with many otehr implementations.
+#' input data which is consistent with many other implementations.
+#'
+#' [extractFOSC()] can be used to extract stable clusters from an MST.
 #'
 #' @family HDBSCAN functions
 #'
@@ -62,24 +64,20 @@
 #'  `"mutual reachability (euclidean)"` for `mst_mrdist()`.
 #'  `mst_mrdist()` also stores `minPts` in the result.
 #'
-#' @seealso [hdbscan()], [mrdist()], [extractFOSC()]
 #' @examples
 #' data("moons")
 #'
-#' ## MST of a distance matrix
-#' hc <- mst_dist(dist(moons))
-#' hc
+#' ## MST of a mutual reachability distance matrix
+#' d <- mrdist(moons, minPts = 5)
+#' hc_mr <- mst_dist(d)
+#' hc_mr
+#' plot(hc_mr)
 #'
 #' ## MST of the mutual reachability graph without creating the distance matrix.
-#' hc_mr <- mst_mrdist(moons, minPts = 5)
+#' hc_mr2 <- mst_mrdist(moons, minPts = 5)
 #'
 #' ## same as
-#' hc_mr2 <- mst_dist(mrdist(moons, minPts = 5))
 #' all.equal(hc_mr$merge, hc_mr2$merge)
-#'
-#' ## extract clusters (this is HDBSCAN)
-#' cl <- extractFOSC(hc_mr)
-#' hullplot(moons, cl$cluster, main = "HDBSCAN")
 #' @export
 mst_dist <- function(x) {
   .check_dist(x)

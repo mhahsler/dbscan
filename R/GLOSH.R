@@ -46,6 +46,8 @@
 #' set containing GLOSH values for all data points.
 #' @author Matt Piekenbrock
 #'
+#' @family HDBSCAN functions
+#'
 #' @references Campello, Ricardo JGB, Davoud Moulavi, Arthur Zimek, and Joerg
 #' Sander. Hierarchical density estimates for data clustering, visualization,
 #' and outlier detection. _ACM Transactions on Knowledge Discovery from Data

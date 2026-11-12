@@ -135,6 +135,7 @@
 #' `prune_unstable = TRUE` will remove the unstable branches.
 #'
 #' @family clustering functions
+#' @family HDBSCAN functions
 #'
 #' @param x a valid [hclust] object created via [hclust()] or the result of
 #' [hdbscan()]. For an [hdbscan()] result, its hierarchy (the `hc` component)

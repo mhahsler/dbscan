@@ -27,7 +27,8 @@
 #' stability-based flat cluster extraction. HDBSCAN essentially computes the
 #' hierarchy of all DBSCAN* clusterings, and
 #' then uses a stability-based extraction method to find optimal cuts in the
-#' hierarchy, thus producing a flat solution.
+#' hierarchy, thus producing a flat solution. It uses Prim's algorithm and
+#' saves memory by avoiding to creating a complete distance matrix.
 #'
 #' ## The algorithm
 #'

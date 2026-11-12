@@ -379,7 +379,6 @@ Jarvis-Patrick algorithms.
   [`plot(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   [`coredist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   [`mrdist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  [`minimum_spanning_tree()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   [`predict(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   : Hierarchical DBSCAN (HDBSCAN)
 - [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)
@@ -466,6 +465,9 @@ Plot clusters and work with reachability plots and cluster hierarchies.
   : Reachability Distances
 - [`as.dendrogram()`](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
   : Coercions to Dendrogram
+- [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+  : Minimum Spanning Tree Hierarchies
 
 ## Tidiers
 

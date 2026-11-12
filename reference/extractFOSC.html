@@ -82,7 +82,8 @@ stability-based objective extraction.</p>
 <span>  alpha <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  minPts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prune_unstable <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  validate_constraints <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  validate_constraints <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cluster_selection_epsilon <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -124,6 +125,13 @@ implies.</p></dd>
 <dt id="arg-validate-constraints">validate_constraints<a class="anchor" aria-label="anchor" href="#arg-validate-constraints"></a></dt>
 <dd><p>logical; should constraints be checked for
 validity? See details for what are considered valid constraints.</p></dd>
+
+
+<dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
+<dd><p>double; a distance threshold below which
+no clusters should be selected (see Malzer &amp; Baum 2020, and
+<code><a href="hdbscan.html">hdbscan()</a></code>).
+The default of 0.0 means this feature is not used.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -301,6 +309,12 @@ Discovery</em> 27(3): 344-371.
 <span class="r-in"><span><span class="va">cl_con2</span><span class="op">$</span><span class="va">cluster</span> <span class="co"># same as the second example</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 6 5 5 5 5 6 5 6 6 5 6 0 6 6 5 5 5 5 5 5 5 6 5 6 5 5 6 6 6 5 6 0 5 6 6 6 5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [38] 5 0 6 6 6 5 6 5 6 5 6 0 5 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Unsupervised extraction with a distance threshold (HDBSCAN(e))</span></span></span>
+<span class="r-in"><span><span class="fu">extractFOSC</span><span class="op">(</span><span class="va">cl</span><span class="op">$</span><span class="va">hc</span>, cluster_selection_epsilon <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">$</span><span class="va">cluster</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [38] 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1</span>
 </code></pre></div>
     </div>

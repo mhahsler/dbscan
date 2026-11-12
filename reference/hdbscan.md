@@ -30,11 +30,9 @@ plot(
   ...
 )
 
-coredist(x, minPts)
+coredist(x, minPts, ...)
 
 mrdist(x, minPts, coredist = NULL)
-
-minimum_spanning_tree(x)
 
 # S3 method for class 'hdbscan'
 predict(object, newdata, data, ...)
@@ -181,9 +179,6 @@ point.
 `mrdist()` returns a [dist](https://rdrr.io/r/stats/dist.html) object
 containing pairwise mutual reachability distances.
 
-`minimum_spanning_tree()` returns the minimum spanning tree as an
-`hclust` object.
-
 ## Details
 
 This fast implementation of HDBSCAN (Campello et al., 2013) computes the
@@ -212,24 +207,9 @@ several of the HDBSCAN steps:
 
 4.  Extract the clusters from the pruned tree.
 
-### Cluster selection using epsilon
+### Core and mutual reachability distances
 
-When using a value greater than 0.0 for `cluster_selection_epsilon`, a
-combination between DBSCAN\* and HDBSCAN\* can be achieved (see Malzer &
-Baum 2020). This means that part of the tree is affected by
-`cluster_selection_epsilon` as if running DBSCAN\* with `eps` =
-`cluster_selection_epsilon`. The remaining part (on levels above the
-threshold) is still processed by HDBSCAN\*'s stability-based selection
-algorithm and can therefore return clusters of variable densities. Note
-that there is not always a remaining part, especially if the parameter
-value is chosen too large, or if there aren't enough clusters of
-variable densities. In this case, the result will be equal to DBSCAN\*.
-`cluster_selection_epsilon` is especially useful for cases where
-HDBSCAN\* produces too many small clusters that need to be merged, while
-still being able to extract clusters of variable densities at higher
-levels.
-
-### Helper Functions
+These can be calculated using the following two exposed functions:
 
 - `coredist()`: The core distance is defined for each point as the
   distance to the (`minPts - 1`)-th nearest neighbor. It is a density
@@ -239,32 +219,59 @@ levels.
   smoother estimates.
 
 - `mrdist()`: The mutual reachability distance is defined between two
-  points as `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`.
-  This distance metric is used by HDBSCAN. It has the effect of
-  increasing distances in low density areas, separating clusters better.
+  points as `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. It
+  has the effect of increasing distances in low density areas,
+  separating clusters better.
 
-- `minimal_spanning_tree()`: Computes the minimum spanning tree (MST) of
-  a graph defined by a [dist](https://rdrr.io/r/stats/dist.html) object
-  with Prim's algorithm.
+### Minimum spanning tree construction
 
-- [`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
-  data point to the same cluster as the nearest point if it is not more
-  than that points core distance away. Otherwise the new point is
-  classified as a noise point (i.e., cluster ID 0).
+[`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+constructs a MST from the mutual reachability distance matrix.
+
+**Note:** If `x` is a data matrix, then
+[`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+is used which computes the mutual reachability distance MST directly
+using Prim's algorithm without the expensive distance matrix creating.
+This reduces memory complexity from \\O(n^2)\\ to \\O(d n)\\ and speeds
+up the calculation. This only works with Euclidean distances.
+
+### Tree pruning and cluster selection
+
+The MST is pruned using stability and clusters are extracted in an
+unsupervised version using
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
+
+Malzer and Baum (2020) describe that a combination between DBSCAN\* and
+HDBSCAN\* can be achieved by using a `cluster_selection_epsilon` greater
+than 0.0. The tree below `cluster_selection_epsilon` produces a result
+identical to DBSCAN\* with `eps = cluster_selection_epsilon`. The
+remaining part (on levels above the threshold) is still processed by
+HDBSCAN\*'s stability-based selection algorithm and can therefore return
+clusters of variable densities. Note that there is not always a
+remaining part, especially if the parameter value is chosen too large,
+or if there aren't enough clusters of variable densities. In this case,
+the result will be equal to DBSCAN\*. `cluster_selection_epsilon` is
+especially useful for cases where HDBSCAN\* produces too many small
+clusters that need to be merged, while still being able to extract
+clusters of variable densities at higher levels.
+
+### Cluster membership prediction for new points
+
+[`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
+data point to the same cluster as the nearest point if it is not more
+than that points core distance away. Otherwise the new point is
+classified as a noise point (i.e., cluster ID 0).
 
 ### Related Methods
 
-Clusters can be extracted from the MST created by HDBSCAN or any other
-hierarchical clustering in a more flexible way using
-[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
-and using the default parameters for unsupervised cluster extraction.
+- [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+  implements a more general framework for clusters selection from
+  hierarchies (i.e., dendrograms) In addition to HDBSCAN's unsupervised
+  cluster extraction, it also provides semisupervised methods with
+  cluster constraints.
 
-The Global-Local Outlier Score from Hierarchies (GLOSH; see section 6 of
-Campello et al., 2015) is available in function
-[`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md).
-Clusters can also be extracted based on instance-level constraints (see
-section 5.3 of Campello et al. 2015) using
-[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
+- [`glosh()`](https://michael.hahsler.net/dbscan/reference/glosh.md)
+  implements the GLOSH outlier score.
 
 ## References
 
@@ -286,6 +293,9 @@ on Multisensor Fusion and Integration for Intelligent Systems (MFI), pp.
 [doi:10.1109/MFI49285.2020.9235263](https://doi.org/10.1109/MFI49285.2020.9235263)
 
 ## See also
+
+Other HDBSCAN functions:
+[`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
 
 Other clustering functions:
 [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
@@ -382,8 +392,8 @@ hullplot(X, hdbe, main = "HDBSCAN(e)")
 
 ## Manually perform the steps of HDBSCAN
 d <- mrdist(X, minPts = 3)
-mst_hc <- minimum_spanning_tree(d)
+mst_hc <- mst_dist(d)
 cl <- extractFOSC(mst_hc)
-hullplot(X, cl$cluster, main = "HDBSCAN(e)")
+hullplot(X, cl$cluster, main = "HDBSCAN")
 #> Warning: Not enough colors. Some colors will be reused.
 ```

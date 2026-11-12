@@ -1,6 +1,6 @@
 # Plot Clusters
 
-This function produces a two-dimensional scatter plot of data points and
+`clplot()` produces a two-dimensional scatter plot of data points and
 colors the data points according to a supplied clustering. Noise points
 are marked as `x`. `hullplot()` also adds convex hulls to clusters.
 
@@ -13,6 +13,7 @@ hullplot(
   col = NULL,
   pch = NULL,
   cex = 0.5,
+  hull = TRUE,
   hull_lwd = 1,
   hull_lty = 1,
   solid = TRUE,
@@ -51,6 +52,10 @@ clplot(x, cl, col = NULL, pch = NULL, cex = 0.5, main = "Cluster Plot", ...)
 
   expansion factor for symbols.
 
+- hull:
+
+  logical; calculate and show convex hulls for clusters.
+
 - hull_lwd, hull_lty:
 
   line width and line type used for the convex hull.
@@ -84,17 +89,18 @@ x <- cbind(
   )
 cl <- rep(1:4, times = 100)
 
-
 ### original data with true clustering
 clplot(x, cl, main = "True clusters")
-
 hullplot(x, cl, main = "True clusters")
 
-### use different symbols
-hullplot(x, cl, main = "True clusters", pch = cl)
 
-### just the hulls
+### use different symbols for each cluster
+clplot(x, cl, main = "True clusters", pch = cl)
+
+
+### plot just the hulls
 hullplot(x, cl, main = "True clusters", pch = NA)
+
 
 ### a version suitable for b/w printing)
 hullplot(x, cl, main = "True clusters", solid = FALSE,
@@ -106,7 +112,6 @@ hullplot(x, cl, main = "True clusters", solid = FALSE,
 ### run some clustering algorithms and plot the results
 db <- dbscan(x, eps = .07, minPts = 10)
 clplot(x, db, main = "DBSCAN")
-
 hullplot(x, db, main = "DBSCAN")
 
 

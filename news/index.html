@@ -56,11 +56,14 @@
 <li>Added seeded randomized comparisons of native and distance-matrix search backends and a Linux ASan/LSan/UBSan runner and CI workflow. Native backend tests are skipped on CRAN and enabled explicitly by the sanitizer driver.</li>
 <li>
 <code><a href="../reference/hdbscan.html">hdbscan()</a></code> now records <code>minPts</code> in its <code>hc</code> component. <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> uses it as the default for <code>minPts</code>. Documentation of <code>minPts</code> in <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> was clarified.</li>
+<li>New <code><a href="../reference/mst_dist.html">mst_dist()</a></code> (single-linkage hierarchy of the minimum spanning tree of a <code>dist</code> object as an <code>hclust</code> object) and <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> (MST of the mutual reachability graph computed directly from a data matrix and <code>minPts</code>). Note that the rows of <code>merge</code> keep the MST order and do not follow the <code>hclust</code> normalization convention.</li>
 <li>
-<code><a href="../reference/hdbscan.html">minimum_spanning_tree()</a></code> is now exposed to the user.</li>
+<code><a href="../reference/hdbscan.html">hdbscan()</a></code> with a data matrix now builds the minimum spanning tree with <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code>. Mutual reachability distances are computed on the fly, so no full distance matrix is stored. Results are unchanged. For <code>dist</code> input the previous approach is used.</li>
+<li>
+<code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> gained the argument <code>cluster_selection_epsilon</code> (as in <code><a href="../reference/hdbscan.html">hdbscan()</a></code>), so that the manual HDBSCAN(e) steps give the same clusters.</li>
 <li>
 <code><a href="../reference/extractFOSC.html">extractFOSC()</a></code> now also accepts the result of <code><a href="../reference/hdbscan.html">hdbscan()</a></code> as <code>x</code> and uses its hierarchy.</li>
-<li>optics(): The default for <code>eps</code> is now <code>NULL</code>, which estimates the neighborhood size from <code>minPts</code> and the data (as before). Specifying <code>eps = Inf</code> now uses an unlimited neighborhood instead of the estimate and gives the complete reachability structure. The estimate can leave several reachability distances undefined (<code>Inf</code>) when the data contain well-separated groups.</li>
+<li>optics(): The default for <code>eps</code> is now <code>NULL</code>, which estimates the neighborhood size from <code>minPts</code> and the data improving speed. Specifying <code>eps = Inf</code> now uses an unlimited neighborhood instead of the estimate and gives the complete reachability structure.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bugfixes-1-2-8">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-1-2-8"></a></h3>

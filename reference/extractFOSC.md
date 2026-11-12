@@ -19,7 +19,8 @@ extractFOSC(
   alpha = 0,
   minPts = NULL,
   prune_unstable = FALSE,
-  validate_constraints = FALSE
+  validate_constraints = FALSE,
+  cluster_selection_epsilon = 0
 )
 ```
 
@@ -63,6 +64,13 @@ extractFOSC(
 
   logical; should constraints be checked for validity? See details for
   what are considered valid constraints.
+
+- cluster_selection_epsilon:
+
+  double; a distance threshold below which no clusters should be
+  selected (see Malzer & Baum 2020, and
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)).
+  The default of 0.0 means this feature is not used.
 
 ## Value
 
@@ -252,5 +260,11 @@ cl_con2 <- extractFOSC(cl$hc, minPts = 5,
 cl_con2$cluster # same as the second example
 #>   [1] 6 5 5 5 5 6 5 6 6 5 6 0 6 6 5 5 5 5 5 5 5 6 5 6 5 5 6 6 6 5 6 0 5 6 6 6 5
 #>  [38] 5 0 6 6 6 5 6 5 6 5 6 0 5 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3
+#>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1
+
+## Unsupervised extraction with a distance threshold (HDBSCAN(e))
+extractFOSC(cl$hc, cluster_selection_epsilon = 0.5)$cluster
+#>   [1] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
+#>  [38] 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3
 #>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1
 ```

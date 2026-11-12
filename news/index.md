@@ -17,18 +17,32 @@
   uses it as the default for `minPts`. Documentation of `minPts` in
   [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
   was clarified.
-- [`minimum_spanning_tree()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  is now exposed to the user.
+- New
+  [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+  (single-linkage hierarchy of the minimum spanning tree of a `dist`
+  object as an `hclust` object) and
+  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+  (MST of the mutual reachability graph computed directly from a data
+  matrix and `minPts`). Note that the rows of `merge` keep the MST order
+  and do not follow the `hclust` normalization convention.
+- [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  with a data matrix now builds the minimum spanning tree with
+  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md).
+  Mutual reachability distances are computed on the fly, so no full
+  distance matrix is stored. Results are unchanged. For `dist` input the
+  previous approach is used.
+- [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+  gained the argument `cluster_selection_epsilon` (as in
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)),
+  so that the manual HDBSCAN(e) steps give the same clusters.
 - [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
   now also accepts the result of
   [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
   as `x` and uses its hierarchy.
 - optics(): The default for `eps` is now `NULL`, which estimates the
-  neighborhood size from `minPts` and the data (as before). Specifying
-  `eps = Inf` now uses an unlimited neighborhood instead of the estimate
-  and gives the complete reachability structure. The estimate can leave
-  several reachability distances undefined (`Inf`) when the data contain
-  well-separated groups.
+  neighborhood size from `minPts` and the data improving speed.
+  Specifying `eps = Inf` now uses an unlimited neighborhood instead of
+  the estimate and gives the complete reachability structure.
 
 ### Bugfixes
 

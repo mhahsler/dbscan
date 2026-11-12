@@ -77,10 +77,10 @@ cl$hc
 
     ## 
     ## Call:
-    ## minimum_spanning_tree(x = mrd)
+    ## mst_mrdist(x = x, minPts = minPts, coredist = coredist)
     ## 
     ## Cluster method   : robust single 
-    ## Distance         : mutual reachability 
+    ## Distance         : mutual reachability (euclidean) 
     ## Number of objects: 100
 
 Note that although this object is available for use with any of the

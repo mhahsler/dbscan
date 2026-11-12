@@ -12,7 +12,7 @@
   sNNclust](https://michael.hahsler.net/dbscan/articles/nnclustering.md):
 - [Ordering Points With
   OPTICS](https://michael.hahsler.net/dbscan/articles/optics.md):
-- [Outlier Detection with
+- [Outlier Detection with Package
   dbscan](https://michael.hahsler.net/dbscan/articles/outlier.md):
 - [Using dbscan from
   Python](https://michael.hahsler.net/dbscan/articles/python.md):

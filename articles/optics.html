@@ -48,7 +48,7 @@
     <li><a class="dropdown-item" href="../articles/knn.html">Nearest-Neighbor Search and Graphs</a></li>
     <li><a class="dropdown-item" href="../articles/nnclustering.html">Nearest-Neighbor Clustering with jpclust and sNNclust</a></li>
     <li><a class="dropdown-item" href="../articles/optics.html">Ordering Points With OPTICS</a></li>
-    <li><a class="dropdown-item" href="../articles/outlier.html">Outlier Detection with dbscan</a></li>
+    <li><a class="dropdown-item" href="../articles/outlier.html">Outlier Detection with Package dbscan</a></li>
     <li><a class="dropdown-item" href="../articles/python.html">Using dbscan from Python</a></li>
     <li><a class="dropdown-item" href="../articles/tidyverse.html">Using dbscan with tidyverse</a></li>
   </ul>
@@ -129,10 +129,10 @@ and</li>
 reachability distances in OPTICS order are obtained with:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">opt</span><span class="op">$</span><span class="va">order</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1]   1 363 209 349 337 301 357 333 321 285</span></span>
+<span><span class="co">#&gt;  [1]   1  13  17  21  89 149 165 193 209  57</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">opt</span><span class="op">$</span><span class="va">reachdist</span><span class="op">[</span><span class="va">opt</span><span class="op">$</span><span class="va">order</span><span class="op">]</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1]        Inf 0.06559013 0.06559013 0.05673844 0.05673844 0.05673844</span></span>
-<span><span class="co">#&gt;  [7] 0.05246930 0.05056201 0.03653219 0.03653219</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1]        Inf 0.06559013 0.06559013 0.06559013 0.06559013 0.06559013</span></span>
+<span><span class="co">#&gt;  [7] 0.06559013 0.06559013 0.06559013 0.05673844</span></span></code></pre></div>
 <p>The first reachability distance is undefined because the first point
 has no predecessor. It is stored as <code>Inf</code>.</p>
 </div>
@@ -197,10 +197,10 @@ although OPTICS can leave some DBSCAN border points unassigned.</p>
 <span><span class="va">opt_db</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
 <span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA</span></span>
-<span><span class="co">#&gt; The clustering contains 4 cluster(s) and 92 noise points.</span></span>
+<span><span class="co">#&gt; The clustering contains 4 cluster(s) and 95 noise points.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0  1  2  3  4 </span></span>
-<span><span class="co">#&gt; 92 81 84 72 71 </span></span>
+<span><span class="co">#&gt; 95 78 83 73 71 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span></span>
 <span><span class="co">#&gt;                   eps_cl, xi, cluster</span></span>
@@ -214,7 +214,7 @@ data order.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">opt_db</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  0  1  2  3  4 </span></span>
-<span><span class="co">#&gt; 92 81 84 72 71</span></span>
+<span><span class="co">#&gt; 95 78 83 73 71</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -233,7 +233,7 @@ level:</p>
 <span>  noise <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">opt_db_wide</span><span class="op">$</span><span class="va">cluster</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; clusters    noise </span></span>
-<span><span class="co">#&gt;        3       62</span></span></code></pre></div>
+<span><span class="co">#&gt;        3       60</span></span></code></pre></div>
 <p>Choose <code>eps_cl &lt;= opt$eps</code>. A useful threshold crosses
 stable valleys below the peaks that separate them. If a single global
 cut cannot represent groups of differing density, use the Xi extraction
@@ -252,19 +252,27 @@ without selecting one global distance threshold.</p>
 <span><span class="va">opt_xi</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
 <span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05</span></span>
-<span><span class="co">#&gt; The clustering contains 7 cluster(s) and 1 noise points.</span></span>
+<span><span class="co">#&gt; The clustering contains 15 cluster(s) and 0 noise points.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span></span>
 <span><span class="co">#&gt;                   eps_cl, xi, clusters_xi, cluster</span></span>
 <span><span class="va">opt_xi</span><span class="op">$</span><span class="va">clusters_xi</span></span>
-<span><span class="co">#&gt;   start end cluster_id</span></span>
-<span><span class="co">#&gt; 1     1 194          1</span></span>
-<span><span class="co">#&gt; 2     1 301          2</span></span>
-<span><span class="co">#&gt; 3     8  23          3</span></span>
-<span><span class="co">#&gt; 4    94 106          4</span></span>
-<span><span class="co">#&gt; 5   196 288          5</span></span>
-<span><span class="co">#&gt; 6   302 399          6</span></span>
-<span><span class="co">#&gt; 7   308 335          7</span></span>
+<span><span class="co">#&gt;    start end cluster_id</span></span>
+<span><span class="co">#&gt; 1      1 193          1</span></span>
+<span><span class="co">#&gt; 2      1 300          2</span></span>
+<span><span class="co">#&gt; 3      1 400          3</span></span>
+<span><span class="co">#&gt; 4     10  49          4</span></span>
+<span><span class="co">#&gt; 5     12  23          5</span></span>
+<span><span class="co">#&gt; 6     31  47          6</span></span>
+<span><span class="co">#&gt; 7     93 175          7</span></span>
+<span><span class="co">#&gt; 8     99 109          8</span></span>
+<span><span class="co">#&gt; 9    195 288          9</span></span>
+<span><span class="co">#&gt; 10   196 247         10</span></span>
+<span><span class="co">#&gt; 11   219 231         11</span></span>
+<span><span class="co">#&gt; 12   302 400         12</span></span>
+<span><span class="co">#&gt; 13   304 375         13</span></span>
+<span><span class="co">#&gt; 14   305 315         14</span></span>
+<span><span class="co">#&gt; 15   319 346         15</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">opt_xi</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optics_files/figure-html/extract-xi-1.png" class="r-plt" alt="" width="576"></p>
 <p>Each row of <code>clusters_xi</code> gives the start and end
@@ -289,7 +297,7 @@ fine-grained solution is needed.</p>
 <span><span class="va">opt_xi_min</span></span>
 <span><span class="co">#&gt; OPTICS ordering/clustering for 400 objects.</span></span>
 <span><span class="co">#&gt; Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05</span></span>
-<span><span class="co">#&gt; The clustering contains 4 cluster(s) and 250 noise points.</span></span>
+<span><span class="co">#&gt; The clustering contains 6 cluster(s) and 308 noise points.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Available fields: order, reachdist, coredist, predecessor, minPts, eps,</span></span>
 <span><span class="co">#&gt;                   eps_cl, xi, clusters_xi, cluster</span></span></code></pre></div>

@@ -501,7 +501,7 @@ Turn clustering objects into tidy tibbles and augment the original data.
 - [`tidy()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
   [`augment()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
   [`glance()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
-  : Turn an dbscan clustering object into a tidy tibble
+  : Turn a dbscan clustering object into a tidy tibble
 
 ## Data Sets
 
@@ -532,7 +532,7 @@ Example and benchmark data sets for density-based clustering.
   sNNclust](https://michael.hahsler.net/dbscan/articles/nnclustering.md):
 - [Ordering Points With
   OPTICS](https://michael.hahsler.net/dbscan/articles/optics.md):
-- [Outlier Detection with
+- [Outlier Detection with Package
   dbscan](https://michael.hahsler.net/dbscan/articles/outlier.md):
 - [Using dbscan from
   Python](https://michael.hahsler.net/dbscan/articles/python.md):

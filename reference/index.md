@@ -136,7 +136,7 @@ Turn clustering objects into tidy tibbles and augment the original data.
 - [`tidy()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
   [`augment()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
   [`glance()`](https://michael.hahsler.net/dbscan/reference/dbscan_tidiers.md)
-  : Turn an dbscan clustering object into a tidy tibble
+  : Turn a dbscan clustering object into a tidy tibble
 
 ## Data Sets
 

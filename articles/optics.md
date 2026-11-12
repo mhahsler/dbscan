@@ -54,10 +54,10 @@ reachability distances in OPTICS order are obtained with:
 ``` r
 
 head(opt$order, 10)
-#>  [1]   1 363 209 349 337 301 357 333 321 285
+#>  [1]   1  13  17  21  89 149 165 193 209  57
 head(opt$reachdist[opt$order], 10)
-#>  [1]        Inf 0.06559013 0.06559013 0.05673844 0.05673844 0.05673844
-#>  [7] 0.05246930 0.05056201 0.03653219 0.03653219
+#>  [1]        Inf 0.06559013 0.06559013 0.06559013 0.06559013 0.06559013
+#>  [7] 0.06559013 0.06559013 0.06559013 0.05673844
 ```
 
 The first reachability distance is undefined because the first point has
@@ -135,10 +135,10 @@ opt_db <- extractDBSCAN(opt, eps_cl = 0.065)
 opt_db
 #> OPTICS ordering/clustering for 400 objects.
 #> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA
-#> The clustering contains 4 cluster(s) and 92 noise points.
+#> The clustering contains 4 cluster(s) and 95 noise points.
 #> 
 #>  0  1  2  3  4 
-#> 92 81 84 72 71 
+#> 95 78 83 73 71 
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, cluster
@@ -156,7 +156,7 @@ palette. Cluster assignments are stored in original data order.
 table(opt_db$cluster)
 #> 
 #>  0  1  2  3  4 
-#> 92 81 84 72 71
+#> 95 78 83 73 71
 
 plot(
   x,
@@ -179,7 +179,7 @@ c(
   noise = sum(opt_db_wide$cluster == 0)
 )
 #> clusters    noise 
-#>        3       62
+#>        3       60
 ```
 
 Choose `eps_cl <= opt$eps`. A useful threshold crosses stable valleys
@@ -202,19 +202,27 @@ opt_xi <- extractXi(opt, xi = 0.05)
 opt_xi
 #> OPTICS ordering/clustering for 400 objects.
 #> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05
-#> The clustering contains 7 cluster(s) and 1 noise points.
+#> The clustering contains 15 cluster(s) and 0 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, clusters_xi, cluster
 opt_xi$clusters_xi
-#>   start end cluster_id
-#> 1     1 194          1
-#> 2     1 301          2
-#> 3     8  23          3
-#> 4    94 106          4
-#> 5   196 288          5
-#> 6   302 399          6
-#> 7   308 335          7
+#>    start end cluster_id
+#> 1      1 193          1
+#> 2      1 300          2
+#> 3      1 400          3
+#> 4     10  49          4
+#> 5     12  23          5
+#> 6     31  47          6
+#> 7     93 175          7
+#> 8     99 109          8
+#> 9    195 288          9
+#> 10   196 247         10
+#> 11   219 231         11
+#> 12   302 400         12
+#> 13   304 375         13
+#> 14   305 315         14
+#> 15   319 346         15
 plot(opt_xi)
 ```
 
@@ -249,7 +257,7 @@ opt_xi_min <- extractXi(opt, xi = 0.05, minimum = TRUE)
 opt_xi_min
 #> OPTICS ordering/clustering for 400 objects.
 #> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.05
-#> The clustering contains 4 cluster(s) and 250 noise points.
+#> The clustering contains 6 cluster(s) and 308 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, clusters_xi, cluster

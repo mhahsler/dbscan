@@ -1,4 +1,4 @@
-# Outlier Detection with dbscan
+# Outlier Detection with Package dbscan
 
 The **dbscan** package provides several related approaches to
 unsupervised outlier detection:

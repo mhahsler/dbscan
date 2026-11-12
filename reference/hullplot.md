@@ -122,11 +122,13 @@ hullplot(x, opDBSCAN, main = "OPTICS")
 
 opXi <- extractXi(op, xi = 0.05)
 hullplot(x, opXi, main = "OPTICSXi")
+#> Warning: Not enough colors. Some colors will be reused.
 
 
 # Extract minimal 'flat' clusters only
 opXi <- extractXi(op, xi = 0.05, minimum = TRUE)
 hullplot(x, opXi, main = "OPTICSXi")
+#> Warning: Not enough colors. Some colors will be reused.
 
 
 km <- kmeans(x, centers = 4)

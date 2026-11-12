@@ -195,6 +195,17 @@ result in several undefined reachability distances (shown as dashed
 lines in the reachability plot). If the plot shows too many dashed lines
 then `eps` should be increased.
 
+### Ties
+
+OPTICS repeatedly processes the unprocessed point with the smallest
+reachability distance. If several points have the same reachability
+distance, ties are broken by the position of the point in the data: the
+point with the lower id (row number) is processed first. This follows
+the ELKI implementation. With ties, the returned order (and therefore
+the reachability plot and extracted clusters) can depend on the row
+order of the data. Ties are common for data with repeated values or for
+data on a regular grid.
+
 ### Extracting a Clustering
 
 Several methods to extract a clustering from the order returned by
@@ -209,14 +220,14 @@ OPTICS are implemented:
 - `extractXi()` extract clusters hierarchically specified in Ankerst et
   al (1999) based on the steepness of the reachability plot. One
   interpretation of the `xi` parameter is that it classifies clusters by
-  change in relative cluster density. The used algorithm was originally
-  contributed by the ELKI framework and is explained in Schubert et al
-  (2018), but contains a set of fixes. With `correctPredecessors = TRUE`
-  (the default), the end of each cluster is additionally shortened so
-  that the predecessor of its last point is inside the cluster and the
-  cluster does not end in points with infinite reachability distance.
-  This step is not part of the original algorithm and removes a common
-  artifact (found by the ELKI framework).
+  change in relative cluster density. The algorithm is a port of the
+  implementation in the ELKI framework (version 0.8.0). It follows
+  Ankerst et al (1999) with the improvements described in Schubert and
+  Gertz (2018). With `correctPredecessors = TRUE` (the default), the end
+  of each cluster is shortened so that the predecessor of its last point
+  is inside the cluster. This step is not part of the original algorithm
+  and removes a common artifact (found by the ELKI framework). Clusters
+  with fewer than `minPts` points are not reported.
 
 ### Predict Cluster Memberships
 
@@ -283,29 +294,29 @@ res
 
 ### get order
 res$order
-#>   [1]   1 363 209 349 337 301 357 333 321 285 281 253 241 177 153  57 257  29
-#>  [19]  77 169 105 293 229 145 181 385 393 377 317 381 185 117 101   9  73 237
-#>  [37] 397 369 365 273 305 245 249 309 157 345 213 205  97  49  33  41 193 149
-#>  [55]  17  83 389  25 121 329   5 161 341 217 189 141  85  53 225 313 289 261
-#>  [73] 221 173  69  61 297 125  81 133 129 197 109 137  59  93 165  89  21  13
-#>  [91] 277 191 203 379 399 375 351 311 235 231 227  71  11 299 271 291 147  55
-#> [109]  23 323 219 275  47 263   3 367 331 175  87 339 319 251 247 171 111 223
-#> [127]  51  63 343 303 207 151 391 359 287 283 215 143 131 115  99  31 183  43
-#> [145] 243 199  79  27 295  67 347 255 239 195 187 139 107  39 119 179 395 371
-#> [163] 201 123 159  91 211 355 103 327  95   7 167  35 267 155 387 383 335 315
-#> [181] 259 135  15 113 279 373   4 353 265 127  45  37  19 276 224 361 260 288
-#> [199] 336 368 348 292 268 252 120 108  96  88  32  16 340 156 388 372 356 332
-#> [217] 304 220 188 168 136 124  56 236  28 244 392 184  76 380 232 100 116 112
-#> [235] 256  72   8 280  64  52 208 172 152 148 360 352 192 160 144 284 216  48
-#> [253]  84  92  36  20 212 272 264 200 128  80 180 364 196  12 132  40 324 308
-#> [271] 176 164  68 316 312 384 300 344 328 248 204 140 296  24 320 228  60  44
-#> [289] 233  65 400 376 240 163 104 396 307  75  14 325 269 262 234 382 294 206
-#> [307] 198 374 310 362 318 386 358 330 278 210 298 282 122  98  34  26 174 142
-#> [325]  46   6  62 118 190 202 114 322 286  38 242 394 342 266 162 130  30 182
-#> [343]   2  74 314 290 246 194 170 126 158 378 350 254 226 214  70  18  10 366
-#> [361] 354 186 150  86 306 102 338 346 134 250 138  94  78 390 274  58  42 258
-#> [379]  66  90 146 370 222 218 326  82 110 270 334 178 166 398  22  50 238 106
-#> [397] 154 302 230  54
+#>   [1]   1  13  17  21  89 149 165 193 209  57 169 241 153 177 253 281 285 321
+#>  [19]  29 257 333 357  77 105 293 301 229 145 181   9 117 101 185 317 377 381
+#>  [37] 385 393  73 237 273 365 369 397 245 305 249 337 349 157 309 205 213 345
+#>  [55]  33  49  97  41  83  25 389 121   5 329 161  53  85 141 189 217 341 225
+#>  [73]  61  69 261  81 173 221 125 289 297 313 129 133 109 197  59 137 363  93
+#>  [91] 277  35 191  91 147 201 203 231  11 227 235 271 299 311 351  71 375 379
+#> [109] 399 291  23  55 219 323 275  47 263   3  87 175 331 367 171 247 251 319
+#> [127] 339 111 223  51  63 151  31 131 143 207 303 343 391  99 115 215 283 287
+#> [145] 359  43 183  27  79 199 243 295  67 347 139 187 255  39 107 195 239 119
+#> [163] 179 395 371 123 159 211 103 355 327   7  95 167 267 155  15 135 259 315
+#> [181] 335 383 387 113 279 373   4 127 265 353  37  45  19 224 172   8 144 160
+#> [199] 192 208 232  28  72 100 256 260 288 336 368  32  96  16  88 108 120 252
+#> [217] 268 292 156 124 188 220 304 340 356 388  56 136 168 332 372 236 244  76
+#> [235] 184 392 380 348 116 112 280  64  52 148 152 352 360 361 284  48 216  84
+#> [253]  36  92  20  80 180 212 128 200 264 272  12 196 364 132  40 324  68 164
+#> [271] 176 308 316 312 384 248 300 204 328 344 140  24 296 320  60 228 276  44
+#> [289]  65 233 400 163 240 376 104 396 307  75  14 325 269  82  66  70  10  18
+#> [307] 158 214 226 254 246 314 350 378 366 290 342  38 190   6  34  26  98 174
+#> [325] 210 282 298 310 362 374 122 318  46 142 278 330 358 386  62 118 114 202
+#> [343] 322 198 286 294 242 394  30 130 162 266   2 182 382  74 126 170 194 354
+#> [361] 186 150 206 234  86 306 102 338 134 346 250  78  94 138 390  42  58 274
+#> [379] 258  90 146 218 222 370 326 110 270 334 166 178 398 262  22  50 238 106
+#> [397] 154 230 302  54
 
 ### plot produces a reachability plot
 plot(res)
@@ -321,10 +332,10 @@ res <- extractDBSCAN(res, eps_cl = .065)
 res
 #> OPTICS ordering/clustering for 400 objects.
 #> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.065, xi = NA
-#> The clustering contains 4 cluster(s) and 92 noise points.
+#> The clustering contains 4 cluster(s) and 95 noise points.
 #> 
 #>  0  1  2  3  4 
-#> 92 81 84 72 71 
+#> 95 78 83 73 71 
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, cluster
@@ -339,10 +350,10 @@ res <- extractDBSCAN(res, eps_cl = .07)
 res
 #> OPTICS ordering/clustering for 400 objects.
 #> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = 0.07, xi = NA
-#> The clustering contains 3 cluster(s) and 62 noise points.
+#> The clustering contains 3 cluster(s) and 60 noise points.
 #> 
 #>   0   1   2   3 
-#>  62 184  79  75 
+#>  60 184  80  76 
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, cluster
@@ -356,7 +367,7 @@ res <- extractXi(res, xi = 0.01)
 res
 #> OPTICS ordering/clustering for 400 objects.
 #> Parameters: minPts = 10, eps = 0.192510982439203, eps_cl = NA, xi = 0.01
-#> The clustering contains 15 cluster(s) and 1 noise points.
+#> The clustering contains 18 cluster(s) and 0 noise points.
 #> 
 #> Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 #>                   eps_cl, xi, cluster, clusters_xi
@@ -371,20 +382,23 @@ hullplot(x, res)
 res$clusters_xi
 #>    start end cluster_id
 #> 1      1  91          1
-#> 2      1 194          2
+#> 2      1 193          2
 #> 3      1 301          3
-#> 4      3  69          4
-#> 5      7  24          5
-#> 6     25  43          6
-#> 7     92 183          7
-#> 8     94 128          8
-#> 9    132 148          9
-#> 10   195 287         10
-#> 11   197 256         11
-#> 12   197 276         12
-#> 13   212 223         13
-#> 14   302 399         14
-#> 15   307 350         15
+#> 4      1 400          4
+#> 5      9  72          5
+#> 6     10  28          6
+#> 7     29  47          7
+#> 8     93 183          8
+#> 9     98 130          9
+#> 10    98 152         10
+#> 11   132 151         11
+#> 12   194 288         12
+#> 13   195 275         13
+#> 14   196 255         14
+#> 15   219 231         15
+#> 16   302 400         16
+#> 17   306 315         17
+#> 18   319 359         18
 
 ### use OPTICS on a precomputed distance matrix
 d <- dist(x)

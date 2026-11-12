@@ -1,7 +1,7 @@
 # Ordering Points to Identify the Clustering Structure (OPTICS)
 
 Implementation of the OPTICS (Ordering points to identify the clustering
-structure) point ordering algorithm using a kd-tree.
+structure) point ordering algorithm using a k-d tree.
 
 ## Usage
 
@@ -172,9 +172,9 @@ dense the cluster) and high points indicate points between clusters.
 ### Specifying the Data
 
 If `x` is specified as a data matrix, then Euclidean distances and fast
-nearest neighbor lookup using a kd-tree are used. See
+nearest neighbor lookup using a k-d tree are used. See
 [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) for
-details on the parameters for the kd-tree.
+details on the parameters for the k-d tree.
 
 ### The effect of eps
 
@@ -283,7 +283,7 @@ x <- cbind(
   y = runif(4, 0, 1) + rnorm(n, sd = 0.1)
   )
 
-plot(x, col=rep(1:4, times = 100))
+plot(x, col=rep(1:4, times = 100), asp = 1)
 
 
 ### run OPTICS (Note: we use the default eps = Inf)
@@ -325,7 +325,7 @@ plot(res)
 
 
 ### plot the order of points in the reachability plot
-plot(x, col = "grey")
+plot(x, col = "grey", pch = 19, asp = 1)
 polygon(x[res$order, ])
 
 
@@ -344,7 +344,7 @@ res
 
 plot(res)  ## black is noise
 
-hullplot(x, res)
+hullplot(x, res, asp = 1)
 
 
 ### re-cut at a higher eps threshold
@@ -361,7 +361,7 @@ res
 #>                   eps_cl, xi, cluster
 plot(res)
 
-hullplot(x, res)
+hullplot(x, res, asp = 1)
 
 
 ### extract hierarchical clustering of varying density using the Xi method
@@ -376,7 +376,7 @@ res
 
 plot(res)
 
-hullplot(x, res)
+hullplot(x, res, asp = 1)
 #> Warning: Not enough colors. Some colors will be reused.
 
 

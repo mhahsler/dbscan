@@ -1,6 +1,6 @@
 # Find the k Nearest Neighbors
 
-This function uses a kd-tree to find all k nearest neighbors in a data
+This function uses a k-d tree to find all k nearest neighbors in a data
 matrix (including distances) fast.
 
 ## Usage
@@ -58,11 +58,11 @@ print(x, ...)
 
 - bucketSize:
 
-  max size of the kd-tree leafs.
+  max size of the k-d tree leafs.
 
 - splitRule:
 
-  rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+  rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
   `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding).
   `"SUGGEST"` uses ANNs best guess.
 
@@ -115,7 +115,7 @@ Handling of ties and self-matches
 
 Details on the search parameters:
 
-- `search` controls if a kd-tree or linear search (both implemented in
+- `search` controls if a k-d tree or linear search (both implemented in
   the ANN library; see Mount and Arya, 2010). Note, that these
   implementations cannot handle NAs. `search = "dist"` precomputes
   Euclidean distances first using R. NAs are handled, but the resulting
@@ -123,7 +123,7 @@ Details on the search parameters:
   precomputed distance matrix can be provided as `x` (`search` is
   ignored).
 
-- `bucketSize` and `splitRule` influence how the kd-tree is built.
+- `bucketSize` and `splitRule` influence how the k-d tree is built.
   `approx` uses the approximate nearest neighbor search implemented in
   ANN. All nearest neighbors up to a distance of `eps / (1 + approx)`
   will be considered and all with a distance greater than `eps` will not
@@ -156,7 +156,7 @@ Michael Hahsler
 data(iris)
 x <- iris[, -5]
 
-# Example 1: finding kNN for all points in a data matrix (using a kd-tree)
+# Example 1: finding kNN for all points in a data matrix (using a k-d tree)
 nn <- kNN(x, k = 5)
 nn
 #> k-nearest neighbors for 150 objects (k=5).

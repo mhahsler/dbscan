@@ -158,7 +158,7 @@ sinusoidal structure that intersects the groups.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.25</span>, asp <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"DS3 data"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="nnclustering_files/figure-html/data-1.png" class="r-plt" alt="" width="576"></p>
 <p>For numeric matrices and data frames, both functions use Euclidean
-distance and fast kd-tree nearest-neighbor search. Variable scales
+distance and fast k-d tree nearest-neighbor search. Variable scales
 therefore matter. Standardize variables when their units are not
 comparable and scaling is appropriate for the application.</p>
 </div>
@@ -376,7 +376,7 @@ sets; see <code><a href="../reference/sNN.html">?sNN</a></code>.</p>
 </h2>
 <p>Both clustering functions also accept a <code>dist</code> object.
 This permits other distance measures, at the cost of storing all
-pairwise distances and giving up the fast kd-tree search.</p>
+pairwise distances and giving up the fast k-d tree search.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">my_data</span>, method <span class="op">=</span> <span class="st">"manhattan"</span><span class="op">)</span></span>
 <span></span>

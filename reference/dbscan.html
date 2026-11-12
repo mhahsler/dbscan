@@ -6,8 +6,8 @@
     }
   };
 </script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Density-based Spatial Clustering of Applications with Noise (DBSCAN) — dbscan"><meta name="description" content="Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-applications with noise) clustering algorithm using a kd-tree."><meta property="og:description" content="Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-applications with noise) clustering algorithm using a kd-tree."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
+applications with noise) clustering algorithm using a k-d tree."><meta property="og:description" content="Fast reimplementation of the DBSCAN (Density-based spatial clustering of
+applications with noise) clustering algorithm using a k-d tree."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -53,7 +53,7 @@ applications with noise) clustering algorithm using a kd-tree."><meta property="
 
     <div class="ref-description section level2">
     <p>Fast reimplementation of the DBSCAN (Density-based spatial clustering of
-applications with noise) clustering algorithm using a kd-tree.</p>
+applications with noise) clustering algorithm using a k-d tree.</p>
     </div>
 
     <div class="section level2">
@@ -169,7 +169,7 @@ noise points. This is implemented with <code>borderPoints = FALSE</code>.</p>
 
 
 <p>If <code>x</code> is a matrix or a data.frame, then fast fixed-radius nearest
-neighbor computation using a kd-tree is performed using Euclidean distance.
+neighbor computation using a k-d tree is performed using Euclidean distance.
 See <code><a href="frNN.html">frNN()</a></code> for more information on the parameters related to
 nearest neighbor search. <strong>Note</strong> that only numerical values are allowed in <code>x</code>.</p>
 <p>Any precomputed distance matrix (dist object) can be specified as <code>x</code>.
@@ -377,7 +377,7 @@ Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications.
 <span class="r-in"><span>    names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'fpc'</span>, <span class="st">'dbscan (dist)'</span>, <span class="st">'dbscan (linear)'</span>, <span class="st">'dbscan (kdtree)'</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    main <span class="op">=</span> <span class="st">"Runtime comparison in ms"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co">## speedup of the kd-tree-based version compared to the fpc implementation</span></span></span>
+<span class="r-in"><span>  <span class="co">## speedup of the k-d tree-based version compared to the fpc implementation</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">t_fpc</span><span class="op">$</span><span class="va">time</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">t_dbscan</span><span class="op">$</span><span class="va">time</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

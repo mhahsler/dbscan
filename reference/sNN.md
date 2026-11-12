@@ -63,11 +63,11 @@ print(x, ...)
 
 - bucketSize:
 
-  max size of the kd-tree leafs.
+  max size of the k-d tree leafs.
 
 - splitRule:
 
-  rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+  rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
   `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding).
   `"SUGGEST"` uses ANNs best guess.
 

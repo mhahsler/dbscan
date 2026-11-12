@@ -139,7 +139,7 @@ neighbors</td>
 <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, <code><a href="../reference/NN.html">adjacencylist()</a></code>, and
 <code><a href="../reference/comps.html">comps()</a></code> for finding connected components.</p>
 <p>Nearest neighbor search is optimized for Euclidean distance where it
-used kd-tree implemented in the ANN library (Mount and Arya, 2010).</p>
+used k-d tree implemented in the ANN library (Mount and Arya, 2010).</p>
 <div class="section level2">
 <h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
@@ -233,7 +233,7 @@ two data columns are used as coordinates.</p>
 <div class="section level3">
 <h3 id="reuse-and-reduce-a-search">Reuse and reduce a search<a class="anchor" aria-label="anchor" href="#reuse-and-reduce-a-search"></a>
 </h3>
-<p>A stored search can be reduced without rebuilding the kd-tree. This
+<p>A stored search can be reduced without rebuilding the k-d tree. This
 is useful when an analysis needs several values of <code>k</code>:
 calculate the largest required neighborhood once and retain its leading
 columns.</p>
@@ -562,7 +562,7 @@ order for <code>kNN</code> and <code>frNN</code>. The default for
 </h2>
 <p>Supplying a <code>dist</code> object allows <code><a href="../reference/kNN.html">kNN()</a></code>,
 <code><a href="../reference/frNN.html">frNN()</a></code>, and <code><a href="../reference/sNN.html">sNN()</a></code> to use another dissimilarity
-measure. However, this means that the efficient kd-tree implementation
+measure. However, this means that the efficient k-d tree implementation
 cannot be used.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d_manhattan</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"manhattan"</span><span class="op">)</span></span>
@@ -591,7 +591,7 @@ application.</p>
 strategies:</p>
 <ul>
 <li>
-<code>"kdtree"</code>, the default, builds a kd-tree and is
+<code>"kdtree"</code>, the default, builds a k-d tree and is
 typically the best starting point for low- or moderate-dimensional
 data;</li>
 <li>
@@ -615,11 +615,11 @@ observations.</p>
 <span><span class="co">#&gt; tree_vs_linear   tree_vs_dist </span></span>
 <span><span class="co">#&gt;           TRUE           TRUE</span></span></code></pre></div>
 <p><code>bucketSize</code> and <code>splitRule</code> control
-construction of the kd-tree. Their defaults are appropriate for most
+construction of the k-d tree. Their defaults are appropriate for most
 uses. Setting <code>approx</code> above zero enables approximate search,
 which can improve speed at the cost of omitting some true neighbors.
 Assess the effect on the downstream analysis before using it.</p>
-<p>Kd-trees generally become less effective as dimensionality grows.
+<p>K-d trees generally become less effective as dimensionality grows.
 Linear search, an application-specific dimension reduction, or a
 different distance representation may be preferable in high-dimensional
 settings.</p>
@@ -628,7 +628,7 @@ settings.</p>
 <h2 id="important-details">Important details<a class="anchor" aria-label="anchor" href="#important-details"></a>
 </h2>
 <ul>
-<li>Input data and query points must be numeric and finite for kd-tree
+<li>Input data and query points must be numeric and finite for k-d tree
 and linear search.</li>
 <li>A search of <code>x</code> against itself excludes self-matches;
 query searches do not.</li>

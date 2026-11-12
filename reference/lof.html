@@ -6,8 +6,8 @@
     }
   };
 </script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Local Outlier Factor Score — lof"><meta name="description" content="Calculate the Local Outlier Factor (LOF) score for each data point using a
-kd-tree to speed up kNN search."><meta property="og:description" content="Calculate the Local Outlier Factor (LOF) score for each data point using a
-kd-tree to speed up kNN search."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
+k-d tree to speed up kNN search."><meta property="og:description" content="Calculate the Local Outlier Factor (LOF) score for each data point using a
+k-d tree to speed up kNN search."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -53,7 +53,7 @@ kd-tree to speed up kNN search."><meta property="og:image" content="https://mich
 
     <div class="ref-description section level2">
     <p>Calculate the Local Outlier Factor (LOF) score for each data point using a
-kd-tree to speed up kNN search.</p>
+k-d tree to speed up kNN search.</p>
     </div>
 
     <div class="section level2">
@@ -94,7 +94,7 @@ not an outlier. Points that have a substantially lower lrd than their
 neighbors are considered outliers and produce scores significantly larger
 than 1.</p>
 <p>If a data matrix is specified, then Euclidean distances and fast nearest
-neighbor search using a kd-tree is used.</p>
+neighbor search using a k-d tree is used.</p>
 <p><strong>Note on duplicate points:</strong> If there are more than <code>minPts</code>
 duplicates of a point in the data, then LOF the local readability distance
 will be 0 resulting in an undefined LOF score of 0/0. We set LOF in this

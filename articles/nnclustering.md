@@ -53,7 +53,7 @@ plot(x, pch = 19, cex = 0.25, asp = 1, main = "DS3 data")
 ![](nnclustering_files/figure-html/data-1.png)
 
 For numeric matrices and data frames, both functions use Euclidean
-distance and fast kd-tree nearest-neighbor search. Variable scales
+distance and fast k-d tree nearest-neighbor search. Variable scales
 therefore matter. Standardize variables when their units are not
 comparable and scaling is appropriate for the application.
 
@@ -304,7 +304,7 @@ or plotted for small data sets; see
 
 Both clustering functions also accept a `dist` object. This permits
 other distance measures, at the cost of storing all pairwise distances
-and giving up the fast kd-tree search.
+and giving up the fast k-d tree search.
 
 ``` r
 

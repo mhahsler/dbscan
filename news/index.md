@@ -4,6 +4,8 @@
 
 ### Changes
 
+- Documentation now consistently spells “k-d tree” (was kd-tree, kd
+  tree, and k-d tree).
 - Added RAII model for ANN. ANN searches now release point storage,
   trees, and search buffers automatically when C++ exceptions or user
   interrupts unwind a call.
@@ -261,10 +263,10 @@ CRAN release: 2021-02-26
 
 - Improved speed of LOF for large ks (following suggestions by
   eduardokapp).
-- kNN: results is now not sorted again for kd-tree queries which is much
-  faster (by a factor of 10).
+- kNN: results is now not sorted again for k-d tree queries which is
+  much faster (by a factor of 10).
 - ANN library: annclose() is now only called once when the package is
-  unloaded. This is in preparation to support persistent kd-trees using
+  unloaded. This is in preparation to support persistent k-d trees using
   external pointers.
 - hdbscan lost parameter xdist.
 

@@ -6,8 +6,8 @@
     }
   };
 </script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Ordering Points to Identify the Clustering Structure (OPTICS) — optics"><meta name="description" content="Implementation of the OPTICS (Ordering points to identify the clustering
-structure) point ordering algorithm using a kd-tree."><meta property="og:description" content="Implementation of the OPTICS (Ordering points to identify the clustering
-structure) point ordering algorithm using a kd-tree."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
+structure) point ordering algorithm using a k-d tree."><meta property="og:description" content="Implementation of the OPTICS (Ordering points to identify the clustering
+structure) point ordering algorithm using a k-d tree."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -53,7 +53,7 @@ structure) point ordering algorithm using a kd-tree."><meta property="og:image" 
 
     <div class="ref-description section level2">
     <p>Implementation of the OPTICS (Ordering points to identify the clustering
-structure) point ordering algorithm using a kd-tree.</p>
+structure) point ordering algorithm using a k-d tree.</p>
     </div>
 
     <div class="section level2">
@@ -221,8 +221,8 @@ points between clusters.</p>
 
 
 <p>If <code>x</code> is specified as a data matrix, then Euclidean distances and fast
-nearest neighbor lookup using a kd-tree are used. See <code><a href="kNN.html">kNN()</a></code> for
-details on the parameters for the kd-tree.</p>
+nearest neighbor lookup using a k-d tree are used. See <code><a href="kNN.html">kNN()</a></code> for
+details on the parameters for the k-d tree.</p>
 </div>
 
 <div class="section">
@@ -332,7 +332,7 @@ pp. 318-329.</p>
 <span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, times <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, times <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### run OPTICS (Note: we use the default eps = Inf)</span></span></span>
@@ -374,7 +374,7 @@ pp. 318-329.</p>
 <span class="r-plt img"><img src="optics-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### plot the order of points in the reachability plot</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col <span class="op">=</span> <span class="st">"grey"</span>, pch <span class="op">=</span> <span class="fl">19</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/polygon.html" class="external-link">polygon</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">res</span><span class="op">$</span><span class="va">order</span>, <span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -393,7 +393,7 @@ pp. 318-329.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>  <span class="co">## black is noise</span></span></span>
 <span class="r-plt img"><img src="optics-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### re-cut at a higher eps threshold</span></span></span>
@@ -410,7 +410,7 @@ pp. 318-329.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   eps_cl, xi, cluster</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-6.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### extract hierarchical clustering of varying density using the Xi method</span></span></span>
@@ -425,7 +425,7 @@ pp. 318-329.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optics-8.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">res</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Not enough colors. Some colors will be reused.</span>
 <span class="r-plt img"><img src="optics-9.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

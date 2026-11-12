@@ -1,7 +1,7 @@
 # Global-Local Outlier Score from Hierarchies
 
 Calculate the Global-Local Outlier Score from Hierarchies (GLOSH) score
-for each data point using a kd-tree to speed up kNN search.
+for each data point using a k-d tree to speed up kNN search.
 
 ## Usage
 

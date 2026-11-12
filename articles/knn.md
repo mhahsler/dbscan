@@ -27,7 +27,7 @@ and [`comps()`](https://michael.hahsler.net/dbscan/reference/comps.md)
 for finding connected components.
 
 Nearest neighbor search is optimized for Euclidean distance where it
-used kd-tree implemented in the ANN library (Mount and Arya, 2010).
+used k-d tree implemented in the ANN library (Mount and Arya, 2010).
 
 ## Example data
 
@@ -139,7 +139,7 @@ plot(knn5, x, pch = 19, main = "5-nearest-neighbor graph")
 
 ### Reuse and reduce a search
 
-A stored search can be reduced without rebuilding the kd-tree. This is
+A stored search can be reduced without rebuilding the k-d tree. This is
 useful when an analysis needs several values of `k`: calculate the
 largest required neighborhood once and retain its leading columns.
 
@@ -546,7 +546,7 @@ Supplying a `dist` object allows
 [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md), and
 [`sNN()`](https://michael.hahsler.net/dbscan/reference/sNN.md) to use
 another dissimilarity measure. However, this means that the efficient
-kd-tree implementation cannot be used.
+k-d tree implementation cannot be used.
 
 ``` r
 
@@ -574,7 +574,7 @@ variable weights are meaningful for the application.
 
 For numeric data, the `search` argument offers three strategies:
 
-- `"kdtree"`, the default, builds a kd-tree and is typically the best
+- `"kdtree"`, the default, builds a k-d tree and is typically the best
   starting point for low- or moderate-dimensional data;
 - `"linear"` checks the observations without building a tree; and
 - `"dist"` first calculates all pairwise Euclidean distances.
@@ -596,20 +596,21 @@ c(
 #>           TRUE           TRUE
 ```
 
-`bucketSize` and `splitRule` control construction of the kd-tree. Their
+`bucketSize` and `splitRule` control construction of the k-d tree. Their
 defaults are appropriate for most uses. Setting `approx` above zero
 enables approximate search, which can improve speed at the cost of
 omitting some true neighbors. Assess the effect on the downstream
 analysis before using it.
 
-Kd-trees generally become less effective as dimensionality grows. Linear
-search, an application-specific dimension reduction, or a different
-distance representation may be preferable in high-dimensional settings.
+K-d trees generally become less effective as dimensionality grows.
+Linear search, an application-specific dimension reduction, or a
+different distance representation may be preferable in high-dimensional
+settings.
 
 ## Important details
 
-- Input data and query points must be numeric and finite for kd-tree and
-  linear search.
+- Input data and query points must be numeric and finite for k-d tree
+  and linear search.
 - A search of `x` against itself excludes self-matches; query searches
   do not.
 - [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) returns

@@ -124,7 +124,7 @@ Do not include identifiers, labels, or unordered factors as numeric
 features. For a non-Euclidean distance, calculate a `dist` object first
 and pass it to
 [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md);
-this does not use the fast kd-tree search.
+this does not use the fast k-d tree search.
 
 ## Choose `minPts` and `eps`
 

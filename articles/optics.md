@@ -30,7 +30,7 @@ plot(x, asp = 1, main = "Example data")
 
 [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)
 accepts a numeric matrix or data frame. For numeric data it uses
-Euclidean distance and a fast kd-tree search.
+Euclidean distance and a fast k-d tree search.
 
 ``` r
 
@@ -139,7 +139,7 @@ therefore proceeds in two steps if `eps = Inf` (the default):
 
 1.  The core distances of all points are computed with a
     \\k\\-nearest-neighbor search (\\k = \mathtt{minPts} - 1\\, using
-    the kd-tree).
+    the k-d tree).
 2.  Prim’s algorithm scans the unvisited points once for every visited
     point and calculates the needed distances on the fly. A distance
     matrix is never created, so only \\O(n)\\ memory is needed in
@@ -357,7 +357,7 @@ transformations used for the training data to new observations.
 To use a distance other than Euclidean distance, calculate a `dist`
 object and pass it to
 [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md).
-This uses the supplied pairwise distances rather than the kd-tree
+This uses the supplied pairwise distances rather than the k-d tree
 search.
 
 ``` r

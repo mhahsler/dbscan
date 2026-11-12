@@ -1,6 +1,6 @@
 # Find the Fixed Radius Nearest Neighbors
 
-This function uses a kd-tree to find the fixed radius nearest neighbors
+This function uses a k-d tree to find the fixed radius nearest neighbors
 (including distances) fast.
 
 ## Usage
@@ -55,11 +55,11 @@ print(x, ...)
 
 - bucketSize:
 
-  max size of the kd-tree leafs.
+  max size of the k-d tree leafs.
 
 - splitRule:
 
-  rule to split the kd-tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
+  rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
   `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding).
   `"SUGGEST"` uses ANNs best guess.
 
@@ -108,7 +108,7 @@ the id of the nearest neighbors.
 ## Details
 
 If `x` is specified as a data matrix, then Euclidean distances and fast
-nearest neighbor lookup using a kd-tree are used.
+nearest neighbor lookup using a k-d tree are used.
 
 To create a frNN object from scratch, you need to supply at least the
 elements `id` with a list of integer vectors with the nearest neighbor

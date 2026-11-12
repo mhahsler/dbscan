@@ -4,7 +4,7 @@ Calculate the local density at each data point as either the number of
 points in the eps-neighborhood (as used in
 [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md)) or
 perform kernel density estimation (KDE) using a uniform kernel. The
-function uses a kd-tree for fast fixed-radius nearest neighbor search.
+function uses a k-d tree for fast fixed-radius nearest neighbor search.
 
 ## Usage
 
@@ -59,7 +59,7 @@ point count in the eps-neighborhood divided by \\(2\\eps\\n)\\, where
 
 Alternatively, `type = "gaussian"` calculates a Gaussian kernel estimate
 where `eps` is used as the standard deviation. To speed up computation,
-a kd-tree is used to find all points within 3 times the standard
+a k-d tree is used to find all points within 3 times the standard
 deviation and these points are used for the estimate.
 
 Points with low local density often indicate noise (see e.g., Wishart

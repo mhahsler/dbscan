@@ -35,7 +35,7 @@ kNNdistplot(x, k, minPts, ...)
 
 - ...:
 
-  further arguments (e.g., kd-tree related parameters) are passed on to
+  further arguments (e.g., k-d tree related parameters) are passed on to
   [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
 
 - minPts:

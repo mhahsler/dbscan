@@ -52,7 +52,8 @@
 <h2 class="pkg-version" data-toc-text="1.2.8" id="dbscan-128-2026-11-12">dbscan 1.2.8 (2026-11-12)<a class="anchor" aria-label="anchor" href="#dbscan-128-2026-11-12"></a></h2>
 <div class="section level3">
 <h3 id="changes-1-2-8">Changes<a class="anchor" aria-label="anchor" href="#changes-1-2-8"></a></h3>
-<ul><li>Added RAII model for ANN. ANN searches now release point storage, trees, and search buffers automatically when C++ exceptions or user interrupts unwind a call.</li>
+<ul><li>Documentation now consistently spells “k-d tree” (was kd-tree, kd tree, and k-d tree).</li>
+<li>Added RAII model for ANN. ANN searches now release point storage, trees, and search buffers automatically when C++ exceptions or user interrupts unwind a call.</li>
 <li>New <code><a href="../reference/mst_dist.html">mst_dist()</a></code> (single-linkage hierarchy of the minimum spanning tree of a <code>dist</code> object as an <code>hclust</code> object) and <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> (MST of the mutual reachability graph computed directly from a data matrix and <code>minPts</code>).</li>
 <li>
 <code><a href="../reference/hdbscan.html">hdbscan()</a></code> with a data matrix now builds the minimum spanning tree with <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> avoiding creating a full distance matrix.</li>
@@ -252,8 +253,8 @@
 <div class="section level3">
 <h3 id="improvements-1-1-6">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-1-6"></a></h3>
 <ul><li>Improved speed of LOF for large ks (following suggestions by eduardokapp).</li>
-<li>kNN: results is now not sorted again for kd-tree queries which is much faster (by a factor of 10).</li>
-<li>ANN library: annclose() is now only called once when the package is unloaded. This is in preparation to support persistent kd-trees using external pointers.</li>
+<li>kNN: results is now not sorted again for k-d tree queries which is much faster (by a factor of 10).</li>
+<li>ANN library: annclose() is now only called once when the package is unloaded. This is in preparation to support persistent k-d trees using external pointers.</li>
 <li>hdbscan lost parameter xdist.</li>
 </ul></div>
 <div class="section level3">

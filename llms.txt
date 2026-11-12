@@ -48,12 +48,12 @@ includes:
 - **DBCV:** Density-based clustering validation ([Moulavi et al.
   2014](#ref-moulavi2014)).
 
-**Fast Nearest-Neighbor Search (using kd-trees)**
+**Fast Nearest-Neighbor Search (using k-d trees)**
 
 - **kNN search**
 - **Fixed-radius NN search**
 
-The implementations use the kd-tree data structure (from library ANN)
+The implementations use the k-d tree data structure (from library ANN)
 for faster k-nearest neighbor search, and are for Euclidean distance
 typically faster than the native R implementations (e.g., dbscan in
 package `fpc`), or the implementations in

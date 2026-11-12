@@ -219,7 +219,7 @@ These can be calculated using the following two exposed functions:
 - `coredist()`: The core distance is defined for each point as the
   distance to the (`minPts - 1`)-th nearest neighbor. It produces a
   density estimate where larger values for `minPts` lead to larger and
-  smoother estimates. The core distance is For matrix data, a fast kd
+  smoother estimates. The core distance is For matrix data, a fast k-d
   tree based on Euclidean distance is used. Additional parameters to
   `coredist()` are passed on to
   [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md).

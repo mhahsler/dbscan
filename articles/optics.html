@@ -106,7 +106,7 @@ and how to extract flat or hierarchical clusters from it.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, asp <span class="op">=</span> <span class="fl">1</span>, main <span class="op">=</span> <span class="st">"Example data"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optics_files/figure-html/data-1.png" class="r-plt" alt="" width="576"></p>
 <p><code><a href="../reference/optics.html">optics()</a></code> accepts a numeric matrix or data frame. For
-numeric data it uses Euclidean distance and a fast kd-tree search.</p>
+numeric data it uses Euclidean distance and a fast k-d tree search.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">optics</a></span><span class="op">(</span><span class="va">x</span>, minPts <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">opt</span></span>
@@ -195,8 +195,8 @@ favor of the observation with the lower row number.</p>
 <p>This implementaion of <code><a href="../reference/optics.html">optics()</a></code> therefore proceeds in two
 steps if <code>eps = Inf</code> (the default):</p>
 <ol style="list-style-type: decimal">
-<li>The core distances of all points are computed with a <span class="math inline">\(k\)</span>-nearest-neighbor search (<span class="math inline">\(k = \mathtt{minPts} - 1\)</span>, using the
-kd-tree).</li>
+<li>The core distances of all points are computed with a <span class="math inline">\(k\)</span>-nearest-neighbor search (<span class="math inline">\(k = \mathtt{minPts} - 1\)</span>, using the k-d
+tree).</li>
 <li>Prim’s algorithm scans the unvisited points once for every visited
 point and calculates the needed distances on the fly. A distance matrix
 is never created, so only <span class="math inline">\(O(n)\)</span>
@@ -375,7 +375,7 @@ data to new observations.</p>
 </h2>
 <p>To use a distance other than Euclidean distance, calculate a
 <code>dist</code> object and pass it to <code><a href="../reference/optics.html">optics()</a></code>. This uses
-the supplied pairwise distances rather than the kd-tree search.</p>
+the supplied pairwise distances rather than the k-d tree search.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"manhattan"</span><span class="op">)</span></span>
 <span><span class="va">opt_manhattan</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optics.html">optics</a></span><span class="op">(</span><span class="va">d</span>, minPts <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>

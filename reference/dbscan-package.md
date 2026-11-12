@@ -43,7 +43,7 @@ Useful links:
 
 - <https://github.com/mhahsler/dbscan>
 
-- <http://michael.hahsler.net/dbscan/>
+- <https://michael.hahsler.net/dbscan/>
 
 - Report bugs at <https://github.com/mhahsler/dbscan/issues>
 

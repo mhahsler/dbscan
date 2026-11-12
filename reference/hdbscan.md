@@ -49,7 +49,9 @@ predict(object, newdata, data, ...)
 - minPts:
 
   integer; Main parameter to control density estimate smoothing and the
-  minimum clusters size. See details.
+  minimum clusters size. See details. For `mrdist()` (and
+  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md))
+  it can be omitted if `coredist` is specified.
 
 - cluster_selection_epsilon:
 
@@ -186,8 +188,8 @@ hierarchical cluster tree representing density estimates along with the
 stability-based flat cluster extraction. HDBSCAN essentially computes
 the hierarchy of all DBSCAN\* clusterings, and then uses a
 stability-based extraction method to find optimal cuts in the hierarchy,
-thus producing a flat solution. It uses Prim's algorithm and saves
-memory by avoiding to creating a complete distance matrix.
+thus producing a flat solution. It uses Prim's algorithm and is memory
+efficient by avoiding to create a complete distance matrix.
 
 ### The algorithm
 
@@ -208,68 +210,82 @@ several of the HDBSCAN steps:
 
 4.  Extract the clusters from the pruned tree.
 
-Because one `minPts` value sets both the density smoothing and the
-minimum cluster size, a single call cannot change one without the other.
-To use a different minimum cluster size, extract the clusters again from
-the result with
-[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
-e.g., `extractFOSC(res, minPts = 20)`. This keeps the density estimates
-and the hierarchy of `res`.
+The individual steps are described in the following.
 
 ### Core and mutual reachability distances
 
 These can be calculated using the following two exposed functions:
 
 - `coredist()`: The core distance is defined for each point as the
-  distance to the (`minPts - 1`)-th nearest neighbor. It is a density
-  estimate equivalent to
-  [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
-  with `k = minPts -1`. Larger values for `minPts` lead to larger and
-  smoother estimates.
+  distance to the (`minPts - 1`)-th nearest neighbor. It produces a
+  density estimate where larger values for `minPts` lead to larger and
+  smoother estimates. The core distance is For matrix data, a fast kd
+  tree based on Euclidean distance is used. Additional parameters to
+  `coredist()` are passed on to
+  [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md).
+  A core distance vector is returned.
 
 - `mrdist()`: The mutual reachability distance is defined between two
   points as `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`. It
   has the effect of increasing distances in low density areas,
   separating clusters better.
 
+To use non-Euclidean distances, the call `hdbscan()`, `coredist()`, or
+`mrdist()` with a precomputed distance matrix.
+
 ### Minimum spanning tree construction
 
 [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-constructs a MST from the mutual reachability distance matrix.
-
-**Note:** If `x` is a data matrix, then
+constructs a MST from a data from the mutual reachability distance
+matrix. Since distance matrices are of size \\O(n^2)\\ and thus can
+become very large,
 [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-is used which computes the mutual reachability distance MST directly
-using Prim's algorithm without the expensive distance matrix creating.
-This reduces memory complexity from \\O(n^2)\\ to \\O(d n)\\ and speeds
-up the calculation. This only works with Euclidean distances.
+is also provides which directly constructs the MST from matrix data
+without creating the full distance matrix. This reduces memory
+complexity \\O(d n)\\ and speeds up the calculation, but only works with
+Euclidean distances.
 
 ### Tree pruning and cluster selection
 
-The MST is pruned using stability and clusters are extracted in an
-unsupervised version using
+The MST is pruned using stability and clusters are extracted in the
+unsupervised version implemented in
 [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
+Because one `minPts` value sets both the density smoothing and the
+minimum cluster size in HDBSCAN, using a different minimum cluster size
+requires an explicit call to
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+with the new `minPts`, e.g., `extractFOSC(res, minPts = 20)`. This keeps
+the density estimates using the original `minPts`and the hierarchy of
+`res`, but recomputed stability and cluster extraction using the new
+`minPts` value.
 
-Malzer and Baum (2020) describe that a combination between DBSCAN\* and
-HDBSCAN\* can be achieved by using a `cluster_selection_epsilon` greater
-than 0.0. The tree below `cluster_selection_epsilon` produces a result
-identical to DBSCAN\* with `eps = cluster_selection_epsilon`. The
-remaining part (on levels above the threshold) is still processed by
-HDBSCAN\*'s stability-based selection algorithm and can therefore return
-clusters of variable densities. Note that there is not always a
-remaining part, especially if the parameter value is chosen too large,
-or if there aren't enough clusters of variable densities. In this case,
-the result will be equal to DBSCAN\*. `cluster_selection_epsilon` is
-especially useful for cases where HDBSCAN\* produces too many small
-clusters that need to be merged, while still being able to extract
-clusters of variable densities at higher levels.
+### HDBSCAN\* and DBSCAN\*
+
+Campello, Moulavi, and Sander (2013) introduced DBSCAN\* and HDBSCAN\*
+and demonstrated that for a fixed minimum points parameter `minPts`, the
+HDBSCAN\* hierarchy encodes a one-to-one correspondence with the
+complete set of flat clusterings obtainable by DBSCAN\* across every
+possible radius `eps`. Malzer and Baum (2020) describe that a
+combination between DBSCAN\* and HDBSCAN\* can be achieved by using a
+`cluster_selection_epsilon` greater than 0.0. The tree below
+`cluster_selection_epsilon` produces a result identical to DBSCAN\* with
+`eps = cluster_selection_epsilon`. The remaining part (on levels above
+the threshold) is still processed by HDBSCAN\*'s stability-based
+selection algorithm and can therefore return clusters of variable
+densities. Note that there is not always a remaining part, especially if
+the parameter value is chosen too large, or if there aren't enough
+clusters of variable densities. In this case, the result will be equal
+to DBSCAN\*. `cluster_selection_epsilon` is especially useful for cases
+where HDBSCAN\* produces too many small clusters that need to be merged,
+while still being able to extract clusters of variable densities at
+higher levels.
 
 ### Cluster membership prediction for new points
 
-[`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
-data point to the same cluster as the nearest point if it is not more
-than that points core distance away. Otherwise the new point is
-classified as a noise point (i.e., cluster ID 0).
+- [`predict()`](https://rdrr.io/r/stats/predict.html) assigns each new
+  data point to the same cluster as the nearest point if it is not more
+  than that points core distance away. Otherwise the new point is
+  classified as a noise point (i.e., cluster ID 0).
 
 ### Related Methods
 

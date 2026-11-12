@@ -1,14 +1,14 @@
 # Using Hierarchical DBSCAN (HDBSCAN)
 
-The dbscan package \[6\] includes a fast implementation of Hierarchical
-DBSCAN (HDBSCAN) and its related algorithm(s) for the R platform. This
-vignette introduces how to interface with these features. To understand
-how HDBSCAN works, we refer to an excellent Python Notebook resource
-that goes over the basic concepts of the algorithm (see [the
-SciKit-learn
-docs](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)).
-For the sake of simplicity, consider the same sample dataset from the
-notebook:
+The dbscan package \[6\] provides a fast implementation of Hierarchical
+DBSCAN (HDBSCAN) and related algorithms for R. Nearest-neighbor searches
+use k-d trees, and for data matrices the minimum spanning tree (MST) is
+computed with Prim’s algorithm without materializing the full distance
+matrix. This vignette introduces the corresponding interface. For an
+introduction to the concepts of the algorithm, see the [HDBSCAN
+documentation](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html)
+of the Python library hdbscan. We use the same sample dataset as that
+documentation:
 
 ``` r
 
@@ -30,8 +30,8 @@ plot(moons, pch=20)
 
 ![](hdbscan_files/figure-html/unnamed-chunk-1-1.png)
 
-To run the HDBSCAN algorithm, simply pass the dataset and the (single)
-parameter value ‘minPts’ to the hdbscan function.
+To run HDBSCAN, pass the data and the single parameter `minPts` to
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md).
 
 ``` r
 
@@ -49,8 +49,9 @@ parameter value ‘minPts’ to the hdbscan function.
     ## Available fields: cluster, minPts, coredist, cluster_scores,
     ##                   membership_prob, outlier_scores, hc
 
-The ‘flat’ results are stored in the ‘cluster’ member. Noise points are
-given a value of 0, so increment by 1.
+The flat clustering is stored in the `cluster` component. Noise points
+are assigned the cluster id 0, so we add 1 to obtain valid color
+indices.
 
 ``` r
 
@@ -59,16 +60,15 @@ given a value of 0, so increment by 1.
 
 ![](hdbscan_files/figure-html/unnamed-chunk-3-1.png)
 
-The results match intuitive notions of what ‘similar’ clusters may look
-like when they manifest in arbitrary shapes.
+The clustering recovers the intuitive, arbitrarily shaped groups in the
+data.
 
-## Hierarchical DBSCAN
+## The HDBSCAN\* Hierarchy
 
-The resulting HDBSCAN object contains a hierarchical representation of
-every possible DBSCAN\* clustering. This hierarchical representation is
-compactly stored in the familiar ‘hc’ member of the resulting HDBSCAN
-object, in the same format of traditional hierarchical clustering
-objects formed using the ‘hclust’ method from the stats package.
+The `hdbscan` object contains a hierarchical representation of all
+DBSCAN\* clusterings for the given `minPts`. The hierarchy is stored in
+the `hc` component as an `hclust` object (see
+[`stats::hclust()`](https://rdrr.io/r/stats/hclust.html)).
 
 ``` r
 
@@ -83,12 +83,13 @@ cl$hc
     ## Distance         : mutual reachability (euclidean) 
     ## Number of objects: 100
 
-Note that although this object is available for use with any of the
-methods that work with ‘hclust’ objects, the distance method HDBSCAN
-uses (mutual reachability distance, see \[2\]) is *not* an available
-method of the hclust function. This hierarchy, denoted the “HDBSCAN\*
-hierarchy” in \[3\], can be visualized using the built-in plotting
-method from the stats package
+The object can be used with functions that accept `hclust` objects.
+Note, however, that the hierarchy is a single-linkage hierarchy under
+the mutual reachability distance (see \[3\]), which
+[`stats::hclust()`](https://rdrr.io/r/stats/hclust.html) does not
+provide as a linkage method. It is called the “HDBSCAN\* hierarchy” in
+\[3, 4\] and can be visualized with the plot method for `hclust` objects
+from the stats package:
 
 ``` r
 
@@ -97,15 +98,15 @@ plot(cl$hc, main="HDBSCAN* Hierarchy")
 
 ![](hdbscan_files/figure-html/unnamed-chunk-5-1.png)
 
-## DBSCAN\* vs cutting the HDBSCAN\* tree
+## DBSCAN\* vs. Cutting the HDBSCAN\* Hierarchy
 
-As the name implies, the fascinating thing about the HDBSCAN\* hierarchy
-is that any global ‘cut’ is equivalent to running DBSCAN\* (DBSCAN w/o
-border points) at the tree’s cutting threshold \\eps\\ (assuming the
-same \\minPts\\ parameter setting was used). But can this be verified
-manually? Using a modified function to distinguish noise using core
-distance as 0 (since the stats cutree method *does not* assign
-singletons with 0), the results can be shown to be identical.
+A global cut of the HDBSCAN\* hierarchy at height \\\varepsilon\\ is
+equivalent to running DBSCAN\* (DBSCAN \[1\] without border points) with
+\\\varepsilon\\ and the same \\minPts\\. We can verify this empirically.
+[`stats::cutree()`](https://rdrr.io/r/stats/cutree.html) does not label
+singletons as noise, so the function below assigns noise (cluster id 0)
+to all points whose core distance exceeds \\\varepsilon\\. The
+clusterings are then compared across all cut heights.
 
 ``` r
 
@@ -133,15 +134,14 @@ print(all(check == TRUE))
 
     ## [1] TRUE
 
-## Simplified Tree
+## Simplified Cluster Tree
 
-The HDBSCAN\* hierarchy is useful, but for larger datasets it can become
-overly cumbersome since every data point is represented as a leaf
-somewhere in the hierarchy. The hdbscan object comes with a powerful
-visualization tool that plots the ‘simplified’ hierarchy(see \[2\] for
-more details), which shows **cluster-wide** changes over an infinite
-number of \\eps\\ thresholds. It is the default visualization dispatched
-by the ‘plot’ method
+The full HDBSCAN\* hierarchy becomes unwieldy for larger datasets
+because every observation is a leaf. The
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) method for
+`hdbscan` objects instead shows the simplified (condensed) cluster tree
+(see \[3, 4\]), which displays **cluster-wide** changes over all values
+of \\\varepsilon\\. It is the default visualization:
 
 ``` r
 
@@ -150,7 +150,7 @@ by the ‘plot’ method
 
 ![](hdbscan_files/figure-html/unnamed-chunk-7-1.png)
 
-You can change up colors
+The color gradient can be changed,
 
 ``` r
 
@@ -159,7 +159,7 @@ You can change up colors
 
 ![](hdbscan_files/figure-html/unnamed-chunk-8-1.png)
 
-… and scale the widths for individual devices appropriately
+the widths scaled to the output device,
 
 ``` r
 
@@ -168,7 +168,8 @@ plot(cl, gradient = c("purple", "blue", "green", "yellow"), scale=1.5)
 
 ![](hdbscan_files/figure-html/unnamed-chunk-9-1.png)
 
-… even outline the most ‘stable’ clusters reported in the flat solution
+and the clusters selected for the flat solution (those with maximal
+stability \[2\]) can be outlined:
 
 ``` r
 
@@ -179,11 +180,11 @@ plot(cl, gradient = c("purple", "blue", "green", "yellow"), show_flat = TRUE)
 
 ## Cluster Stability Scores
 
-Note the stability scores correspond to the labels on the condensed
-tree, but the cluster assignments in the cluster member element do not
-correspond to the labels in the condensed tree. Also, note that these
-scores represent the stability scores *before* the traversal up the tree
-that updates the scores based on the children.
+The stability scores are indexed by the cluster labels of the condensed
+tree. These labels differ from the cluster ids in the `cluster`
+component. The scores are the stability values *before* the bottom-up
+traversal of the tree that updates them based on the stability of the
+child clusters.
 
 ``` r
 
@@ -193,8 +194,9 @@ print(cl$cluster_scores)
     ##         1         2         3 
     ## 110.70613  90.86559  45.62762
 
-The individual point membership ‘probabilities’ are in the probabilities
-member element
+The membership “probabilities” of the individual points are stored in
+`membership_prob`. They are derived from the core distances and are not
+probabilities in a statistical sense.
 
 ``` r
 
@@ -203,9 +205,8 @@ member element
 
     ## [1] 0.4354753 0.2893287 0.4778663 0.4035933 0.4574012 0.4904582
 
-These can be used to show the ‘degree of cluster membership’ by, for
-example, plotting points with transparencies that correspond to their
-membership degrees.
+They can be used to visualize the degree of cluster membership, for
+example, by mapping it to the transparency of the points.
 
 ``` r
 
@@ -219,21 +220,17 @@ membership degrees.
 
 ## Global-Local Outlier Score from Hierarchies
 
-A recent journal publication on HDBSCAN comes with a new outlier measure
-that computes an outlier score of each point in the data based on local
-*and* global properties of the hierarchy, defined as the Global-Local
-Outlier Score from Hierarchies (GLOSH)\[4\]. An example of this is shown
-below, where unlike the membership probabilities, the opacity of point
-represents the amount of “outlierness” the point represents.
-Traditionally, outliers are generally considered to be observations that
-deviate from the expected value of their presumed underlying
-distribution, where the measure of deviation that is considered
-significant is determined by some statistical threshold value.
+The Global-Local Outlier Score from Hierarchies (GLOSH) \[4\] assigns an
+outlier score to each point based on both local *and* global properties
+of the hierarchy. The scores are available in the `outlier_scores`
+component. In the plot below, the opacity of a point represents its
+outlier score, and the ten points with the highest scores are labeled.
 
-**Note:** Because of the distinction made that noise points, points that
-*are not* assigned to any clusters, should be considered in the
-definition of an outlier, the outlier scores computed are not just the
-inversely-proportional scores to the membership probabilities.
+**Note:** GLOSH is computed from the hierarchy. It is not simply the
+complement of the membership probabilities, which are based on the core
+distances of the points within the selected clusters. Noise points
+(points not assigned to any cluster) are taken into account in the
+definition of an outlier.
 
 ``` r
 
@@ -246,15 +243,12 @@ inversely-proportional scores to the membership probabilities.
 
 ![](hdbscan_files/figure-html/unnamed-chunk-14-1.png)
 
-## A Larger Clustering Example
+## A Larger Example
 
-A larger example dataset may be more beneficial in explicitly revealing
-the usefulness of HDSBCAN. Consider the ‘DS3’ dataset originally
-published as part of a benchmark test dataset for the Chameleon
-clustering algorithm \[5\]. It’s clear that the shapes in this dataset
-can be distinguished sufficiently well by a human, however, it is well
-known that many clustering algorithms fail to capture the intuitive
-structure.
+A larger dataset illustrates the advantages of HDBSCAN more clearly. The
+`DS3` dataset was published as a benchmark for the Chameleon clustering
+algorithm \[5\]. Its shapes are easy to identify visually, but many
+clustering algorithms fail to recover them.
 
 ``` r
 
@@ -264,7 +258,7 @@ plot(DS3, pch=20, cex=0.25)
 
 ![](hdbscan_files/figure-html/unnamed-chunk-15-1.png)
 
-Using the single parameter setting of, say, 25, HDBSCAN finds 6 clusters
+With `minPts = 25`, HDBSCAN finds the 6 clusters in the data:
 
 ``` r
 
@@ -282,9 +276,8 @@ cl2
     ## Available fields: cluster, minPts, coredist, cluster_scores,
     ##                   membership_prob, outlier_scores, hc
 
-Marking the noise appropriately and highlighting points based on their
-‘membership probabilities’ as before, a visualization of the cluster
-structure can be easily crafted.
+As before, we mark noise points and map the membership probabilities to
+opacity.
 
 ``` r
 
@@ -299,7 +292,7 @@ structure can be easily crafted.
 
 ![](hdbscan_files/figure-html/unnamed-chunk-17-1.png)
 
-The simplified tree can be particularly useful for larger datasets
+The simplified cluster tree is particularly useful for larger datasets:
 
 ``` r
 
@@ -310,18 +303,21 @@ The simplified tree can be particularly useful for larger datasets
 
 ## Performance
 
-All of the computational and memory intensive tasks required by HDSBCAN
-were written in C++ using the Rcpp package. With DBSCAN, the performance
-depends on the parameter settings, primarily on the radius at which
-points are considered as candidates for clustering (‘eps’), and
-generally less so on the ‘minPts’ parameter. Intuitively, larger values
-of eps increase the computation time.
+The computationally intensive steps of HDBSCAN are implemented in C++
+using Rcpp. Core distances are computed with a k-d tree based
+k-nearest-neighbor search. For a data matrix,
+[`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+then constructs the MST of the mutual reachability graph with Prim’s
+algorithm and computes the (Euclidean) mutual reachability distances on
+the fly (see
+[`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)).
+The \\n \times n\\ distance matrix is never stored, so memory use is
+\\O(nd)\\ for \\n\\ points in \\d\\ dimensions. The running time is
+still quadratic in \\n\\.
 
-One of the primary computational bottleneck with using HDBSCAN is the
-computation of the full (euclidean) pairwise distance between all
-points, for which HDBSCAN currently relies on base R ‘dist’ method for.
-If a precomputed one is available, the running time of HDBSCAN can be
-moderately reduced.
+If a `dist` object is supplied instead of a data matrix, its distances
+are used directly. This supports other distance measures, but requires
+\\O(n^2)\\ memory.
 
 ## References
 

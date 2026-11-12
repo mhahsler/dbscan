@@ -83,13 +83,14 @@ Piekenbrock, Michael Hahsler</h4>
 
     
     
-<p>The dbscan package [6] includes a fast implementation of Hierarchical
-DBSCAN (HDBSCAN) and its related algorithm(s) for the R platform. This
-vignette introduces how to interface with these features. To understand
-how HDBSCAN works, we refer to an excellent Python Notebook resource
-that goes over the basic concepts of the algorithm (see <a href="https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html" class="external-link">the
-SciKit-learn docs</a>). For the sake of simplicity, consider the same
-sample dataset from the notebook:</p>
+<p>The dbscan package [6] provides a fast implementation of Hierarchical
+DBSCAN (HDBSCAN) and related algorithms for R. Nearest-neighbor searches
+use k-d trees, and for data matrices the minimum spanning tree (MST) is
+computed with Prim’s algorithm without materializing the full distance
+matrix. This vignette introduces the corresponding interface. For an
+introduction to the concepts of the algorithm, see the <a href="https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html" class="external-link">HDBSCAN
+documentation</a> of the Python library hdbscan. We use the same sample
+dataset as that documentation:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/mhahsler/dbscan" class="external-link">"dbscan"</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -101,8 +102,8 @@ sample dataset from the notebook:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"moons"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">moons</span>, pch<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-1-1.png" class="r-plt" alt="" width="700"></p>
-<p>To run the HDBSCAN algorithm, simply pass the dataset and the
-(single) parameter value ‘minPts’ to the hdbscan function.</p>
+<p>To run HDBSCAN, pass the data and the single parameter
+<code>minPts</code> to <code><a href="../reference/hdbscan.html">hdbscan()</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hdbscan.html">hdbscan</a></span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span>  <span class="va">cl</span></span></code></pre></div>
@@ -115,21 +116,22 @@ sample dataset from the notebook:</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Available fields: cluster, minPts, coredist, cluster_scores,</span></span>
 <span><span class="co">##                   membership_prob, outlier_scores, hc</span></span></code></pre>
-<p>The ‘flat’ results are stored in the ‘cluster’ member. Noise points
-are given a value of 0, so increment by 1.</p>
+<p>The flat clustering is stored in the <code>cluster</code> component.
+Noise points are assigned the cluster id 0, so we add 1 to obtain valid
+color indices.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">moons</span>, col<span class="op">=</span><span class="va">cl</span><span class="op">$</span><span class="va">cluster</span><span class="op">+</span><span class="fl">1</span>, pch<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
-<p>The results match intuitive notions of what ‘similar’ clusters may
-look like when they manifest in arbitrary shapes.</p>
+<p>The clustering recovers the intuitive, arbitrarily shaped groups in
+the data.</p>
 <div class="section level2">
-<h2 id="hierarchical-dbscan">Hierarchical DBSCAN<a class="anchor" aria-label="anchor" href="#hierarchical-dbscan"></a>
+<h2 id="the-hdbscan-hierarchy">The HDBSCAN* Hierarchy<a class="anchor" aria-label="anchor" href="#the-hdbscan-hierarchy"></a>
 </h2>
-<p>The resulting HDBSCAN object contains a hierarchical representation
-of every possible DBSCAN* clustering. This hierarchical representation
-is compactly stored in the familiar ‘hc’ member of the resulting HDBSCAN
-object, in the same format of traditional hierarchical clustering
-objects formed using the ‘hclust’ method from the stats package.</p>
+<p>The <code>hdbscan</code> object contains a hierarchical
+representation of all DBSCAN* clusterings for the given
+<code>minPts</code>. The hierarchy is stored in the <code>hc</code>
+component as an <code>hclust</code> object (see
+<code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">stats::hclust()</a></code>).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl</span><span class="op">$</span><span class="va">hc</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
@@ -139,26 +141,25 @@ objects formed using the ‘hclust’ method from the stats package.</p>
 <span><span class="co">## Cluster method   : robust single </span></span>
 <span><span class="co">## Distance         : mutual reachability (euclidean) </span></span>
 <span><span class="co">## Number of objects: 100</span></span></code></pre>
-<p>Note that although this object is available for use with any of the
-methods that work with ‘hclust’ objects, the distance method HDBSCAN
-uses (mutual reachability distance, see [2]) is <em>not</em> an
-available method of the hclust function. This hierarchy, denoted the
-“HDBSCAN* hierarchy” in [3], can be visualized using the built-in
-plotting method from the stats package</p>
+<p>The object can be used with functions that accept <code>hclust</code>
+objects. Note, however, that the hierarchy is a single-linkage hierarchy
+under the mutual reachability distance (see [3]), which
+<code><a href="https://rdrr.io/r/stats/hclust.html" class="external-link">stats::hclust()</a></code> does not provide as a linkage method. It is
+called the “HDBSCAN* hierarchy” in [3, 4] and can be visualized with the
+plot method for <code>hclust</code> objects from the stats package:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl</span><span class="op">$</span><span class="va">hc</span>, main<span class="op">=</span><span class="st">"HDBSCAN* Hierarchy"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="dbscan-vs-cutting-the-hdbscan-tree">DBSCAN* vs cutting the HDBSCAN* tree<a class="anchor" aria-label="anchor" href="#dbscan-vs-cutting-the-hdbscan-tree"></a>
+<h2 id="dbscan-vs--cutting-the-hdbscan-hierarchy">DBSCAN* vs. Cutting the HDBSCAN* Hierarchy<a class="anchor" aria-label="anchor" href="#dbscan-vs--cutting-the-hdbscan-hierarchy"></a>
 </h2>
-<p>As the name implies, the fascinating thing about the HDBSCAN*
-hierarchy is that any global ‘cut’ is equivalent to running DBSCAN*
-(DBSCAN w/o border points) at the tree’s cutting threshold <span class="math inline">\(eps\)</span> (assuming the same <span class="math inline">\(minPts\)</span> parameter setting was used). But
-can this be verified manually? Using a modified function to distinguish
-noise using core distance as 0 (since the stats cutree method <em>does
-not</em> assign singletons with 0), the results can be shown to be
-identical.</p>
+<p>A global cut of the HDBSCAN* hierarchy at height <span class="math inline">\(\varepsilon\)</span> is equivalent to running
+DBSCAN* (DBSCAN [1] without border points) with <span class="math inline">\(\varepsilon\)</span> and the same <span class="math inline">\(minPts\)</span>. We can verify this empirically.
+<code><a href="https://rdrr.io/r/stats/cutree.html" class="external-link">stats::cutree()</a></code> does not label singletons as noise, so the
+function below assigns noise (cluster id 0) to all points whose core
+distance exceeds <span class="math inline">\(\varepsilon\)</span>. The
+clusterings are then compared across all cut heights.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hdbscan.html">hdbscan</a></span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">check</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">moons</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
@@ -183,28 +184,27 @@ identical.</p>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 <div class="section level2">
-<h2 id="simplified-tree">Simplified Tree<a class="anchor" aria-label="anchor" href="#simplified-tree"></a>
+<h2 id="simplified-cluster-tree">Simplified Cluster Tree<a class="anchor" aria-label="anchor" href="#simplified-cluster-tree"></a>
 </h2>
-<p>The HDBSCAN* hierarchy is useful, but for larger datasets it can
-become overly cumbersome since every data point is represented as a leaf
-somewhere in the hierarchy. The hdbscan object comes with a powerful
-visualization tool that plots the ‘simplified’ hierarchy(see [2] for
-more details), which shows <strong>cluster-wide</strong> changes over an
-infinite number of <span class="math inline">\(eps\)</span> thresholds.
-It is the default visualization dispatched by the ‘plot’ method</p>
+<p>The full HDBSCAN* hierarchy becomes unwieldy for larger datasets
+because every observation is a leaf. The <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method for
+<code>hdbscan</code> objects instead shows the simplified (condensed)
+cluster tree (see [3, 4]), which displays <strong>cluster-wide</strong>
+changes over all values of <span class="math inline">\(\varepsilon\)</span>. It is the default
+visualization:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
-<p>You can change up colors</p>
+<p>The color gradient can be changed,</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl</span>, gradient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"orange"</span>, <span class="st">"red"</span>, <span class="st">"blue"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
-<p>… and scale the widths for individual devices appropriately</p>
+<p>the widths scaled to the output device,</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl</span>, gradient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"purple"</span>, <span class="st">"blue"</span>, <span class="st">"green"</span>, <span class="st">"yellow"</span><span class="op">)</span>, scale<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
-<p>… even outline the most ‘stable’ clusters reported in the flat
-solution</p>
+<p>and the clusters selected for the flat solution (those with maximal
+stability [2]) can be outlined:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl</span>, gradient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"purple"</span>, <span class="st">"blue"</span>, <span class="st">"green"</span>, <span class="st">"yellow"</span><span class="op">)</span>, show_flat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
@@ -212,23 +212,23 @@ solution</p>
 <div class="section level2">
 <h2 id="cluster-stability-scores">Cluster Stability Scores<a class="anchor" aria-label="anchor" href="#cluster-stability-scores"></a>
 </h2>
-<p>Note the stability scores correspond to the labels on the condensed
-tree, but the cluster assignments in the cluster member element do not
-correspond to the labels in the condensed tree. Also, note that these
-scores represent the stability scores <em>before</em> the traversal up
-the tree that updates the scores based on the children.</p>
+<p>The stability scores are indexed by the cluster labels of the
+condensed tree. These labels differ from the cluster ids in the
+<code>cluster</code> component. The scores are the stability values
+<em>before</em> the bottom-up traversal of the tree that updates them
+based on the stability of the child clusters.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cl</span><span class="op">$</span><span class="va">cluster_scores</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##         1         2         3 </span></span>
 <span><span class="co">## 110.70613  90.86559  45.62762</span></span></code></pre>
-<p>The individual point membership ‘probabilities’ are in the
-probabilities member element</p>
+<p>The membership “probabilities” of the individual points are stored in
+<code>membership_prob</code>. They are derived from the core distances
+and are not probabilities in a statistical sense.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cl</span><span class="op">$</span><span class="va">membership_prob</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.4354753 0.2893287 0.4778663 0.4035933 0.4574012 0.4904582</span></span></code></pre>
-<p>These can be used to show the ‘degree of cluster membership’ by, for
-example, plotting points with transparencies that correspond to their
-membership degrees.</p>
+<p>They can be used to visualize the degree of cluster membership, for
+example, by mapping it to the transparency of the points.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">moons</span>, col<span class="op">=</span><span class="va">cl</span><span class="op">$</span><span class="va">cluster</span><span class="op">+</span><span class="fl">1</span>, pch<span class="op">=</span><span class="fl">21</span><span class="op">)</span></span>
 <span>  <span class="va">colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">col</span>, <span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/adjustcolor.html" class="external-link">adjustcolor</a></span><span class="op">(</span><span class="va">col</span>, alpha.f <span class="op">=</span> <span class="va">cl</span><span class="op">$</span><span class="va">membership_prob</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, </span>
@@ -239,22 +239,17 @@ membership degrees.</p>
 <div class="section level2">
 <h2 id="global-local-outlier-score-from-hierarchies">Global-Local Outlier Score from Hierarchies<a class="anchor" aria-label="anchor" href="#global-local-outlier-score-from-hierarchies"></a>
 </h2>
-<p>A recent journal publication on HDBSCAN comes with a new outlier
-measure that computes an outlier score of each point in the data based
-on local <em>and</em> global properties of the hierarchy, defined as the
-Global-Local Outlier Score from Hierarchies (GLOSH)[4]. An example of
-this is shown below, where unlike the membership probabilities, the
-opacity of point represents the amount of “outlierness” the point
-represents. Traditionally, outliers are generally considered to be
-observations that deviate from the expected value of their presumed
-underlying distribution, where the measure of deviation that is
-considered significant is determined by some statistical threshold
-value.</p>
-<p><strong>Note:</strong> Because of the distinction made that noise
-points, points that <em>are not</em> assigned to any clusters, should be
-considered in the definition of an outlier, the outlier scores computed
-are not just the inversely-proportional scores to the membership
-probabilities.</p>
+<p>The Global-Local Outlier Score from Hierarchies (GLOSH) [4] assigns
+an outlier score to each point based on both local <em>and</em> global
+properties of the hierarchy. The scores are available in the
+<code>outlier_scores</code> component. In the plot below, the opacity of
+a point represents its outlier score, and the ten points with the
+highest scores are labeled.</p>
+<p><strong>Note:</strong> GLOSH is computed from the hierarchy. It is
+not simply the complement of the membership probabilities, which are
+based on the core distances of the points within the selected clusters.
+Noise points (points not assigned to any cluster) are taken into account
+in the definition of an outlier.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="va">top_outliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">cl</span><span class="op">$</span><span class="va">outlier_scores</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
 <span>  <span class="va">colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mapply.html" class="external-link">mapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">col</span>, <span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/adjustcolor.html" class="external-link">adjustcolor</a></span><span class="op">(</span><span class="va">col</span>, alpha.f <span class="op">=</span> <span class="va">cl</span><span class="op">$</span><span class="va">outlier_scores</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, </span>
@@ -264,21 +259,18 @@ probabilities.</p>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="a-larger-clustering-example">A Larger Clustering Example<a class="anchor" aria-label="anchor" href="#a-larger-clustering-example"></a>
+<h2 id="a-larger-example">A Larger Example<a class="anchor" aria-label="anchor" href="#a-larger-example"></a>
 </h2>
-<p>A larger example dataset may be more beneficial in explicitly
-revealing the usefulness of HDSBCAN. Consider the ‘DS3’ dataset
-originally published as part of a benchmark test dataset for the
-Chameleon clustering algorithm [5]. It’s clear that the shapes in this
-dataset can be distinguished sufficiently well by a human, however, it
-is well known that many clustering algorithms fail to capture the
-intuitive structure.</p>
+<p>A larger dataset illustrates the advantages of HDBSCAN more clearly.
+The <code>DS3</code> dataset was published as a benchmark for the
+Chameleon clustering algorithm [5]. Its shapes are easy to identify
+visually, but many clustering algorithms fail to recover them.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"DS3"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">DS3</span>, pch<span class="op">=</span><span class="fl">20</span>, cex<span class="op">=</span><span class="fl">0.25</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="700"></p>
-<p>Using the single parameter setting of, say, 25, HDBSCAN finds 6
-clusters</p>
+<p>With <code>minPts = 25</code>, HDBSCAN finds the 6 clusters in the
+data:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hdbscan.html">hdbscan</a></span><span class="op">(</span><span class="va">DS3</span>, minPts <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span>
 <span><span class="va">cl2</span></span></code></pre></div>
@@ -291,9 +283,8 @@ clusters</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Available fields: cluster, minPts, coredist, cluster_scores,</span></span>
 <span><span class="co">##                   membership_prob, outlier_scores, hc</span></span></code></pre>
-<p>Marking the noise appropriately and highlighting points based on
-their ‘membership probabilities’ as before, a visualization of the
-cluster structure can be easily crafted.</p>
+<p>As before, we mark noise points and map the membership probabilities
+to opacity.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">DS3</span>, col<span class="op">=</span><span class="va">cl2</span><span class="op">$</span><span class="va">cluster</span><span class="op">+</span><span class="fl">1</span>, </span>
 <span>       pch<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">cl2</span><span class="op">$</span><span class="va">cluster</span> <span class="op">==</span> <span class="fl">0</span>, <span class="fl">8</span>, <span class="fl">1</span><span class="op">)</span>, <span class="co"># Mark noise as star</span></span>
@@ -303,8 +294,8 @@ cluster structure can be easily crafted.</p>
 <span>                   <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/adjustcolor.html" class="external-link">adjustcolor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/grDevices/palette.html" class="external-link">palette</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="op">(</span><span class="va">cl2</span><span class="op">$</span><span class="va">cluster</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, alpha.f <span class="op">=</span> <span class="va">cl2</span><span class="op">$</span><span class="va">membership_prob</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">DS3</span>, col<span class="op">=</span><span class="va">colors</span>, pch<span class="op">=</span><span class="fl">20</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="700"></p>
-<p>The simplified tree can be particularly useful for larger
-datasets</p>
+<p>The simplified cluster tree is particularly useful for larger
+datasets:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cl2</span>, scale <span class="op">=</span> <span class="fl">3</span>, gradient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"purple"</span>, <span class="st">"orange"</span>, <span class="st">"red"</span><span class="op">)</span>, show_flat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hdbscan_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="700"></p>
@@ -312,17 +303,18 @@ datasets</p>
 <div class="section level2">
 <h2 id="performance">Performance<a class="anchor" aria-label="anchor" href="#performance"></a>
 </h2>
-<p>All of the computational and memory intensive tasks required by
-HDSBCAN were written in C++ using the Rcpp package. With DBSCAN, the
-performance depends on the parameter settings, primarily on the radius
-at which points are considered as candidates for clustering (‘eps’), and
-generally less so on the ‘minPts’ parameter. Intuitively, larger values
-of eps increase the computation time.</p>
-<p>One of the primary computational bottleneck with using HDBSCAN is the
-computation of the full (euclidean) pairwise distance between all
-points, for which HDBSCAN currently relies on base R ‘dist’ method for.
-If a precomputed one is available, the running time of HDBSCAN can be
-moderately reduced.</p>
+<p>The computationally intensive steps of HDBSCAN are implemented in C++
+using Rcpp. Core distances are computed with a k-d tree based
+k-nearest-neighbor search. For a data matrix, <code><a href="../reference/hdbscan.html">hdbscan()</a></code>
+then constructs the MST of the mutual reachability graph with Prim’s
+algorithm and computes the (Euclidean) mutual reachability distances on
+the fly (see <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code>). The <span class="math inline">\(n \times n\)</span> distance matrix is never
+stored, so memory use is <span class="math inline">\(O(nd)\)</span> for
+<span class="math inline">\(n\)</span> points in <span class="math inline">\(d\)</span> dimensions. The running time is still
+quadratic in <span class="math inline">\(n\)</span>.</p>
+<p>If a <code>dist</code> object is supplied instead of a data matrix,
+its distances are used directly. This supports other distance measures,
+but requires <span class="math inline">\(O(n^2)\)</span> memory.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

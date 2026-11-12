@@ -2,20 +2,22 @@
 
 ## Clustering Algorithms
 
-Cluster data with DBSCAN, HDBSCAN, OPTICS, shared nearest neighbor, and
+Cluster data with DBSCAN, OPTICS, HDBSCAN, shared nearest neighbor, and
 Jarvis-Patrick algorithms.
+
+### DBSCAN
+
+Density-based spatial clustering of applications with noise.
 
 - [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md)
   [`is.corepoint()`](https://michael.hahsler.net/dbscan/reference/dbscan.md)
   [`predict(`*`<dbscan_fast>`*`)`](https://michael.hahsler.net/dbscan/reference/dbscan.md)
   : Density-based Spatial Clustering of Applications with Noise (DBSCAN)
-- [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  [`print(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  [`plot(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  [`coredist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  [`mrdist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  [`predict(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  : Hierarchical DBSCAN (HDBSCAN)
+
+### OPTICS
+
+Ordering points to identify the clustering structure.
+
 - [`optics()`](https://michael.hahsler.net/dbscan/reference/optics.md)
   [`print(`*`<optics>`*`)`](https://michael.hahsler.net/dbscan/reference/optics.md)
   [`plot(`*`<optics>`*`)`](https://michael.hahsler.net/dbscan/reference/optics.md)
@@ -25,12 +27,38 @@ Jarvis-Patrick algorithms.
   [`extractXi()`](https://michael.hahsler.net/dbscan/reference/optics.md)
   [`predict(`*`<optics>`*`)`](https://michael.hahsler.net/dbscan/reference/optics.md)
   : Ordering Points to Identify the Clustering Structure (OPTICS)
+
+### HDBSCAN
+
+Hierarchical DBSCAN, its minimum spanning tree hierarchy, and the
+extraction of clusters from hierarchies.
+
+- [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  [`print(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  [`plot(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  [`coredist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  [`mrdist()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  [`predict(`*`<hdbscan>`*`)`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+  : Hierarchical DBSCAN (HDBSCAN)
+- [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+  : Framework for the Optimal Extraction of Clusters from Hierarchies
+- [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+  : Minimum Spanning Tree Hierarchies
+
+### Shared Nearest Neighbor Clustering
+
+Clustering based on shared nearest neighbor graphs.
+
 - [`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
   : Shared Nearest Neighbor Clustering
 - [`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md)
   : Jarvis-Patrick Clustering
-- [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
-  : Framework for the Optimal Extraction of Clusters from Hierarchies
+
+### Cluster Summaries
+
+Count clusters, noise points, and observations.
+
 - [`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
   [`nnoise()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
   : Number of Clusters, Noise Points, and Observations
@@ -100,9 +128,6 @@ Plot clusters and work with reachability plots and cluster hierarchies.
   : Reachability Distances
 - [`as.dendrogram()`](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
   : Coercions to Dendrogram
-- [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-  : Minimum Spanning Tree Hierarchies
 
 ## Tidiers
 

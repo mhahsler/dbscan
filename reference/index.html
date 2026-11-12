@@ -50,7 +50,12 @@
     <div class="section level2">
       <h2 id="clustering-algorithms">Clustering Algorithms<a class="anchor" aria-label="anchor" href="#clustering-algorithms"></a></h2>
 
-      <div class="section-desc"><p>Cluster data with DBSCAN, HDBSCAN, OPTICS, shared nearest neighbor, and Jarvis-Patrick algorithms.</p></div>
+      <div class="section-desc"><p>Cluster data with DBSCAN, OPTICS, HDBSCAN, shared nearest neighbor, and Jarvis-Patrick algorithms.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+      <h3 id="dbscan">DBSCAN<a class="anchor" aria-label="anchor" href="#dbscan"></a></h3>
+      <div class="section-desc"><p>Density-based spatial clustering of applications with noise.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -63,8 +68,33 @@
 
         </dt>
         <dd>Density-based Spatial Clustering of Applications with Noise (DBSCAN)</dd>
+      </dl></div><div class="section level2">
 
-        <dt>
+      <h3 id="optics">OPTICS<a class="anchor" aria-label="anchor" href="#optics"></a></h3>
+      <div class="section-desc"><p>Ordering points to identify the clustering structure.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="optics.html">optics()</a></code> <code><a href="optics.html">print(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">plot(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">as.reachability(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">as.dendrogram(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">extractDBSCAN()</a></code> <code><a href="optics.html">extractXi()</a></code> <code><a href="optics.html">predict(<i>&lt;optics&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Ordering Points to Identify the Clustering Structure (OPTICS)</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="hdbscan">HDBSCAN<a class="anchor" aria-label="anchor" href="#hdbscan"></a></h3>
+      <div class="section-desc"><p>Hierarchical DBSCAN, its minimum spanning tree hierarchy, and the extraction of clusters from hierarchies.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="hdbscan.html">hdbscan()</a></code> <code><a href="hdbscan.html">print(<i>&lt;hdbscan&gt;</i>)</a></code> <code><a href="hdbscan.html">plot(<i>&lt;hdbscan&gt;</i>)</a></code> <code><a href="hdbscan.html">coredist()</a></code> <code><a href="hdbscan.html">mrdist()</a></code> <code><a href="hdbscan.html">predict(<i>&lt;hdbscan&gt;</i>)</a></code>
 
@@ -73,12 +103,28 @@
 
         <dt>
 
-          <code><a href="optics.html">optics()</a></code> <code><a href="optics.html">print(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">plot(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">as.reachability(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">as.dendrogram(<i>&lt;optics&gt;</i>)</a></code> <code><a href="optics.html">extractDBSCAN()</a></code> <code><a href="optics.html">extractXi()</a></code> <code><a href="optics.html">predict(<i>&lt;optics&gt;</i>)</a></code>
+          <code><a href="extractFOSC.html">extractFOSC()</a></code>
 
         </dt>
-        <dd>Ordering Points to Identify the Clustering Structure (OPTICS)</dd>
+        <dd>Framework for the Optimal Extraction of Clusters from Hierarchies</dd>
 
         <dt>
+
+          <code><a href="mst_dist.html">mst_dist()</a></code> <code><a href="mst_dist.html">mst_mrdist()</a></code>
+
+        </dt>
+        <dd>Minimum Spanning Tree Hierarchies</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="shared-nearest-neighbor-clustering">Shared Nearest Neighbor Clustering<a class="anchor" aria-label="anchor" href="#shared-nearest-neighbor-clustering"></a></h3>
+      <div class="section-desc"><p>Clustering based on shared nearest neighbor graphs.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="sNNclust.html">sNNclust()</a></code>
 
@@ -91,15 +137,17 @@
 
         </dt>
         <dd>Jarvis-Patrick Clustering</dd>
+      </dl></div><div class="section level2">
 
-        <dt>
+      <h3 id="cluster-summaries">Cluster Summaries<a class="anchor" aria-label="anchor" href="#cluster-summaries"></a></h3>
+      <div class="section-desc"><p>Count clusters, noise points, and observations.</p></div>
 
-          <code><a href="extractFOSC.html">extractFOSC()</a></code>
+      <dl></dl></div><div class="section level2">
 
-        </dt>
-        <dd>Framework for the Optimal Extraction of Clusters from Hierarchies</dd>
 
-        <dt>
+
+
+      <dl><dt>
 
           <code><a href="ncluster.html">ncluster()</a></code> <code><a href="ncluster.html">nnoise()</a></code>
 
@@ -239,13 +287,6 @@
 
         </dt>
         <dd>Coercions to Dendrogram</dd>
-
-        <dt>
-
-          <code><a href="mst_dist.html">mst_dist()</a></code> <code><a href="mst_dist.html">mst_mrdist()</a></code>
-
-        </dt>
-        <dd>Minimum Spanning Tree Hierarchies</dd>
       </dl></div><div class="section level2">
       <h2 id="tidiers">Tidiers<a class="anchor" aria-label="anchor" href="#tidiers"></a></h2>
 

@@ -101,7 +101,8 @@ calculated with an arbitrary distance metric.</p></dd>
 
 <dt id="arg-minpts">minPts<a class="anchor" aria-label="anchor" href="#arg-minpts"></a></dt>
 <dd><p>integer; Main parameter to control density estimate smoothing
-and the minimum clusters size. See details.</p></dd>
+and the minimum clusters size. See details. For <code>mrdist()</code> (and
+<code><a href="mst_dist.html">mst_mrdist()</a></code>) it can be omitted if <code>coredist</code> is specified.</p></dd>
 
 
 <dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
@@ -224,7 +225,7 @@ stability-based flat cluster extraction. HDBSCAN essentially computes the
 hierarchy of all DBSCAN* clusterings, and
 then uses a stability-based extraction method to find optimal cuts in the
 hierarchy, thus producing a flat solution. It uses Prim's algorithm and
-saves memory by avoiding to creating a complete distance matrix.</p><div class="section">
+is memory efficient by avoiding to create a complete distance matrix.</p><div class="section">
 <h3 id="the-algorithm">The algorithm<a class="anchor" aria-label="anchor" href="#the-algorithm"></a></h3>
 
 
@@ -237,11 +238,7 @@ larger values for <code>minPts</code> give larger and smoother density estimates
 cluster size because splits are only allowed when both branches
 have at least <code>minPts</code> points.</p></li>
 <li><p>Extract the clusters from the pruned tree.</p></li>
-</ol><p>Because one <code>minPts</code> value sets both the density smoothing and the minimum
-cluster size, a single call cannot change one without the other. To use a
-different minimum cluster size, extract the clusters again from the result
-with <code><a href="extractFOSC.html">extractFOSC()</a></code>, e.g., <code>extractFOSC(res, minPts = 20)</code>. This keeps the
-density estimates and the hierarchy of <code>res</code>.</p>
+</ol><p>The individual steps are described in the following.</p>
 </div>
 
 <div class="section">
@@ -250,25 +247,31 @@ density estimates and the hierarchy of <code>res</code>.</p>
 
 <p>These can be calculated using the following two exposed functions:</p><ul><li><p><code>coredist()</code>: The core distance is defined for each point as
 the distance to the (<code>minPts - 1</code>)-th nearest neighbor.
-It is a density estimate equivalent to <code><a href="kNNdist.html">kNNdist()</a></code> with <code>k = minPts -1</code>.
-Larger values for <code>minPts</code> lead to larger and smoother estimates.</p></li>
+It produces a density estimate where larger values for <code>minPts</code> lead to
+larger and smoother estimates. The core distance is
+For matrix data, a fast kd tree based on Euclidean distance is used.
+Additional parameters to <code>coredist()</code> are passed on to <code><a href="kNNdist.html">kNNdist()</a></code>. A
+core distance vector is returned.</p></li>
 <li><p><code>mrdist()</code>: The mutual reachability distance is defined between two points as
 <code>mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))</code>.
 It has the effect of increasing distances in low density areas, separating
 clusters better.</p></li>
-</ul></div>
+</ul><p>To use non-Euclidean distances, the call <code>hdbscan()</code>, <code>coredist()</code>,
+or <code>mrdist()</code> with a precomputed distance matrix.</p>
+</div>
 
 <div class="section">
 <h3 id="minimum-spanning-tree-construction">Minimum spanning tree construction<a class="anchor" aria-label="anchor" href="#minimum-spanning-tree-construction"></a></h3>
 
 
-<p><code><a href="mst_dist.html">mst_dist()</a></code> constructs a MST from the mutual reachability distance matrix.</p>
-<p><strong>Note:</strong> If <code>x</code> is a data matrix, then <code><a href="mst_dist.html">mst_mrdist()</a></code> is used which computes
-the mutual reachability distance MST directly using Prim's algorithm
-without the expensive distance matrix creating.
-This reduces memory complexity from \(O(n^2)\) to
-\(O(d n)\) and speeds up the calculation.
-This only works with Euclidean distances.</p>
+<p><code><a href="mst_dist.html">mst_dist()</a></code> constructs a MST from a data from the mutual
+reachability distance matrix. Since distance matrices
+are of size \(O(n^2)\) and thus can become very large,
+<code><a href="mst_dist.html">mst_mrdist()</a></code> is also provides which directly constructs the MST from
+matrix data without creating the full distance matrix.
+This reduces memory complexity
+\(O(d n)\) and speeds up the calculation, but
+only works with Euclidean distances.</p>
 </div>
 
 <div class="section">
@@ -276,8 +279,25 @@ This only works with Euclidean distances.</p>
 
 
 <p>The MST is pruned using stability and clusters are extracted
-in an unsupervised version using <code><a href="extractFOSC.html">extractFOSC()</a></code>.</p>
-<p>Malzer and Baum (2020) describe that
+in the unsupervised version implemented in <code><a href="extractFOSC.html">extractFOSC()</a></code>.
+Because one <code>minPts</code> value sets both the density smoothing and the minimum
+cluster size in HDBSCAN, using a different minimum cluster size
+requires an explicit call to <code><a href="extractFOSC.html">extractFOSC()</a></code> with the new <code>minPts</code>,
+e.g., <code>extractFOSC(res, minPts = 20)</code>. This keeps the
+density estimates using the original <code>minPts</code>and the hierarchy of <code>res</code>,
+but recomputed stability and cluster extraction using the new <code>minPts</code> value.</p>
+</div>
+
+<div class="section">
+<h3 id="hdbscan-and-dbscan-">HDBSCAN* and DBSCAN*<a class="anchor" aria-label="anchor" href="#hdbscan-and-dbscan-"></a></h3>
+
+
+<p>Campello, Moulavi, and Sander (2013) introduced DBSCAN* and HDBSCAN*
+and demonstrated that for a fixed minimum points parameter <code>minPts</code>,
+the HDBSCAN* hierarchy encodes a one-to-one correspondence with the complete
+set of flat clusterings obtainable by DBSCAN* across every possible radius
+<code>eps</code>.
+Malzer and Baum (2020) describe that
 a combination between DBSCAN* and HDBSCAN* can be achieved
 by using a <code>cluster_selection_epsilon</code> greater than 0.0.
 The tree below <code>cluster_selection_epsilon</code> produces
@@ -298,11 +318,10 @@ of variable densities at higher levels.</p>
 <div class="section">
 <h3 id="cluster-membership-prediction-for-new-points">Cluster membership prediction for new points<a class="anchor" aria-label="anchor" href="#cluster-membership-prediction-for-new-points"></a></h3>
 
-
-<p><code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> assigns each new data point to the same cluster as the nearest point
+<ul><li><p><code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> assigns each new data point to the same cluster as the nearest point
 if it is not more than that points core distance away. Otherwise the new point
-is classified as a noise point (i.e., cluster ID 0).</p>
-</div>
+is classified as a noise point (i.e., cluster ID 0).</p></li>
+</ul></div>
 
 <div class="section">
 <h3 id="related-methods">Related Methods<a class="anchor" aria-label="anchor" href="#related-methods"></a></h3>

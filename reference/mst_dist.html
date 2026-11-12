@@ -75,12 +75,13 @@ converted to a numeric matrix) with finite values.</p></dd>
 
 <dt id="arg-minpts">minPts<a class="anchor" aria-label="anchor" href="#arg-minpts"></a></dt>
 <dd><p>integer; minimum number of points used to calculate the core
-distances (see <code><a href="hdbscan.html">coredist()</a></code>).</p></dd>
+distances (see <code><a href="hdbscan.html">coredist()</a></code>). It can be omitted if <code>coredist</code> is specified.
+If given, it is stored in the result.</p></dd>
 
 
 <dt id="arg-coredist">coredist<a class="anchor" aria-label="anchor" href="#arg-coredist"></a></dt>
 <dd><p>optional vector with the core distance of each point. If
-<code>NULL</code>, then it is calculated with <code><a href="hdbscan.html">coredist()</a></code>.</p></dd>
+<code>NULL</code>, then it is calculated with <code><a href="hdbscan.html">coredist()</a></code> (and <code>minPts</code> is required).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -96,7 +97,7 @@ directly) may fail or give unexpected results. The <code>method</code> component
 <code>"robust single"</code>. <code>dist.method</code> is taken from the <code>"method"</code> attribute of
 <code>x</code> for <code>mst_dist()</code> (it is omitted if <code>x</code> has none) and is
 <code>"mutual reachability (euclidean)"</code> for <code>mst_mrdist()</code>.
-<code>mst_mrdist()</code> also stores <code>minPts</code> in the result.</p>
+<code>mst_mrdist()</code> also stores <code>minPts</code> in the result (if specified).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -115,6 +116,7 @@ likely for mutual reachability distances constructed as
 <code>mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))</code>.
 Ties in this implementation are broken in order of the rows in the
 input data which is consistent with many other implementations.</p>
+<p><code><a href="extractFOSC.html">extractFOSC()</a></code> can be used to extract stable clusters from an MST.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -128,30 +130,27 @@ input data which is consistent with many other implementations.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"moons"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## MST of a distance matrix</span></span></span>
-<span class="r-in"><span><span class="va">hc</span> <span class="op">&lt;-</span> <span class="fu">mst_dist</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">moons</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">hc</span></span></span>
+<span class="r-in"><span><span class="co">## MST of a mutual reachability distance matrix</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="hdbscan.html">mrdist</a></span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">hc_mr</span> <span class="op">&lt;-</span> <span class="fu">mst_dist</span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">hc_mr</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> mst_dist(x = dist(moons))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mst_dist(x = d)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cluster method   : robust single </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Distance         : euclidean </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Distance         : mutual reachability (euclidean) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of objects: 100 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">hc_mr</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="mst_dist-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## MST of the mutual reachability graph without creating the distance matrix.</span></span></span>
-<span class="r-in"><span><span class="va">hc_mr</span> <span class="op">&lt;-</span> <span class="fu">mst_mrdist</span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">hc_mr2</span> <span class="op">&lt;-</span> <span class="fu">mst_mrdist</span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## same as</span></span></span>
-<span class="r-in"><span><span class="va">hc_mr2</span> <span class="op">&lt;-</span> <span class="fu">mst_dist</span><span class="op">(</span><span class="fu"><a href="hdbscan.html">mrdist</a></span><span class="op">(</span><span class="va">moons</span>, minPts <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">hc_mr</span><span class="op">$</span><span class="va">merge</span>, <span class="va">hc_mr2</span><span class="op">$</span><span class="va">merge</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## extract clusters (this is HDBSCAN)</span></span></span>
-<span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="extractFOSC.html">extractFOSC</a></span><span class="op">(</span><span class="va">hc_mr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="hullplot.html">hullplot</a></span><span class="op">(</span><span class="va">moons</span>, <span class="va">cl</span><span class="op">$</span><span class="va">cluster</span>, main <span class="op">=</span> <span class="st">"HDBSCAN"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="mst_dist-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

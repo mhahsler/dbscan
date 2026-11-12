@@ -245,31 +245,35 @@ cl$cluster
 #>   [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
 #>  [38] 3 3 3 3 3 3 3 3 3 3 3 3 3 2 2 1 1 1 1 1 2 2 1 2 2 2 1 1 2 1 1 1 2 1 1 2 2
 #>  [75] 2 1 2 1 2 2 1 2 2 1 1 2 2 1 2 2 1 2 2 2 1 1 1 2 1 1
+hullplot(moons, cl)
 
-## Constraint-based extraction from the HDBSCAN hierarchy
-## (w/ stability-based tiebreaker (semisupervised))
+
+## Semisupervised constraint-based extraction from the HDBSCAN hierarchy
+## alpha = 0: clusters are chosen to satisfy as many constraints as possible,
+##            cluster stability only breaks ties.
+## constraint: point 12 should link with 49, but not with 47
 cl_con <- extractFOSC(cl$hc, minPts = 5,
-  constraints = list("12" = c(49, -47)))
+  constraints = list("12" = c(+49, -47)),
+  alpha = 0)
 cl_con$cluster
 #>   [1] 6 5 5 5 5 6 5 6 6 5 6 0 6 6 5 5 5 5 5 5 5 6 5 6 5 5 6 6 6 5 6 0 5 6 6 6 5
 #>  [38] 5 0 6 6 6 5 6 5 6 5 6 0 5 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3
 #>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1
+hullplot(moons, cl_con)
 
-## Alternative formulation: Constraint-based extraction from the HDBSCAN hierarchy
-## (w/ stability-based tiebreaker (semisupervised)) using distance thresholds
+
+## Semisupervised alternative formulation using constraints on distances
+## constraint: +1: Link points with a distance < 0.1;
+##             -1: do not link points with distance > 1.0;
+##              0: no preference for all other links.
 dist_moons <- dist(moons)
 cl_con2 <- extractFOSC(cl$hc, minPts = 5,
-  constraints = ifelse(dist_moons < 0.1, 1L,
-                ifelse(dist_moons > 1, -1L, 0L)))
-
-cl_con2$cluster # same as the second example
-#>   [1] 6 5 5 5 5 6 5 6 6 5 6 0 6 6 5 5 5 5 5 5 5 6 5 6 5 5 6 6 6 5 6 0 5 6 6 6 5
-#>  [38] 5 0 6 6 6 5 6 5 6 5 6 0 5 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3
-#>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1
+  constraints = ifelse(dist_moons < 0.1, +1L,
+                ifelse(dist_moons > 1.0, -1L, 0L)),
+  alpha = 0)
+hullplot(moons, cl_con)
 
 ## Unsupervised extraction with a distance threshold (HDBSCAN(e))
-extractFOSC(cl$hc, cluster_selection_epsilon = 0.5)$cluster
-#>   [1] 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4
-#>  [38] 4 4 4 4 4 4 4 4 4 4 4 4 4 3 3 1 1 1 1 1 3 3 1 3 3 3 1 1 3 1 1 1 3 1 1 3 3
-#>  [75] 3 1 3 1 3 3 1 3 3 1 1 3 3 1 3 3 1 3 3 3 1 1 1 3 1 1
+cl_dist <- extractFOSC(cl$hc, cluster_selection_epsilon = 1)
+hullplot(moons, cl_dist)
 ```

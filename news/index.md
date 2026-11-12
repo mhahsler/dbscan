@@ -1,6 +1,6 @@
 # Changelog
 
-## dbscan 1.2.8 (unpublished)
+## dbscan 1.2.8 (2026-11-12)
 
 ### Changes
 

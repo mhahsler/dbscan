@@ -287,12 +287,12 @@ plot(hdb, show_flat = TRUE)
 The dbscan package is licensed under the [GNU General Public License
 (GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-The **OPTICSXi** R implementation in `R/optics_extractXi.R` was directly
-ported from the ELKI framework’s Java implementation with permission by
-the original author, Erich Schubert. This function is redistributed
-under the stricter [GNU
-AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Remove the file
-and function to use the package under the GNU GPL v3 license.
+The **OPTICSXi** R implementation was directly ported from the ELKI
+framework’s Java implementation with permission by the original author,
+Erich Schubert. This function is redistributed under the stricter [GNU
+AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Follow the
+instruction in the in `R/optics_extractXi.R` to use the package under
+the GNU GPL v3 license.
 
 ## Citation request
 
@@ -420,14 +420,6 @@ Clustering based on shared nearest neighbor graphs.
 - [`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md)
   : Jarvis-Patrick Clustering
 
-### Cluster Summaries
-
-Count clusters, noise points, and observations.
-
-- [`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
-  [`nnoise()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
-  : Number of Clusters, Noise Points, and Observations
-
 ## Nearest Neighbor Search
 
 Find k-nearest, fixed-radius, and shared nearest neighbors and work with
@@ -472,18 +464,16 @@ density.
   [`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
   : Calculate and Plot k-Nearest Neighbor Distances
 
-## Clustering Evaluation
+## Cluster Validation
 
-Evaluate density-based clusterings with the Density-Based Clustering
-Validation index.
+Summarize, evaluate, and visualize clusterings, including reachability
+plots and cluster hierarchies.
 
+- [`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
+  [`nnoise()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
+  : Number of Clusters, Noise Points, and Observations
 - [`dbcv()`](https://michael.hahsler.net/dbscan/reference/dbcv.md) :
   Density-Based Clustering Validation Index (DBCV)
-
-## Cluster Visualization and Hierarchies
-
-Plot clusters and work with reachability plots and cluster hierarchies.
-
 - [`hullplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
   [`clplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
   : Plot Clusters
@@ -494,7 +484,7 @@ Plot clusters and work with reachability plots and cluster hierarchies.
 - [`as.dendrogram()`](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
   : Coercions to Dendrogram
 
-## Tidiers
+## Tidyverse Tidiers
 
 Turn clustering objects into tidy tibbles and augment the original data.
 

@@ -55,14 +55,6 @@ Clustering based on shared nearest neighbor graphs.
 - [`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md)
   : Jarvis-Patrick Clustering
 
-### Cluster Summaries
-
-Count clusters, noise points, and observations.
-
-- [`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
-  [`nnoise()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
-  : Number of Clusters, Noise Points, and Observations
-
 ## Nearest Neighbor Search
 
 Find k-nearest, fixed-radius, and shared nearest neighbors and work with
@@ -107,18 +99,16 @@ density.
   [`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
   : Calculate and Plot k-Nearest Neighbor Distances
 
-## Clustering Evaluation
+## Cluster Validation
 
-Evaluate density-based clusterings with the Density-Based Clustering
-Validation index.
+Summarize, evaluate, and visualize clusterings, including reachability
+plots and cluster hierarchies.
 
+- [`ncluster()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
+  [`nnoise()`](https://michael.hahsler.net/dbscan/reference/ncluster.md)
+  : Number of Clusters, Noise Points, and Observations
 - [`dbcv()`](https://michael.hahsler.net/dbscan/reference/dbcv.md) :
   Density-Based Clustering Validation Index (DBCV)
-
-## Cluster Visualization and Hierarchies
-
-Plot clusters and work with reachability plots and cluster hierarchies.
-
 - [`hullplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
   [`clplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
   : Plot Clusters
@@ -129,7 +119,7 @@ Plot clusters and work with reachability plots and cluster hierarchies.
 - [`as.dendrogram()`](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
   : Coercions to Dendrogram
 
-## Tidiers
+## Tidyverse Tidiers
 
 Turn clustering objects into tidy tibbles and augment the original data.
 

@@ -47,9 +47,10 @@
 #'   objects. For `mst_mrdist()` a data matrix (or an object that can be
 #'   converted to a numeric matrix) with finite values.
 #' @param minPts integer; minimum number of points used to calculate the core
-#'   distances (see [coredist()]).
+#'   distances (see [coredist()]). It can be omitted if `coredist` is specified.
+#'   If given, it is stored in the result.
 #' @param coredist optional vector with the core distance of each point. If
-#'   `NULL`, then it is calculated with [coredist()].
+#'   `NULL`, then it is calculated with [coredist()] (and `minPts` is required).
 #'
 #' @returns an [hclust] object representing the single-linkage hierarchy
 #'  of the MST. Note: the rows of the `merge` matrix keep
@@ -62,7 +63,7 @@
 #'  `"robust single"`. `dist.method` is taken from the `"method"` attribute of
 #'  `x` for `mst_dist()` (it is omitted if `x` has none) and is
 #'  `"mutual reachability (euclidean)"` for `mst_mrdist()`.
-#'  `mst_mrdist()` also stores `minPts` in the result.
+#'  `mst_mrdist()` also stores `minPts` in the result (if specified).
 #'
 #' @examples
 #' data("moons")
@@ -99,7 +100,10 @@ mst_dist <- function(x) {
 #' @rdname mst_dist
 #' @export
 mst_mrdist <- function(x, minPts, coredist = NULL) {
-  minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
+  if (is.null(coredist) && missing(minPts))
+    stop("minPts is required if coredist is not specified.")
+  if (!missing(minPts))
+    minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
   x <- .as_finite_numeric_matrix(x)
   if (nrow(x) < 2L)
     stop("x needs to contain at least 2 objects.")
@@ -115,6 +119,7 @@ mst_mrdist <- function(x, minPts, coredist = NULL) {
   hc$labels <- rownames(x)
   hc$call <- match.call()
   hc$dist.method <- "mutual reachability (euclidean)"
-  hc$minPts <- minPts
+  if (!missing(minPts))
+    hc$minPts <- minPts
   return(hc)
 }

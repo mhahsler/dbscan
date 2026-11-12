@@ -43,7 +43,8 @@ mrdist(x, minPts, coredist = NULL)
 calculated with an arbitrary distance metric.}
 
 \item{minPts}{integer; Main parameter to control density estimate smoothing
-and the minimum clusters size. See details.}
+and the minimum clusters size. See details. For \code{mrdist()} (and
+\code{\link[=mst_mrdist]{mst_mrdist()}}) it can be omitted if \code{coredist} is specified.}
 
 \item{cluster_selection_epsilon}{double; a distance threshold below which
 no clusters should be selected (see Malzer & Baum 2020). The threshold is

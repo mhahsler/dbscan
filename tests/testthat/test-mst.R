@@ -139,3 +139,22 @@ test_that("mst_mrdist", {
   x_na <- x; x_na[1, 1] <- NA
   expect_error(mst_mrdist(x_na, 4))
 })
+
+test_that("minPts is optional if coredist is given", {
+  set.seed(1234)
+  x <- cbind(rnorm(40), rnorm(40))
+  cd <- coredist(x, 4)
+
+  expect_equal(mrdist(x, coredist = cd), mrdist(x, minPts = 4, coredist = cd))
+  expect_equal(mrdist(dist(x), coredist = cd), mrdist(x, minPts = 4, coredist = cd),
+               ignore_attr = "call")
+  expect_error(mrdist(x), "minPts is required")
+  expect_error(mrdist(x, minPts = 1))
+
+  hc <- mst_mrdist(x, coredist = cd)
+  expect_equal(hc$merge, mst_mrdist(x, 4, coredist = cd)$merge)
+  expect_null(hc$minPts)
+  expect_equal(mst_mrdist(x, 4, coredist = cd)$minPts, 4L)
+  expect_error(mst_mrdist(x), "minPts is required")
+  expect_error(mst_mrdist(x, minPts = 1, coredist = cd))
+})

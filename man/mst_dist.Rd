@@ -15,10 +15,11 @@ objects. For \code{mst_mrdist()} a data matrix (or an object that can be
 converted to a numeric matrix) with finite values.}
 
 \item{minPts}{integer; minimum number of points used to calculate the core
-distances (see \code{\link[=coredist]{coredist()}}).}
+distances (see \code{\link[=coredist]{coredist()}}). It can be omitted if \code{coredist} is specified.
+If given, it is stored in the result.}
 
 \item{coredist}{optional vector with the core distance of each point. If
-\code{NULL}, then it is calculated with \code{\link[=coredist]{coredist()}}.}
+\code{NULL}, then it is calculated with \code{\link[=coredist]{coredist()}} (and \code{minPts} is required).}
 }
 \value{
 an \link{hclust} object representing the single-linkage hierarchy
@@ -32,7 +33,7 @@ directly) may fail or give unexpected results. The \code{method} component is
 \code{"robust single"}. \code{dist.method} is taken from the \code{"method"} attribute of
 \code{x} for \code{mst_dist()} (it is omitted if \code{x} has none) and is
 \code{"mutual reachability (euclidean)"} for \code{mst_mrdist()}.
-\code{mst_mrdist()} also stores \code{minPts} in the result.
+\code{mst_mrdist()} also stores \code{minPts} in the result (if specified).
 }
 \description{
 Computes the minimum spanning tree (MST) of a graph with Prim's algorithm
@@ -56,24 +57,23 @@ likely for mutual reachability distances constructed as
 \code{mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))}.
 Ties in this implementation are broken in order of the rows in the
 input data which is consistent with many other implementations.
+
+\code{\link[=extractFOSC]{extractFOSC()}} can be used to extract stable clusters from an MST.
 }
 \examples{
 data("moons")
 
-## MST of a distance matrix
-hc <- mst_dist(dist(moons))
-hc
+## MST of a mutual reachability distance matrix
+d <- mrdist(moons, minPts = 5)
+hc_mr <- mst_dist(d)
+hc_mr
+plot(hc_mr)
 
 ## MST of the mutual reachability graph without creating the distance matrix.
-hc_mr <- mst_mrdist(moons, minPts = 5)
+hc_mr2 <- mst_mrdist(moons, minPts = 5)
 
 ## same as
-hc_mr2 <- mst_dist(mrdist(moons, minPts = 5))
 all.equal(hc_mr$merge, hc_mr2$merge)
-
-## extract clusters (this is HDBSCAN)
-cl <- extractFOSC(hc_mr)
-hullplot(moons, cl$cluster, main = "HDBSCAN")
 }
 \seealso{
 Other HDBSCAN functions:

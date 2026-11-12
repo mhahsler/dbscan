@@ -114,7 +114,8 @@
 #' @param x a data matrix (Euclidean distances are used) or a [dist] object
 #' calculated with an arbitrary distance metric.
 #' @param minPts integer; Main parameter to control density estimate smoothing
-#'   and the minimum clusters size. See details.
+#'   and the minimum clusters size. See details. For `mrdist()` (and
+#'   [mst_mrdist()]) it can be omitted if `coredist` is specified.
 #' @param cluster_selection_epsilon double; a distance threshold below which
 #'  no clusters should be selected (see Malzer & Baum 2020). The threshold is
 #'  specified in mutual reachability distance (see `mrdist()`). The default of
@@ -538,6 +539,12 @@ coredist <- function(x, minPts, ...)
 #' @rdname hdbscan
 #' @export
 mrdist <- function(x, minPts, coredist = NULL) {
+  if (is.null(coredist)) {
+    if (missing(minPts))
+      stop("minPts is required if coredist is not specified.")
+    minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
+  }
+
   if (inherits(x, "dist")) {
     .check_dist(x)
     x_dist <- x

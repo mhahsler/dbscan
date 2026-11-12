@@ -5,14 +5,30 @@ template:
 
 reference:
 - title: Clustering Algorithms
-  desc: Cluster data with DBSCAN, HDBSCAN, OPTICS, shared nearest neighbor, and Jarvis-Patrick algorithms.
+  desc: Cluster data with DBSCAN, OPTICS, HDBSCAN, shared nearest neighbor, and Jarvis-Patrick algorithms.
+- subtitle: DBSCAN
+  desc: Density-based spatial clustering of applications with noise.
   contents:
   - dbscan
-  - hdbscan
+- subtitle: OPTICS
+  desc: Ordering points to identify the clustering structure.
+  contents:
   - optics
+- subtitle: HDBSCAN
+  desc: Hierarchical DBSCAN, its minimum spanning tree hierarchy, and the extraction of clusters from hierarchies.
+  contents:
+  - hdbscan
+  - extractFOSC
+  - mst_dist
+- subtitle: Shared Nearest Neighbor Clustering
+  desc: Clustering based on shared nearest neighbor graphs.
+  contents:
   - sNNclust
   - jpclust
-  - has_concept("clustering functions")
+- subtitle: Cluster Summaries
+  desc: Count clusters, noise points, and observations.
+  contents:
+  - ncluster
 - title: Nearest Neighbor Search
   desc: Find k-nearest, fixed-radius, and shared nearest neighbors and work with nearest-neighbor graphs.
   contents:
@@ -39,7 +55,6 @@ reference:
   - hullplot
   - reachability
   - dendrogram
-  - mst_dist
 - title: Tidiers
   desc: Turn clustering objects into tidy tibbles and augment the original data.
   contents:

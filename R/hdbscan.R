@@ -28,7 +28,7 @@
 #' hierarchy of all DBSCAN* clusterings, and
 #' then uses a stability-based extraction method to find optimal cuts in the
 #' hierarchy, thus producing a flat solution. It uses Prim's algorithm and
-#' saves memory by avoiding to creating a complete distance matrix.
+#' is memory efficient by avoiding to create a complete distance matrix.
 #'
 #' ## The algorithm
 #'
@@ -44,11 +44,7 @@
 #'    have at least `minPts` points.
 #' 4. Extract the clusters from the pruned tree.
 #'
-#' Because one `minPts` value sets both the density smoothing and the minimum
-#' cluster size, a single call cannot change one without the other. To use a
-#' different minimum cluster size, extract the clusters again from the result
-#' with [extractFOSC()], e.g., `extractFOSC(res, minPts = 20)`. This keeps the
-#' density estimates and the hierarchy of `res`.
+#' The individual steps are described in the following.
 #'
 #' ## Core and mutual reachability distances
 #'
@@ -56,30 +52,52 @@
 #'
 #' * `coredist()`: The core distance is defined for each point as
 #' the distance to the (`minPts - 1`)-th nearest neighbor.
-#' It is a density estimate equivalent to `kNNdist()` with `k = minPts -1`.
-#' Larger values for `minPts` lead to larger and smoother estimates.
+#' It produces a density estimate where larger values for `minPts` lead to
+#' larger and smoother estimates. The core distance is
+#  calculated using [`kNNdist()`] with `k = minPts -1`.
+#' For matrix data, a fast kd tree based on Euclidean distance is used.
+#' Additional parameters to `coredist()` are passed on to `kNNdist()`. A
+#' core distance vector is returned.
 #'
 #' * `mrdist()`: The mutual reachability distance is defined between two points as
 #' `mrd(a, b) = max(coredist(a), coredist(b), dist(a, b))`.
 #' It has the effect of increasing distances in low density areas, separating
 #' clusters better.
 #'
+#' To use non-Euclidean distances, the call `hdbscan()`, `coredist()`,
+#' or `mrdist()` with a precomputed distance matrix.
+#'
+#'
 #' ## Minimum spanning tree construction
 #'
-#' [`mst_dist()`] constructs a MST from the mutual reachability distance matrix.
-#'
-#' **Note:** If `x` is a data matrix, then [`mst_mrdist()`] is used which computes
-#' the mutual reachability distance MST directly using Prim's algorithm
-#' without the expensive distance matrix creating.
-#' This reduces memory complexity from \eqn{O(n^2)} to
-#' \eqn{O(d n)} and speeds up the calculation.
-#' This only works with Euclidean distances.
+#' [`mst_dist()`] constructs a MST from a data from the mutual
+#' reachability distance matrix. Since distance matrices
+#' are of size \eqn{O(n^2)} and thus can become very large,
+#' [`mst_mrdist()`] is also provides which directly constructs the MST from
+#' matrix data without creating the full distance matrix.
+#' This reduces memory complexity
+#' \eqn{O(d n)} and speeds up the calculation, but
+#' only works with Euclidean distances.
 #'
 #' ## Tree pruning and cluster selection
 #'
 #' The MST is pruned using stability and clusters are extracted
-#' in an unsupervised version using [`extractFOSC()`].
+#' in the unsupervised version implemented in [`extractFOSC()`].
+#' Because one `minPts` value sets both the density smoothing and the minimum
+#' cluster size in HDBSCAN, using a different minimum cluster size
+#' requires an explicit call to [extractFOSC()] with the new `minPts`,
+#' e.g., `extractFOSC(res, minPts = 20)`. This keeps the
+#' density estimates using the original `minPts`and the hierarchy of `res`,
+#' but recomputed stability and cluster extraction using the new `minPts` value.
 #'
+#'
+#' ## HDBSCAN* and DBSCAN*
+#'
+#' Campello, Moulavi, and Sander (2013) introduced DBSCAN* and HDBSCAN*
+#' and demonstrated that for a fixed minimum points parameter `minPts`,
+#' the HDBSCAN* hierarchy encodes a one-to-one correspondence with the complete
+#' set of flat clusterings obtainable by DBSCAN* across every possible radius
+#' `eps`.
 #' Malzer and Baum (2020) describe that
 #' a combination between DBSCAN* and HDBSCAN* can be achieved
 #' by using a `cluster_selection_epsilon` greater than 0.0.
@@ -99,7 +117,7 @@
 #'
 #' ## Cluster membership prediction for new points
 #'
-#' `predict()` assigns each new data point to the same cluster as the nearest point
+#' * `predict()` assigns each new data point to the same cluster as the nearest point
 #' if it is not more than that points core distance away. Otherwise the new point
 #' is classified as a noise point (i.e., cluster ID 0).
 #'

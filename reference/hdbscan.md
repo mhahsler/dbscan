@@ -208,6 +208,14 @@ several of the HDBSCAN steps:
 
 4.  Extract the clusters from the pruned tree.
 
+Because one `minPts` value sets both the density smoothing and the
+minimum cluster size, a single call cannot change one without the other.
+To use a different minimum cluster size, extract the clusters again from
+the result with
+[`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md),
+e.g., `extractFOSC(res, minPts = 20)`. This keeps the density estimates
+and the hierarchy of `res`.
+
 ### Core and mutual reachability distances
 
 These can be calculated using the following two exposed functions:

@@ -237,7 +237,12 @@ larger values for <code>minPts</code> give larger and smoother density estimates
 cluster size because splits are only allowed when both branches
 have at least <code>minPts</code> points.</p></li>
 <li><p>Extract the clusters from the pruned tree.</p></li>
-</ol></div>
+</ol><p>Because one <code>minPts</code> value sets both the density smoothing and the minimum
+cluster size, a single call cannot change one without the other. To use a
+different minimum cluster size, extract the clusters again from the result
+with <code><a href="extractFOSC.html">extractFOSC()</a></code>, e.g., <code>extractFOSC(res, minPts = 20)</code>. This keeps the
+density estimates and the hierarchy of <code>res</code>.</p>
+</div>
 
 <div class="section">
 <h3 id="core-and-mutual-reachability-distances">Core and mutual reachability distances<a class="anchor" aria-label="anchor" href="#core-and-mutual-reachability-distances"></a></h3>

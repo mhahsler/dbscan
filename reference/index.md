@@ -27,6 +27,10 @@ Ordering points to identify the clustering structure.
   [`extractXi()`](https://michael.hahsler.net/dbscan/reference/optics.md)
   [`predict(`*`<optics>`*`)`](https://michael.hahsler.net/dbscan/reference/optics.md)
   : Ordering Points to Identify the Clustering Structure (OPTICS)
+- [`print(`*`<reachability>`*`)`](https://michael.hahsler.net/dbscan/reference/reachability.md)
+  [`plot(`*`<reachability>`*`)`](https://michael.hahsler.net/dbscan/reference/reachability.md)
+  [`as.reachability()`](https://michael.hahsler.net/dbscan/reference/reachability.md)
+  : Reachability Distances
 
 ### HDBSCAN
 
@@ -112,10 +116,6 @@ plots and cluster hierarchies.
 - [`hullplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
   [`clplot()`](https://michael.hahsler.net/dbscan/reference/hullplot.md)
   : Plot Clusters
-- [`print(`*`<reachability>`*`)`](https://michael.hahsler.net/dbscan/reference/reachability.md)
-  [`plot(`*`<reachability>`*`)`](https://michael.hahsler.net/dbscan/reference/reachability.md)
-  [`as.reachability()`](https://michael.hahsler.net/dbscan/reference/reachability.md)
-  : Reachability Distances
 - [`as.dendrogram()`](https://michael.hahsler.net/dbscan/reference/dendrogram.md)
   : Coercions to Dendrogram
 

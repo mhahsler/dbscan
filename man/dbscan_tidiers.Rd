@@ -14,7 +14,7 @@
 \alias{glance.dbscan}
 \alias{glance.hdbscan}
 \alias{glance.general_clustering}
-\title{Turn an dbscan clustering object into a tidy tibble}
+\title{Turn a dbscan clustering object into a tidy tibble}
 \usage{
 tidy(x, ...)
 
@@ -41,7 +41,8 @@ glance(x, ...)
 \method{glance}{general_clustering}(x, ...)
 }
 \arguments{
-\item{x}{An \code{dbscan} object returned from \code{\link[=dbscan]{dbscan()}}.}
+\item{x}{A clustering object returned by \code{\link[=dbscan]{dbscan()}}, \code{\link[=hdbscan]{hdbscan()}},
+\code{\link[=jpclust]{jpclust()}} or \code{\link[=sNNclust]{sNNclust()}}.}
 
 \item{...}{further arguments are ignored without a warning.}
 
@@ -49,10 +50,64 @@ glance(x, ...)
 
 \item{newdata}{New data to predict cluster labels for.}
 }
+\value{
+A \link[tibble:tibble]{tibble} (see Details for the columns).
+}
 \description{
 Provides \link[generics:tidy]{tidy()}, \link[generics:augment]{augment()}, and
 \link[generics:glance]{glance()} verbs for clusterings created with algorithms
 in package \code{dbscan} to work with \href{https://www.tidymodels.org/}{tidymodels}.
+}
+\details{
+Methods are available for the clustering objects created by \code{\link[=dbscan]{dbscan()}},
+\code{\link[=hdbscan]{hdbscan()}}, \code{\link[=jpclust]{jpclust()}} and \code{\link[=sNNclust]{sNNclust()}}. Clusterings created by \code{\link[=optics]{optics()}}
+are not supported.
+
+All three verbs return a \link[tibble:tibble]{tibble}. Cluster 0 represents
+noise points. Noise points are not assigned to a cluster.
+\subsection{\code{tidy()}}{
+
+Returns one row per cluster, including the noise cluster 0, with the columns:
+\itemize{
+\item \code{cluster}: the cluster label as a factor (the levels are \code{0} to the number
+of clusters).
+\item \code{size}: the number of points in the cluster.
+\item \code{noise}: \code{TRUE} for cluster 0 (the noise points).
+\item \code{cluster_score} (only for \code{\link[=hdbscan]{hdbscan()}}): the stability score of the cluster
+(see the component \code{cluster_scores} in \code{\link[=hdbscan]{hdbscan()}}). It is \code{NA} for the
+noise cluster.
+}
+}
+
+\subsection{\code{augment()}}{
+
+Returns the data (or \code{newdata}) as a tibble with additional columns. The
+original data used to create the clustering always needs to be passed as
+\code{data} because the clustering object does not store it.
+If \code{newdata} is specified, then the cluster labels of the new points are
+predicted with \code{predict()}. Otherwise, the labels in the clustering are
+used. The added columns are:
+\itemize{
+\item \code{.cluster}: the cluster label as a factor.
+\item \code{noise} (only for \code{\link[=dbscan]{dbscan()}}): \code{TRUE} if the point is a noise point.
+\item \code{.coredist}, \code{.membership_prob} and \code{.outlier_scores} (only for
+\code{\link[=hdbscan]{hdbscan()}}): the core distance, the cluster membership probability and
+the GLOSH outlier score of each point (see \code{\link[=hdbscan]{hdbscan()}}). They are \code{NA} for
+points in \code{newdata}.
+}
+
+Augmenting \code{newdata} is not supported for \code{\link[=jpclust]{jpclust()}} and \code{\link[=sNNclust]{sNNclust()}}.
+}
+
+\subsection{\code{glance()}}{
+
+Returns a one-row summary of the clustering with the columns:
+\itemize{
+\item \code{nobs}: the number of points.
+\item \code{n.clusters}: the number of clusters (without noise).
+\item \code{nexcluded}: the number of noise points.
+}
+}
 }
 \examples{
 \dontshow{if (requireNamespace("tibble", quietly = TRUE) && identical(Sys.getenv("NOT_CRAN"), "true")) withAutoprint(\{ # examplesIf}

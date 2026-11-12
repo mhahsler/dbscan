@@ -1,5 +1,5 @@
 ---
-title: "Outlier Detection with dbscan"
+title: "Outlier Detection with Package dbscan"
 author: "Michael Hahsler"
 output:
   rmarkdown::html_vignette:

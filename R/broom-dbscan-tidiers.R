@@ -1,13 +1,62 @@
-#' Turn an dbscan clustering object into a tidy tibble
+#' Turn a dbscan clustering object into a tidy tibble
 #'
 #' Provides [tidy()][generics::tidy()], [augment()][generics::augment()], and
 #' [glance()][generics::glance()] verbs for clusterings created with algorithms
 #' in package `dbscan` to work with [tidymodels](https://www.tidymodels.org/).
 #'
-#' @param x An `dbscan` object returned from [dbscan::dbscan()].
+#' Methods are available for the clustering objects created by [dbscan()],
+#' [hdbscan()], [jpclust()] and [sNNclust()]. Clusterings created by [optics()]
+#' are not supported.
+#'
+#' @details
+#' All three verbs return a [tibble][tibble::tibble()]. Cluster 0 represents
+#' noise points. Noise points are not assigned to a cluster.
+#'
+#' ## `tidy()`
+#'
+#' Returns one row per cluster, including the noise cluster 0, with the columns:
+#'
+#' * `cluster`: the cluster label as a factor (the levels are `0` to the number
+#'   of clusters).
+#' * `size`: the number of points in the cluster.
+#' * `noise`: `TRUE` for cluster 0 (the noise points).
+#' * `cluster_score` (only for [hdbscan()]): the stability score of the cluster
+#'   (see the component `cluster_scores` in [hdbscan()]). It is `NA` for the
+#'   noise cluster.
+#'
+#' ## `augment()`
+#'
+#' Returns the data (or `newdata`) as a tibble with additional columns. The
+#' original data used to create the clustering always needs to be passed as
+#' `data` because the clustering object does not store it.
+#' If `newdata` is specified, then the cluster labels of the new points are
+#' predicted with `predict()`. Otherwise, the labels in the clustering are
+#' used. The added columns are:
+#'
+#' * `.cluster`: the cluster label as a factor.
+#' * `noise` (only for [dbscan()]): `TRUE` if the point is a noise point.
+#' * `.coredist`, `.membership_prob` and `.outlier_scores` (only for
+#'   [hdbscan()]): the core distance, the cluster membership probability and
+#'   the GLOSH outlier score of each point (see [hdbscan()]). They are `NA` for
+#'   points in `newdata`.
+#'
+#' Augmenting `newdata` is not supported for [jpclust()] and [sNNclust()].
+#'
+#' ## `glance()`
+#'
+#' Returns a one-row summary of the clustering with the columns:
+#'
+#' * `nobs`: the number of points.
+#' * `n.clusters`: the number of clusters (without noise).
+#' * `nexcluded`: the number of noise points.
+#'
+#' @param x A clustering object returned by [dbscan()], [hdbscan()],
+#'   [jpclust()] or [sNNclust()].
 #' @param data The data used to create the clustering.
 #' @param newdata New data to predict cluster labels for.
 #' @param ... further arguments are ignored without a warning.
+#'
+#' @returns A [tibble][tibble::tibble()] (see Details for the columns).
 #'
 #' @name dbscan_tidiers
 #' @aliases dbscan_tidiers glance tidy augment

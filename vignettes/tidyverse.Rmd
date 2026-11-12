@@ -32,7 +32,14 @@ Get cluster statistics as a tibble:
 tidy(db)
 ```
 
-Visualize the clustering with ggplot2, using an x for noise points:
+The tidier `augment()` can be used to combine the clustering with the dataset 
+which is useful for visualization.
+```{r augment}
+augment(db, x)
+```
+
+
+Visualize the clustering with ggplot2. 
 
 ```{r plot, fig.alt="DBSCAN clusters in the iris data"}
 augment(db, x) %>%
@@ -40,3 +47,7 @@ augment(db, x) %>%
   geom_point(aes(color = .cluster, shape = noise)) +
   scale_shape_manual(values = c(19, 4))
 ```
+
+`scale_shape_manual()` sets the point symbols to filled circles for regular 
+points and x for noise points.
+

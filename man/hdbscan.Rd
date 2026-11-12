@@ -137,6 +137,12 @@ cluster size because splits are only allowed when both branches
 have at least \code{minPts} points.
 \item Extract the clusters from the pruned tree.
 }
+
+Because one \code{minPts} value sets both the density smoothing and the minimum
+cluster size, a single call cannot change one without the other. To use a
+different minimum cluster size, extract the clusters again from the result
+with \code{\link[=extractFOSC]{extractFOSC()}}, e.g., \code{extractFOSC(res, minPts = 20)}. This keeps the
+density estimates and the hierarchy of \code{res}.
 }
 
 \subsection{Core and mutual reachability distances}{

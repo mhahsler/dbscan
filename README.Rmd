@@ -79,7 +79,7 @@ pairs(x, col = db$cluster + 1L)
 
 OPTICS
 ```{r}
-opt <- optics(x, eps = 1, minPts = 4)
+opt <- optics(x, minPts = 4)
 opt
 ```
 
@@ -87,7 +87,7 @@ Extract DBSCAN-like clustering from OPTICS
 and create a reachability plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 ```{r OPTICS_extractDBSCAN, fig.height=3}
 opt <- extractDBSCAN(opt, eps_cl = .4)
-plot(opt)
+plot(opt, type = "h")
 ```
 
 HDBSCAN

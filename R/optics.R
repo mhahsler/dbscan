@@ -68,10 +68,10 @@
 #' improve performance significantly for large data sets. If `eps` is too small,
 #' then points can have undefined core distances (they are noise) and
 #' reachability distances. Undefined reachability distances are
-#' shown as dashed lines in the reachability plot, and the ordering can
+#' shown as dotted lines in the reachability plot, and the ordering can
 #' differ from the one for `eps = Inf`. `optics()` gives a warning if a finite
 #' `eps` results in undefined reachability distances in addition to the first
-#' one. If the plot shows too many dashed lines then `eps` should be increased.
+#' one. If the plot shows too many dotted lines then `eps` should be increased.
 #'
 #' ## Ties
 #'
@@ -133,10 +133,13 @@
 #' @param correctPredecessors logical, correct a common artifact by pruning
 #' the steep up area for points that have predecessors not in the
 #' cluster--found by the ELKI framework, see details for `extractXi()`.
+#' @param col colors used to plot the reachability distances in the order of
+#' the points in the ordering. The default `NULL` colors the points by
+#' cluster (noise is shown in black).
 #' @param ...  additional arguments are passed on to fixed-radius nearest
 #' neighbor search algorithm. See [frNN()] for details on how to
-#' control the search strategy.
-#' @param cluster,predecessor plot clusters and predecessors.
+#' control the search strategy. For `plot()`, they are passed on to
+#' [plot.reachability()] (e.g., `hide_first` and `type`).
 #'
 #' @return An object of class `optics` with components:
 #' \item{eps }{ value of `eps` parameter. }
@@ -407,9 +410,12 @@ print.optics <- function(x, ...) {
 #' @export
 plot.optics <-
   function(x,
-    cluster = TRUE,
-    predecessor = FALSE,
-    ...) {
+           col = NULL,
+           ...) {
+
+    if (is.null(col))
+        col <- x$cluster[x$order] + 1L
+
     # OPTICS cluster extraction methods
     if (inherits(x$cluster, "xics") ||
         all(c("start", "end", "cluster_id") %in% names(x$clusters_xi))) {
@@ -429,7 +435,7 @@ plot.optics <-
       # top_level <- extractClusterLabels(x$clusters_xi, x$order)
       plot(
         as.reachability(x),
-        col = x$cluster[x$order] + 1L,
+        col = col,
         xlab = NA,
         xaxt = 'n',
         yaxs = "i",
@@ -453,7 +459,7 @@ plot.optics <-
         !is.null(x$eps_cl)) {
       # Works for integers too
       ## extractDBSCAN clustering
-      plot(as.reachability(x), col = x$cluster[x$order] + 1L, ...)
+      plot(as.reachability(x), col = col, ...)
       lines(
         x = c(0, length(x$cluster)),
         y = c(x$eps_cl, x$eps_cl),

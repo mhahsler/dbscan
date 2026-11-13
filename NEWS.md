@@ -10,6 +10,10 @@
   reachability graph computed directly from a data matrix and `minPts`). 
 * `hdbscan()` with a data matrix now builds the minimum spanning tree with
   `mst_mrdist()` avoiding creating a full distance matrix.
+* `plot()` for `reachability` objects gained the arguments `hide_first` (do not
+  draw the undefined first reachability distance) and `type`. `plot()` for
+  `optics` objects gained the argument `col` and no longer has the unused
+  arguments `cluster` and `predecessor`.
 * optics(): The default `eps = Inf` uses an unlimited
   neighborhood and gives the complete reachability structure. It is computed
   exactly with a memory efficient Prim-style scan.

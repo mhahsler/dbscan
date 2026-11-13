@@ -16,7 +16,7 @@ optics(x, eps = Inf, minPts = 5, ...)
 
 \method{print}{optics}(x, ...)
 
-\method{plot}{optics}(x, cluster = TRUE, predecessor = FALSE, ...)
+\method{plot}{optics}(x, col = NULL, ...)
 
 \method{as.reachability}{optics}(object, ...)
 
@@ -43,9 +43,12 @@ plot. Default is 5 points.}
 
 \item{...}{additional arguments are passed on to fixed-radius nearest
 neighbor search algorithm. See \code{\link[=frNN]{frNN()}} for details on how to
-control the search strategy.}
+control the search strategy. For \code{plot()}, they are passed on to
+\code{\link[=plot.reachability]{plot.reachability()}} (e.g., \code{hide_first} and \code{type}).}
 
-\item{cluster, predecessor}{plot clusters and predecessors.}
+\item{col}{colors used to plot the reachability distances in the order of
+the points in the ordering. The default \code{NULL} colors the points by
+cluster (noise is shown in black).}
 
 \item{object}{clustering object.}
 
@@ -139,10 +142,10 @@ A finite \code{eps} restricts the maximum epsilon neighborhood size, which can
 improve performance significantly for large data sets. If \code{eps} is too small,
 then points can have undefined core distances (they are noise) and
 reachability distances. Undefined reachability distances are
-shown as dashed lines in the reachability plot, and the ordering can
+shown as dotted lines in the reachability plot, and the ordering can
 differ from the one for \code{eps = Inf}. \code{optics()} gives a warning if a finite
 \code{eps} results in undefined reachability distances in addition to the first
-one. If the plot shows too many dashed lines then \code{eps} should be increased.
+one. If the plot shows too many dotted lines then \code{eps} should be increased.
 }
 
 \subsection{Ties}{

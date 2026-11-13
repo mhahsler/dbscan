@@ -64,7 +64,7 @@ structure) point ordering algorithm using a k-d tree.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'optics'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, cluster <span class="op">=</span> <span class="cn">TRUE</span>, predecessor <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, col <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'optics'</span></span>
 <span><span class="fu"><a href="reachability.html">as.reachability</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -105,11 +105,14 @@ plot. Default is 5 points.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>additional arguments are passed on to fixed-radius nearest
 neighbor search algorithm. See <code><a href="frNN.html">frNN()</a></code> for details on how to
-control the search strategy.</p></dd>
+control the search strategy. For <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, they are passed on to
+<code><a href="reachability.html">plot.reachability()</a></code> (e.g., <code>hide_first</code> and <code>type</code>).</p></dd>
 
 
-<dt id="arg-cluster-predecessor">cluster, predecessor<a class="anchor" aria-label="anchor" href="#arg-cluster-predecessor"></a></dt>
-<dd><p>plot clusters and predecessors.</p></dd>
+<dt id="arg-col">col<a class="anchor" aria-label="anchor" href="#arg-col"></a></dt>
+<dd><p>colors used to plot the reachability distances in the order of
+the points in the ordering. The default <code>NULL</code> colors the points by
+cluster (noise is shown in black).</p></dd>
 
 
 <dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
@@ -241,10 +244,10 @@ points, so it can still be slow for large data sets.</p>
 improve performance significantly for large data sets. If <code>eps</code> is too small,
 then points can have undefined core distances (they are noise) and
 reachability distances. Undefined reachability distances are
-shown as dashed lines in the reachability plot, and the ordering can
+shown as dotted lines in the reachability plot, and the ordering can
 differ from the one for <code>eps = Inf</code>. <code>optics()</code> gives a warning if a finite
 <code>eps</code> results in undefined reachability distances in addition to the first
-one. If the plot shows too many dashed lines then <code>eps</code> should be increased.</p>
+one. If the plot shows too many dotted lines then <code>eps</code> should be increased.</p>
 </div>
 
 <div class="section">

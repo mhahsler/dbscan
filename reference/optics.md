@@ -12,7 +12,7 @@ optics(x, eps = Inf, minPts = 5, ...)
 print(x, ...)
 
 # S3 method for class 'optics'
-plot(x, cluster = TRUE, predecessor = FALSE, ...)
+plot(x, col = NULL, ...)
 
 # S3 method for class 'optics'
 as.reachability(object, ...)
@@ -54,11 +54,17 @@ predict(object, newdata, data, ...)
   additional arguments are passed on to fixed-radius nearest neighbor
   search algorithm. See
   [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md) for
-  details on how to control the search strategy.
+  details on how to control the search strategy. For
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html), they are
+  passed on to
+  [`plot.reachability()`](https://michael.hahsler.net/dbscan/reference/reachability.md)
+  (e.g., `hide_first` and `type`).
 
-- cluster, predecessor:
+- col:
 
-  plot clusters and predecessors.
+  colors used to plot the reachability distances in the order of the
+  points in the ordering. The default `NULL` colors the points by
+  cluster (noise is shown in black).
 
 - object:
 
@@ -191,10 +197,10 @@ A finite `eps` restricts the maximum epsilon neighborhood size, which
 can improve performance significantly for large data sets. If `eps` is
 too small, then points can have undefined core distances (they are
 noise) and reachability distances. Undefined reachability distances are
-shown as dashed lines in the reachability plot, and the ordering can
+shown as dotted lines in the reachability plot, and the ordering can
 differ from the one for `eps = Inf`. `optics()` gives a warning if a
 finite `eps` results in undefined reachability distances in addition to
-the first one. If the plot shows too many dashed lines then `eps` should
+the first one. If the plot shows too many dotted lines then `eps` should
 be increased.
 
 ### Ties

@@ -57,6 +57,8 @@
 <li>New <code><a href="../reference/mst_dist.html">mst_dist()</a></code> (single-linkage hierarchy of the minimum spanning tree of a <code>dist</code> object as an <code>hclust</code> object) and <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> (MST of the mutual reachability graph computed directly from a data matrix and <code>minPts</code>).</li>
 <li>
 <code><a href="../reference/hdbscan.html">hdbscan()</a></code> with a data matrix now builds the minimum spanning tree with <code><a href="../reference/mst_dist.html">mst_mrdist()</a></code> avoiding creating a full distance matrix.</li>
+<li>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for <code>reachability</code> objects gained the arguments <code>hide_first</code> (do not draw the undefined first reachability distance) and <code>type</code>. <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for <code>optics</code> objects gained the argument <code>col</code> and no longer has the unused arguments <code>cluster</code> and <code>predecessor</code>.</li>
 <li>optics(): The default <code>eps = Inf</code> uses an unlimited neighborhood and gives the complete reachability structure. It is computed exactly with a memory efficient Prim-style scan.</li>
 <li>optics() now gives a warning if a finite <code>eps</code> results in undefined reachability distances in addition to the first one.</li>
 <li>optics(): Ties in the reachability distance are now broken in favor of the point with the lower id (row number), following the current ELKI implementation. The <code>predecessor</code> component also is now consistent with ELKI 0.8.0.</li>

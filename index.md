@@ -72,6 +72,7 @@ The following R packages use `dbscan`:
 [CPC](https://CRAN.R-project.org/package=CPC),
 [crosshap](https://CRAN.R-project.org/package=crosshap),
 [crownsegmentr](https://CRAN.R-project.org/package=crownsegmentr),
+[CspStandSegmentation](https://CRAN.R-project.org/package=CspStandSegmentation),
 [cyclicwave](https://CRAN.R-project.org/package=cyclicwave),
 [daltoolbox](https://CRAN.R-project.org/package=daltoolbox),
 [DataSimilarity](https://CRAN.R-project.org/package=DataSimilarity),
@@ -107,7 +108,6 @@ The following R packages use `dbscan`:
 [mlr3cluster](https://CRAN.R-project.org/package=mlr3cluster),
 [neuroim2](https://CRAN.R-project.org/package=neuroim2),
 [oclust](https://CRAN.R-project.org/package=oclust),
-[omicsTools](https://CRAN.R-project.org/package=omicsTools),
 [openSkies](https://CRAN.R-project.org/package=openSkies),
 [opticskxi](https://CRAN.R-project.org/package=opticskxi),
 [OTclust](https://CRAN.R-project.org/package=OTclust),
@@ -120,10 +120,12 @@ The following R packages use `dbscan`:
 [pguIMP](https://CRAN.R-project.org/package=pguIMP),
 [phynotype](https://CRAN.R-project.org/package=phynotype),
 [PiC](https://CRAN.R-project.org/package=PiC),
+[PsyML](https://CRAN.R-project.org/package=PsyML),
 [quickOutlier](https://CRAN.R-project.org/package=quickOutlier),
 [R4VN](https://CRAN.R-project.org/package=R4VN),
 [rarefun](https://CRAN.R-project.org/package=rarefun),
 [rcrisp](https://CRAN.R-project.org/package=rcrisp),
+[relm](https://CRAN.R-project.org/package=relm),
 [Rhobots](https://CRAN.R-project.org/package=Rhobots),
 [riemannianStats](https://CRAN.R-project.org/package=riemannianStats),
 [riskutility](https://CRAN.R-project.org/package=riskutility),
@@ -155,6 +157,7 @@ The following R packages use `dbscan`:
 [tidylearn](https://CRAN.R-project.org/package=tidylearn),
 [tidySEM](https://CRAN.R-project.org/package=tidySEM),
 [tlsR](https://CRAN.R-project.org/package=tlsR),
+[treehunt](https://CRAN.R-project.org/package=treehunt),
 [VBphenoR](https://CRAN.R-project.org/package=VBphenoR),
 [VIProDesign](https://CRAN.R-project.org/package=VIProDesign),
 [weird](https://CRAN.R-project.org/package=weird)
@@ -223,13 +226,13 @@ OPTICS
 
 ``` r
 
-opt <- optics(x, eps = 1, minPts = 4)
+opt <- optics(x, minPts = 4)
 opt
 ```
 
 ``` R
 ## OPTICS ordering/clustering for 150 objects.
-## Parameters: minPts = 4, eps = 1, eps_cl = NA, xi = NA
+## Parameters: minPts = 4, eps = Inf, eps_cl = NA, xi = NA
 ## Available fields: order, reachdist, coredist, predecessor, minPts, eps,
 ##                   eps_cl, xi
 ```
@@ -287,12 +290,12 @@ plot(hdb, show_flat = TRUE)
 The dbscan package is licensed under the [GNU General Public License
 (GPL) Version 3 or later](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-The **OPTICSXi** R implementation was directly ported from the ELKI
-framework’s Java implementation with permission by the original author,
-Erich Schubert. This function is redistributed under the stricter [GNU
-AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Follow the
-instruction in the in `R/optics_extractXi.R` to use the package under
-the GNU GPL v3 license.
+The **OPTICSXi** R implementation in `R/optics_extractXi.R` was directly
+ported from the ELKI framework’s (version 0.8.0) Java implementation
+with permission by the original author, Erich Schubert. This function is
+redistributed under the stricter [GNU
+AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Remove the file
+and function to use the package under the GNU GPL v3 license.
 
 ## Citation request
 
@@ -304,7 +307,7 @@ To cite package ‘dbscan’ in publications use:
 
 ``` R
 @Article{,
-  title = {{dbscan}: Fast Density-Based Clustering with {R}},
+  title = {dbscan: Fast Density-Based Clustering with {R}},
   author = {Michael Hahsler and Matthew Piekenbrock and Derek Doran},
   journal = {Journal of Statistical Software},
   year = {2019},

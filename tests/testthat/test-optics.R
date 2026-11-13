@@ -146,10 +146,13 @@ test_that("optics with eps = Inf uses an unlimited neighborhood", {
 
   # distance matrix and distance search give the same result
   res_dist <- optics(dist(x), eps = Inf, minPts = minPts)
-  expect_identical(res_dist$order, res_inf$order)
-  expect_equal(res_dist$reachdist, res_inf$reachdist)
+  # iris has many tied distances. Distances computed from the data matrix and
+  # by dist() can differ in the last bits (e.g., FMA on arm64), which changes
+  # tie-breaking and thus the order. We compare order-independent results.
+  expect_equal(res_dist$coredist, res_inf$coredist)
+  expect_equal(sort(res_dist$reachdist), sort(res_inf$reachdist))
   res_search <- optics(x, eps = Inf, minPts = minPts, search = "dist")
-  expect_equal(res_search$reachdist, res_inf$reachdist)
+  expect_equal(sort(res_search$reachdist), sort(res_inf$reachdist))
 
   # the complete structure can be converted to a dendrogram
   expect_s3_class(as.dendrogram(res_inf), "dendrogram")

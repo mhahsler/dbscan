@@ -1,4 +1,4 @@
-# dbscan 1.2.8 (2026-11-12)
+# dbscan 1.2.8 (unpublished)
 
 ## Changes
 * Documentation now consistently spells "k-d tree" (was kd-tree, kd tree, and k-d tree).

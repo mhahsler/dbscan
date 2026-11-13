@@ -1,0 +1,40 @@
+name: Sanitizers
+
+# Runs R CMD check in the R-hub sanitizer/valgrind containers, which mimic
+# the additional checks CRAN runs on packages with compiled code.
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "src/**"
+      - "R/**"
+      - "tests/**"
+      - "DESCRIPTION"
+      - ".github/workflows/sanitizers.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  sanitizers:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.container }}
+    container:
+      image: ghcr.io/r-hub/containers/${{ matrix.container }}:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container: [clang-asan, gcc-asan, clang-ubsan, valgrind]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual", "--ignore-vignettes")'
+          build_args: 'c("--no-build-vignettes")'
+          error-on: '"error"'

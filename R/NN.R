@@ -89,7 +89,8 @@ sort.NN <- function(x, decreasing = FALSE, ...) {
 
 #' @rdname NN
 #' @export
-plot.NN <- function(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...) {
+plot.NN <- function(x, data, main = NULL, pch = 16,
+                    col = "black", linecol = "gray", ...) {
   if (is.null(main)) {
     if (inherits(x, "frNN"))
       main <- paste0("frNN graph (eps = ", x$eps, ")")
@@ -101,7 +102,7 @@ plot.NN <- function(x, data, main = NULL, pch = 16, col = "black", linecol = "gr
   }
 
   ## create an empty plot
-  graphics::plot.default(data[, 1:2], main = main, type = "n", pch = pch, col = col, ...)
+  graphics::plot.default(data[, 1:2], main = main, type = "n", ...)
 
   id <- adjacencylist(x)
 
@@ -120,7 +121,7 @@ plot.NN <- function(x, data, main = NULL, pch = 16, col = "black", linecol = "gr
 
   } else {
     ## ad vertices
-    points(data[, 1:2], main = main, pch = pch, ...)
+    points(data[, 1:2], main = main, pch = pch, col = col, ...)
     ## use colors if it was from a query
     for (i in seq_along(id)) {
       points(data[id[[i]], ], pch = pch, col = i + 1L)

@@ -14,12 +14,12 @@ adjacencylist(x, ...)
 
 \method{sort}{NN}(x, decreasing = FALSE, ...)
 
-\method{plot}{NN}(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...)
+\method{plot}{NN}(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...)
 }
 \arguments{
 \item{x}{a \code{NN} object}
 
-\item{...}{further parameters past on to \code{\link[=plot]{plot()}}.}
+\item{...}{further parameters are passed on to \code{\link[graphics:plot.default]{graphics::plot.default()}}.}
 
 \item{decreasing}{sort in decreasing order?}
 
@@ -29,7 +29,8 @@ adjacencylist(x, ...)
 
 \item{pch}{plotting character.}
 
-\item{col}{color used for the data points (nodes).}
+\item{col}{color used for the data points (nodes). Use \code{NULL} to make
+the points invisible.}
 
 \item{linecol}{color used for edges.}
 }
@@ -51,7 +52,7 @@ x <- iris[, -5]
 nn <- kNN(x, k=5)
 nn
 
-# plot the kNN where NN are shown as line conecting points.
+# plot the kNN where NN are shown as line connecting points.
 plot(nn, x)
 
 # show the first few elements of the adjacency list

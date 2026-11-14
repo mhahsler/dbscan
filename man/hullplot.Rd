@@ -47,7 +47,7 @@ hulls? alpha controls the level of alpha shading.}
 
 \item{main}{main title.}
 
-\item{...}{additional arguments passed on to plot.}
+\item{...}{further parameters are passed on to \code{\link[graphics:plot.default]{graphics::plot.default()}}.}
 }
 \description{
 \code{clplot()} produces a two-dimensional scatter plot of data points

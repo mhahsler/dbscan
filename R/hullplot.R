@@ -41,7 +41,7 @@
 #' @param main main title.
 #' @param solid,alpha draw filled polygons instead of just lines for the convex
 #' hulls? alpha controls the level of alpha shading.
-#' @param ...  additional arguments passed on to plot.
+#' @param ... further parameters are passed on to [graphics::plot.default()].
 #' @author Michael Hahsler
 #' @keywords plot clustering
 #' @examples
@@ -138,7 +138,7 @@ hullplot <- function(x,
   # mark noise points
   pch <- pch %||% ifelse(cl == 0L, 4L, 1L)
 
-  plot(x[, 1:2],
+  graphics::plot.default(x[, 1:2],
     col = c(col_noise, col)[cl + 1L],
     pch = pch,
     cex = cex,

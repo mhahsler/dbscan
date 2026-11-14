@@ -7,7 +7,16 @@
 \usage{
 kNNdist(x, k, all = FALSE, ...)
 
-kNNdistplot(x, k, minPts, ...)
+kNNdistplot(
+  x,
+  k,
+  minPts,
+  type = "l",
+  xlab = NULL,
+  ylab = NULL,
+  kNNdist_param = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{the data set as a matrix of points (Euclidean distance is used) or
@@ -19,11 +28,20 @@ a precalculated \link{dist} object.}
 \item{all}{should a matrix with the distances to all k nearest neighbors be
 returned?}
 
-\item{...}{further arguments (e.g., k-d tree related parameters) are passed
-on to \code{\link[=kNN]{kNN()}}.}
+\item{...}{for \code{kNNdist()}, further arguments (e.g., k-d tree related
+parameters) are passed on to \code{\link[=kNN]{kNN()}}. For \code{kNNdistplot()}, further graphical
+parameters are passed on to \code{\link[graphics:plot.default]{graphics::plot.default()}} (or
+\code{\link[graphics:matplot]{graphics::matplot()}} if several values of \code{k} are given).}
 
 \item{minPts}{to use a k-NN plot to determine a suitable \code{eps} value for \code{\link[=dbscan]{dbscan()}},
 \code{minPts} used in dbscan can be specified and will set \code{k = minPts - 1}.}
+
+\item{type, xlab, ylab}{plot type and axis labels for \code{kNNdistplot()}. The
+default \code{NULL} for \code{xlab} and \code{ylab} uses a descriptive label.}
+
+\item{kNNdist_param}{a named list of additional arguments (e.g., k-d tree
+related parameters) passed on to \code{kNNdist()} and then to \code{\link[=kNN]{kNN()}} by
+\code{kNNdistplot()}, for example, \code{list(search = "linear")}.}
 }
 \value{
 \code{kNNdist()} returns a numeric vector with the distance to its k
@@ -54,9 +72,10 @@ kNNdist(iris, k = 4, all = TRUE)
 ## The knee is visible around a distance of .7
 kNNdistplot(iris, k = 4)
 
-## Look at all k-NN distance plots for a k of 1 to 10
-## Note that k-NN distances are increasing in k
-kNNdistplot(iris, k = 1:20)
+## Look at k-NN distance plots for different k values
+## Note that k-NN distances are increasing in k, so the
+## lowest line is for the lowest k value.
+kNNdistplot(iris, k = c(1, 5, 10, 20))
 
 cl <- dbscan(iris, eps = .7, minPts = 5)
 pairs(iris, col = cl$cluster + 1L)

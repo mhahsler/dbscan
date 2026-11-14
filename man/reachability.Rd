@@ -29,7 +29,8 @@ as.reachability(object, ...)
 \arguments{
 \item{x}{object of class \code{reachability}.}
 
-\item{...}{graphical parameters are passed on to \code{plot()},
+\item{...}{for \code{plot()} graphical parameters are passed on to
+\code{\link[graphics:plot.default]{graphics::plot.default()}}.
 or arguments for other methods.}
 
 \item{order_labels}{whether to plot text labels for each points reachability
@@ -131,9 +132,10 @@ plot(res)
 reach <- as.reachability(res)
 reach
 
-### plot still produces a reachability plot; points ids
+### plot also produces a reachability plot; point IDs
 ### (rows in the original data) can be displayed with order_labels = TRUE
-plot(reach, order_labels = TRUE)
+### the plotting parameter type can be used to change the plot style.
+plot(reach, order_labels = TRUE, type = "l")
 
 ### Reachability objects can be directly converted to dendrograms
 dend <- as.dendrogram(reach)

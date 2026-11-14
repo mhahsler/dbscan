@@ -65,8 +65,8 @@
 #' be much faster for some search methods. kNN objects can be sorted using
 #' `sort()`.
 #' @param bucketSize max size of the k-d tree leafs.
-#' @param splitRule rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
-#' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
+#' @param splitRule rule to split the k-d tree. One of `"std"`, `"midpt"`, `"fair"`,
+#' `"sl_midpt"`, `"sl_fair"` or `"suggest"`. The default value `"suggest"` uses
 #' ANNs best guess.
 #' @param approx use approximate nearest neighbors. All NN up to a distance of
 #' a factor of `1 + approx` eps may be used. Some actual NN may be omitted
@@ -318,15 +318,17 @@ print.kNN <- function(x, ...) {
 
 # Convert names to integers for C++
 .parse_search <- function(search) {
-  search <- pmatch(toupper(search), c("KDTREE", "LINEAR", "DIST"))
+  search <- pmatch(tolower(search), .ANNsearchTypes)
   if (is.na(search))
-    stop("Unknown NN search type!")
+    stop("Unknown NN search method! Available for search: ",
+         paste(sQuote(.ANNsearchTypes), collapse = ", "))
   search
 }
 
 .parse_splitRule <- function(splitRule) {
-  splitRule <- pmatch(toupper(splitRule), .ANNsplitRule) - 1L
+  splitRule <- pmatch(tolower(splitRule), .ANNsplitRule) - 1L
   if (is.na(splitRule))
-    stop("Unknown splitRule!")
+    stop("Unknown splitRule! Available: ",
+         paste(sQuote(.ANNsplitRule), collapse = ", "))
   splitRule
 }

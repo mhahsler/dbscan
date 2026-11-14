@@ -36,8 +36,15 @@
 #'    `minPts` used in dbscan can be specified and will set `k = minPts - 1`.
 #' @param all should a matrix with the distances to all k nearest neighbors be
 #' returned?
-#' @param ... further arguments (e.g., k-d tree related parameters) are passed
-#' on to [kNN()].
+#' @param type,xlab,ylab plot type and axis labels for `kNNdistplot()`. The
+#' default `NULL` for `xlab` and `ylab` uses a descriptive label.
+#' @param kNNdist_param a named list of additional arguments (e.g., k-d tree
+#' related parameters) passed on to `kNNdist()` and then to [kNN()] by
+#' `kNNdistplot()`, for example, `list(search = "linear")`.
+#' @param ... for `kNNdist()`, further arguments (e.g., k-d tree related
+#' parameters) are passed on to [kNN()]. For `kNNdistplot()`, further graphical
+#' parameters are passed on to [graphics::plot.default()] (or
+#' [graphics::matplot()] if several values of `k` are given).
 #'
 #' @return `kNNdist()` returns a numeric vector with the distance to its k
 #' nearest neighbor. If `all = TRUE` then a matrix with k columns
@@ -62,9 +69,10 @@
 #' ## The knee is visible around a distance of .7
 #' kNNdistplot(iris, k = 4)
 #'
-#' ## Look at all k-NN distance plots for a k of 1 to 10
-#' ## Note that k-NN distances are increasing in k
-#' kNNdistplot(iris, k = 1:20)
+#' ## Look at k-NN distance plots for different k values
+#' ## Note that k-NN distances are increasing in k, so the
+#' ## lowest line is for the lowest k value.
+#' kNNdistplot(iris, k = c(1, 5, 10, 20))
 #'
 #' cl <- dbscan(iris, eps = .7, minPts = 5)
 #' pairs(iris, col = cl$cluster + 1L)
@@ -79,27 +87,40 @@ kNNdist <- function(x, k, all = FALSE, ...) {
 
 #' @rdname kNNdist
 #' @export
-kNNdistplot <- function(x, k, minPts, ...) {
+kNNdistplot <- function(x, k, minPts, type = "l",
+                        xlab = NULL, ylab = NULL,
+                        kNNdist_param = NULL, ...) {
   if (missing(k) && missing(minPts))
     stop("k or minPts need to be specified.")
-
   if (missing(k))
     k <- minPts - 1
 
+  if (is.null(xlab))
+    xlab <- "Points sorted by distance"
+
   if (length(k) == 1) {
-  kNNdist <- sort(kNNdist(x, k, ...))
-  plot(
-    kNNdist,
-    type = "l",
-    ylab = paste0(k, "-NN distance"),
-    xlab = "Points sorted by distance"
-  )
+    if (is.null(ylab))
+      ylab <- paste0(k, "-NN distances")
+
+    kNNd <- sort(do.call(kNNdist, c(list(x, k), as.list(kNNdist_param))))
+    graphics::plot.default(
+      kNNd,
+      type = type,
+      xlab = xlab,
+      ylab = ylab,
+      ...
+    )
 
   } else {
-    knnds <- vapply(k, function(i) sort(kNNdist(x, i, ...)), numeric(nrow(x)))
+    if (is.null(ylab))
+      ylab <- paste0("k-NN distances for k={", paste(k, collapse = ","),"}")
+    knnds <- vapply(k, function(i)
+      sort(do.call(kNNdist, c(list(x, i), as.list(kNNdist_param)))),
+      numeric(nrow(as.matrix(x))))
 
-    matplot(knnds, type = "l", lty = 1,
-            ylab = paste0("k-NN distance"),
-            xlab = "Points sorted by distance")
+    graphics::matplot(knnds, type = type, lty = 1,
+                      xlab = xlab,
+                      ylab = ylab,
+                      ...)
   }
 }

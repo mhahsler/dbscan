@@ -29,9 +29,10 @@
 #'
 #' @param x a `NN` object
 #' @param pch plotting character.
-#' @param col color used for the data points (nodes).
+#' @param col color used for the data points (nodes). Use `NULL` to make
+#'  the points invisible.
 #' @param linecol color used for edges.
-#' @param ... further parameters past on to [plot()].
+#' @param ... further parameters are passed on to [graphics::plot.default()].
 #' @param decreasing sort in decreasing order?
 #' @param data that was used to create `x`
 #' @param main title
@@ -49,7 +50,7 @@
 #' nn <- kNN(x, k=5)
 #' nn
 #'
-#' # plot the kNN where NN are shown as line conecting points.
+#' # plot the kNN where NN are shown as line connecting points.
 #' plot(nn, x)
 #'
 #' # show the first few elements of the adjacency list
@@ -88,7 +89,7 @@ sort.NN <- function(x, decreasing = FALSE, ...) {
 
 #' @rdname NN
 #' @export
-plot.NN <- function(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...) {
+plot.NN <- function(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...) {
   if (is.null(main)) {
     if (inherits(x, "frNN"))
       main <- paste0("frNN graph (eps = ", x$eps, ")")
@@ -100,7 +101,7 @@ plot.NN <- function(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray"
   }
 
   ## create an empty plot
-  plot(data[, 1:2], main = main, type = "n", pch = pch, col = col, ...)
+  graphics::plot.default(data[, 1:2], main = main, type = "n", pch = pch, col = col, ...)
 
   id <- adjacencylist(x)
 

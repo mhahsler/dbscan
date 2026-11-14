@@ -433,7 +433,7 @@ plot.optics <-
 
       # Get top level cluster labels
       # top_level <- extractClusterLabels(x$clusters_xi, x$order)
-      plot(
+      plot.reachability(
         as.reachability(x),
         col = col,
         xlab = NA,
@@ -459,7 +459,7 @@ plot.optics <-
         !is.null(x$eps_cl)) {
       # Works for integers too
       ## extractDBSCAN clustering
-      plot(as.reachability(x), col = col, ...)
+      plot.reachability(as.reachability(x), col = col, ...)
       lines(
         x = c(0, length(x$cluster)),
         y = c(x$eps_cl, x$eps_cl),

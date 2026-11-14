@@ -1,35 +1,44 @@
-# dbscan 1.2.8 (unpublished)
+# dbscan 1.3.0 (unpublished)
 
 ## Changes
-* Documentation now consistently spells "k-d tree" (was kd-tree, kd tree, and k-d tree).
-* Added RAII model for ANN. ANN searches now release point storage, trees, 
+* __ANN:__ Added RAII model for ANN. ANN searches now release point storage, trees, 
   and search buffers automatically when C++ exceptions or user interrupts 
   unwind a call.
-* New `mst_dist()` (single-linkage hierarchy of the minimum spanning tree of a `dist`
-  object as an `hclust` object) and `mst_mrdist()` (MST of the mutual
-  reachability graph computed directly from a data matrix and `minPts`). 
-* `hdbscan()` with a data matrix now builds the minimum spanning tree with
-  `mst_mrdist()` avoiding creating a full distance matrix.
-* `plot()` for `reachability` objects gained the arguments `hide_first` (do not
-  draw the undefined first reachability distance) and `type`. `plot()` for
-  `optics` objects gained the argument `col` and no longer has the unused
-  arguments `cluster` and `predecessor`.
-* optics(): The default `eps = Inf` uses an unlimited
-  neighborhood and gives the complete reachability structure. It is computed
-  exactly with a memory efficient Prim-style scan.
-* optics() now gives a warning if a finite `eps` results in undefined
-  reachability distances in addition to the first one.
-* optics(): Ties in the reachability distance are now broken in favor of the
-  point with the lower id (row number), following the current ELKI
-  implementation. The `predecessor` component also is now consistent 
-  with ELKI 0.8.0.
-* extractXi(): The implementation was updated to follow the OPTICS Xi cluster
-  extraction in ELKI 0.8.0 (Schubert and Gertz, 2018). 
-* `extractFOSC()` gained the argument `cluster_selection_epsilon` (as in
-  `hdbscan()`) and now also accepts the result of `hdbscan()` as `x`.
-* `hdbscan()` now records `minPts` in its `hc` component. `extractFOSC()` uses it
-  as the default for `minPts`.
-* Added sanitizer runs (skipped on CRAN).
+* __HDBSCAN__ 
+  - New `mst_dist()` (single-linkage hierarchy of the minimum spanning tree of a `dist`
+    object as an `hclust` object) and `mst_mrdist()` (MST of the mutual
+    reachability graph computed directly from a data matrix and `minPts`). 
+  - `hdbscan()` with a data matrix now builds the minimum spanning tree with
+    `mst_mrdist()` avoiding creating a full distance matrix.
+  - `extractFOSC()` gained the argument `cluster_selection_epsilon` (as in
+    `hdbscan()`) and now also accepts the result of `hdbscan()` as `x`.
+  - `hdbscan()` now records `minPts` in its `hc` component. `extractFOSC()` uses it
+    as the default for `minPts`.
+* __OPTICS__
+  - optics(): The default `eps = Inf` uses an unlimited
+    neighborhood and gives the complete reachability structure. It is computed
+    exactly with a memory efficient Prim-style scan.
+  - optics() now gives a warning if a finite `eps` results in undefined
+    reachability distances in addition to the first one.
+  - optics(): Ties in the reachability distance are now broken in favor of the
+    point with the lower id (row number), following the current ELKI
+    implementation. The `predecessor` component also is now consistent 
+    with ELKI 0.8.0.
+  - extractXi(): The implementation was updated to follow the OPTICS Xi cluster
+    extraction in ELKI 0.8.0 (Schubert and Gertz, 2018). 
+* __Plotting__
+  - All plot functions now consistently pass on ... to the underlying plot function
+    from graphics.
+  - `plot()` for `reachability` objects gained the arguments `hide_first` (do not
+    draw the undefined first reachability distance) and `type`. `plot()` for
+    `optics` objects gained the argument `col` and no longer has the unused
+    arguments `cluster` and `predecessor`.
+  - `kNNdistplot()` gained the arguments `type`, `xlab`, `ylab`, and
+    `kNNdist_param` (a list passing additional arguments, e.g., k-d tree
+    parameters, on to `kNNdist()`). `...` now passes graphical parameters on to
+    `plot.default()` (or `matplot()` for several values of `k`) instead of to
+    `kNN()`.
+* __Sanitizer:__ Added sanitizer runs (skipped on CRAN).
 
 ## Bugfixes
 * kNN.cpp: Keep the k nearest hits in kNN_int when the query point 

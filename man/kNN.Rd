@@ -44,8 +44,8 @@ be much faster for some search methods. kNN objects can be sorted using
 
 \item{bucketSize}{max size of the k-d tree leafs.}
 
-\item{splitRule}{rule to split the k-d tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
-\code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
+\item{splitRule}{rule to split the k-d tree. One of \code{"std"}, \code{"midpt"}, \code{"fair"},
+\code{"sl_midpt"}, \code{"sl_fair"} or \code{"suggest"}. The default value \code{"suggest"} uses
 ANNs best guess.}
 
 \item{approx}{use approximate nearest neighbors. All NN up to a distance of

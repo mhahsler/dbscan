@@ -235,7 +235,7 @@ plot (extracted DBSCAN clusters at eps_cl=.4 are colored)
 
 ``` r
 opt <- extractDBSCAN(opt, eps_cl = 0.4)
-plot(opt)
+plot(opt, type = "h")
 ```
 
 ![](man/figures/README-OPTICS_extractDBSCAN-1.png)<!-- -->

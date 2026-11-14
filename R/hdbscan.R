@@ -539,7 +539,7 @@ plot.hdbscan <-
       }
     }
 
-    ## Run the recursive plotting
+    ## Run the recursive plotting. This calls stats::plot.dendrogram()
     plot(
       dend,
       edge.root = TRUE,

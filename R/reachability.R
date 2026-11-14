@@ -84,7 +84,8 @@
 #' drawn at the top of the plot.
 #' @param type plot type passed on to `plot()`. The default `"h"` draws
 #' vertical bars.
-#' @param ...  graphical parameters are passed on to `plot()`,
+#' @param ...  for `plot()` graphical parameters are passed on to
+#'   [graphics::plot.default()].
 #'   or arguments for other methods.
 #'
 #' @return An object of class `reachability` with components:
@@ -126,9 +127,10 @@
 #' reach <- as.reachability(res)
 #' reach
 #'
-#' ### plot still produces a reachability plot; points ids
+#' ### plot also produces a reachability plot; point IDs
 #' ### (rows in the original data) can be displayed with order_labels = TRUE
-#' plot(reach, order_labels = TRUE)
+#' ### the plotting parameter type can be used to change the plot style.
+#' plot(reach, order_labels = TRUE, type = "l")
 #'
 #' ### Reachability objects can be directly converted to dendrograms
 #' dend <- as.dendrogram(reach)
@@ -172,7 +174,7 @@ plot.reachability <- function(x,
 
   if (hide_first) reachdist[1L] <- NA
 
-  plot(
+  graphics::plot.default(
     reachdist,
     xlab = xlab,
     ylab = ylab,

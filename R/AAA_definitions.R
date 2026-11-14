@@ -17,7 +17,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-.ANNsplitRule <- c("STD", "MIDPT", "FAIR", "SL_MIDPT", "SL_FAIR", "SUGGEST")
+.ANNsplitRule <- c("std", "midpt", "fair", "sl_midpt", "sl_fair", "suggest")
+.ANNsearchTypes <- c("kdtree", "linear", "dist")
 
 .matrixlike <- function(x) {
   if  (is.null(dim(x)))

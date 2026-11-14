@@ -71,7 +71,8 @@ clplot(x, cl, col = NULL, pch = NULL, cex = 0.5, main = "Cluster Plot", ...)
 
 - ...:
 
-  additional arguments passed on to plot.
+  further parameters are passed on to
+  [`graphics::plot.default()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ## Author
 

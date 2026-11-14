@@ -62,9 +62,9 @@ print(x, ...)
 
 - splitRule:
 
-  rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
-  `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding).
-  `"SUGGEST"` uses ANNs best guess.
+  rule to split the k-d tree. One of `"std"`, `"midpt"`, `"fair"`,
+  `"sl_midpt"`, `"sl_fair"` or `"suggest"`. The default value
+  `"suggest"` uses ANNs best guess.
 
 - approx:
 

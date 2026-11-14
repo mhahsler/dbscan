@@ -12,7 +12,16 @@ The plot can be used to help find suitable parameter values for
 ``` r
 kNNdist(x, k, all = FALSE, ...)
 
-kNNdistplot(x, k, minPts, ...)
+kNNdistplot(
+  x,
+  k,
+  minPts,
+  type = "l",
+  xlab = NULL,
+  ylab = NULL,
+  kNNdist_param = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -35,8 +44,13 @@ kNNdistplot(x, k, minPts, ...)
 
 - ...:
 
-  further arguments (e.g., k-d tree related parameters) are passed on to
-  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
+  for `kNNdist()`, further arguments (e.g., k-d tree related parameters)
+  are passed on to
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md). For
+  `kNNdistplot()`, further graphical parameters are passed on to
+  [`graphics::plot.default()`](https://rdrr.io/r/graphics/plot.default.html)
+  (or [`graphics::matplot()`](https://rdrr.io/r/graphics/matplot.html)
+  if several values of `k` are given).
 
 - minPts:
 
@@ -44,6 +58,18 @@ kNNdistplot(x, k, minPts, ...)
   [`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
   `minPts` used in dbscan can be specified and will set
   `k = minPts - 1`.
+
+- type, xlab, ylab:
+
+  plot type and axis labels for `kNNdistplot()`. The default `NULL` for
+  `xlab` and `ylab` uses a descriptive label.
+
+- kNNdist_param:
+
+  a named list of additional arguments (e.g., k-d tree related
+  parameters) passed on to `kNNdist()` and then to
+  [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md) by
+  `kNNdistplot()`, for example, `list(search = "linear")`.
 
 ## Value
 
@@ -262,9 +288,10 @@ kNNdist(iris, k = 4, all = TRUE)
 kNNdistplot(iris, k = 4)
 
 
-## Look at all k-NN distance plots for a k of 1 to 10
-## Note that k-NN distances are increasing in k
-kNNdistplot(iris, k = 1:20)
+## Look at k-NN distance plots for different k values
+## Note that k-NN distances are increasing in k, so the
+## lowest line is for the lowest k value.
+kNNdistplot(iris, k = c(1, 5, 10, 20))
 
 
 cl <- dbscan(iris, eps = .7, minPts = 5)

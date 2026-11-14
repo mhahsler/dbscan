@@ -20,12 +20,12 @@ Source:
 
 Hahsler M, Piekenbrock M (????). *dbscan: Density-Based Spatial
 Clustering of Applications with Noise (DBSCAN) and Related Algorithms*.
-R package version 1.2.8, <https://github.com/mhahsler/dbscan>.
+R package version 1.3.0, <https://github.com/mhahsler/dbscan>.
 
     @Manual{,
       title = {dbscan: Density-Based Spatial Clustering of Applications with Noise (DBSCAN) and Related Algorithms},
       author = {Michael Hahsler and Matthew Piekenbrock},
-      note = {R package version 1.2.8},
+      note = {R package version 1.3.0},
       url = {https://github.com/mhahsler/dbscan},
     }
 

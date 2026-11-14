@@ -18,7 +18,7 @@ adjacencylist(x, ...)
 sort(x, decreasing = FALSE, ...)
 
 # S3 method for class 'NN'
-plot(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...)
+plot(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...)
 ```
 
 ## Arguments
@@ -29,8 +29,8 @@ plot(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...)
 
 - ...:
 
-  further parameters past on to
-  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
+  further parameters are passed on to
+  [`graphics::plot.default()`](https://rdrr.io/r/graphics/plot.default.html).
 
 - decreasing:
 
@@ -50,7 +50,8 @@ plot(x, data, main = NULL, pch = 16, col = NULL, linecol = "gray", ...)
 
 - col:
 
-  color used for the data points (nodes).
+  color used for the data points (nodes). Use `NULL` to make the points
+  invisible.
 
 - linecol:
 
@@ -89,7 +90,7 @@ nn
 #> 
 #> Available fields: dist, id, k, sort, metric
 
-# plot the kNN where NN are shown as line conecting points.
+# plot the kNN where NN are shown as line connecting points.
 plot(nn, x)
 
 

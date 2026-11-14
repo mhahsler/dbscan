@@ -21,7 +21,7 @@ reachability plots. We implement dendrogram conversion and reachability plots.">
 
     <a class="navbar-brand me-2" href="../index.html">dbscan</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,7 +97,8 @@ reachability plots. We implement dendrogram conversion and reachability plots.</
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>graphical parameters are passed on to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>,
+<dd><p>for <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> graphical parameters are passed on to
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">graphics::plot.default()</a></code>.
 or arguments for other methods.</p></dd>
 
 
@@ -237,6 +238,7 @@ Springer Berlin Heidelberg.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### plot produces a reachability plot.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="reachability-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### Manually extract reachability components from OPTICS</span></span></span>
 <span class="r-in"><span><span class="va">reach</span> <span class="op">&lt;-</span> <span class="fu">as.reachability</span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></span>
@@ -245,21 +247,22 @@ Springer Berlin Heidelberg.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Avg minimum reachability distance: 0.1367073</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Available Fields: order, reachdist</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">### plot still produces a reachability plot; points ids</span></span></span>
+<span class="r-in"><span><span class="co">### plot also produces a reachability plot; point IDs</span></span></span>
 <span class="r-in"><span><span class="co">### (rows in the original data) can be displayed with order_labels = TRUE</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">reach</span>, order_labels <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="reachability-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co">### the plotting parameter type can be used to change the plot style.</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">reach</span>, order_labels <span class="op">=</span> <span class="cn">TRUE</span>, type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="reachability-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### Reachability objects can be directly converted to dendrograms</span></span></span>
 <span class="r-in"><span><span class="va">dend</span> <span class="op">&lt;-</span> <span class="fu"><a href="dendrogram.html">as.dendrogram</a></span><span class="op">(</span><span class="va">reach</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dend</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'dendrogram' with 2 branches and 20 members total, at height 0.3912521 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">dend</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="reachability-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="reachability-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### A dendrogram can be converted back into a reachability object</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">as.reachability</span><span class="op">(</span><span class="va">dend</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="reachability-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="reachability-5.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

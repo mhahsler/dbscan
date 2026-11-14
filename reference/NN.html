@@ -17,7 +17,7 @@ adjacency list are defined."><meta property="og:image" content="https://michael.
 
     <a class="navbar-brand me-2" href="../index.html">dbscan</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ adjacency list are defined.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">x</span>, decreasing <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'NN'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, main <span class="op">=</span> <span class="cn">NULL</span>, pch <span class="op">=</span> <span class="fl">16</span>, col <span class="op">=</span> <span class="cn">NULL</span>, linecol <span class="op">=</span> <span class="st">"gray"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">data</span>, main <span class="op">=</span> <span class="cn">NULL</span>, pch <span class="op">=</span> <span class="fl">16</span>, col <span class="op">=</span> <span class="st">"black"</span>, linecol <span class="op">=</span> <span class="st">"gray"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,7 +82,7 @@ adjacency list are defined.</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>further parameters past on to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</p></dd>
+<dd><p>further parameters are passed on to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">graphics::plot.default()</a></code>.</p></dd>
 
 
 <dt id="arg-decreasing">decreasing<a class="anchor" aria-label="anchor" href="#arg-decreasing"></a></dt>
@@ -102,7 +102,8 @@ adjacency list are defined.</p>
 
 
 <dt id="arg-col">col<a class="anchor" aria-label="anchor" href="#arg-col"></a></dt>
-<dd><p>color used for the data points (nodes).</p></dd>
+<dd><p>color used for the data points (nodes). Use <code>NULL</code> to make
+the points invisible.</p></dd>
 
 
 <dt id="arg-linecol">linecol<a class="anchor" aria-label="anchor" href="#arg-linecol"></a></dt>
@@ -142,7 +143,7 @@ adjacency list are defined.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Available fields: dist, id, k, sort, metric</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># plot the kNN where NN are shown as line conecting points.</span></span></span>
+<span class="r-in"><span><span class="co"># plot the kNN where NN are shown as line connecting points.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="NN-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

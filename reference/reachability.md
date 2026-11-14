@@ -42,9 +42,10 @@ as.reachability(object, ...)
 
 - ...:
 
-  graphical parameters are passed on to
-  [`plot()`](https://rdrr.io/r/graphics/plot.default.html), or arguments
-  for other methods.
+  for [`plot()`](https://rdrr.io/r/graphics/plot.default.html) graphical
+  parameters are passed on to
+  [`graphics::plot.default()`](https://rdrr.io/r/graphics/plot.default.html).
+  or arguments for other methods.
 
 - order_labels:
 
@@ -189,6 +190,7 @@ res
 ### plot produces a reachability plot.
 plot(res)
 
+
 ### Manually extract reachability components from OPTICS
 reach <- as.reachability(res)
 reach
@@ -196,9 +198,10 @@ reach
 #> Avg minimum reachability distance: 0.1367073
 #> Available Fields: order, reachdist
 
-### plot still produces a reachability plot; points ids
+### plot also produces a reachability plot; point IDs
 ### (rows in the original data) can be displayed with order_labels = TRUE
-plot(reach, order_labels = TRUE)
+### the plotting parameter type can be used to change the plot style.
+plot(reach, order_labels = TRUE, type = "l")
 
 
 ### Reachability objects can be directly converted to dendrograms

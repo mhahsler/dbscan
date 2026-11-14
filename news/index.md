@@ -1,53 +1,65 @@
 # Changelog
 
-## dbscan 1.2.8 (unpublished)
+## dbscan 1.3.0 (unpublished)
 
 ### Changes
 
-- Documentation now consistently spells “k-d tree” (was kd-tree, kd
-  tree, and k-d tree).
-- Added RAII model for ANN. ANN searches now release point storage,
-  trees, and search buffers automatically when C++ exceptions or user
-  interrupts unwind a call.
-- New
-  [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-  (single-linkage hierarchy of the minimum spanning tree of a `dist`
-  object as an `hclust` object) and
-  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-  (MST of the mutual reachability graph computed directly from a data
-  matrix and `minPts`).
-- [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  with a data matrix now builds the minimum spanning tree with
-  [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
-  avoiding creating a full distance matrix.
-- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
-  `reachability` objects gained the arguments `hide_first` (do not draw
-  the undefined first reachability distance) and `type`.
-  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for `optics`
-  objects gained the argument `col` and no longer has the unused
-  arguments `cluster` and `predecessor`.
-- optics(): The default `eps = Inf` uses an unlimited neighborhood and
-  gives the complete reachability structure. It is computed exactly with
-  a memory efficient Prim-style scan.
-- optics() now gives a warning if a finite `eps` results in undefined
-  reachability distances in addition to the first one.
-- optics(): Ties in the reachability distance are now broken in favor of
-  the point with the lower id (row number), following the current ELKI
-  implementation. The `predecessor` component also is now consistent
-  with ELKI 0.8.0.
-- extractXi(): The implementation was updated to follow the OPTICS Xi
-  cluster extraction in ELKI 0.8.0 (Schubert and Gertz, 2018).
-- [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
-  gained the argument `cluster_selection_epsilon` (as in
-  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md))
-  and now also accepts the result of
-  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  as `x`.
-- [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
-  now records `minPts` in its `hc` component.
-  [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
-  uses it as the default for `minPts`.
-- Added sanitizer runs (skipped on CRAN).
+- **ANN:** Added RAII model for ANN. ANN searches now release point
+  storage, trees, and search buffers automatically when C++ exceptions
+  or user interrupts unwind a call.
+- **HDBSCAN**
+  - New
+    [`mst_dist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+    (single-linkage hierarchy of the minimum spanning tree of a `dist`
+    object as an `hclust` object) and
+    [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+    (MST of the mutual reachability graph computed directly from a data
+    matrix and `minPts`).
+  - [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+    with a data matrix now builds the minimum spanning tree with
+    [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md)
+    avoiding creating a full distance matrix.
+  - [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+    gained the argument `cluster_selection_epsilon` (as in
+    [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md))
+    and now also accepts the result of
+    [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+    as `x`.
+  - [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
+    now records `minPts` in its `hc` component.
+    [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
+    uses it as the default for `minPts`.
+- **OPTICS**
+  - optics(): The default `eps = Inf` uses an unlimited neighborhood and
+    gives the complete reachability structure. It is computed exactly
+    with a memory efficient Prim-style scan.
+  - optics() now gives a warning if a finite `eps` results in undefined
+    reachability distances in addition to the first one.
+  - optics(): Ties in the reachability distance are now broken in favor
+    of the point with the lower id (row number), following the current
+    ELKI implementation. The `predecessor` component also is now
+    consistent with ELKI 0.8.0.
+  - extractXi(): The implementation was updated to follow the OPTICS Xi
+    cluster extraction in ELKI 0.8.0 (Schubert and Gertz, 2018).
+- **Plotting**
+  - All plot functions now consistently pass on … to the underlying plot
+    function from graphics.
+  - [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+    `reachability` objects gained the arguments `hide_first` (do not
+    draw the undefined first reachability distance) and `type`.
+    [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+    `optics` objects gained the argument `col` and no longer has the
+    unused arguments `cluster` and `predecessor`.
+  - [`kNNdistplot()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)
+    gained the arguments `type`, `xlab`, `ylab`, and `kNNdist_param` (a
+    list passing additional arguments, e.g., k-d tree parameters, on to
+    [`kNNdist()`](https://michael.hahsler.net/dbscan/reference/kNNdist.md)).
+    `...` now passes graphical parameters on to
+    [`plot.default()`](https://rdrr.io/r/graphics/plot.default.html) (or
+    [`matplot()`](https://rdrr.io/r/graphics/matplot.html) for several
+    values of `k`) instead of to
+    [`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md).
+- **Sanitizer:** Added sanitizer runs (skipped on CRAN).
 
 ### Bugfixes
 

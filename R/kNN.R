@@ -20,72 +20,86 @@
 
 #' Find the k Nearest Neighbors
 #'
-#' This function uses a k-d tree to find all k nearest neighbors in a data
-#' matrix (including distances) fast.
+#' This function finds all k nearest neighbors in a data
+#' matrix (including distances).
 #'
-#' Handling of ties and self-matches
+#' To speed up k nearest neighbors, a k-d tree is used
+#' for data matrices by default. Box-decomposition trees, linear search,
+#' and precomputing distance matrices are also available.
 #'
+#' ## Using a kNN object as `x`
+#'
+#' If `x` is a `kNN` object, then the first `k` neighbors are returned
+#' (sorted by distance). All other arguments are ignored. An error is
+#' raised if `x` contains fewer than `k` neighbors.
+#'
+#' ## Sorting, ties and self-matches
+#'
+#' * **Sorting:** With `sort = TRUE` (default), the neighbors of each point are
+#'   ordered by distance and ties are broken by id. With `sort = FALSE`, the
+#'   neighbors are returned in the order found by the search (the tree-based
+#'   searches return them by increasing distance, but tied neighbors are
+#'   not ordered by id), which avoids the cost of sorting.
+#'   A `kNN` object can be sorted later using `sort()`.
 #' * **Ties:** If the kth and the (k+1)th nearest neighbor are tied, then the
-#' neighbor found first is returned and the other one is ignored.
-#' * **Self-matches:** If no query is specified, then self-matches are
-#' removed.
+#'   neighbor found first is returned and the other one is ignored.
+#' * **Self-matches:** If no `query` is specified, then self-matches are
+#'   removed. If `query` is specified, then a query point that is also in `x`
+#'   is returned as its own nearest neighbor (at distance 0).
 #'
-#' Details on the search parameters:
+#' ## Input requirements
 #'
-#' * `search` controls if
-#' a k-d tree or linear search (both implemented in the ANN library; see Mount
-#' and Arya, 2010). Note, that these implementations cannot handle NAs.
-#' `search = "dist"` precomputes Euclidean distances first using R. NAs are
-#' handled, but the resulting distance matrix cannot contain NAs. To use other
-#' distance measures, a precomputed distance matrix can be provided as `x`
-#' (`search` is ignored).
+#' * `x` can be a numeric matrix, a data.frame with only numeric columns, a
+#'   [dist] object or a `kNN` object.
+#' * `query` needs to be a numeric matrix or
+#'   data.frame with the same number of columns as `x`, and can only be used
+#'   if `x` is a data matrix.
+#' * `k` needs to be a whole number with `1 <= k < nrow(x)`.
 #'
-#' * `bucketSize` and `splitRule` influence how the k-d tree is
-#' built. `approx` uses the approximate nearest neighbor search
-#' implemented in ANN. All nearest neighbors up to a distance of
-#' `eps / (1 + approx)` will be considered and all with a distance
-#' greater than `eps` will not be considered. The other points might be
-#' considered. Note that this results in some actual nearest neighbors being
-#' omitted leading to spurious clusters and noise points. However, the
-#' algorithm will enjoy a significant speedup. For more details see Mount and
-#' Arya (2010).
+#' ## Non-Euclidean distances
+#'
+#' To use non-Euclidean distances, a distance matrix needs to be precomputed
+#' by the user and supplied as `x`. Note that this leads to restrictions
+#' of the number of observations that can be used since the distance
+#' matrix grows with \eqn{O(n^2)}.
 #'
 #' @aliases kNN knn
 #' @family NN functions
 #'
-#' @param x a data matrix, a [dist] object or a [kNN] object.
+#' @templateVar type kNN
+#' @template NN-search-section
+#' @template NN-search-params
+#'
+#' @param x a numeric data matrix (or data.frame), a [dist] object or a [kNN]
+#' object.
 #' @param k number of neighbors to find.
 #' @param query a data matrix with the points to query. If query is not
 #' specified, the NN for all the points in `x` is returned. If query is
 #' specified then `x` needs to be a data matrix.
-#' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
-#' `"dist"`).
-#' @param sort sort the neighbors by distance? Note that some search methods
-#' already sort the results. Sorting is expensive and `sort = FALSE` may
-#' be much faster for some search methods. kNN objects can be sorted using
+#' @param sort sort the neighbors of each point by distance (ties are broken by
+#' id)? `sort = FALSE` skips this step and returns the neighbors in the order
+#' found by the search, which is faster. kNN objects can be sorted later using
 #' `sort()`.
-#' @param bucketSize max size of the k-d tree leafs.
-#' @param splitRule rule to split the k-d tree. One of `"std"`, `"midpt"`, `"fair"`,
-#' `"sl_midpt"`, `"sl_fair"` or `"suggest"`. The default value `"suggest"` uses
-#' ANNs best guess.
-#' @param approx use approximate nearest neighbors. All NN up to a distance of
-#' a factor of `1 + approx` eps may be used. Some actual NN may be omitted
-#' leading to spurious clusters and noise points.  However, the algorithm will
-#' enjoy a significant speedup.
-#' @param decreasing sort in decreasing order?
-#' @param ... further arguments
+#' @param decreasing for `sort()`, sort the neighbors by decreasing distance
+#' instead of increasing distance?
+#' @param ... further arguments (ignored).
 #'
 #' @return An object of class `kNN` (subclass of [NN]) containing a
 #' list with the following components:
-#' \item{dist }{a matrix with distances. }
-#' \item{id }{a matrix with `ids`. }
+#' \item{dist }{a matrix with distances (one row per point in `x` or `query`,
+#'   one column per neighbor). }
+#' \item{id }{a matrix with the row numbers in `x` of the neighbors. }
 #' \item{k }{number `k` used. }
-#' \item{metric }{ used distance metric. }
+#' \item{sort }{logical; are the neighbors in each row sorted by increasing
+#'   distance (with ties broken by id)? }
+#' \item{metric }{ used distance metric. This is `"euclidean"` for data
+#'   matrices. For a [dist] object, it is the method stored in the object (which
+#'   can be `NULL`). }
 #'
 #' @author Michael Hahsler
 #' @references David M. Mount and Sunil Arya (2010). ANN: A Library for
 #' Approximate Nearest Neighbor Searching,
-#' \url{http://www.cs.umd.edu/~mount/ANN/}.
+#' \url{https://www.cs.umd.edu/~mount/ANN/}.
 #' @keywords model
 #' @examples
 #' data(iris)
@@ -110,10 +124,11 @@
 #' q <- x[c(1,100),]
 #' nn <- kNN(x, k = 10, query = q)
 #'
-#' plot(nn, x, col = "grey")
+#' # we plot the first two features for iris
+#' plot(nn, x[, 1:2], col = "grey")
 #' points(q, pch = 3, lwd = 2)
 #'
-#' # Example 3: find kNN using distances
+#' # Example 3: find kNN using a precomputed (non-Euclidean) distance matrix
 #' d <- dist(x, method = "manhattan")
 #' nn <- kNN(d, k = 1)
 #' plot(nn, x)
@@ -126,6 +141,7 @@ kNN <-
     search = "kdtree",
     bucketSize = 10,
     splitRule = "suggest",
+    shrinkRule = "suggest",
     approx = 0) {
     k <- .validate_integer_scalar(k, "k")
 
@@ -145,6 +161,7 @@ kNN <-
 
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
+    shrinkRule <- .parse_shrinkRule(shrinkRule)
     bucketSize <- .validate_bucket_size(bucketSize)
     approx <- .validate_nonnegative_scalar(approx, "approx")
 
@@ -188,6 +205,7 @@ kNN <-
         as.integer(search),
         as.integer(bucketSize),
         as.integer(splitRule),
+        as.integer(shrinkRule),
         as.double(approx)
       )
       dimnames(ret$dist) <- list(rownames(query), 1:k)
@@ -199,6 +217,7 @@ kNN <-
         as.integer(search),
         as.integer(bucketSize),
         as.integer(splitRule),
+        as.integer(shrinkRule),
         as.double(approx)
       )
       dimnames(ret$dist) <- list(rownames(x), 1:k)
@@ -266,7 +285,8 @@ dist_to_kNN <- function(x, k) {
 #' @rdname kNN
 #' @export
 sort.kNN <- function(x, decreasing = FALSE, ...) {
-  if (isTRUE(x$sort))
+  ## x$sort = TRUE means: sorted by increasing distance (ties by id)
+  if (isTRUE(x$sort) && !decreasing)
     return(x)
   if (is.null(x$dist))
     stop("Unable to sort. Distances are missing.")
@@ -285,7 +305,7 @@ sort.kNN <- function(x, decreasing = FALSE, ...) {
     x$dist[i, ] <- x$dist[i, ][o[, i]]
     x$id[i, ] <- x$id[i, ][o[, i]]
   }
-  x$sort <- TRUE
+  x$sort <- !decreasing
 
   x
 }
@@ -323,6 +343,14 @@ print.kNN <- function(x, ...) {
     stop("Unknown NN search method! Available for search: ",
          paste(sQuote(.ANNsearchTypes), collapse = ", "))
   search
+}
+
+.parse_shrinkRule <- function(shrinkRule) {
+  shrinkRule <- pmatch(tolower(shrinkRule), .ANNshrinkRule) - 1L
+  if (length(shrinkRule) != 1L || is.na(shrinkRule))
+    stop("Unknown shrinkRule! Available: ",
+         paste(sQuote(.ANNshrinkRule), collapse = ", "))
+  shrinkRule
 }
 
 .parse_splitRule <- function(splitRule) {

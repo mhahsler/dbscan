@@ -238,9 +238,9 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
   eps <- .validate_nonnegative_scalar(eps, "eps", allow_infinite = TRUE)
 
   ### extra contains settings for frNN
-  ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
+  ### search = "kdtree", bucketSize = 10, splitRule = "suggest", shrinkRule = "suggest", approx = 0
   extra <- list(...)
-  args <- c("search", "bucketSize", "splitRule", "approx")
+  args <- c("search", "bucketSize", "splitRule", "shrinkRule", "approx")
   m <- pmatch(names(extra), args)
   if (anyNA(m))
     stop("Unknown parameter: ",
@@ -249,6 +249,7 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
 
   search <- .parse_search(extra$search %||% "kdtree")
   splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
+  shrinkRule <- .parse_shrinkRule(extra$shrinkRule %||% "suggest")
   bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
   approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
@@ -269,7 +270,7 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
 
     # every point needs a core distance (minPts points including the point)
     if (n >= minPts) {
-      knn_args <- extra[intersect(names(extra), c("search", "bucketSize", "splitRule"))]
+      knn_args <- extra[intersect(names(extra), c("search", "bucketSize", "splitRule", "shrinkRule"))]
       cd <- do.call(kNNdist, c(list(x, k = minPts - 1L), knn_args))
 
       ret <- if (inherits(x, "dist"))
@@ -326,6 +327,7 @@ optics <- function(x, eps = Inf, minPts = 5, ...) {
       as.integer(search),
       as.integer(bucketSize),
       as.integer(splitRule),
+      as.integer(shrinkRule),
       as.double(approx),
       frNN
     )

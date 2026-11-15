@@ -21,3 +21,4 @@ _config.yml
 ^python$
 ^tools$
 ^tmp$
+^man-roxygen$

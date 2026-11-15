@@ -24,7 +24,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 IntegerVector dbscan_int(
     NumericMatrix data, double eps, int minPts, NumericVector weights,
-    int borderPoints, int type, int bucketSize, int splitRule, double approx,
+    int borderPoints, int type, int bucketSize, int splitRule, int shrinkRule, double approx,
     List frNN) {
 
   // k-d tree uses squared distances
@@ -55,7 +55,7 @@ IntegerVector dbscan_int(
 
     // create k-d tree (1) or linear search structure (2)
     kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-      bucketSize, splitRule);
+      bucketSize, splitRule, shrinkRule);
     //Rprintf("k-d tree ready. starting DBSCAN.\n");
   }
 

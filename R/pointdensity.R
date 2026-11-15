@@ -48,7 +48,7 @@
 #' @param type `"frequency"`, `"density"`, or `"gaussian"`. should the raw count of
 #' points inside the eps-neighborhood, the eps-neighborhood density estimate,
 #' or a Gaussian density estimate be returned?
-#' @param search,bucketSize,splitRule,approx algorithmic parameters for
+#' @param search,bucketSize,splitRule,shrinkRule,approx algorithmic parameters for
 #' [frNN()].
 #'
 #' @return A vector of the same length as data points (rows) in `x` with
@@ -98,6 +98,7 @@ pointdensity <- function(x,
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0) {
   type <- match.arg(type, choices = c("frequency", "density", "gaussian"))
   eps <- .validate_nonnegative_scalar(eps, "eps")
@@ -107,7 +108,8 @@ pointdensity <- function(x,
   if (type == "gaussian")
     return (.pointdensity_gaussian(x, sd = eps, search = search,
                                    bucketSize = bucketSize,
-                                   splitRule = splitRule, approx = approx))
+                                   splitRule = splitRule,
+                                   shrinkRule = shrinkRule, approx = approx))
 
   # regular dbscan density estimation
   if (inherits(x, "dist")) {
@@ -118,6 +120,7 @@ pointdensity <- function(x,
       search = search,
       bucketSize = bucketSize,
       splitRule = splitRule,
+      shrinkRule = shrinkRule,
       approx = approx
     )
     d <- lengths(nn$id) + 1L
@@ -126,6 +129,7 @@ pointdensity <- function(x,
     # faster implementation for a data matrix
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
+    shrinkRule <- .parse_shrinkRule(shrinkRule)
     x <- .as_finite_numeric_matrix(x)
 
     d <- dbscan_density_int(
@@ -134,6 +138,7 @@ pointdensity <- function(x,
       as.integer(search),
       as.integer(bucketSize),
       as.integer(splitRule),
+      as.integer(shrinkRule),
       as.double(approx)
     )
   }

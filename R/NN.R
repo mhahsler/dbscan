@@ -36,6 +36,16 @@
 #' @param decreasing sort in decreasing order?
 #' @param data that was used to create `x`
 #' @param main title
+#' @param xlab,ylab axis labels. The default is to use the column names of
+#'  `data` or, if the data is projected, the principal components with the
+#'  percentage of variance they explain.
+#'
+#' @details
+#' `plot()` draws the neighborhood graph in the first two dimensions of
+#' `data`. If `data` has more than two columns, then the data is first
+#' projected onto its first two principal components using [stats::prcomp()]
+#' (centered, but not scaled, so Euclidean distances are preserved as well as
+#' possible) and the graph is drawn in the projection.
 #'
 #' @section Subclasses:
 #' [kNN], [frNN] and [sNN]
@@ -51,6 +61,7 @@
 #' nn
 #'
 #' # plot the kNN where NN are shown as line connecting points.
+#' # Since the data has more than 2 dimensions, a PCA projection is used.
 #' plot(nn, x)
 #'
 #' # show the first few elements of the adjacency list
@@ -90,7 +101,8 @@ sort.NN <- function(x, decreasing = FALSE, ...) {
 #' @rdname NN
 #' @export
 plot.NN <- function(x, data, main = NULL, pch = 16,
-                    col = "black", linecol = "gray", ...) {
+                    col = "black", linecol = "gray",
+                    xlab = NULL, ylab = NULL, ...) {
   if (is.null(main)) {
     if (inherits(x, "frNN"))
       main <- paste0("frNN graph (eps = ", x$eps, ")")
@@ -101,8 +113,13 @@ plot.NN <- function(x, data, main = NULL, pch = 16,
         ifelse(is.null(x$kt), "", paste0(", kt=", x$kt)), ")")
   }
 
+  ## use the first two dimensions or a PCA projection for more dimensions
+  proj <- .project_2d(data, "data", xlab, ylab)
+  data <- proj$data
+
   ## create an empty plot
-  graphics::plot.default(data[, 1:2], main = main, type = "n", ...)
+  graphics::plot.default(data, main = main, type = "n",
+    xlab = proj$xlab, ylab = proj$ylab, ...)
 
   id <- adjacencylist(x)
 
@@ -117,14 +134,14 @@ plot.NN <- function(x, data, main = NULL, pch = 16,
     }
 
     ## ad vertices
-    points(data[, 1:2], main = main, pch = pch, col = col, ...)
+    points(data, pch = pch, col = col, ...)
 
   } else {
     ## ad vertices
-    points(data[, 1:2], main = main, pch = pch, col = col, ...)
+    points(data, pch = pch, col = col, ...)
     ## use colors if it was from a query
     for (i in seq_along(id)) {
-      points(data[id[[i]], ], pch = pch, col = i + 1L)
+      points(data[id[[i]], , drop = FALSE], pch = pch, col = i + 1L)
     }
   }
 }

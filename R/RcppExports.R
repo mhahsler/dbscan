@@ -37,8 +37,8 @@ dspc <- function(cl_idx, internal_nodes, all_cl_ids, mrd_dist) {
     .Call(`_dbscan_dspc`, cl_idx, internal_nodes, all_cl_ids, mrd_dist)
 }
 
-dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN) {
-    .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, approx, frNN)
+dbscan_int <- function(data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, shrinkRule, approx, frNN) {
+    .Call(`_dbscan_dbscan_int`, data, eps, minPts, weights, borderPoints, type, bucketSize, splitRule, shrinkRule, approx, frNN)
 }
 
 reach_to_dendrogram <- function(reachability, pl_order) {
@@ -53,16 +53,16 @@ mst_to_dendrogram <- function(mst) {
     .Call(`_dbscan_mst_to_dendrogram`, mst)
 }
 
-dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, approx)
+dbscan_density_int <- function(data, eps, type, bucketSize, splitRule, shrinkRule, approx) {
+    .Call(`_dbscan_dbscan_density_int`, data, eps, type, bucketSize, splitRule, shrinkRule, approx)
 }
 
-frNN_int <- function(data, eps, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_frNN_int`, data, eps, type, bucketSize, splitRule, approx)
+frNN_int <- function(data, eps, type, bucketSize, splitRule, shrinkRule, approx) {
+    .Call(`_dbscan_frNN_int`, data, eps, type, bucketSize, splitRule, shrinkRule, approx)
 }
 
-frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, approx)
+frNN_query_int <- function(data, query, eps, type, bucketSize, splitRule, shrinkRule, approx) {
+    .Call(`_dbscan_frNN_query_int`, data, query, eps, type, bucketSize, splitRule, shrinkRule, approx)
 }
 
 distToAdjacency <- function(constraints, N) {
@@ -109,16 +109,16 @@ extractSemiSupervised <- function(cl_tree, constraints, alpha = 0, prune_unstabl
     .Call(`_dbscan_extractSemiSupervised`, cl_tree, constraints, alpha, prune_unstable_leaves, cluster_selection_epsilon)
 }
 
-kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, approx)
+kNN_query_int <- function(data, query, k, type, bucketSize, splitRule, shrinkRule, approx) {
+    .Call(`_dbscan_kNN_query_int`, data, query, k, type, bucketSize, splitRule, shrinkRule, approx)
 }
 
-kNN_int <- function(data, k, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, approx)
+kNN_int <- function(data, k, type, bucketSize, splitRule, shrinkRule, approx) {
+    .Call(`_dbscan_kNN_int`, data, k, type, bucketSize, splitRule, shrinkRule, approx)
 }
 
-lof_kNN <- function(data, minPts, type, bucketSize, splitRule, approx) {
-    .Call(`_dbscan_lof_kNN`, data, minPts, type, bucketSize, splitRule, approx)
+lof_kNN <- function(data, minPts, type, bucketSize, splitRule, shrinkRule, approx) {
+    .Call(`_dbscan_lof_kNN`, data, minPts, type, bucketSize, splitRule, shrinkRule, approx)
 }
 
 mrd <- function(dm, cd) {
@@ -137,8 +137,8 @@ hclustMergeOrder <- function(mst, o) {
     .Call(`_dbscan_hclustMergeOrder`, mst, o)
 }
 
-optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, approx, frNN) {
-    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, approx, frNN)
+optics_int <- function(data, eps, minPts, type, bucketSize, splitRule, shrinkRule, approx, frNN) {
+    .Call(`_dbscan_optics_int`, data, eps, minPts, type, bucketSize, splitRule, shrinkRule, approx, frNN)
 }
 
 optics_prim <- function(x, coredist) {

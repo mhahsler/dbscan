@@ -83,3 +83,37 @@ test_that("sNN", {
 
   expect_equal(nn$shared, ss)
 })
+
+test_that("sNN sorting and arguments", {
+  x <- as.matrix(iris[!duplicated(iris[, -5]), -5])
+  k <- 6
+
+  nn <- sNN(x, k = k)
+  expect_true(nn$sort_shared)
+  expect_false(nn$sort)
+  for (i in seq_len(nrow(x)))
+    expect_identical(order(-nn$shared[i, ], nn$id[i, ]), seq_len(k))
+
+  ## increasing order (ties by id)
+  inc <- sort(nn, decreasing = FALSE)
+  expect_false(inc$sort_shared)
+  for (i in seq_len(nrow(x)))
+    expect_identical(order(inc$shared[i, ], inc$id[i, ]), seq_len(k))
+  expect_equal(unname(inc$shared), unname(t(apply(nn$shared, 1, sort))))
+
+  ## sorting back gives the original order
+  expect_identical(sort(inc), nn)
+
+  ## k is required unless x is a kNN object
+  expect_error(sNN(x), "k is required")
+  expect_identical(sNN(kNN(x, 4))$k, 4L)
+
+  ## kt can be equal to k, but not larger
+  expect_no_error(sNN(x, k = k, kt = k))
+  expect_error(sNN(x, k = k, kt = k + 1), "at most k")
+
+  ## thresholded edges are NA
+  t3 <- sNN(x, k = k, kt = 3)
+  expect_true(all(is.na(t3$id) == is.na(t3$shared)))
+  expect_true(all(t3$shared[!is.na(t3$shared)] >= 3))
+})

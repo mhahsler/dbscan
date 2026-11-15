@@ -43,6 +43,8 @@ test_that("frNN", {
 
   ## search options
   nn_linear <- frNN(x, eps=eps, search = "linear")
+  nn_bd <- frNN(x, eps=eps, search = "bdtree")
+  expect_equal(sort(nn_bd)$id, sort(nn_linear)$id)
   expect_equal(nn, nn_linear)
 
   ## split options
@@ -50,6 +52,13 @@ test_that("frNN", {
     nn3 <- frNN(x, eps=eps, splitRule = so)
     expect_equal(nn, nn3)
   }
+
+  ## shrink rules (bd-tree)
+  for (sr in c("none", "simple", "centroid", "suggest")) {
+    nn3 <- frNN(x, eps=eps, search = "bdtree", shrinkRule = sr)
+    expect_equal(sort(nn3)$id, sort(nn_linear)$id)
+  }
+  expect_error(frNN(x, eps=eps, search = "bdtree", shrinkRule = "bogus"))
 
   ## bucket size
   for (bs in c(5, 10, 15, 100)) {
@@ -99,4 +108,34 @@ test_that("frNN", {
   expect_identical(nn$id[[2]], 8L)
 
   expect_error(frNN(dist(x[1:8, , drop=FALSE]), x[9:10, , drop = FALSE], eps = 2))
+})
+
+test_that("frNN sorting and boundary", {
+  x <- as.matrix(expand.grid(1:6, 1:6))
+
+  unsorted <- frNN(x, eps = 1.5, sort = FALSE)
+  expect_false(unsorted$sort)
+  sorted <- frNN(x, eps = 1.5, sort = TRUE)
+  expect_true(sorted$sort)
+  expect_identical(sort(unsorted), sorted)
+
+  ## ties are broken by id
+  for (i in seq_along(sorted$id))
+    expect_identical(order(sorted$dist[[i]], sorted$id[[i]]),
+      seq_along(sorted$id[[i]]))
+
+  ## decreasing
+  dec <- sort(sorted, decreasing = TRUE)
+  expect_false(dec$sort)
+  for (i in seq_along(dec$dist))
+    expect_false(is.unsorted(rev(dec$dist[[i]])))
+  expect_identical(sort(dec), sorted)
+
+  ## points exactly at distance eps are neighbors (all search methods)
+  y <- cbind(c(0, 1, 3), 0)
+  for (s in c("kdtree", "linear", "bdtree", "dist"))
+    expect_identical(frNN(y, eps = 1, search = s)$id[[1]], 2L)
+
+  ## isolated points have empty neighborhoods
+  expect_identical(frNN(y, eps = .5)$id[[3]], integer(0))
 })

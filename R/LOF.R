@@ -98,7 +98,7 @@ lof <- function(x, minPts = 5, ...) {
   }
   minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
 
-  args <- c("search", "bucketSize", "splitRule", "approx")
+  args <- c("search", "bucketSize", "splitRule", "shrinkRule", "approx")
   m <- pmatch(names(extra), args)
   if (anyNA(m))
     stop("Unknown parameter: ",
@@ -109,6 +109,7 @@ lof <- function(x, minPts = 5, ...) {
   search <- .parse_search(search)
   splitRule <- extra$splitRule %||% "suggest"
   splitRule <- .parse_splitRule(splitRule)
+  shrinkRule <- .parse_shrinkRule(extra$shrinkRule %||% "suggest")
   bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
   approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
@@ -168,6 +169,7 @@ lof <- function(x, minPts = 5, ...) {
       as.integer(search),
       as.integer(bucketSize),
       as.integer(splitRule),
+      as.integer(shrinkRule),
       as.double(approx)
     )
   }

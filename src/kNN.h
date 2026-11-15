@@ -9,6 +9,6 @@ using namespace Rcpp;
 // returns knn + dist
 // [[Rcpp::export]]
 List kNN_int(NumericMatrix data, int k,
-             int type, int bucketSize, int splitRule, double approx);
+             int type, int bucketSize, int splitRule, int shrinkRule, double approx);
 
 #endif

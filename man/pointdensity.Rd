@@ -12,6 +12,7 @@ pointdensity(
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0
 )
 }
@@ -26,7 +27,7 @@ the kernel.}
 points inside the eps-neighborhood, the eps-neighborhood density estimate,
 or a Gaussian density estimate be returned?}
 
-\item{search, bucketSize, splitRule, approx}{algorithmic parameters for
+\item{search, bucketSize, splitRule, shrinkRule, approx}{algorithmic parameters for
 \code{\link[=frNN]{frNN()}}.}
 }
 \value{

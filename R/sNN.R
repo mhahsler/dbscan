@@ -25,24 +25,52 @@
 #' Calculates the number of shared nearest neighbors
 #' and creates a shared nearest neighbors graph.
 #'
-#' The number of shared nearest neighbors of two points p and q is the
-#' intersection of the kNN neighborhood of two points.
-#' Note: that each point is considered to be part
+#' The number of shared nearest neighbors of two points p and q is the size of
+#' the intersection of the kNN neighborhoods of the two points.
+#' Note that each point is considered to be part
 #' of its own kNN neighborhood.
 #' The range for the shared nearest neighbors is
 #' \eqn{[0, k]}. The result is a n-by-k matrix called `shared`.
 #' Each row is a point and the columns are the point's k nearest neighbors.
-#' The value is the count of the shared neighbors.
+#' The value `shared[i, j]` is the count of the shared neighbors of point `i` and
+#' its j-th neighbor.
 #'
 #' The shared nearest neighbor graph connects a point with all its nearest neighbors
 #' if they have at least one shared neighbor. The number of shared neighbors can be used
 #' as an edge weight.
-#' Javis and Patrick (1973) use a slightly
+#' Jarvis and Patrick (1973) use a slightly
 #' modified (see parameter `jp`) shared nearest neighbor graph for
 #' clustering.
 #'
+#' The `k` nearest neighbors are found with [kNN()]. The search parameters are
+#' passed on to it (see the section on the search parameters below).
+#'
+#' ## Using a kNN object as `x`
+#'
+#' If `x` is a `kNN` object, then `k` can be omitted and `x$k` is used. If `k`
+#' is smaller than `x$k`, then the first `k` neighbors (by distance) are used.
+#' An error is raised if `x` contains fewer than `k` neighbors. The search
+#' parameters are ignored. A `query` is not supported.
+#'
+#' ## Thresholding and sorting
+#'
+#' * **Threshold `kt`:** If `kt` is specified, then only edges with at least
+#'   `kt` shared neighbors are kept (`kt` needs to be at most `k`). The entries
+#'   for removed edges are set to `NA` in `id`, `dist` and `shared`.
+#'   [adjacencylist()] skips them.
+#' * **Sorting:** The neighbors are found without sorting. With `sort = TRUE`
+#'   (default), the neighbors of each point (the columns of `id`, `dist` and
+#'   `shared`) are then reordered by decreasing number of shared neighbors
+#'   (ties are broken by id). The columns then no longer follow the distance
+#'   rank, and `$sort` is `FALSE`. A `sNN` object can be sorted later using
+#'   `sort()`.
+#'
 #' @aliases sNN snn
 #' @family NN functions
+#'
+#' @templateVar type sNN
+#' @template NN-search-section
+#' @template NN-search-params
 #'
 #' @param x a data matrix, a [dist] object or a [kNN] object.
 #' @param k number of neighbors to consider to calculate the shared nearest
@@ -50,31 +78,32 @@
 #' @param kt minimum threshold on the number of shared nearest neighbors to
 #' build the shared nearest neighbor graph. Edges are only preserved if
 #' `kt` or more neighbors are shared.
-#' @param jp In regular sNN graphs, two points that are not neighbors
-#' can have shared neighbors.
-#' Javis and Patrick (1973) requires the two points to be neighbors, otherwise
+#' @param jp In regular sNN graphs, a point and one of its neighbors can have
+#' shared neighbors even if the point is not one of the neighbor's `k` nearest
+#' neighbors.
+#' Jarvis and Patrick (1973) require the neighbor relation to be mutual: the
+#' point also needs to be among the neighbor's `k` nearest neighbors, otherwise
 #' the count is zeroed out. `TRUE` uses this behavior.
-#' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
-#' `"dist"`).
-#' @param sort sort by the number of shared nearest neighbors? Note that this
+#' @param sort sort the neighbors of each point by the number of shared nearest
+#' neighbors (decreasing, ties are broken by id)? Note that this
 #' is expensive and `sort = FALSE` is much faster. sNN objects can be
-#' sorted using `sort()`.
-#' @param bucketSize max size of the k-d tree leafs.
-#' @param splitRule rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
-#' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
-#' ANNs best guess.
-#' @param approx use approximate nearest neighbors. All NN up to a distance of
-#' a factor of `(1 + approx) eps` may be used. Some actual NN may be omitted
-#' leading to spurious clusters and noise points.  However, the algorithm will
-#' enjoy a significant speedup.
-#' @param decreasing logical; sort in decreasing order?
-#' @param ... additional parameters are passed on.
+#' sorted later using `sort()`.
+#' @param decreasing for `sort()`, sort by decreasing number of shared
+#' neighbors (the default)? Use `FALSE` for increasing order.
+#' @param ... further arguments (ignored).
 #' @return An object of class `sNN` (subclass of [kNN] and [NN]) containing a list
-#' with the following components:
-#' \item{id }{a matrix with ids. }
-#' \item{dist}{a matrix with the distances. }
+#' with the following components (the matrices have one row per point and `k`
+#' columns; edges removed by `kt` are `NA`):
+#' \item{id }{a matrix with the ids (row numbers in `x`) of the neighbors. }
+#' \item{dist}{a matrix with the distances to the neighbors. }
 #' \item{shared }{a matrix with the number of shared nearest neighbors. }
-#' \item{k }{number of `k` used. }
+#' \item{k }{the number `k` used. }
+#' \item{sort }{logical; are the neighbors sorted by increasing distance? This
+#'   is `FALSE` if `sort = TRUE` was used, since the neighbors are then sorted by
+#'   the number of shared neighbors. }
+#' \item{sort_shared }{logical; are the neighbors sorted by decreasing number of
+#'   shared neighbors? }
+#' \item{kt }{the threshold `kt` used (`NULL` if none). }
 #' \item{metric }{the used distance metric. }
 #'
 #' @author Michael Hahsler
@@ -82,6 +111,12 @@
 #' Similarity Measure Based on Shared Near Neighbors. _IEEE Trans. Comput._
 #' 22, 11 (November 1973), 1025-1034.
 #' \doi{10.1109/T-C.1973.223640}
+#'
+#' David M. Mount and Sunil Arya (2010). ANN: A Library for
+#' Approximate Nearest Neighbor Searching,
+#' \url{http://www.cs.umd.edu/~mount/ANN/}.
+#' @seealso [sNNclust()] and [jpclust()], which cluster using the shared nearest
+#' neighbor graph.
 #' @keywords model
 #' @examples
 #' data(iris)
@@ -108,6 +143,10 @@
 #'
 #' # get an adjacency list for the shared nearest neighbor graph
 #' adjacencylist(nn_3)
+#'
+#' # Jarvis-Patrick graph (requires mutual nearest neighbors)
+#' nn_jp <- sNN(x, k = k, jp = TRUE)
+#' table(as.vector(nn_jp$shared))
 #' @export
 sNN <- function(x,
   k,
@@ -117,9 +156,13 @@ sNN <- function(x,
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0) {
-  if (missing(k))
+  if (missing(k)) {
+    if (!inherits(x, "kNN"))
+      stop("k is required unless x is a kNN object.")
     k <- x$k
+  }
   k <- .validate_integer_scalar(k, "k")
 
   if (inherits(x, "kNN")) {
@@ -142,6 +185,7 @@ sNN <- function(x,
         search = search,
         bucketSize = bucketSize,
         splitRule = splitRule,
+        shrinkRule = shrinkRule,
         approx = approx
       )
 
@@ -157,7 +201,7 @@ sNN <- function(x,
 
   if (!is.null(kt)) {
     if (kt > k)
-      stop("kt needs to be less than k.")
+      stop("kt needs to be at most k.")
     rem <- x$shared < kt
     x$id[rem] <- NA
     x$dist[rem] <- NA
@@ -170,7 +214,8 @@ sNN <- function(x,
 #' @rdname sNN
 #' @export
 sort.sNN <- function(x, decreasing = TRUE, ...) {
-  if (isTRUE(x$sort_shared))
+  ## x$sort_shared = TRUE means: sorted by decreasing number of shared neighbors
+  if (isTRUE(x$sort_shared) && decreasing)
     return(x)
   if (is.null(x$shared))
     stop("Unable to sort. Number of shared neighbors is missing.")
@@ -180,11 +225,12 @@ sort.sNN <- function(x, decreasing = TRUE, ...) {
     return(x)
   }
 
-  ## sort first by number of shared points (decreasing) and break ties by id (increasing)
+  ## sort by number of shared points and break ties by id (increasing)
   k <- ncol(x$shared)
+  sgn <- if (decreasing) -1L else 1L
   o <- vapply(
     seq_len(nrow(x$shared)),
-    function(i) order(k - x$shared[i, ], x$id[i, ], decreasing = !decreasing),
+    function(i) order(sgn * x$shared[i, ], x$id[i, ]),
     integer(k)
   )
   for (i in seq_len(ncol(o))) {
@@ -194,7 +240,7 @@ sort.sNN <- function(x, decreasing = TRUE, ...) {
   }
 
   x$sort <- FALSE
-  x$sort_shared <- TRUE
+  x$sort_shared <- decreasing
 
   x
 }

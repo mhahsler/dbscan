@@ -18,7 +18,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 .ANNsplitRule <- c("std", "midpt", "fair", "sl_midpt", "sl_fair", "suggest")
-.ANNsearchTypes <- c("kdtree", "linear", "dist")
+.ANNshrinkRule <- c("none", "simple", "centroid", "suggest")
+.ANNsearchTypes <- c("kdtree", "linear", "dist", "bdtree")
 
 .matrixlike <- function(x) {
   if  (is.null(dim(x)))
@@ -91,4 +92,26 @@
 
   storage.mode(x) <- "double"
   x
+}
+
+## Reduce data for a two-dimensional scatter plot. Data with more than 2
+## columns is projected onto the first two principal components (using
+## prcomp). Returns the 2-column data and axis labels (NULL for the default
+## labels). User supplied labels in xlab and ylab are kept.
+.project_2d <- function(x, name = "x", xlab = NULL, ylab = NULL) {
+  if (!.matrixlike(x) || ncol(x) < 2L)
+    stop(name, " needs to be a matrix or data.frame with at least 2 columns to plot.",
+      call. = FALSE)
+
+  if (ncol(x) == 2L)
+    return(list(data = as.matrix(x), xlab = xlab, ylab = ylab))
+
+  x <- .as_finite_numeric_matrix(x, name)
+  pc <- stats::prcomp(x)
+  ve <- round(100 * pc$sdev[1:2]^2 / sum(pc$sdev^2), 1)
+  list(
+    data = pc$x[, 1:2, drop = FALSE],
+    xlab = xlab %||% paste0("PC1 (", ve[1], "% of variance)"),
+    ylab = ylab %||% paste0("PC2 (", ve[2], "% of variance)")
+  )
 }

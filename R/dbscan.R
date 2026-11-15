@@ -273,12 +273,12 @@ dbscan <-
     dist_method <- dist_method %||% "unknown"
 
     ### extra contains settings for frNN
-    ### search = "kdtree", bucketSize = 10, splitRule = "suggest", approx = 0
+    ### search = "kdtree", bucketSize = 10, splitRule = "suggest", shrinkRule = "suggest", approx = 0
     ### also check for MinPts for fpc compatibility (does not work for
     ### search method dist)
     extra <- list(...)
     args <-
-      c("MinPts", "search", "bucketSize", "splitRule", "approx")
+      c("MinPts", "search", "bucketSize", "splitRule", "shrinkRule", "approx")
     m <- pmatch(names(extra), args)
     if (anyNA(m))
       stop("Unknown parameter: ",
@@ -296,6 +296,7 @@ dbscan <-
     eps <- .validate_nonnegative_scalar(eps, "eps")
     search <- .parse_search(extra$search %||% "kdtree")
     splitRule <- .parse_splitRule(extra$splitRule %||% "suggest")
+    shrinkRule <- .parse_shrinkRule(extra$shrinkRule %||% "suggest")
     bucketSize <- .validate_bucket_size(extra$bucketSize %||% 10L)
     approx <- .validate_nonnegative_scalar(extra$approx %||% 0, "approx")
 
@@ -344,6 +345,7 @@ dbscan <-
       as.integer(search),
       as.integer(bucketSize),
       as.integer(splitRule),
+      as.integer(shrinkRule),
       as.double(approx),
       frNN
     )

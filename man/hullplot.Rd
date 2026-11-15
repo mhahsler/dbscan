@@ -17,10 +17,22 @@ hullplot(
   solid = TRUE,
   alpha = 0.2,
   main = "Convex Cluster Hulls",
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 
-clplot(x, cl, col = NULL, pch = NULL, cex = 0.5, main = "Cluster Plot", ...)
+clplot(
+  x,
+  cl,
+  col = NULL,
+  pch = NULL,
+  cex = 0.5,
+  main = "Cluster Plot",
+  xlab = NULL,
+  ylab = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{a data matrix. If more than 2 columns are provided, then the data
@@ -46,6 +58,10 @@ points and \code{x} for noise points.}
 hulls? alpha controls the level of alpha shading.}
 
 \item{main}{main title.}
+
+\item{xlab, ylab}{axis labels. The default is to use the column names of \code{x}
+or, if the data is projected, the principal components with the percentage
+of variance they explain.}
 
 \item{...}{further parameters are passed on to \code{\link[graphics:plot.default]{graphics::plot.default()}}.}
 }

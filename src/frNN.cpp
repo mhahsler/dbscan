@@ -18,7 +18,7 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 List frNN_int(NumericMatrix data, double eps, int type,
-  int bucketSize, int splitRule, double approx) {
+  int bucketSize, int splitRule, int shrinkRule, double approx) {
 
   // k-d tree uses squared distances
   double eps2 = eps*eps;
@@ -34,9 +34,9 @@ List frNN_int(NumericMatrix data, double eps, int type,
   }
   //Rprintf("Points copied.\n");
 
-  // create k-d tree (1) or linear search structure (2)
+  // create k-d tree (1), linear search structure (2), or bd-tree (4)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-    bucketSize, splitRule);
+    bucketSize, splitRule, shrinkRule);
   //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   // frNN
@@ -82,7 +82,7 @@ List frNN_int(NumericMatrix data, double eps, int type,
 
 // [[Rcpp::export]]
 List frNN_query_int(NumericMatrix data, NumericMatrix query, double eps, int type,
-  int bucketSize, int splitRule, double approx) {
+  int bucketSize, int splitRule, int shrinkRule, double approx) {
 
   // k-d tree uses squared distances
   double eps2 = eps*eps;
@@ -107,9 +107,9 @@ List frNN_query_int(NumericMatrix data, NumericMatrix query, double eps, int typ
   }
   //Rprintf("Points copied.\n");
 
-  // create k-d tree (1) or linear search structure (2)
+  // create k-d tree (1), linear search structure (2), or bd-tree (4)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-    bucketSize, splitRule);
+    bucketSize, splitRule, shrinkRule);
   //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   // frNN

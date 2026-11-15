@@ -20,7 +20,7 @@ using namespace Rcpp;
 // returns knn-dist and the neighborhood size as a matrix
 // [[Rcpp::export]]
 List lof_kNN(NumericMatrix data, int minPts,
-  int type, int bucketSize, int splitRule, double approx) {
+  int type, int bucketSize, int splitRule, int shrinkRule, double approx) {
 
   // minPts includes the point itself; k does not!
   int k = minPts - 1;
@@ -38,7 +38,7 @@ List lof_kNN(NumericMatrix data, int minPts,
 
   // create k-d tree (1) or linear search structure (2)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-    bucketSize, splitRule);
+    bucketSize, splitRule, shrinkRule);
   //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   // Note: the search also returns the point itself (as the first hit)!

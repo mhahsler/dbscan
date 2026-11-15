@@ -39,6 +39,9 @@
 #' @param hull logical; calculate and show convex hulls for clusters.
 #' @param hull_lwd,hull_lty line width and line type used for the convex hull.
 #' @param main main title.
+#' @param xlab,ylab axis labels. The default is to use the column names of `x`
+#' or, if the data is projected, the principal components with the percentage
+#' of variance they explain.
 #' @param solid,alpha draw filled polygons instead of just lines for the convex
 #' hulls? alpha controls the level of alpha shading.
 #' @param ... further parameters are passed on to [graphics::plot.default()].
@@ -102,10 +105,12 @@ hullplot <- function(x,
   solid = TRUE,
   alpha = .2,
   main = "Convex Cluster Hulls",
+  xlab = NULL,
+  ylab = NULL,
   ...) {
   ### handle d>2 by using PCA
-  if (ncol(x) > 2)
-    x <- prcomp(x)$x
+  proj <- .project_2d(x, "x", xlab, ylab)
+  x <- proj$data
 
   ### extract clustering (keep hierarchical xICSXi structure)
   if (inherits(cl, "xics") || "clusters_xi" %in% names(cl)) {
@@ -138,11 +143,13 @@ hullplot <- function(x,
   # mark noise points
   pch <- pch %||% ifelse(cl == 0L, 4L, 1L)
 
-  graphics::plot.default(x[, 1:2],
+  graphics::plot.default(x,
     col = c(col_noise, col)[cl + 1L],
     pch = pch,
     cex = cex,
     main = main,
+    xlab = proj$xlab,
+    ylab = proj$ylab,
     ...)
 
   col_poly <- adjustcolor(col, alpha.f = alpha)
@@ -201,7 +208,9 @@ clplot <- function(x,
                    pch = NULL,
                    cex = 0.5,
                    main = "Cluster Plot",
+                   xlab = NULL,
+                   ylab = NULL,
                    ...)
   hullplot(x, cl = cl, col = col, pch = pch, cex = cex, main = main,
-           hull = FALSE, ...)
+           xlab = xlab, ylab = ylab, hull = FALSE, ...)
 

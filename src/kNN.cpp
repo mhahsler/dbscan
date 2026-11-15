@@ -15,7 +15,7 @@
 
 // returns knn + dist
 List kNN_int(NumericMatrix data, int k,
-  int type, int bucketSize, int splitRule, double approx) {
+  int type, int bucketSize, int splitRule, int shrinkRule, double approx) {
 
   // copy data
   int nrow = data.nrow();
@@ -28,9 +28,9 @@ List kNN_int(NumericMatrix data, int k,
   }
   //Rprintf("Points copied.\n");
 
-  // create k-d tree (1) or linear search structure (2)
+  // create k-d tree (1), linear search structure (2), or bd-tree (4)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-    bucketSize, splitRule);
+    bucketSize, splitRule, shrinkRule);
   //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   NumericMatrix d(nrow, k);
@@ -65,14 +65,14 @@ List kNN_int(NumericMatrix data, int k,
   ret["dist"] = d;
   ret["id"] = id;
   ret["k"] = k;
-  ret["sort"] = true;
+  ret["sort"] = false;  // ANN order: by distance, ties not ordered by id
   return ret;
 }
 
 // returns knn + dist using data and query
 // [[Rcpp::export]]
 List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
-  int type, int bucketSize, int splitRule, double approx) {
+  int type, int bucketSize, int splitRule, int shrinkRule, double approx) {
 
   // FIXME: check ncol for data and query
 
@@ -97,9 +97,9 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   }
   //Rprintf("Points copied.\n");
 
-  // create k-d tree (1) or linear search structure (2)
+  // create k-d tree (1), linear search structure (2), or bd-tree (4)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-    bucketSize, splitRule);
+    bucketSize, splitRule, shrinkRule);
   //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   NumericMatrix d(nrow_q, k);
@@ -127,6 +127,6 @@ List kNN_query_int(NumericMatrix data, NumericMatrix query, int k,
   ret["dist"] = d;
   ret["id"] = id;
   ret["k"] = k;
-  ret["sort"] = true;
+  ret["sort"] = false;  // ANN order: by distance, ties not ordered by id
   return ret;
 }

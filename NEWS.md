@@ -1,3 +1,29 @@
+# dbscan 1.3.1 (unreleased)
+
+## Changes
+* __ANN:__ Added `search = "bdtree"` (box-decomposition tree) as a nearest neighbor
+  search option for `kNN()`, `frNN()`, `sNN()` and the functions using them.
+* __ANN:__ Added the `shrinkRule` parameter (`"none"`, `"simple"`, `"centroid"`,
+  `"suggest"`) to `kNN()`, `frNN()` and `sNN()` to control how the box-decomposition
+  tree is built when `search = "bdtree"`. The default is ANN's suggested rule.
+* `sort()` for `frNN` objects: `decreasing = TRUE` now sorts by decreasing distance for
+  objects that were already sorted.
+* `sort()` for `sNN` objects: `decreasing = FALSE` now sorts by increasing number of
+  shared neighbors for objects that were already sorted (ties are broken by increasing id).
+  `sNN()` now gives an informative error if `k` is missing and `x` is not a kNN
+  object, and the error for `kt > k` now says "at most k".
+* `kNN()`: `sort = FALSE` now returns unsorted results (`$sort` is `FALSE`) and
+  `sort = TRUE` breaks ties in distance by id. `sort(x, decreasing = TRUE)` now sorts
+  by decreasing distance for objects that were already sorted.
+* `plot()` for `kNN`, `frNN` and `sNN` objects now projects data with more than two
+  columns onto the first two principal components (using `prcomp()`) instead of
+  showing only the first two columns. Axis labels can be set with `xlab` and `ylab`.
+* `hullplot()` and `clplot()` label the axes with the principal components (and the
+  variance they explain) when the data is projected. Axis labels can be set with
+  `xlab` and `ylab`.
+* Improved the documentation of `kNN()`, `frNN()` and `sNN()` (shared description of the
+  search parameters, `approx`, sorting, input requirements, NAs).
+
 # dbscan 1.3.0 (2026-11-14)
 
 ## Changes

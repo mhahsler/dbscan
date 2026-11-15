@@ -20,52 +20,86 @@
 
 #' Find the Fixed Radius Nearest Neighbors
 #'
-#' This function uses a k-d tree to find the fixed radius nearest neighbors
+#' This function finds the fixed radius nearest neighbors
 #' (including distances) fast.
 #'
 #' If `x` is specified as a data matrix, then Euclidean distances and fast
-#' nearest neighbor lookup using a k-d tree are used.
+#' nearest neighbor lookup using a k-d tree (default), a box-decomposition tree
+#' or linear search are used (see the section on the search parameters).
+#' All points within a distance of `eps` of a point (including points at
+#' exactly distance `eps`) are its neighbors.
 #'
-#' To create a frNN object from scratch, you need to supply at least the
-#' elements `id` with a list of integer vectors with the nearest neighbor
-#' ids for each point and `eps` (see below).
+#' ## Sorting and self-matches
 #'
-#' **Self-matches:** Self-matches are not returned!
+#' * **Sorting:** With `sort = TRUE` (default), the neighbors of each point are
+#'   ordered by increasing distance and ties are broken by id. With
+#'   `sort = FALSE`, the neighbors are returned in no particular order, which
+#'   avoids the cost of sorting. A `frNN` object can be sorted later using `sort()`.
+#' * **Self-matches:** If no `query` is specified, then self-matches are
+#'   removed. If `query` is specified, then a query point that is also in `x`
+#'   is returned as its own neighbor (at distance 0).
+#'
+#' ## Using a frNN object as `x`
+#'
+#' If `x` is a `frNN` object, then the neighborhoods are reduced to the
+#' smaller radius `eps`. An error is raised if `eps` is larger than the radius
+#' stored in `x`. All other arguments are ignored.
+#'
+#' ## Input requirements
+#'
+#' * `x` can be a numeric matrix, a data.frame with only numeric columns, a
+#'   [dist] object or a `frNN` object.
+#' * `query` needs to be a numeric matrix or data.frame with the same number of
+#'   columns as `x`, and can only be used if `x` is a data matrix.
+#'
+#' ## Memory
+#'
+#' The size of the result grows with the number of neighbors of all points, which
+#' can approach \eqn{O(n^2)} for a large `eps`. Choose `eps` carefully for large
+#' data sets.
+#'
+#' ## Creating a frNN object from scratch
+#'
+#' A `frNN` object is a list with class `c("frNN", "NN")` and the components
+#' described in the value section. You need to supply at least `id` and `eps`.
+#' `dist` is needed for sorting and plotting, and `sort` should be set to
+#' `FALSE` unless the neighbors are already sorted. `metric` is informational.
 #'
 #' @aliases frNN frnn print.frnn
 #' @family NN functions
 #'
+#' @templateVar type frNN
+#' @template NN-search-section
+#' @template NN-search-params
+#'
 #' @param x a data matrix, a dist object or a frNN object.
-#' @param eps neighbors radius.
+#' @param eps radius of the neighborhood (a finite, non-negative number).
+#' Points within this distance are neighbors.
 #' @param query a data matrix with the points to query. If query is not
 #' specified, the NN for all the points in `x` is returned. If query is
 #' specified then `x` needs to be a data matrix.
-#' @param sort sort the neighbors by distance? This is expensive and can be
-#' done later using `sort()`.
-#' @param search nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
-#' `"dist"`).
-#' @param bucketSize max size of the k-d tree leafs.
-#' @param splitRule rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
-#' `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding). `"SUGGEST"` uses
-#' ANNs best guess.
-#' @param approx a positive number useed for approximate nearest neighbors. All NN up to a distance of
-#' a factor of `1 + approx` eps may be used. Some actual NN may be omitted
-#' leading to spurious clusters and noise points.  However, the algorithm will
-#' enjoy a significant speedup.
-#' @param decreasing sort in decreasing order?
-#' @param ... further arguments
+#' @param sort sort the neighbors of each point by distance (ties are broken by
+#' id)? This is expensive and can be done later using `sort()`.
+#' @param decreasing for `sort()`, sort the neighbors by decreasing distance
+#' instead of increasing distance?
+#' @param ... further arguments (ignored).
 #'
 #' @returns
 #'
 #' `frNN()` returns an object of class [frNN] (subclass of
 #' [NN]) containing a list with the following components:
-#' \item{id }{a list of
-#' integer vectors. Each vector contains the ids (row numbers) of the fixed radius nearest
-#' neighbors. }
-#' \item{dist }{a list with distances (same structure as
+#' \item{id }{a list with one integer vector per point in `x` (or `query`).
+#' Each vector contains the ids (row numbers in `x`) of the fixed radius nearest
+#' neighbors. A point without neighbors has an empty vector (`integer(0)`).
+#' The list is named with the row names if available. }
+#' \item{dist }{a list with the distances (same structure as
 #' `id`). }
 #' \item{eps }{ neighborhood radius `eps` that was used. }
-#' \item{metric }{ used distance metric. }
+#' \item{sort }{logical; are the neighbors of each point sorted by increasing
+#' distance (with ties broken by id)? }
+#' \item{metric }{ used distance metric. This is `"euclidean"` for data
+#' matrices. For a [dist] object, it is the method stored in the object (which
+#' can be `NULL`). }
 #'
 #' `adjacencylist()` returns a list with one entry per data point in `x`. Each entry
 #' contains the id of the nearest neighbors.
@@ -75,6 +109,7 @@
 #' @references David M. Mount and Sunil Arya (2010). ANN: A Library for
 #' Approximate Nearest Neighbor Searching,
 #' \url{http://www.cs.umd.edu/~mount/ANN/}.
+#' @seealso [dbscan()], which accepts a precomputed `frNN` object.
 #' @keywords model
 #' @examples
 #' data(iris)
@@ -86,7 +121,7 @@
 #'
 #' # Number of neighbors
 #' hist(lengths(adjacencylist(nn)),
-#'   xlab = "k", main="Number of Neighbors",
+#'   xlab = "Number of neighbors", main = "Number of Neighbors",
 #'   sub = paste("Neighborhood size eps =", nn$eps))
 #'
 #' # Explore neighbors of point i = 10
@@ -106,8 +141,15 @@
 #' q <- x[c(1,100),]
 #' nn <- frNN(x, eps = .5, query = q)
 #'
-#' plot(nn, x, col = "grey")
+#' plot(nn, x[, 1:2], col = "grey")
 #' points(q, pch = 3, lwd = 2)
+#'
+#' ## Example 3: a precomputed frNN object can be used for DBSCAN
+#' nn <- frNN(x, eps = .5)
+#' db <- dbscan(nn, minPts = 5)
+#' db
+#'
+#' clplot(x, cl = db)
 #' @export frNN
 frNN <-
   function(x,
@@ -117,6 +159,7 @@ frNN <-
     search = "kdtree",
     bucketSize = 10,
     splitRule = "suggest",
+    shrinkRule = "suggest",
     approx = 0) {
     eps <- .validate_nonnegative_scalar(eps, "eps")
 
@@ -136,6 +179,7 @@ frNN <-
 
     search <- .parse_search(search)
     splitRule <- .parse_splitRule(splitRule)
+    shrinkRule <- .parse_shrinkRule(shrinkRule)
     bucketSize <- .validate_bucket_size(bucketSize)
     approx <- .validate_nonnegative_scalar(approx, "approx")
 
@@ -177,6 +221,7 @@ frNN <-
           as.integer(search),
           as.integer(bucketSize),
           as.integer(splitRule),
+          as.integer(shrinkRule),
           as.double(approx)
         )
       names(ret$dist) <- rownames(query)
@@ -189,6 +234,7 @@ frNN <-
         as.integer(search),
         as.integer(bucketSize),
         as.integer(splitRule),
+        as.integer(shrinkRule),
         as.double(approx)
       )
       names(ret$dist) <- rownames(x)
@@ -263,7 +309,8 @@ dist_to_frNN <- function(x, eps, sort = FALSE) {
 #' @rdname frNN
 #' @export
 sort.frNN <- function(x, decreasing = FALSE, ...) {
-  if (isTRUE(x$sort))
+  ## x$sort = TRUE means: sorted by increasing distance (ties by id)
+  if (isTRUE(x$sort) && !decreasing)
     return(x)
   if (is.null(x$dist))
     stop("Unable to sort. Distances are missing.")
@@ -292,7 +339,7 @@ sort.frNN <- function(x, decreasing = FALSE, ...) {
   names(x$dist) <- n
   names(x$id) <- n
 
-  x$sort <- TRUE
+  x$sort <- !decreasing
 
   x
 }

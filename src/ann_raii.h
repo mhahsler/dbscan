@@ -5,6 +5,7 @@
 #define DBSCAN_ANN_RAII_H
 
 #include "ANN/ANN.h"
+#include "ANN/bd_tree.h"
 #include <cstddef>
 #include <memory>
 #include <stdexcept>
@@ -71,10 +72,15 @@ public:
 
 inline std::unique_ptr<ANNpointSet> make_ann_tree(
     ANNpointArray points, int rows, int columns, int type,
-    int bucket_size, int split_rule) {
+    int bucket_size, int split_rule,
+    int shrink_rule = ANN_BD_SUGGEST) {
   if (type == 1)
     return std::make_unique<ANNkd_tree>(points, rows, columns, bucket_size,
       static_cast<ANNsplitRule>(split_rule));
+  if (type == 4)
+    return std::make_unique<ANNbd_tree>(points, rows, columns, bucket_size,
+      static_cast<ANNsplitRule>(split_rule),
+      static_cast<ANNshrinkRule>(shrink_rule));
   return std::make_unique<ANNbruteForce>(points, rows, columns);
 }
 

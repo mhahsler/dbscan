@@ -14,7 +14,17 @@ adjacencylist(x, ...)
 
 \method{sort}{NN}(x, decreasing = FALSE, ...)
 
-\method{plot}{NN}(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...)
+\method{plot}{NN}(
+  x,
+  data,
+  main = NULL,
+  pch = 16,
+  col = "black",
+  linecol = "gray",
+  xlab = NULL,
+  ylab = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{a \code{NN} object}
@@ -33,11 +43,22 @@ adjacencylist(x, ...)
 the points invisible.}
 
 \item{linecol}{color used for edges.}
+
+\item{xlab, ylab}{axis labels. The default is to use the column names of
+\code{data} or, if the data is projected, the principal components with the
+percentage of variance they explain.}
 }
 \description{
 NN is an abstract S3 superclass for the classes of the objects returned
 by \code{\link[=kNN]{kNN()}}, \code{\link[=frNN]{frNN()}} and \code{\link[=sNN]{sNN()}}. Methods for sorting, plotting and getting an
 adjacency list are defined.
+}
+\details{
+\code{plot()} draws the neighborhood graph in the first two dimensions of
+\code{data}. If \code{data} has more than two columns, then the data is first
+projected onto its first two principal components using \code{\link[stats:prcomp]{stats::prcomp()}}
+(centered, but not scaled, so Euclidean distances are preserved as well as
+possible) and the graph is drawn in the projection.
 }
 \section{Subclasses}{
 
@@ -53,6 +74,7 @@ nn <- kNN(x, k=5)
 nn
 
 # plot the kNN where NN are shown as line connecting points.
+# Since the data has more than 2 dimensions, a PCA projection is used.
 plot(nn, x)
 
 # show the first few elements of the adjacency list

@@ -17,6 +17,7 @@ frNN(
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0
 )
 
@@ -29,60 +30,164 @@ frNN(
 \arguments{
 \item{x}{a data matrix, a dist object or a frNN object.}
 
-\item{eps}{neighbors radius.}
+\item{eps}{radius of the neighborhood (a finite, non-negative number).
+Points within this distance are neighbors.}
 
 \item{query}{a data matrix with the points to query. If query is not
 specified, the NN for all the points in \code{x} is returned. If query is
 specified then \code{x} needs to be a data matrix.}
 
-\item{sort}{sort the neighbors by distance? This is expensive and can be
-done later using \code{sort()}.}
+\item{sort}{sort the neighbors of each point by distance (ties are broken by
+id)? This is expensive and can be done later using \code{sort()}.}
 
-\item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"} or
-\code{"dist"}).}
+\item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"},
+\code{"dist"} or \code{"bdtree"}). See the section on the search parameters.}
 
-\item{bucketSize}{max size of the k-d tree leafs.}
+\item{bucketSize}{max size of the k-d or bd tree leafs.}
 
-\item{splitRule}{rule to split the k-d tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
-\code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
-ANNs best guess.}
+\item{splitRule}{rule to split the k-d or bd tree. One of \code{"std"}, \code{"midpt"}, \code{"fair"},
+\code{"sl_midpt"}, \code{"sl_fair"} or \code{"suggest"} (SL stands for sliding). The default
+value \code{"suggest"} uses ANNs best guess.}
 
-\item{approx}{a positive number useed for approximate nearest neighbors. All NN up to a distance of
-a factor of \code{1 + approx} eps may be used. Some actual NN may be omitted
-leading to spurious clusters and noise points.  However, the algorithm will
-enjoy a significant speedup.}
+\item{shrinkRule}{shrinking rule used to build the box-decomposition tree
+(only used for \code{search = "bdtree"}). One of \code{"none"} (no shrinking, equivalent
+to a k-d tree), \code{"simple"}, \code{"centroid"} or \code{"suggest"}. The default value
+\code{"suggest"} uses ANNs best guess.}
 
-\item{decreasing}{sort in decreasing order?}
+\item{approx}{a non-negative number used for approximate nearest neighbors.
+All NN up to a distance of \code{eps / (1 + approx)} are considered and none with
+a distance greater than \code{eps}. The points in between might be considered.
+Some actual NN may be omitted, but the search will be faster.
+Ignored by \code{search = "linear"} and \code{"dist"}.}
 
-\item{...}{further arguments}
+\item{decreasing}{for \code{sort()}, sort the neighbors by decreasing distance
+instead of increasing distance?}
+
+\item{...}{further arguments (ignored).}
 }
 \value{
 \code{frNN()} returns an object of class \link{frNN} (subclass of
 \link{NN}) containing a list with the following components:
-\item{id }{a list of
-integer vectors. Each vector contains the ids (row numbers) of the fixed radius nearest
-neighbors. }
-\item{dist }{a list with distances (same structure as
+\item{id }{a list with one integer vector per point in \code{x} (or \code{query}).
+Each vector contains the ids (row numbers in \code{x}) of the fixed radius nearest
+neighbors. A point without neighbors has an empty vector (\code{integer(0)}).
+The list is named with the row names if available. }
+\item{dist }{a list with the distances (same structure as
 \code{id}). }
 \item{eps }{ neighborhood radius \code{eps} that was used. }
-\item{metric }{ used distance metric. }
+\item{sort }{logical; are the neighbors of each point sorted by increasing
+distance (with ties broken by id)? }
+\item{metric }{ used distance metric. This is \code{"euclidean"} for data
+matrices. For a \link{dist} object, it is the method stored in the object (which
+can be \code{NULL}). }
 
 \code{adjacencylist()} returns a list with one entry per data point in \code{x}. Each entry
 contains the id of the nearest neighbors.
 }
 \description{
-This function uses a k-d tree to find the fixed radius nearest neighbors
+This function finds the fixed radius nearest neighbors
 (including distances) fast.
 }
 \details{
 If \code{x} is specified as a data matrix, then Euclidean distances and fast
-nearest neighbor lookup using a k-d tree are used.
+nearest neighbor lookup using a k-d tree (default), a box-decomposition tree
+or linear search are used (see the section on the search parameters).
+All points within a distance of \code{eps} of a point (including points at
+exactly distance \code{eps}) are its neighbors.
+\subsection{Sorting and self-matches}{
+\itemize{
+\item \strong{Sorting:} With \code{sort = TRUE} (default), the neighbors of each point are
+ordered by increasing distance and ties are broken by id. With
+\code{sort = FALSE}, the neighbors are returned in no particular order, which
+avoids the cost of sorting. A \code{frNN} object can be sorted later using \code{sort()}.
+\item \strong{Self-matches:} If no \code{query} is specified, then self-matches are
+removed. If \code{query} is specified, then a query point that is also in \code{x}
+is returned as its own neighbor (at distance 0).
+}
+}
 
-To create a frNN object from scratch, you need to supply at least the
-elements \code{id} with a list of integer vectors with the nearest neighbor
-ids for each point and \code{eps} (see below).
+\subsection{Using a frNN object as \code{x}}{
 
-\strong{Self-matches:} Self-matches are not returned!
+If \code{x} is a \code{frNN} object, then the neighborhoods are reduced to the
+smaller radius \code{eps}. An error is raised if \code{eps} is larger than the radius
+stored in \code{x}. All other arguments are ignored.
+}
+
+\subsection{Input requirements}{
+\itemize{
+\item \code{x} can be a numeric matrix, a data.frame with only numeric columns, a
+\link{dist} object or a \code{frNN} object.
+\item \code{query} needs to be a numeric matrix or data.frame with the same number of
+columns as \code{x}, and can only be used if \code{x} is a data matrix.
+}
+}
+
+\subsection{Memory}{
+
+The size of the result grows with the number of neighbors of all points, which
+can approach \eqn{O(n^2)} for a large \code{eps}. Choose \code{eps} carefully for large
+data sets.
+}
+
+\subsection{Creating a frNN object from scratch}{
+
+A \code{frNN} object is a list with class \code{c("frNN", "NN")} and the components
+described in the value section. You need to supply at least \code{id} and \code{eps}.
+\code{dist} is needed for sorting and plotting, and \code{sort} should be set to
+\code{FALSE} unless the neighbors are already sorted. \code{metric} is informational.
+}
+
+\subsection{Details on the search parameters:}{
+\itemize{
+\item \code{search} controls what method is used if \code{x} is a data matrix.
+Available methods are:
+\itemize{
+\item \code{"kdtree"} uses a Euclidean k-d tree to speed up NN search.
+This is the default with good overall performance.
+\item \code{"bdtree"} uses a box-decomposition tree. Its spatial boxes can, in
+addition to splitting, also shrink. According to the ANN authors, this
+tree type may be faster than a k-d tree on tightly clustered data.
+\item \code{"linear"} performs linear search directly on the data.
+\item \code{"dist"} precomputes Euclidean distances first using \code{\link[=dist]{dist()}}. While fast
+for small data sets, the memory requirements for the distance matrix grow
+with \eqn{O(n^2)}.
+}
+
+The trees and linear search use the highly optimized ANN library (Mount
+and Arya, 2010) for Euclidean distances.
+
+If \code{x} is a distance matrix, then \code{search} is ignored and \code{"dist"}
+is used.
+\item Tree specific parameters
+\itemize{
+\item \code{bucketSize}, \code{splitRule} and \code{shrinkRule} control how the tree is
+built. \code{bucketSize} and \code{splitRule} apply to k-d and bd trees;
+\code{shrinkRule} applies only to bd trees (\code{"none"} gives a tree that
+behaves like a k-d tree).
+\item \code{approx} uses the approximate fixed-radius search implemented in ANN.
+All neighbors up to a distance of \code{eps / (1 + approx)} are considered
+and none with a distance greater than \code{eps}. The points in between might
+be considered, so some actual neighbors may be omitted. This can lead
+to a significant speedup. The default \code{approx = 0} gives exact results.
+\code{approx} is only used by the tree-based searches. For more details see
+Mount and Arya (2010).
+}
+}
+}
+
+\subsection{Handling of \code{NA}s:}{
+
+The tree-based searches and \code{search = "linear"} cannot handle \code{NA}, \code{NaN} or
+infinite values in the data (in \code{x} or \code{query}); an error is raised. (The ANN
+library does not check its input and would silently return wrong results.)
+With \code{search = "dist"}, the distances are calculated by \code{\link[=dist]{dist()}}, which
+leaves out coordinates that are \code{NA} for a pair of points and scales up
+the remaining sum. These distances are not exactly Euclidean distances.
+The resulting distance matrix (and a \link{dist} object supplied as \code{x})
+cannot contain \code{NA}s, which happens, for example, if a point has only
+\code{NA} values. Otherwise, remove or impute missing values before
+performing the search.
+}
 }
 \examples{
 data(iris)
@@ -94,7 +199,7 @@ nn
 
 # Number of neighbors
 hist(lengths(adjacencylist(nn)),
-  xlab = "k", main="Number of Neighbors",
+  xlab = "Number of neighbors", main = "Number of Neighbors",
   sub = paste("Neighborhood size eps =", nn$eps))
 
 # Explore neighbors of point i = 10
@@ -114,8 +219,15 @@ plot(frNN(nn, eps = .3), x)
 q <- x[c(1,100),]
 nn <- frNN(x, eps = .5, query = q)
 
-plot(nn, x, col = "grey")
+plot(nn, x[, 1:2], col = "grey")
 points(q, pch = 3, lwd = 2)
+
+## Example 3: a precomputed frNN object can be used for DBSCAN
+nn <- frNN(x, eps = .5)
+db <- dbscan(nn, minPts = 5)
+db
+
+clplot(x, cl = db)
 }
 \references{
 David M. Mount and Sunil Arya (2010). ANN: A Library for
@@ -123,6 +235,8 @@ Approximate Nearest Neighbor Searching,
 \url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
+\code{\link[=dbscan]{dbscan()}}, which accepts a precomputed \code{frNN} object.
+
 Other NN functions:
 \code{\link{NN}},
 \code{\link[=comps]{comps()}},

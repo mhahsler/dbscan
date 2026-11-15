@@ -20,7 +20,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 IntegerVector dbscan_density_int(
     NumericMatrix data, double eps,
-    int type, int bucketSize, int splitRule, double approx) {
+    int type, int bucketSize, int splitRule, int shrinkRule, double approx) {
 
   // k-d tree uses squared distances
   double eps2 = eps*eps;
@@ -42,7 +42,7 @@ IntegerVector dbscan_density_int(
 
   // create k-d tree (1) or linear search structure (2)
   auto kdTree = make_ann_tree(dataPts.get(), nrow, ncol, type,
-    bucketSize, splitRule);
+    bucketSize, splitRule, shrinkRule);
   //Rprintf("k-d tree ready. starting DBSCAN.\n");
 
   std::vector<int> N;

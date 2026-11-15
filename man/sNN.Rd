@@ -16,6 +16,7 @@ sNN(
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0
 )
 
@@ -33,40 +34,57 @@ neighbors.}
 build the shared nearest neighbor graph. Edges are only preserved if
 \code{kt} or more neighbors are shared.}
 
-\item{jp}{In regular sNN graphs, two points that are not neighbors
-can have shared neighbors.
-Javis and Patrick (1973) requires the two points to be neighbors, otherwise
+\item{jp}{In regular sNN graphs, a point and one of its neighbors can have
+shared neighbors even if the point is not one of the neighbor's \code{k} nearest
+neighbors.
+Jarvis and Patrick (1973) require the neighbor relation to be mutual: the
+point also needs to be among the neighbor's \code{k} nearest neighbors, otherwise
 the count is zeroed out. \code{TRUE} uses this behavior.}
 
-\item{sort}{sort by the number of shared nearest neighbors? Note that this
+\item{sort}{sort the neighbors of each point by the number of shared nearest
+neighbors (decreasing, ties are broken by id)? Note that this
 is expensive and \code{sort = FALSE} is much faster. sNN objects can be
-sorted using \code{sort()}.}
+sorted later using \code{sort()}.}
 
-\item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"} or
-\code{"dist"}).}
+\item{search}{nearest neighbor search strategy (one of \code{"kdtree"}, \code{"linear"},
+\code{"dist"} or \code{"bdtree"}). See the section on the search parameters.}
 
-\item{bucketSize}{max size of the k-d tree leafs.}
+\item{bucketSize}{max size of the k-d or bd tree leafs.}
 
-\item{splitRule}{rule to split the k-d tree. One of \code{"STD"}, \code{"MIDPT"}, \code{"FAIR"},
-\code{"SL_MIDPT"}, \code{"SL_FAIR"} or \code{"SUGGEST"} (SL stands for sliding). \code{"SUGGEST"} uses
-ANNs best guess.}
+\item{splitRule}{rule to split the k-d or bd tree. One of \code{"std"}, \code{"midpt"}, \code{"fair"},
+\code{"sl_midpt"}, \code{"sl_fair"} or \code{"suggest"} (SL stands for sliding). The default
+value \code{"suggest"} uses ANNs best guess.}
 
-\item{approx}{use approximate nearest neighbors. All NN up to a distance of
-a factor of \verb{(1 + approx) eps} may be used. Some actual NN may be omitted
-leading to spurious clusters and noise points.  However, the algorithm will
-enjoy a significant speedup.}
+\item{shrinkRule}{shrinking rule used to build the box-decomposition tree
+(only used for \code{search = "bdtree"}). One of \code{"none"} (no shrinking, equivalent
+to a k-d tree), \code{"simple"}, \code{"centroid"} or \code{"suggest"}. The default value
+\code{"suggest"} uses ANNs best guess.}
 
-\item{decreasing}{logical; sort in decreasing order?}
+\item{approx}{approximation factor for the tree-based searches. The j-th
+neighbor found is at most \code{(1 + approx)} times as far away as the true j-th
+nearest neighbor. \code{0} (default) gives exact results; larger values are
+faster, but some true nearest neighbors may be omitted. Ignored by
+\code{search = "linear"} and \code{"dist"}.}
 
-\item{...}{additional parameters are passed on.}
+\item{decreasing}{for \code{sort()}, sort by decreasing number of shared
+neighbors (the default)? Use \code{FALSE} for increasing order.}
+
+\item{...}{further arguments (ignored).}
 }
 \value{
 An object of class \code{sNN} (subclass of \link{kNN} and \link{NN}) containing a list
-with the following components:
-\item{id }{a matrix with ids. }
-\item{dist}{a matrix with the distances. }
+with the following components (the matrices have one row per point and \code{k}
+columns; edges removed by \code{kt} are \code{NA}):
+\item{id }{a matrix with the ids (row numbers in \code{x}) of the neighbors. }
+\item{dist}{a matrix with the distances to the neighbors. }
 \item{shared }{a matrix with the number of shared nearest neighbors. }
-\item{k }{number of \code{k} used. }
+\item{k }{the number \code{k} used. }
+\item{sort }{logical; are the neighbors sorted by increasing distance? This
+is \code{FALSE} if \code{sort = TRUE} was used, since the neighbors are then sorted by
+the number of shared neighbors. }
+\item{sort_shared }{logical; are the neighbors sorted by decreasing number of
+shared neighbors? }
+\item{kt }{the threshold \code{kt} used (\code{NULL} if none). }
 \item{metric }{the used distance metric. }
 }
 \description{
@@ -74,21 +92,99 @@ Calculates the number of shared nearest neighbors
 and creates a shared nearest neighbors graph.
 }
 \details{
-The number of shared nearest neighbors of two points p and q is the
-intersection of the kNN neighborhood of two points.
-Note: that each point is considered to be part
+The number of shared nearest neighbors of two points p and q is the size of
+the intersection of the kNN neighborhoods of the two points.
+Note that each point is considered to be part
 of its own kNN neighborhood.
 The range for the shared nearest neighbors is
 \eqn{[0, k]}. The result is a n-by-k matrix called \code{shared}.
 Each row is a point and the columns are the point's k nearest neighbors.
-The value is the count of the shared neighbors.
+The value \code{shared[i, j]} is the count of the shared neighbors of point \code{i} and
+its j-th neighbor.
 
 The shared nearest neighbor graph connects a point with all its nearest neighbors
 if they have at least one shared neighbor. The number of shared neighbors can be used
 as an edge weight.
-Javis and Patrick (1973) use a slightly
+Jarvis and Patrick (1973) use a slightly
 modified (see parameter \code{jp}) shared nearest neighbor graph for
 clustering.
+
+The \code{k} nearest neighbors are found with \code{\link[=kNN]{kNN()}}. The search parameters are
+passed on to it (see the section on the search parameters below).
+\subsection{Using a kNN object as \code{x}}{
+
+If \code{x} is a \code{kNN} object, then \code{k} can be omitted and \code{x$k} is used. If \code{k}
+is smaller than \code{x$k}, then the first \code{k} neighbors (by distance) are used.
+An error is raised if \code{x} contains fewer than \code{k} neighbors. The search
+parameters are ignored. A \code{query} is not supported.
+}
+
+\subsection{Thresholding and sorting}{
+\itemize{
+\item \strong{Threshold \code{kt}:} If \code{kt} is specified, then only edges with at least
+\code{kt} shared neighbors are kept (\code{kt} needs to be at most \code{k}). The entries
+for removed edges are set to \code{NA} in \code{id}, \code{dist} and \code{shared}.
+\code{\link[=adjacencylist]{adjacencylist()}} skips them.
+\item \strong{Sorting:} The neighbors are found without sorting. With \code{sort = TRUE}
+(default), the neighbors of each point (the columns of \code{id}, \code{dist} and
+\code{shared}) are then reordered by decreasing number of shared neighbors
+(ties are broken by id). The columns then no longer follow the distance
+rank, and \verb{$sort} is \code{FALSE}. A \code{sNN} object can be sorted later using
+\code{sort()}.
+}
+}
+
+\subsection{Details on the search parameters:}{
+\itemize{
+\item \code{search} controls what method is used if \code{x} is a data matrix.
+Available methods are:
+\itemize{
+\item \code{"kdtree"} uses a Euclidean k-d tree to speed up NN search.
+This is the default with good overall performance.
+\item \code{"bdtree"} uses a box-decomposition tree. Its spatial boxes can, in
+addition to splitting, also shrink. According to the ANN authors, this
+tree type may be faster than a k-d tree on tightly clustered data.
+\item \code{"linear"} performs linear search directly on the data.
+\item \code{"dist"} precomputes Euclidean distances first using \code{\link[=dist]{dist()}}. While fast
+for small data sets, the memory requirements for the distance matrix grow
+with \eqn{O(n^2)}.
+}
+
+The trees and linear search use the highly optimized ANN library (Mount
+and Arya, 2010) for Euclidean distances.
+
+If \code{x} is a distance matrix, then \code{search} is ignored and \code{"dist"}
+is used.
+\item Tree specific parameters
+\itemize{
+\item \code{bucketSize}, \code{splitRule} and \code{shrinkRule} control how the tree is
+built. \code{bucketSize} and \code{splitRule} apply to k-d and bd trees;
+\code{shrinkRule} applies only to bd trees (\code{"none"} gives a tree that
+behaves like a k-d tree).
+\item \code{approx} uses the approximate nearest neighbor search implemented in
+ANN. If \code{approx > 0}, the distance to the j-th returned neighbor is at
+most \code{(1 + approx)} times the distance to the true j-th nearest
+neighbor, so some true nearest neighbors may be omitted. This can lead
+to a significant speedup. The default \code{approx = 0} gives exact
+results. \code{approx} is only used by the tree-based searches. For more
+details see Mount and Arya (2010).
+}
+}
+}
+
+\subsection{Handling of \code{NA}s:}{
+
+The tree-based searches and \code{search = "linear"} cannot handle \code{NA}, \code{NaN} or
+infinite values in the data (in \code{x} or \code{query}); an error is raised. (The ANN
+library does not check its input and would silently return wrong results.)
+With \code{search = "dist"}, the distances are calculated by \code{\link[=dist]{dist()}}, which
+leaves out coordinates that are \code{NA} for a pair of points and scales up
+the remaining sum. These distances are not exactly Euclidean distances.
+The resulting distance matrix (and a \link{dist} object supplied as \code{x})
+cannot contain \code{NA}s, which happens, for example, if a point has only
+\code{NA} values. Otherwise, remove or impute missing values before
+performing the search.
+}
 }
 \examples{
 data(iris)
@@ -115,14 +211,25 @@ plot(nn_3, x)
 
 # get an adjacency list for the shared nearest neighbor graph
 adjacencylist(nn_3)
+
+# Jarvis-Patrick graph (requires mutual nearest neighbors)
+nn_jp <- sNN(x, k = k, jp = TRUE)
+table(as.vector(nn_jp$shared))
 }
 \references{
 R. A. Jarvis and E. A. Patrick. 1973. Clustering Using a
 Similarity Measure Based on Shared Near Neighbors. \emph{IEEE Trans. Comput.}
 22, 11 (November 1973), 1025-1034.
 \doi{10.1109/T-C.1973.223640}
+
+David M. Mount and Sunil Arya (2010). ANN: A Library for
+Approximate Nearest Neighbor Searching,
+\url{http://www.cs.umd.edu/~mount/ANN/}.
 }
 \seealso{
+\code{\link[=sNNclust]{sNNclust()}} and \code{\link[=jpclust]{jpclust()}}, which cluster using the shared nearest
+neighbor graph.
+
 Other NN functions:
 \code{\link{NN}},
 \code{\link[=comps]{comps()}},

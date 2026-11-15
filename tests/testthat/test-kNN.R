@@ -49,6 +49,13 @@ test_that("kNN", {
   ## search options
   nn_linear <- kNN(x, k=k, search = "linear", sort = TRUE)
   expect_equal(nn, nn_linear)
+  nn_bd <- kNN(x, k=k, search = "bdtree", sort = TRUE)
+  for (sr in c("none", "simple", "centroid", "suggest")) {
+    expect_equal(kNN(x, k=k, search = "bdtree", shrinkRule = sr, sort = TRUE)$dist,
+      nn_bd$dist)
+  }
+  expect_error(kNN(x, k=k, search = "bdtree", shrinkRule = "bogus"))
+  expect_equal(nn, nn_bd)
 
   ## split options
   for(so in c("STD", "MIDPT", "FAIR", "SL_FAIR")) {
@@ -128,4 +135,34 @@ test_that("kNN", {
   expect_identical(unname(nn$id[2, ]), 8:4)
 
   expect_error(kNN(dist(x[1:8, , drop=FALSE]), x[9:10, , drop = FALSE], k = 5))
+})
+
+test_that("kNN sorting", {
+  ## grid data has many tied distances
+  x <- as.matrix(expand.grid(1:6, 1:6))
+  k <- 8
+
+  unsorted <- kNN(x, k, sort = FALSE)
+  expect_false(unsorted$sort)
+  expect_false(is.unsorted(t(apply(unsorted$dist, 1, identity))[1, ]))
+
+  sorted <- kNN(x, k, sort = TRUE)
+  expect_true(sorted$sort)
+  expect_identical(sort(unsorted), sorted)
+
+  ## ties are broken by id
+  for (i in seq_len(nrow(x))) {
+    o <- order(sorted$dist[i, ], sorted$id[i, ])
+    expect_identical(o, seq_len(k))
+  }
+
+  ## sorting is the same for all searches
+  expect_equal(kNN(x, k, search = "linear")$dist, sorted$dist)
+  expect_equal(kNN(x, k, search = "bdtree")$dist, sorted$dist)
+
+  ## decreasing
+  dec <- sort(sorted, decreasing = TRUE)
+  expect_false(dec$sort)
+  expect_equal(unname(dec$dist), unname(sorted$dist[, k:1]))
+  expect_identical(kNN(dec, 3), kNN(sorted, 3))
 })

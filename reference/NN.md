@@ -18,7 +18,17 @@ adjacencylist(x, ...)
 sort(x, decreasing = FALSE, ...)
 
 # S3 method for class 'NN'
-plot(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...)
+plot(
+  x,
+  data,
+  main = NULL,
+  pch = 16,
+  col = "black",
+  linecol = "gray",
+  xlab = NULL,
+  ylab = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -57,6 +67,22 @@ plot(x, data, main = NULL, pch = 16, col = "black", linecol = "gray", ...)
 
   color used for edges.
 
+- xlab, ylab:
+
+  axis labels. The default is to use the column names of `data` or, if
+  the data is projected, the principal components with the percentage of
+  variance they explain.
+
+## Details
+
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) draws the
+neighborhood graph in the first two dimensions of `data`. If `data` has
+more than two columns, then the data is first projected onto its first
+two principal components using
+[`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) (centered, but
+not scaled, so Euclidean distances are preserved as well as possible)
+and the graph is drawn in the projection.
+
 ## Subclasses
 
 [kNN](https://michael.hahsler.net/dbscan/reference/kNN.md),
@@ -91,6 +117,7 @@ nn
 #> Available fields: dist, id, k, sort, metric
 
 # plot the kNN where NN are shown as line connecting points.
+# Since the data has more than 2 dimensions, a PCA projection is used.
 plot(nn, x)
 
 
@@ -98,7 +125,7 @@ plot(nn, x)
 head(adjacencylist(nn))
 #> [[1]]
 #>  1  2  3  4  5 
-#> 18  5 40 29 28 
+#> 18  5 40 28 29 
 #> 
 #> [[2]]
 #>  1  2  3  4  5 

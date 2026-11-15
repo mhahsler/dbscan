@@ -1,7 +1,7 @@
 # Find the Fixed Radius Nearest Neighbors
 
-This function uses a k-d tree to find the fixed radius nearest neighbors
-(including distances) fast.
+This function finds the fixed radius nearest neighbors (including
+distances) fast.
 
 ## Usage
 
@@ -14,6 +14,7 @@ frNN(
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0
 )
 
@@ -35,7 +36,8 @@ print(x, ...)
 
 - eps:
 
-  neighbors radius.
+  radius of the neighborhood (a finite, non-negative number). Points
+  within this distance are neighbors.
 
 - query:
 
@@ -45,38 +47,48 @@ print(x, ...)
 
 - sort:
 
-  sort the neighbors by distance? This is expensive and can be done
-  later using [`sort()`](https://rdrr.io/r/base/sort.html).
+  sort the neighbors of each point by distance (ties are broken by id)?
+  This is expensive and can be done later using
+  [`sort()`](https://rdrr.io/r/base/sort.html).
 
 - search:
 
-  nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
-  `"dist"`).
+  nearest neighbor search strategy (one of `"kdtree"`, `"linear"`,
+  `"dist"` or `"bdtree"`). See the section on the search parameters.
 
 - bucketSize:
 
-  max size of the k-d tree leafs.
+  max size of the k-d or bd tree leafs.
 
 - splitRule:
 
-  rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
-  `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding).
-  `"SUGGEST"` uses ANNs best guess.
+  rule to split the k-d or bd tree. One of `"std"`, `"midpt"`, `"fair"`,
+  `"sl_midpt"`, `"sl_fair"` or `"suggest"` (SL stands for sliding). The
+  default value `"suggest"` uses ANNs best guess.
+
+- shrinkRule:
+
+  shrinking rule used to build the box-decomposition tree (only used for
+  `search = "bdtree"`). One of `"none"` (no shrinking, equivalent to a
+  k-d tree), `"simple"`, `"centroid"` or `"suggest"`. The default value
+  `"suggest"` uses ANNs best guess.
 
 - approx:
 
-  a positive number useed for approximate nearest neighbors. All NN up
-  to a distance of a factor of `1 + approx` eps may be used. Some actual
-  NN may be omitted leading to spurious clusters and noise points.
-  However, the algorithm will enjoy a significant speedup.
+  a non-negative number used for approximate nearest neighbors. All NN
+  up to a distance of `eps / (1 + approx)` are considered and none with
+  a distance greater than `eps`. The points in between might be
+  considered. Some actual NN may be omitted, but the search will be
+  faster. Ignored by `search = "linear"` and `"dist"`.
 
 - decreasing:
 
-  sort in decreasing order?
+  for [`sort()`](https://rdrr.io/r/base/sort.html), sort the neighbors
+  by decreasing distance instead of increasing distance?
 
 - ...:
 
-  further arguments
+  further arguments (ignored).
 
 ## Value
 
@@ -86,20 +98,29 @@ list with the following components:
 
 - id :
 
-  a list of integer vectors. Each vector contains the ids (row numbers)
-  of the fixed radius nearest neighbors.
+  a list with one integer vector per point in `x` (or `query`). Each
+  vector contains the ids (row numbers in `x`) of the fixed radius
+  nearest neighbors. A point without neighbors has an empty vector
+  (`integer(0)`). The list is named with the row names if available.
 
 - dist :
 
-  a list with distances (same structure as `id`).
+  a list with the distances (same structure as `id`).
 
 - eps :
 
   neighborhood radius `eps` that was used.
 
+- sort :
+
+  logical; are the neighbors of each point sorted by increasing distance
+  (with ties broken by id)?
+
 - metric :
 
-  used distance metric.
+  used distance metric. This is `"euclidean"` for data matrices. For a
+  [dist](https://rdrr.io/r/stats/dist.html) object, it is the method
+  stored in the object (which can be `NULL`).
 
 [`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md)
 returns a list with one entry per data point in `x`. Each entry contains
@@ -108,13 +129,107 @@ the id of the nearest neighbors.
 ## Details
 
 If `x` is specified as a data matrix, then Euclidean distances and fast
-nearest neighbor lookup using a k-d tree are used.
+nearest neighbor lookup using a k-d tree (default), a box-decomposition
+tree or linear search are used (see the section on the search
+parameters). All points within a distance of `eps` of a point (including
+points at exactly distance `eps`) are its neighbors.
 
-To create a frNN object from scratch, you need to supply at least the
-elements `id` with a list of integer vectors with the nearest neighbor
-ids for each point and `eps` (see below).
+### Sorting and self-matches
 
-**Self-matches:** Self-matches are not returned!
+- **Sorting:** With `sort = TRUE` (default), the neighbors of each point
+  are ordered by increasing distance and ties are broken by id. With
+  `sort = FALSE`, the neighbors are returned in no particular order,
+  which avoids the cost of sorting. A `frNN` object can be sorted later
+  using [`sort()`](https://rdrr.io/r/base/sort.html).
+
+- **Self-matches:** If no `query` is specified, then self-matches are
+  removed. If `query` is specified, then a query point that is also in
+  `x` is returned as its own neighbor (at distance 0).
+
+### Using a frNN object as `x`
+
+If `x` is a `frNN` object, then the neighborhoods are reduced to the
+smaller radius `eps`. An error is raised if `eps` is larger than the
+radius stored in `x`. All other arguments are ignored.
+
+### Input requirements
+
+- `x` can be a numeric matrix, a data.frame with only numeric columns, a
+  [dist](https://rdrr.io/r/stats/dist.html) object or a `frNN` object.
+
+- `query` needs to be a numeric matrix or data.frame with the same
+  number of columns as `x`, and can only be used if `x` is a data
+  matrix.
+
+### Memory
+
+The size of the result grows with the number of neighbors of all points,
+which can approach \\O(n^2)\\ for a large `eps`. Choose `eps` carefully
+for large data sets.
+
+### Creating a frNN object from scratch
+
+A `frNN` object is a list with class `c("frNN", "NN")` and the
+components described in the value section. You need to supply at least
+`id` and `eps`. `dist` is needed for sorting and plotting, and `sort`
+should be set to `FALSE` unless the neighbors are already sorted.
+`metric` is informational.
+
+### Details on the search parameters:
+
+- `search` controls what method is used if `x` is a data matrix.
+  Available methods are:
+
+  - `"kdtree"` uses a Euclidean k-d tree to speed up NN search. This is
+    the default with good overall performance.
+
+  - `"bdtree"` uses a box-decomposition tree. Its spatial boxes can, in
+    addition to splitting, also shrink. According to the ANN authors,
+    this tree type may be faster than a k-d tree on tightly clustered
+    data.
+
+  - `"linear"` performs linear search directly on the data.
+
+  - `"dist"` precomputes Euclidean distances first using
+    [`dist()`](https://rdrr.io/r/stats/dist.html). While fast for small
+    data sets, the memory requirements for the distance matrix grow with
+    \\O(n^2)\\.
+
+  The trees and linear search use the highly optimized ANN library
+  (Mount and Arya, 2010) for Euclidean distances.
+
+  If `x` is a distance matrix, then `search` is ignored and `"dist"` is
+  used.
+
+- Tree specific parameters
+
+  - `bucketSize`, `splitRule` and `shrinkRule` control how the tree is
+    built. `bucketSize` and `splitRule` apply to k-d and bd trees;
+    `shrinkRule` applies only to bd trees (`"none"` gives a tree that
+    behaves like a k-d tree).
+
+  - `approx` uses the approximate fixed-radius search implemented in
+    ANN. All neighbors up to a distance of `eps / (1 + approx)` are
+    considered and none with a distance greater than `eps`. The points
+    in between might be considered, so some actual neighbors may be
+    omitted. This can lead to a significant speedup. The default
+    `approx = 0` gives exact results. `approx` is only used by the
+    tree-based searches. For more details see Mount and Arya (2010).
+
+### Handling of `NA`s:
+
+The tree-based searches and `search = "linear"` cannot handle `NA`,
+`NaN` or infinite values in the data (in `x` or `query`); an error is
+raised. (The ANN library does not check its input and would silently
+return wrong results.) With `search = "dist"`, the distances are
+calculated by [`dist()`](https://rdrr.io/r/stats/dist.html), which
+leaves out coordinates that are `NA` for a pair of points and scales up
+the remaining sum. These distances are not exactly Euclidean distances.
+The resulting distance matrix (and a
+[dist](https://rdrr.io/r/stats/dist.html) object supplied as `x`) cannot
+contain `NA`s, which happens, for example, if a point has only `NA`
+values. Otherwise, remove or impute missing values before performing the
+search.
 
 ## References
 
@@ -122,6 +237,9 @@ David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate
 Nearest Neighbor Searching, <http://www.cs.umd.edu/~mount/ANN/>.
 
 ## See also
+
+[`dbscan()`](https://michael.hahsler.net/dbscan/reference/dbscan.md),
+which accepts a precomputed `frNN` object.
 
 Other NN functions:
 [`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
@@ -150,7 +268,7 @@ nn
 
 # Number of neighbors
 hist(lengths(adjacencylist(nn)),
-  xlab = "k", main="Number of Neighbors",
+  xlab = "Number of neighbors", main = "Number of Neighbors",
   sub = paste("Neighborhood size eps =", nn$eps))
 
 
@@ -196,6 +314,23 @@ plot(frNN(nn, eps = .3), x)
 q <- x[c(1,100),]
 nn <- frNN(x, eps = .5, query = q)
 
-plot(nn, x, col = "grey")
+plot(nn, x[, 1:2], col = "grey")
 points(q, pch = 3, lwd = 2)
+
+
+## Example 3: a precomputed frNN object can be used for DBSCAN
+nn <- frNN(x, eps = .5)
+db <- dbscan(nn, minPts = 5)
+db
+#> DBSCAN clustering for 150 objects.
+#> Parameters: eps = 0.5, minPts = 5
+#> Using euclidean distances and borderpoints = TRUE
+#> The clustering contains 2 cluster(s) and 17 noise points.
+#> 
+#>  0  1  2 
+#> 17 49 84 
+#> 
+#> Available fields: cluster, eps, minPts, metric, borderPoints
+
+clplot(x, cl = db)
 ```

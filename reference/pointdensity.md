@@ -16,6 +16,7 @@ pointdensity(
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0
 )
 ```
@@ -38,7 +39,7 @@ pointdensity(
   points inside the eps-neighborhood, the eps-neighborhood density
   estimate, or a Gaussian density estimate be returned?
 
-- search, bucketSize, splitRule, approx:
+- search, bucketSize, splitRule, shrinkRule, approx:
 
   algorithmic parameters for
   [`frNN()`](https://michael.hahsler.net/dbscan/reference/frNN.md).

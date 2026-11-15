@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dbscan</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,27 @@
       <small>Source: <a href="https://github.com/mhahsler/dbscan/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.3.1" id="dbscan-131-unreleased">dbscan 1.3.1 (unreleased)<a class="anchor" aria-label="anchor" href="#dbscan-131-unreleased"></a></h2>
+<div class="section level3">
+<h3 id="changes-1-3-1">Changes<a class="anchor" aria-label="anchor" href="#changes-1-3-1"></a></h3>
+<ul><li>
+<strong>ANN:</strong> Added <code>search = "bdtree"</code> (box-decomposition tree) as a nearest neighbor search option for <code><a href="../reference/kNN.html">kNN()</a></code>, <code><a href="../reference/frNN.html">frNN()</a></code>, <code><a href="../reference/sNN.html">sNN()</a></code> and the functions using them.</li>
+<li>
+<strong>ANN:</strong> Added the <code>shrinkRule</code> parameter (<code>"none"</code>, <code>"simple"</code>, <code>"centroid"</code>, <code>"suggest"</code>) to <code><a href="../reference/kNN.html">kNN()</a></code>, <code><a href="../reference/frNN.html">frNN()</a></code> and <code><a href="../reference/sNN.html">sNN()</a></code> to control how the box-decomposition tree is built when <code>search = "bdtree"</code>. The default is ANN’s suggested rule.</li>
+<li>
+<code><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort()</a></code> for <code>frNN</code> objects: <code>decreasing = TRUE</code> now sorts by decreasing distance for objects that were already sorted.</li>
+<li>
+<code><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort()</a></code> for <code>sNN</code> objects: <code>decreasing = FALSE</code> now sorts by increasing number of shared neighbors for objects that were already sorted (ties are broken by increasing id). <code><a href="../reference/sNN.html">sNN()</a></code> now gives an informative error if <code>k</code> is missing and <code>x</code> is not a kNN object, and the error for <code>kt &gt; k</code> now says “at most k”.</li>
+<li>
+<code><a href="../reference/kNN.html">kNN()</a></code>: <code>sort = FALSE</code> now returns unsorted results (<code>$sort</code> is <code>FALSE</code>) and <code>sort = TRUE</code> breaks ties in distance by id. <code>sort(x, decreasing = TRUE)</code> now sorts by decreasing distance for objects that were already sorted.</li>
+<li>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for <code>kNN</code>, <code>frNN</code> and <code>sNN</code> objects now projects data with more than two columns onto the first two principal components (using <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp()</a></code>) instead of showing only the first two columns. Axis labels can be set with <code>xlab</code> and <code>ylab</code>.</li>
+<li>
+<code><a href="../reference/hullplot.html">hullplot()</a></code> and <code><a href="../reference/hullplot.html">clplot()</a></code> label the axes with the principal components (and the variance they explain) when the data is projected. Axis labels can be set with <code>xlab</code> and <code>ylab</code>.</li>
+<li>Improved the documentation of <code><a href="../reference/kNN.html">kNN()</a></code>, <code><a href="../reference/frNN.html">frNN()</a></code> and <code><a href="../reference/sNN.html">sNN()</a></code> (shared description of the search parameters, <code>approx</code>, sorting, input requirements, NAs).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.3.0" id="dbscan-130-2026-11-14">dbscan 1.3.0 (2026-11-14)<a class="anchor" aria-label="anchor" href="#dbscan-130-2026-11-14"></a></h2>
 <div class="section level3">

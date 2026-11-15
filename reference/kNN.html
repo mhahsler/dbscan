@@ -5,9 +5,9 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Find the k Nearest Neighbors — kNN"><meta name="description" content="This function uses a k-d tree to find all k nearest neighbors in a data
-matrix (including distances) fast."><meta property="og:description" content="This function uses a k-d tree to find all k nearest neighbors in a data
-matrix (including distances) fast."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Find the k Nearest Neighbors — kNN"><meta name="description" content="This function finds all k nearest neighbors in a data
+matrix (including distances)."><meta property="og:description" content="This function finds all k nearest neighbors in a data
+matrix (including distances)."><meta property="og:image" content="https://michael.hahsler.net/dbscan/logo.svg"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +15,7 @@ matrix (including distances) fast."><meta property="og:image" content="https://m
 
     <a class="navbar-brand me-2" href="../index.html">dbscan</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,8 +52,8 @@ matrix (including distances) fast."><meta property="og:image" content="https://m
     </div>
 
     <div class="ref-description section level2">
-    <p>This function uses a k-d tree to find all k nearest neighbors in a data
-matrix (including distances) fast.</p>
+    <p>This function finds all k nearest neighbors in a data
+matrix (including distances).</p>
     </div>
 
     <div class="section level2">
@@ -66,6 +66,7 @@ matrix (including distances) fast.</p>
 <span>  search <span class="op">=</span> <span class="st">"kdtree"</span>,</span>
 <span>  bucketSize <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  splitRule <span class="op">=</span> <span class="st">"suggest"</span>,</span>
+<span>  shrinkRule <span class="op">=</span> <span class="st">"suggest"</span>,</span>
 <span>  approx <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -84,7 +85,8 @@ matrix (including distances) fast.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>a data matrix, a <a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object or a kNN object.</p></dd>
+<dd><p>a numeric data matrix (or data.frame), a <a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object or a kNN
+object.</p></dd>
 
 
 <dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
@@ -98,40 +100,49 @@ specified then <code>x</code> needs to be a data matrix.</p></dd>
 
 
 <dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
-<dd><p>sort the neighbors by distance? Note that some search methods
-already sort the results. Sorting is expensive and <code>sort = FALSE</code> may
-be much faster for some search methods. kNN objects can be sorted using
+<dd><p>sort the neighbors of each point by distance (ties are broken by
+id)? <code>sort = FALSE</code> skips this step and returns the neighbors in the order
+found by the search, which is faster. kNN objects can be sorted later using
 <code><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort()</a></code>.</p></dd>
 
 
 <dt id="arg-search">search<a class="anchor" aria-label="anchor" href="#arg-search"></a></dt>
-<dd><p>nearest neighbor search strategy (one of <code>"kdtree"</code>, <code>"linear"</code> or
-<code>"dist"</code>).</p></dd>
+<dd><p>nearest neighbor search strategy (one of <code>"kdtree"</code>, <code>"linear"</code>,
+<code>"dist"</code> or <code>"bdtree"</code>). See the section on the search parameters.</p></dd>
 
 
 <dt id="arg-bucketsize">bucketSize<a class="anchor" aria-label="anchor" href="#arg-bucketsize"></a></dt>
-<dd><p>max size of the k-d tree leafs.</p></dd>
+<dd><p>max size of the k-d or bd tree leafs.</p></dd>
 
 
 <dt id="arg-splitrule">splitRule<a class="anchor" aria-label="anchor" href="#arg-splitrule"></a></dt>
-<dd><p>rule to split the k-d tree. One of <code>"std"</code>, <code>"midpt"</code>, <code>"fair"</code>,
-<code>"sl_midpt"</code>, <code>"sl_fair"</code> or <code>"suggest"</code>. The default value <code>"suggest"</code> uses
-ANNs best guess.</p></dd>
+<dd><p>rule to split the k-d or bd tree. One of <code>"std"</code>, <code>"midpt"</code>, <code>"fair"</code>,
+<code>"sl_midpt"</code>, <code>"sl_fair"</code> or <code>"suggest"</code> (SL stands for sliding). The default
+value <code>"suggest"</code> uses ANNs best guess.</p></dd>
+
+
+<dt id="arg-shrinkrule">shrinkRule<a class="anchor" aria-label="anchor" href="#arg-shrinkrule"></a></dt>
+<dd><p>shrinking rule used to build the box-decomposition tree
+(only used for <code>search = "bdtree"</code>). One of <code>"none"</code> (no shrinking, equivalent
+to a k-d tree), <code>"simple"</code>, <code>"centroid"</code> or <code>"suggest"</code>. The default value
+<code>"suggest"</code> uses ANNs best guess.</p></dd>
 
 
 <dt id="arg-approx">approx<a class="anchor" aria-label="anchor" href="#arg-approx"></a></dt>
-<dd><p>use approximate nearest neighbors. All NN up to a distance of
-a factor of <code>1 + approx</code> eps may be used. Some actual NN may be omitted
-leading to spurious clusters and noise points.  However, the algorithm will
-enjoy a significant speedup.</p></dd>
+<dd><p>approximation factor for the tree-based searches. The j-th
+neighbor found is at most <code>(1 + approx)</code> times as far away as the true j-th
+nearest neighbor. <code>0</code> (default) gives exact results; larger values are
+faster, but some true nearest neighbors may be omitted. Ignored by
+<code>search = "linear"</code> and <code>"dist"</code>.</p></dd>
 
 
 <dt id="arg-decreasing">decreasing<a class="anchor" aria-label="anchor" href="#arg-decreasing"></a></dt>
-<dd><p>sort in decreasing order?</p></dd>
+<dd><p>for <code><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort()</a></code>, sort the neighbors by decreasing distance
+instead of increasing distance?</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>further arguments</p></dd>
+<dd><p>further arguments (ignored).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -139,46 +150,128 @@ enjoy a significant speedup.</p></dd>
     <p>An object of class <code>kNN</code> (subclass of <a href="NN.html">NN</a>) containing a
 list with the following components:</p>
 <dl><dt>dist </dt>
-<dd><p>a matrix with distances.</p></dd>
+<dd><p>a matrix with distances (one row per point in <code>x</code> or <code>query</code>,
+one column per neighbor).</p></dd>
 
 <dt>id </dt>
-<dd><p>a matrix with <code>ids</code>.</p></dd>
+<dd><p>a matrix with the row numbers in <code>x</code> of the neighbors.</p></dd>
 
 <dt>k </dt>
 <dd><p>number <code>k</code> used.</p></dd>
 
+<dt>sort </dt>
+<dd><p>logical; are the neighbors in each row sorted by increasing
+distance (with ties broken by id)?</p></dd>
+
 <dt>metric </dt>
-<dd><p>used distance metric.</p></dd>
+<dd><p>used distance metric. This is <code>"euclidean"</code> for data
+matrices. For a <a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object, it is the method stored in the object (which
+can be <code>NULL</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Handling of ties and self-matches</p><ul><li><p><strong>Ties:</strong> If the kth and the (k+1)th nearest neighbor are tied, then the
+    <p>To speed up k nearest neighbors, a k-d tree is used
+for data matrices by default. Box-decomposition trees, linear search,
+and precomputing distance matrices are also available.</p><div class="section">
+<h3 id="using-a-knn-object-as-x">Using a kNN object as <code>x</code><a class="anchor" aria-label="anchor" href="#using-a-knn-object-as-x"></a></h3>
+
+
+<p>If <code>x</code> is a <code>kNN</code> object, then the first <code>k</code> neighbors are returned
+(sorted by distance). All other arguments are ignored. An error is
+raised if <code>x</code> contains fewer than <code>k</code> neighbors.</p>
+</div>
+
+<div class="section">
+<h3 id="sorting-ties-and-self-matches">Sorting, ties and self-matches<a class="anchor" aria-label="anchor" href="#sorting-ties-and-self-matches"></a></h3>
+
+<ul><li><p><strong>Sorting:</strong> With <code>sort = TRUE</code> (default), the neighbors of each point are
+ordered by distance and ties are broken by id. With <code>sort = FALSE</code>, the
+neighbors are returned in the order found by the search (the tree-based
+searches return them by increasing distance, but tied neighbors are
+not ordered by id), which avoids the cost of sorting.
+A <code>kNN</code> object can be sorted later using <code><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort()</a></code>.</p></li>
+<li><p><strong>Ties:</strong> If the kth and the (k+1)th nearest neighbor are tied, then the
 neighbor found first is returned and the other one is ignored.</p></li>
-<li><p><strong>Self-matches:</strong> If no query is specified, then self-matches are
-removed.</p></li>
-</ul><p>Details on the search parameters:</p><ul><li><p><code>search</code> controls if
-a k-d tree or linear search (both implemented in the ANN library; see Mount
-and Arya, 2010). Note, that these implementations cannot handle NAs.
-<code>search = "dist"</code> precomputes Euclidean distances first using R. NAs are
-handled, but the resulting distance matrix cannot contain NAs. To use other
-distance measures, a precomputed distance matrix can be provided as <code>x</code>
-(<code>search</code> is ignored).</p></li>
-<li><p><code>bucketSize</code> and <code>splitRule</code> influence how the k-d tree is
-built. <code>approx</code> uses the approximate nearest neighbor search
-implemented in ANN. All nearest neighbors up to a distance of
-<code>eps / (1 + approx)</code> will be considered and all with a distance
-greater than <code>eps</code> will not be considered. The other points might be
-considered. Note that this results in some actual nearest neighbors being
-omitted leading to spurious clusters and noise points. However, the
-algorithm will enjoy a significant speedup. For more details see Mount and
-Arya (2010).</p></li>
+<li><p><strong>Self-matches:</strong> If no <code>query</code> is specified, then self-matches are
+removed. If <code>query</code> is specified, then a query point that is also in <code>x</code>
+is returned as its own nearest neighbor (at distance 0).</p></li>
 </ul></div>
+
+<div class="section">
+<h3 id="input-requirements">Input requirements<a class="anchor" aria-label="anchor" href="#input-requirements"></a></h3>
+
+<ul><li><p><code>x</code> can be a numeric matrix, a data.frame with only numeric columns, a
+<a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object or a <code>kNN</code> object.</p></li>
+<li><p><code>query</code> needs to be a numeric matrix or
+data.frame with the same number of columns as <code>x</code>, and can only be used
+if <code>x</code> is a data matrix.</p></li>
+<li><p><code>k</code> needs to be a whole number with <code>1 &lt;= k &lt; nrow(x)</code>.</p></li>
+</ul></div>
+
+<div class="section">
+<h3 id="non-euclidean-distances">Non-Euclidean distances<a class="anchor" aria-label="anchor" href="#non-euclidean-distances"></a></h3>
+
+
+<p>To use non-Euclidean distances, a distance matrix needs to be precomputed
+by the user and supplied as <code>x</code>. Note that this leads to restrictions
+of the number of observations that can be used since the distance
+matrix grows with \(O(n^2)\).</p>
+</div>
+
+<div class="section">
+<h3 id="details-on-the-search-parameters-">Details on the search parameters:<a class="anchor" aria-label="anchor" href="#details-on-the-search-parameters-"></a></h3>
+
+<ul><li><p><code>search</code> controls what method is used if <code>x</code> is a data matrix.
+Available methods are:</p><ul><li><p><code>"kdtree"</code> uses a Euclidean k-d tree to speed up NN search.
+This is the default with good overall performance.</p></li>
+<li><p><code>"bdtree"</code> uses a box-decomposition tree. Its spatial boxes can, in
+addition to splitting, also shrink. According to the ANN authors, this
+tree type may be faster than a k-d tree on tightly clustered data.</p></li>
+<li><p><code>"linear"</code> performs linear search directly on the data.</p></li>
+<li><p><code>"dist"</code> precomputes Euclidean distances first using <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist()</a></code>. While fast
+for small data sets, the memory requirements for the distance matrix grow
+with \(O(n^2)\).</p></li>
+</ul><p>The trees and linear search use the highly optimized ANN library (Mount
+and Arya, 2010) for Euclidean distances.</p>
+<p>If <code>x</code> is a distance matrix, then <code>search</code> is ignored and <code>"dist"</code>
+is used.</p></li>
+<li><p>Tree specific parameters</p><ul><li><p><code>bucketSize</code>, <code>splitRule</code> and <code>shrinkRule</code> control how the tree is
+built. <code>bucketSize</code> and <code>splitRule</code> apply to k-d and bd trees;
+<code>shrinkRule</code> applies only to bd trees (<code>"none"</code> gives a tree that
+behaves like a k-d tree).</p></li>
+<li><p><code>approx</code> uses the approximate nearest neighbor search implemented in
+ANN. If <code>approx &gt; 0</code>, the distance to the j-th returned neighbor is at
+most <code>(1 + approx)</code> times the distance to the true j-th nearest
+neighbor, so some true nearest neighbors may be omitted. This can lead
+to a significant speedup. The default <code>approx = 0</code> gives exact
+results. <code>approx</code> is only used by the tree-based searches. For more
+details see Mount and Arya (2010).</p></li>
+</ul></li>
+</ul></div>
+
+<div class="section">
+<h3 id="handling-of-nas-">Handling of <code>NA</code>s:<a class="anchor" aria-label="anchor" href="#handling-of-nas-"></a></h3>
+
+
+<p>The tree-based searches and <code>search = "linear"</code> cannot handle <code>NA</code>, <code>NaN</code> or
+infinite values in the data (in <code>x</code> or <code>query</code>); an error is raised. (The ANN
+library does not check its input and would silently return wrong results.)
+With <code>search = "dist"</code>, the distances are calculated by <code><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist()</a></code>, which
+leaves out coordinates that are <code>NA</code> for a pair of points and scales up
+the remaining sum. These distances are not exactly Euclidean distances.
+The resulting distance matrix (and a <a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a> object supplied as <code>x</code>)
+cannot contain <code>NA</code>s, which happens, for example, if a point has only
+<code>NA</code> values. Otherwise, remove or impute missing values before
+performing the search.</p>
+</div>
+
+    </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>David M. Mount and Sunil Arya (2010). ANN: A Library for
 Approximate Nearest Neighbor Searching,
-<a href="http://www.cs.umd.edu/~mount/ANN/" class="external-link">http://www.cs.umd.edu/~mount/ANN/</a>.</p>
+<a href="https://www.cs.umd.edu/~mount/ANN/" class="external-link">https://www.cs.umd.edu/~mount/ANN/</a>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -227,11 +320,12 @@ Approximate Nearest Neighbor Searching,
 <span class="r-in"><span><span class="va">q</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">100</span><span class="op">)</span>,<span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">kNN</span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">10</span>, query <span class="op">=</span> <span class="va">q</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">x</span>, col <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># we plot the first two features for iris</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, col <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">q</span>, pch <span class="op">=</span> <span class="fl">3</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="kNN-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 3: find kNN using distances</span></span></span>
+<span class="r-in"><span><span class="co"># Example 3: find kNN using a precomputed (non-Euclidean) distance matrix</span></span></span>
 <span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"manhattan"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">kNN</span><span class="op">(</span><span class="va">d</span>, k <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">nn</span>, <span class="va">x</span><span class="op">)</span></span></span>

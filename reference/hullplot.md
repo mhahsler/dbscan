@@ -19,10 +19,22 @@ hullplot(
   solid = TRUE,
   alpha = 0.2,
   main = "Convex Cluster Hulls",
+  xlab = NULL,
+  ylab = NULL,
   ...
 )
 
-clplot(x, cl, col = NULL, pch = NULL, cex = 0.5, main = "Cluster Plot", ...)
+clplot(
+  x,
+  cl,
+  col = NULL,
+  pch = NULL,
+  cex = 0.5,
+  main = "Cluster Plot",
+  xlab = NULL,
+  ylab = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -68,6 +80,12 @@ clplot(x, cl, col = NULL, pch = NULL, cex = 0.5, main = "Cluster Plot", ...)
 - main:
 
   main title.
+
+- xlab, ylab:
+
+  axis labels. The default is to use the column names of `x` or, if the
+  data is projected, the principal components with the percentage of
+  variance they explain.
 
 - ...:
 

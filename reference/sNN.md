@@ -15,6 +15,7 @@ sNN(
   search = "kdtree",
   bucketSize = 10,
   splitRule = "suggest",
+  shrinkRule = "suggest",
   approx = 0
 )
 
@@ -45,61 +46,75 @@ print(x, ...)
 
 - jp:
 
-  In regular sNN graphs, two points that are not neighbors can have
-  shared neighbors. Javis and Patrick (1973) requires the two points to
-  be neighbors, otherwise the count is zeroed out. `TRUE` uses this
-  behavior.
+  In regular sNN graphs, a point and one of its neighbors can have
+  shared neighbors even if the point is not one of the neighbor's `k`
+  nearest neighbors. Jarvis and Patrick (1973) require the neighbor
+  relation to be mutual: the point also needs to be among the neighbor's
+  `k` nearest neighbors, otherwise the count is zeroed out. `TRUE` uses
+  this behavior.
 
 - sort:
 
-  sort by the number of shared nearest neighbors? Note that this is
+  sort the neighbors of each point by the number of shared nearest
+  neighbors (decreasing, ties are broken by id)? Note that this is
   expensive and `sort = FALSE` is much faster. sNN objects can be sorted
-  using [`sort()`](https://rdrr.io/r/base/sort.html).
+  later using [`sort()`](https://rdrr.io/r/base/sort.html).
 
 - search:
 
-  nearest neighbor search strategy (one of `"kdtree"`, `"linear"` or
-  `"dist"`).
+  nearest neighbor search strategy (one of `"kdtree"`, `"linear"`,
+  `"dist"` or `"bdtree"`). See the section on the search parameters.
 
 - bucketSize:
 
-  max size of the k-d tree leafs.
+  max size of the k-d or bd tree leafs.
 
 - splitRule:
 
-  rule to split the k-d tree. One of `"STD"`, `"MIDPT"`, `"FAIR"`,
-  `"SL_MIDPT"`, `"SL_FAIR"` or `"SUGGEST"` (SL stands for sliding).
-  `"SUGGEST"` uses ANNs best guess.
+  rule to split the k-d or bd tree. One of `"std"`, `"midpt"`, `"fair"`,
+  `"sl_midpt"`, `"sl_fair"` or `"suggest"` (SL stands for sliding). The
+  default value `"suggest"` uses ANNs best guess.
+
+- shrinkRule:
+
+  shrinking rule used to build the box-decomposition tree (only used for
+  `search = "bdtree"`). One of `"none"` (no shrinking, equivalent to a
+  k-d tree), `"simple"`, `"centroid"` or `"suggest"`. The default value
+  `"suggest"` uses ANNs best guess.
 
 - approx:
 
-  use approximate nearest neighbors. All NN up to a distance of a factor
-  of `(1 + approx) eps` may be used. Some actual NN may be omitted
-  leading to spurious clusters and noise points. However, the algorithm
-  will enjoy a significant speedup.
+  approximation factor for the tree-based searches. The j-th neighbor
+  found is at most `(1 + approx)` times as far away as the true j-th
+  nearest neighbor. `0` (default) gives exact results; larger values are
+  faster, but some true nearest neighbors may be omitted. Ignored by
+  `search = "linear"` and `"dist"`.
 
 - decreasing:
 
-  logical; sort in decreasing order?
+  for [`sort()`](https://rdrr.io/r/base/sort.html), sort by decreasing
+  number of shared neighbors (the default)? Use `FALSE` for increasing
+  order.
 
 - ...:
 
-  additional parameters are passed on.
+  further arguments (ignored).
 
 ## Value
 
 An object of class `sNN` (subclass of
 [kNN](https://michael.hahsler.net/dbscan/reference/kNN.md) and
 [NN](https://michael.hahsler.net/dbscan/reference/NN.md)) containing a
-list with the following components:
+list with the following components (the matrices have one row per point
+and `k` columns; edges removed by `kt` are `NA`):
 
 - id :
 
-  a matrix with ids.
+  a matrix with the ids (row numbers in `x`) of the neighbors.
 
 - dist:
 
-  a matrix with the distances.
+  a matrix with the distances to the neighbors.
 
 - shared :
 
@@ -107,7 +122,22 @@ list with the following components:
 
 - k :
 
-  number of `k` used.
+  the number `k` used.
+
+- sort :
+
+  logical; are the neighbors sorted by increasing distance? This is
+  `FALSE` if `sort = TRUE` was used, since the neighbors are then sorted
+  by the number of shared neighbors.
+
+- sort_shared :
+
+  logical; are the neighbors sorted by decreasing number of shared
+  neighbors?
+
+- kt :
+
+  the threshold `kt` used (`NULL` if none).
 
 - metric :
 
@@ -115,19 +145,103 @@ list with the following components:
 
 ## Details
 
-The number of shared nearest neighbors of two points p and q is the
-intersection of the kNN neighborhood of two points. Note: that each
-point is considered to be part of its own kNN neighborhood. The range
-for the shared nearest neighbors is \\\[0, k\]\\. The result is a n-by-k
-matrix called `shared`. Each row is a point and the columns are the
-point's k nearest neighbors. The value is the count of the shared
-neighbors.
+The number of shared nearest neighbors of two points p and q is the size
+of the intersection of the kNN neighborhoods of the two points. Note
+that each point is considered to be part of its own kNN neighborhood.
+The range for the shared nearest neighbors is \\\[0, k\]\\. The result
+is a n-by-k matrix called `shared`. Each row is a point and the columns
+are the point's k nearest neighbors. The value `shared[i, j]` is the
+count of the shared neighbors of point `i` and its j-th neighbor.
 
 The shared nearest neighbor graph connects a point with all its nearest
 neighbors if they have at least one shared neighbor. The number of
-shared neighbors can be used as an edge weight. Javis and Patrick (1973)
-use a slightly modified (see parameter `jp`) shared nearest neighbor
-graph for clustering.
+shared neighbors can be used as an edge weight. Jarvis and Patrick
+(1973) use a slightly modified (see parameter `jp`) shared nearest
+neighbor graph for clustering.
+
+The `k` nearest neighbors are found with
+[`kNN()`](https://michael.hahsler.net/dbscan/reference/kNN.md). The
+search parameters are passed on to it (see the section on the search
+parameters below).
+
+### Using a kNN object as `x`
+
+If `x` is a `kNN` object, then `k` can be omitted and `x$k` is used. If
+`k` is smaller than `x$k`, then the first `k` neighbors (by distance)
+are used. An error is raised if `x` contains fewer than `k` neighbors.
+The search parameters are ignored. A `query` is not supported.
+
+### Thresholding and sorting
+
+- **Threshold `kt`:** If `kt` is specified, then only edges with at
+  least `kt` shared neighbors are kept (`kt` needs to be at most `k`).
+  The entries for removed edges are set to `NA` in `id`, `dist` and
+  `shared`.
+  [`adjacencylist()`](https://michael.hahsler.net/dbscan/reference/NN.md)
+  skips them.
+
+- **Sorting:** The neighbors are found without sorting. With
+  `sort = TRUE` (default), the neighbors of each point (the columns of
+  `id`, `dist` and `shared`) are then reordered by decreasing number of
+  shared neighbors (ties are broken by id). The columns then no longer
+  follow the distance rank, and `$sort` is `FALSE`. A `sNN` object can
+  be sorted later using [`sort()`](https://rdrr.io/r/base/sort.html).
+
+### Details on the search parameters:
+
+- `search` controls what method is used if `x` is a data matrix.
+  Available methods are:
+
+  - `"kdtree"` uses a Euclidean k-d tree to speed up NN search. This is
+    the default with good overall performance.
+
+  - `"bdtree"` uses a box-decomposition tree. Its spatial boxes can, in
+    addition to splitting, also shrink. According to the ANN authors,
+    this tree type may be faster than a k-d tree on tightly clustered
+    data.
+
+  - `"linear"` performs linear search directly on the data.
+
+  - `"dist"` precomputes Euclidean distances first using
+    [`dist()`](https://rdrr.io/r/stats/dist.html). While fast for small
+    data sets, the memory requirements for the distance matrix grow with
+    \\O(n^2)\\.
+
+  The trees and linear search use the highly optimized ANN library
+  (Mount and Arya, 2010) for Euclidean distances.
+
+  If `x` is a distance matrix, then `search` is ignored and `"dist"` is
+  used.
+
+- Tree specific parameters
+
+  - `bucketSize`, `splitRule` and `shrinkRule` control how the tree is
+    built. `bucketSize` and `splitRule` apply to k-d and bd trees;
+    `shrinkRule` applies only to bd trees (`"none"` gives a tree that
+    behaves like a k-d tree).
+
+  - `approx` uses the approximate nearest neighbor search implemented in
+    ANN. If `approx > 0`, the distance to the j-th returned neighbor is
+    at most `(1 + approx)` times the distance to the true j-th nearest
+    neighbor, so some true nearest neighbors may be omitted. This can
+    lead to a significant speedup. The default `approx = 0` gives exact
+    results. `approx` is only used by the tree-based searches. For more
+    details see Mount and Arya (2010).
+
+### Handling of `NA`s:
+
+The tree-based searches and `search = "linear"` cannot handle `NA`,
+`NaN` or infinite values in the data (in `x` or `query`); an error is
+raised. (The ANN library does not check its input and would silently
+return wrong results.) With `search = "dist"`, the distances are
+calculated by [`dist()`](https://rdrr.io/r/stats/dist.html), which
+leaves out coordinates that are `NA` for a pair of points and scales up
+the remaining sum. These distances are not exactly Euclidean distances.
+The resulting distance matrix (and a
+[dist](https://rdrr.io/r/stats/dist.html) object supplied as `x`) cannot
+contain `NA`s, which happens, for example, if a point has only `NA`
+values. Otherwise, remove or impute missing values before performing the
+search.
 
 ## References
 
@@ -136,7 +250,15 @@ Measure Based on Shared Near Neighbors. *IEEE Trans. Comput.* 22, 11
 (November 1973), 1025-1034.
 [doi:10.1109/T-C.1973.223640](https://doi.org/10.1109/T-C.1973.223640)
 
+David M. Mount and Sunil Arya (2010). ANN: A Library for Approximate
+Nearest Neighbor Searching, <http://www.cs.umd.edu/~mount/ANN/>.
+
 ## See also
+
+[`sNNclust()`](https://michael.hahsler.net/dbscan/reference/sNNclust.md)
+and
+[`jpclust()`](https://michael.hahsler.net/dbscan/reference/jpclust.md),
+which cluster using the shared nearest neighbor graph.
 
 Other NN functions:
 [`NN`](https://michael.hahsler.net/dbscan/reference/NN.md),
@@ -777,4 +899,11 @@ adjacencylist(nn_3)
 #>   1   2   3 
 #>  71 128 139 
 #> 
+
+# Jarvis-Patrick graph (requires mutual nearest neighbors)
+nn_jp <- sNN(x, k = k, jp = TRUE)
+table(as.vector(nn_jp$shared))
+#> 
+#>   0   1   2   3   4   5 
+#> 268  18  72 184 166  42 
 ```

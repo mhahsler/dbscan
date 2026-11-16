@@ -1,35 +1,15 @@
-# dbscan 1.3.1 (unreleased)
+# dbscan 1.3.0 (2026-11-15)
 
 ## Changes
-* __ANN:__ Added `search = "bdtree"` (box-decomposition tree) as a nearest neighbor
-  search option for `kNN()`, `frNN()`, `sNN()` and the functions using them.
-* __ANN:__ Added the `shrinkRule` parameter (`"none"`, `"simple"`, `"centroid"`,
-  `"suggest"`) to `kNN()`, `frNN()` and `sNN()` to control how the box-decomposition
-  tree is built when `search = "bdtree"`. The default is ANN's suggested rule.
-* `sort()` for `frNN` objects: `decreasing = TRUE` now sorts by decreasing distance for
-  objects that were already sorted.
-* `sort()` for `sNN` objects: `decreasing = FALSE` now sorts by increasing number of
-  shared neighbors for objects that were already sorted (ties are broken by increasing id).
-  `sNN()` now gives an informative error if `k` is missing and `x` is not a kNN
-  object, and the error for `kt > k` now says "at most k".
-* `kNN()`: `sort = FALSE` now returns unsorted results (`$sort` is `FALSE`) and
-  `sort = TRUE` breaks ties in distance by id. `sort(x, decreasing = TRUE)` now sorts
-  by decreasing distance for objects that were already sorted.
-* `plot()` for `kNN`, `frNN` and `sNN` objects now projects data with more than two
-  columns onto the first two principal components (using `prcomp()`) instead of
-  showing only the first two columns. Axis labels can be set with `xlab` and `ylab`.
-* `hullplot()` and `clplot()` label the axes with the principal components (and the
-  variance they explain) when the data is projected. Axis labels can be set with
-  `xlab` and `ylab`.
-* Improved the documentation of `kNN()`, `frNN()` and `sNN()` (shared description of the
-  search parameters, `approx`, sorting, input requirements, NAs).
-
-# dbscan 1.3.0 (2026-11-14)
-
-## Changes
-* __ANN:__ Added RAII model for ANN. ANN searches now release point storage, trees, 
+* __ANN:__ 
+  - Added RAII model for ANN. ANN searches now release point storage, trees, 
   and search buffers automatically when C++ exceptions or user interrupts 
   unwind a call.
+  - Added `search = "bdtree"` (box-decomposition tree) as a nearest neighbor
+  search option for `kNN()`, `frNN()`, `sNN()` and the functions using them
+  and added the `shrinkRule` parameter (`"none"`, `"simple"`, `"centroid"`,
+  `"suggest"`) to `kNN()`, `frNN()` and `sNN()` to control how the box-decomposition
+  tree is built.
 * __HDBSCAN__ 
   - New `mst_dist()` (single-linkage hierarchy of the minimum spanning tree of a `dist`
     object as an `hclust` object) and `mst_mrdist()` (MST of the mutual
@@ -41,17 +21,28 @@
   - `hdbscan()` now records `minPts` in its `hc` component. `extractFOSC()` uses it
     as the default for `minPts`.
 * __OPTICS__
-  - optics(): The default `eps = Inf` uses an unlimited
-    neighborhood and gives the complete reachability structure. It is computed
-    exactly with a memory efficient Prim-style scan.
+  - The default `eps = Inf` uses now an unlimited
+    neighborhood and gives the complete reachability structure. This changes the 
+    previous behavior where an imperfect heuristic was used to determine a 
+    suitable value for `eps`.
   - optics() now gives a warning if a finite `eps` results in undefined
-    reachability distances in addition to the first one.
-  - optics(): Ties in the reachability distance are now broken in favor of the
+    reachability distances.
+  - Ties in the reachability distance are now broken in favor of the
     point with the lower id (row number), following the current ELKI
     implementation. The `predecessor` component also is now consistent 
     with ELKI 0.8.0.
   - extractXi(): The implementation was updated to follow the OPTICS Xi cluster
     extraction in ELKI 0.8.0 (Schubert and Gertz, 2018). 
+* __kNN search__
+  - `sNN()` now gives an informative error if `k` is missing and `x` is not a kNN
+    object, and the error for `kt > k` now says "at most k".
+  - `sort()` for `frNN` objects: `decreasing = TRUE` now sorts by decreasing distance for
+    objects that were already sorted.
+  - `sort()` for `sNN` objects: `decreasing = FALSE` now sorts by increasing number of
+    shared neighbors for objects that were already sorted (ties are broken by increasing id).
+  - `kNN()`: `sort = FALSE` now returns unsorted results (`$sort` is `FALSE`) and
+    `sort = TRUE` breaks ties in distance by id. `sort(x, decreasing = TRUE)` now sorts
+    by decreasing distance for objects that were already sorted.
 * __Plotting__
   - All plot functions now consistently pass on ... to the underlying plot function
     from graphics.
@@ -59,11 +50,17 @@
     draw the undefined first reachability distance) and `type`. `plot()` for
     `optics` objects gained the argument `col` and no longer has the unused
     arguments `cluster` and `predecessor`.
+  - `plot()` for `kNN`, `frNN` and `sNN` objects now projects data with more than two
+    columns onto the first two principal components (using `prcomp()`) instead of
+    showing only the first two columns. Axis labels can be set with `xlab` and `ylab`.
   - `kNNdistplot()` gained the arguments `type`, `xlab`, `ylab`, and
     `kNNdist_param` (a list passing additional arguments, e.g., k-d tree
     parameters, on to `kNNdist()`). `...` now passes graphical parameters on to
     `plot.default()` (or `matplot()` for several values of `k`) instead of to
     `kNN()`.
+  - `hullplot()` and `clplot()` label the axes with the principal components (and the
+  variance they explain) when the data is projected. Axis labels can be set with
+  `xlab` and `ylab`.
 * __Sanitizer:__ Added sanitizer runs (skipped on CRAN).
 
 ## Bugfixes

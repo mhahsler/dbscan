@@ -83,6 +83,11 @@
 #'
 #' The MST is pruned using stability and clusters are extracted
 #' in the unsupervised version implemented in [`extractFOSC()`].
+#' Stability is the excess-of-mass measure defined for HDBSCAN*.
+#' In the cluster tree, a child cluster replaces its parent only if the
+#' children's combined stability is larger than the parent's, so
+#' long-lived, high-mass clusters are favored.
+#'
 #' Because one `minPts` value sets both the density smoothing and the minimum
 #' cluster size in HDBSCAN, using a different minimum cluster size
 #' requires an explicit call to [extractFOSC()] with the new `minPts`,

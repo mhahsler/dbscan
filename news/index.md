@@ -6,6 +6,10 @@
 
 - Added the dataset `clusterable_data` (2309 2-d points), the example
   data from the HDBSCAN documentation on soft clustering.
+- Added the dataset `epsilon_data` (118 2-d points with clusters of
+  various densities) from Malzer and Baum (2020). It replaces the data
+  that was typed into the HDBSCAN(e) example of
+  [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md).
 
 ### Changes
 
@@ -19,7 +23,8 @@
     of the condensed tree as `"eps"` (default) or as `"lambda"` (1/eps).
   - [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
     `hdbscan` objects now shows a color bar that maps the colors of the
-    condensed tree to the number of points in a cluster.
+    condensed tree to the number of points in a cluster. The default for
+    `gradient` is now the viridis palette.
   - The `scale` parameter of
     [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
     `hdbscan` objects now defaults to 1 (numeric). The value `"suggest"`

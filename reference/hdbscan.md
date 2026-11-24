@@ -23,7 +23,7 @@ print(x, ...)
 plot(
   x,
   scale = 1,
-  gradient = c("yellow", "red"),
+  gradient = grDevices::hcl.colors(100, palette = "viridis"),
   show_flat = FALSE,
   main = "HDBSCAN*",
   ylab = NULL,
@@ -96,9 +96,16 @@ predict(object, newdata, data, ...)
 
 - gradient:
 
-  character vector; the colors used to build a color ramp for the
-  cluster bars in the condensed tree. The first color is used for small
-  clusters and the last color for large clusters.
+  the color palette for the cluster bars in the condensed tree. The
+  default is the viridis palette. It can be a character vector with at
+  least two colors, the name of a palette available in
+  [`grDevices::hcl.colors()`](https://rdrr.io/r/grDevices/palettes.html)
+  (e.g., `"plasma"`), or a function that takes the number of colors and
+  returns a vector of colors (e.g., a palette created with
+  [`grDevices::colorRampPalette()`](https://rdrr.io/r/grDevices/colorRamp.html)).
+  The colors are interpolated to a continuous ramp. The first color
+  represents 0 points and the last color represents all points in the
+  data set.
 
 - show_flat:
 
@@ -318,12 +325,12 @@ each cluster is drawn as a shaded bar.
   narrower as points leave the cluster as noise or split off into child
   clusters. The widths can be rescaled with `scale`.
 
-- **Color** also shows the size of a cluster. It is a single color per
-  cluster that represents the number of points in the cluster when it is
-  born, picked from the `gradient` (first color for small clusters, last
-  color for large ones). Unlike the width, it does not change along the
-  bar. A color bar at the right side of the plot (`colorbar = TRUE`)
-  maps the colors to the number of points.
+- **Color** shows the same number as the width: the number of points in
+  the cluster at that height. The colors are picked continuously from
+  the `gradient` (first color for 0 points, last color for all points in
+  the data set), so the color of a bar changes along the bar as points
+  leave the cluster. A color bar at the right side of the plot
+  (`colorbar = TRUE`) maps the colors to the number of points.
 
 - The **y-axis** shows the distance `eps` (mutual reachability distance)
   at which clusters split or lose points, or with `yscale = "lambda"`,
@@ -419,58 +426,33 @@ clplot(moons, res)
 
 
 ## Example for HDBSCAN(e) using cluster_selection_epsilon
-# data with clusters of various densities.
-X <- data.frame(
- x = c(
-  0.08, 0.46, 0.46, 2.95, 3.50, 1.49, 6.89, 6.87, 0.21, 0.15,
-  0.15, 0.39, 0.80, 0.80, 0.37, 3.63, 0.35, 0.30, 0.64, 0.59, 1.20, 1.22,
-  1.42, 0.95, 2.70, 6.36, 6.36, 6.36, 6.60, 0.04, 0.71, 0.57, 0.24, 0.24,
-  0.04, 0.04, 1.35, 0.82, 1.04, 0.62, 0.26, 5.98, 1.67, 1.67, 0.48, 0.15,
-  6.67, 6.67, 1.20, 0.21, 3.99, 0.12, 0.19, 0.15, 6.96, 0.26, 0.08, 0.30,
-  1.04, 1.04, 1.04, 0.62, 0.04, 0.04, 0.04, 0.82, 0.82, 1.29, 1.35, 0.46,
-  0.46, 0.04, 0.04, 5.98, 5.98, 6.87, 0.37, 6.47, 6.47, 6.47, 6.67, 0.30,
-  1.49, 3.21, 3.21, 0.75, 0.75, 0.46, 0.46, 0.46, 0.46, 3.63, 0.39, 3.65,
-  4.09, 4.01, 3.36, 1.43, 3.28, 5.94, 6.35, 6.87, 5.60, 5.99, 0.12, 0.00,
-  0.32, 0.39, 0.00, 1.63, 1.36, 5.67, 5.60, 5.79, 1.10, 2.99, 0.39, 0.18
-  ),
- y = c(
-  7.41, 8.01, 8.01, 5.44, 7.11, 7.13, 1.83, 1.83, 8.22, 8.08,
-  8.08, 7.20, 7.83, 7.83, 8.29, 5.99, 8.32, 8.22, 7.38, 7.69, 8.22, 7.31,
-  8.25, 8.39, 6.34, 0.16, 0.16, 0.16, 1.66, 7.55, 7.90, 8.18, 8.32, 8.32,
-  7.97, 7.97, 8.15, 8.43, 7.83, 8.32, 8.29, 1.03, 7.27, 7.27, 8.08, 7.27,
-  0.79, 0.79, 8.22, 7.73, 6.62, 7.62, 8.39, 8.36, 1.73, 8.29, 8.04, 8.22,
-  7.83, 7.83, 7.83, 8.32, 8.11, 7.69, 7.55, 7.20, 7.20, 8.01, 8.15, 7.55,
-  7.55, 7.97, 7.97, 1.03, 1.03, 1.24, 7.20, 0.47, 0.47, 0.47, 0.79, 8.22,
-  7.13, 6.48, 6.48, 7.10, 7.10, 8.01, 8.01, 8.01, 8.01, 5.99, 8.04, 5.22,
-  5.82, 5.14, 4.81, 7.62, 5.73, 0.55, 1.31, 0.05, 0.95, 1.59, 7.99, 7.48,
-  8.38, 7.12, 2.01, 1.40, 0.00, 9.69, 9.47, 9.25, 2.63, 6.89, 0.56, 3.11
- )
-)
+# data with clusters of various densities (Malzer and Baum, 2020).
+data(epsilon_data)
 
 ## HDBSCAN splits one cluster
-hdb <- hdbscan(X, minPts = 3)
+hdb <- hdbscan(epsilon_data, minPts = 3)
 plot(hdb, show_flat = TRUE)
 
-hullplot(X, hdb, main = "HDBSCAN")
+hullplot(epsilon_data, hdb, main = "HDBSCAN")
 #> Warning: Not enough colors. Some colors will be reused.
 
 
 ## DBSCAN* marks the least dense cluster as outliers
-db <- dbscan(X, eps = 1, minPts = 3, borderPoints = FALSE)
-hullplot(X, db, main = "DBSCAN*")
+db <- dbscan(epsilon_data, eps = 1, minPts = 3, borderPoints = FALSE)
+hullplot(epsilon_data, db, main = "DBSCAN*")
 
 
 ## HDBSCAN(e) mixes HDBSCAN AND DBSCAN* to find all clusters
-hdbe <- hdbscan(X, minPts = 3, cluster_selection_epsilon = 1)
+hdbe <- hdbscan(epsilon_data, minPts = 3, cluster_selection_epsilon = 1)
 plot(hdbe, show_flat = TRUE)
 
-hullplot(X, hdbe, main = "HDBSCAN(e)")
+hullplot(epsilon_data, hdbe, main = "HDBSCAN(e)")
 
 
 ## Manually perform the steps of HDBSCAN
-d <- mrdist(X, minPts = 3)
+d <- mrdist(epsilon_data, minPts = 3)
 mst_hc <- mst_dist(d)
 cl <- extractFOSC(mst_hc)
-hullplot(X, cl$cluster, main = "HDBSCAN")
+hullplot(epsilon_data, cl$cluster, main = "HDBSCAN")
 #> Warning: Not enough colors. Some colors will be reused.
 ```

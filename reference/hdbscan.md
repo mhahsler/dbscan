@@ -22,12 +22,14 @@ print(x, ...)
 # S3 method for class 'hdbscan'
 plot(
   x,
-  scale = "suggest",
+  scale = 1,
   gradient = c("yellow", "red"),
   show_flat = FALSE,
   main = "HDBSCAN*",
-  ylab = "eps value",
+  ylab = NULL,
   leaflab = "none",
+  yscale = "eps",
+  colorbar = TRUE,
   ...
 )
 
@@ -87,14 +89,16 @@ predict(object, newdata, data, ...)
 
 - scale:
 
-  integer; used to scale condensed tree based on the graphics device.
-  Lower scale results in wider colored trees lines. The default
-  `'suggest'` sets scale to the number of clusters.
+  numeric; factor used to scale the width of the bars in the condensed
+  tree, which show the number of points in each cluster. The bar widths
+  are multiplied by `scale` (and divided by the number of clusters), so
+  larger values draw wider bars. The default is 1.
 
 - gradient:
 
-  character vector; the colors to build the condensed tree coloring
-  with.
+  character vector; the colors used to build a color ramp for the
+  cluster bars in the condensed tree. The first color is used for small
+  clusters and the last color for large clusters.
 
 - show_flat:
 
@@ -106,12 +110,23 @@ predict(object, newdata, data, ...)
 
 - ylab:
 
-  the label for the y axis.
+  the label for the y axis. The default is the value of `yscale`.
 
 - leaflab:
 
   a string specifying how leaves are labeled (see
   [`stats::plot.dendrogram()`](https://rdrr.io/r/stats/dendrogram.html)).
+
+- yscale:
+
+  character; what the y axis of the condensed tree shows: `"eps"` (the
+  default) shows the distance at which clusters split or lose points and
+  `"lambda"` shows its inverse, \\\lambda = 1/\epsilon\\.
+
+- colorbar:
+
+  logical; show a color bar (legend) that maps the colors of the
+  `gradient` to the number of points in a cluster?
 
 - coredist:
 
@@ -291,6 +306,29 @@ to DBSCAN\*. `cluster_selection_epsilon` is especially useful for cases
 where HDBSCAN\* produces too many small clusters that need to be merged,
 while still being able to extract clusters of variable densities at
 higher levels.
+
+### Condensed tree plot
+
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) draws the
+condensed tree: the simplified cluster hierarchy as a dendrogram where
+each cluster is drawn as a shaded bar.
+
+- **Width** shows the number of points that are still in the cluster at
+  that height. A bar is widest where the cluster is born and gets
+  narrower as points leave the cluster as noise or split off into child
+  clusters. The widths can be rescaled with `scale`.
+
+- **Color** also shows the size of a cluster. It is a single color per
+  cluster that represents the number of points in the cluster when it is
+  born, picked from the `gradient` (first color for small clusters, last
+  color for large ones). Unlike the width, it does not change along the
+  bar. A color bar at the right side of the plot (`colorbar = TRUE`)
+  maps the colors to the number of points.
+
+- The **y-axis** shows the distance `eps` (mutual reachability distance)
+  at which clusters split or lose points, or with `yscale = "lambda"`,
+  its inverse \\\lambda = 1/\epsilon\\. Larger \\\lambda\\ values mean
+  higher density.
 
 ### Cluster membership prediction for new points
 

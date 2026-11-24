@@ -13,8 +13,17 @@
   - [`hdbscan()`](https://michael.hahsler.net/dbscan/reference/hdbscan.md)
     gained the parameter `min_cluster_size` (default: `minPts`) to
     decouple the minimum cluster size used for stability calculation
-    from `minPts`, which now only controls the smoothing of the density
-    estimate. The default reproduces the previous results.
+    from
+  - [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+    `hdbscan` objects gained the parameter `yscale` to show the y-axis
+    of the condensed tree as `"eps"` (default) or as `"lambda"` (1/eps).
+  - [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+    `hdbscan` objects now shows a color bar that maps the colors of the
+    condensed tree to the number of points in a cluster.
+  - The `scale` parameter of
+    [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+    `hdbscan` objects now defaults to 1 (numeric). The value `"suggest"`
+    is deprecated and is treated as 1.
 
 ### Bug fixes
 

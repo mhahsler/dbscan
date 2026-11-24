@@ -59,7 +59,12 @@
 <ul><li>
 <strong>HDBSCAN</strong>
 <ul><li>
-<code><a href="../reference/hdbscan.html">hdbscan()</a></code> gained the parameter <code>min_cluster_size</code> (default: <code>minPts</code>) to decouple the minimum cluster size used for stability calculation from <code>minPts</code>, which now only controls the smoothing of the density estimate. The default reproduces the previous results.</li>
+<code><a href="../reference/hdbscan.html">hdbscan()</a></code> gained the parameter <code>min_cluster_size</code> (default: <code>minPts</code>) to decouple the minimum cluster size used for stability calculation from</li>
+<li>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for <code>hdbscan</code> objects gained the parameter <code>yscale</code> to show the y-axis of the condensed tree as <code>"eps"</code> (default) or as <code>"lambda"</code> (1/eps).</li>
+<li>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for <code>hdbscan</code> objects now shows a color bar that maps the colors of the condensed tree to the number of points in a cluster.</li>
+<li>The <code>scale</code> parameter of <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for <code>hdbscan</code> objects now defaults to 1 (numeric). The value <code>"suggest"</code> is deprecated and is treated as 1.</li>
 </ul></li>
 </ul></div>
 <div class="section level3">

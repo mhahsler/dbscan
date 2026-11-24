@@ -74,12 +74,14 @@ algorithms.</p>
 <span><span class="co"># S3 method for class 'hdbscan'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  scale <span class="op">=</span> <span class="st">"suggest"</span>,</span>
+<span>  scale <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  gradient <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"yellow"</span>, <span class="st">"red"</span><span class="op">)</span>,</span>
 <span>  show_flat <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"HDBSCAN*"</span>,</span>
-<span>  ylab <span class="op">=</span> <span class="st">"eps value"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  leaflab <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  yscale <span class="op">=</span> <span class="st">"eps"</span>,</span>
+<span>  colorbar <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -138,14 +140,16 @@ explicitly computed (see Campello et al, 2013).</p></dd>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
-<dd><p>integer; used to scale condensed tree based on the graphics
-device. Lower scale results in wider colored trees lines.
-The default <code>'suggest'</code> sets scale to the number of clusters.</p></dd>
+<dd><p>numeric; factor used to scale the width of the bars in the
+condensed tree, which show the number of points in each cluster. The bar
+widths are multiplied by <code>scale</code> (and divided by the number of clusters),
+so larger values draw wider bars. The default is 1.</p></dd>
 
 
 <dt id="arg-gradient">gradient<a class="anchor" aria-label="anchor" href="#arg-gradient"></a></dt>
-<dd><p>character vector; the colors to build the condensed tree
-coloring with.</p></dd>
+<dd><p>character vector; the colors used to build a color ramp for
+the cluster bars in the condensed tree. The first color is used for small
+clusters and the last color for large clusters.</p></dd>
 
 
 <dt id="arg-show-flat">show_flat<a class="anchor" aria-label="anchor" href="#arg-show-flat"></a></dt>
@@ -158,11 +162,22 @@ clusters.</p></dd>
 
 
 <dt id="arg-ylab">ylab<a class="anchor" aria-label="anchor" href="#arg-ylab"></a></dt>
-<dd><p>the label for the y axis.</p></dd>
+<dd><p>the label for the y axis. The default is the value of <code>yscale</code>.</p></dd>
 
 
 <dt id="arg-leaflab">leaflab<a class="anchor" aria-label="anchor" href="#arg-leaflab"></a></dt>
 <dd><p>a string specifying how leaves are labeled (see <code><a href="https://rdrr.io/r/stats/dendrogram.html" class="external-link">stats::plot.dendrogram()</a></code>).</p></dd>
+
+
+<dt id="arg-yscale">yscale<a class="anchor" aria-label="anchor" href="#arg-yscale"></a></dt>
+<dd><p>character; what the y axis of the condensed tree shows:
+<code>"eps"</code> (the default) shows the distance at which clusters split or lose
+points and <code>"lambda"</code> shows its inverse, \(\lambda = 1/\epsilon\).</p></dd>
+
+
+<dt id="arg-colorbar">colorbar<a class="anchor" aria-label="anchor" href="#arg-colorbar"></a></dt>
+<dd><p>logical; show a color bar (legend) that maps the colors of
+the <code>gradient</code> to the number of points in a cluster?</p></dd>
 
 
 <dt id="arg-coredist">coredist<a class="anchor" aria-label="anchor" href="#arg-coredist"></a></dt>
@@ -328,6 +343,27 @@ where HDBSCAN* produces too many small clusters that
 need to be merged, while still being able to extract clusters
 of variable densities at higher levels.</p>
 </div>
+
+<div class="section">
+<h3 id="condensed-tree-plot">Condensed tree plot<a class="anchor" aria-label="anchor" href="#condensed-tree-plot"></a></h3>
+
+
+<p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> draws the condensed tree: the simplified cluster hierarchy as a
+dendrogram where each cluster is drawn as a shaded bar.</p><ul><li><p><strong>Width</strong> shows the number of points that are still in the cluster at that
+height. A bar is widest where the cluster is born and gets narrower as
+points leave the cluster as noise or split off into child clusters.
+The widths can be rescaled with <code>scale</code>.</p></li>
+<li><p><strong>Color</strong> also shows the size of a cluster. It is a single color per
+cluster that represents the number of points in the cluster when it is
+born, picked from the <code>gradient</code> (first color for small clusters, last
+color for large ones). Unlike the width, it does not change along the bar.
+A color bar at the right side of the plot (<code>colorbar = TRUE</code>) maps the
+colors to the number of points.</p></li>
+<li><p>The <strong>y-axis</strong> shows the distance <code>eps</code> (mutual reachability distance) at
+which clusters split or lose points, or with <code>yscale = "lambda"</code>, its
+inverse \(\lambda = 1/\epsilon\). Larger \(\lambda\) values mean
+higher density.</p></li>
+</ul></div>
 
 <div class="section">
 <h3 id="cluster-membership-prediction-for-new-points">Cluster membership prediction for new points<a class="anchor" aria-label="anchor" href="#cluster-membership-prediction-for-new-points"></a></h3>

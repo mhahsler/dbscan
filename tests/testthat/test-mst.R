@@ -23,6 +23,8 @@ test_that("mst_dist", {
   expect_no_error(dend <- as.dendrogram(hc))
   expect_equal(nobs(dend), 60)
   expect_setequal(labels(dend), rownames(x))
+  grDevices::pdf(NULL)  # avoid creating Rplots.pdf
+  on.exit(grDevices::dev.off(), add = TRUE)
   expect_no_error(plot(hc))
 
   # merge rows keep the MST order and are not normalized to the hclust

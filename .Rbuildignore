@@ -23,3 +23,5 @@ _config.yml
 ^tmp$
 ^man-roxygen$
 WORK
+
+^tests/testthat/Rplots\.pdf$

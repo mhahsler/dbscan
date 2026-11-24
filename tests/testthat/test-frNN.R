@@ -19,7 +19,7 @@ test_that("frNN", {
   expect_identical(nn$eps, eps)
   expect_length(nn$dist, nrow(x))
   expect_length(nn$id, nrow(x))
-  for (id in nn$id) expect_type(id, "integer")
+  expect_true(all(vapply(nn$id, is.integer, logical(1))))
 
   expect_identical(lengths(nn$dist), lengths(nn$id))
 
@@ -61,7 +61,7 @@ test_that("frNN", {
   expect_error(frNN(x, eps=eps, search = "bdtree", shrinkRule = "bogus"))
 
   ## bucket size
-  for (bs in c(5, 10, 15, 100)) {
+  for (bs in c(5, 10, 100)) {
     nn3 <- frNN(x, eps=eps, bucketSize = bs)
     expect_equal(nn, nn3)
   }

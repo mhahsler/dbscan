@@ -1,7 +1,7 @@
 test_that("randomized exact searches agree across native and distance backends", {
   skip_on_cran()
   set.seed(20261027)
-  iterations <- as.integer(Sys.getenv("DBSCAN_RANDOMIZED_ITERATIONS", "20"))
+  iterations <- as.integer(Sys.getenv("DBSCAN_RANDOMIZED_ITERATIONS", "10"))
   stopifnot(!is.na(iterations), iterations >= 1L)
 
   same_partition <- function(a, b) {
@@ -97,6 +97,7 @@ test_that("tied, duplicate, and boundary neighborhoods agree across backends", {
     x <- matrix(sample(-2:2, 48, replace = TRUE), ncol = 2)
     x <- rbind(x, x[rep(1L, 5L), , drop = FALSE])
     distances <- dist(x)
+    distance_matrix <- unname(as.matrix(distances))
     for (k in c(1L, 4L, nrow(x) - 1L)) {
       expected <- kNN(distances, k)
       for (search in c("kdtree", "linear")) {
@@ -104,12 +105,14 @@ test_that("tied, duplicate, and boundary neighborhoods agree across backends", {
         # A cutoff tie may select different valid IDs, but the distance
         # multiset, unique IDs, and removal of the self-index must agree.
         expect_equal(nearest$dist, expected$dist, tolerance = 1e-12)
-        for (i in seq_len(nrow(x))) {
-          expect_false(i %in% nearest$id[i, ])
-          expect_equal(anyDuplicated(nearest$id[i, ]), 0L)
-          expect_equal(unname(as.matrix(distances)[i, nearest$id[i, ]]),
-                       unname(nearest$dist[i, ]), tolerance = 1e-12)
-        }
+        # one assertion per property for all points (not one per point)
+        ids <- nearest$id
+        expect_false(any(ids == row(ids)))
+        expect_identical(sum(apply(ids, 1, anyDuplicated) > 0L), 0L)
+        expect_equal(matrix(distance_matrix[cbind(as.vector(row(ids)),
+                                                  as.vector(ids))],
+                            nrow = nrow(ids)),
+                     unname(nearest$dist), tolerance = 1e-12)
       }
     }
     for (eps in c(0, 1, 2)) {

@@ -45,3 +45,6 @@ python/**/*.egg-info/
 
 # local scratch files (e.g., ELKI jar and outputs)
 /tmp/
+
+# graphics device output from running tests/examples
+Rplots.pdf

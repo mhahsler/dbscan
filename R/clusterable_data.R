@@ -1,8 +1,9 @@
 #' Clusterable Data (HDBSCAN Soft Clustering Example)
 #'
 #' Contains 2309 2-d points with clusters of different shapes, sizes and
-#' densities plus background noise. It is the example data used in the
-#' HDBSCAN documentation to explain soft clustering.
+#' densities plus background noise.
+#' The data is from McInnes, Healy and Astels (2017) and is available as part
+#' of the contributed scikit-learn compatible project HDBSCAN.
 #'
 #' @name clusterable_data
 #' @docType data
@@ -25,5 +26,6 @@
 #' cl <- hdbscan(clusterable_data, minPts = 15)
 #' cl
 #'
+#' plot(cl)
 #' clplot(clusterable_data, cl)
 NULL

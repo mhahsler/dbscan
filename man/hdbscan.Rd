@@ -178,6 +178,11 @@ only works with Euclidean distances.
 
 The MST is pruned using stability and clusters are extracted
 in the unsupervised version implemented in \code{\link[=extractFOSC]{extractFOSC()}}.
+Stability is the excess-of-mass measure defined for HDBSCAN*.
+In the cluster tree, a child cluster replaces its parent only if the
+children's combined stability is larger than the parent's, so
+long-lived, high-mass clusters are favored.
+
 Because one \code{minPts} value sets both the density smoothing and the minimum
 cluster size in HDBSCAN, using a different minimum cluster size
 requires an explicit call to \code{\link[=extractFOSC]{extractFOSC()}} with the new \code{minPts},

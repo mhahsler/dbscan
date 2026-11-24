@@ -415,8 +415,7 @@ plot.optics <-
            col = NULL,
            ...) {
 
-    if (is.null(col))
-        col <- x$cluster[x$order] + 1L
+    col <- col %||% (x$cluster[x$order] + 1L)
 
     # OPTICS cluster extraction methods
     if (inherits(x$cluster, "xics") ||

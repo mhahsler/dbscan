@@ -95,12 +95,10 @@ kNNdistplot <- function(x, k, minPts, type = "l",
   if (missing(k))
     k <- minPts - 1
 
-  if (is.null(xlab))
-    xlab <- "Points sorted by distance"
+  xlab <- xlab %||% "Points sorted by distance"
 
   if (length(k) == 1) {
-    if (is.null(ylab))
-      ylab <- paste0(k, "-NN distances")
+    ylab <- ylab %||% paste0(k, "-NN distances")
 
     kNNd <- sort(do.call(kNNdist, c(list(x, k), as.list(kNNdist_param))))
     graphics::plot.default(
@@ -112,8 +110,7 @@ kNNdistplot <- function(x, k, minPts, type = "l",
     )
 
   } else {
-    if (is.null(ylab))
-      ylab <- paste0("k-NN distances for k={", paste(k, collapse = ","),"}")
+    ylab <- ylab %||% paste0("k-NN distances for k={", paste(k, collapse = ","), "}")
     knnds <- vapply(k, function(i)
       sort(do.call(kNNdist, c(list(x, i), as.list(kNNdist_param)))),
       numeric(nrow(as.matrix(x))))

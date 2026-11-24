@@ -124,9 +124,7 @@ hullplot <- function(x,
   if (!is.numeric(cl))
     stop("Could not get cluster assignment vector from cl.")
 
-  #if(is.null(col)) col <- c("#000000FF", rainbow(n=max(cl)))
-  if (is.null(col))
-    col <- palette()
+  col <- col %||% palette()
 
   # Note: We use the first color for noise points
   if (length(col) == 1L)

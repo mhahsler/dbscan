@@ -237,14 +237,7 @@ extractFOSC <-
       stop("extractFOSC expects constraints to be either an adjacency list or adjacency matrix.")
 
     ## Use the minPts the hierarchy was built with (hdbscan) as the default.
-    minPts_hc <- x$minPts
-    if (is.null(minPts)) {
-      if (!is.null(minPts_hc)) {
-        minPts <- minPts_hc
-      } else {
-        minPts <- 2L
-      }
-    }
+    minPts <- minPts %||% x$minPts %||% 2L
     minPts <- .validate_integer_scalar(minPts, "minPts", min = 2)
     if (!is.numeric(cluster_selection_epsilon) ||
         length(cluster_selection_epsilon) != 1L ||

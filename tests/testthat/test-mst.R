@@ -158,3 +158,42 @@ test_that("minPts is optional if coredist is given", {
   expect_error(mst_mrdist(x), "minPts is required")
   expect_error(mst_mrdist(x, minPts = 1, coredist = cd))
 })
+
+test_that("lower-triangle index does not overflow for long dist objects", {
+  # closed form in double arithmetic (exact below 2^53)
+  pos0 <- function(n, i, j) {
+    n <- as.double(n)
+    a <- as.double(pmin(i, j)); b <- as.double(pmax(i, j))
+    n * a - (a + 1) * a / 2 + b - a - 1
+  }
+  n <- 100000L
+  i <- c(0L, 5L, 46340L, 46341L, 50000L, 70000L, 99998L)
+  j <- c(1L, 99999L, 46341L, 46342L, 99999L, 60000L, 99999L)
+
+  expect_equal(dbscan:::lt_pos_cpp(n, i, j, FALSE), pos0(n, i, j))
+  expect_equal(dbscan:::lt_pos_cpp(n, j, i, FALSE), pos0(n, i, j))
+  expect_equal(dbscan:::lt_pos_cpp(n, i + 1L, j + 1L, TRUE), pos0(n, i, j))
+
+  # last element of the dist vector
+  expect_equal(dbscan:::lt_pos_cpp(n, n - 2L, n - 1L, FALSE), as.double(n) * (n - 1) / 2 - 1)
+
+  # agrees with stats::dist for a small object
+  d <- dist(matrix(rnorm(40), ncol = 2))
+  m <- as.matrix(d)
+  ii <- c(1L, 3L, 7L, 20L); jj <- c(2L, 9L, 20L, 4L)
+  expect_equal(unclass(d)[dbscan:::lt_pos_cpp(20L, ii - 1L, jj - 1L, FALSE) + 1],
+               m[cbind(ii, jj)])
+})
+
+test_that("mst_dist checks the size of the dist object", {
+  d <- dist(matrix(rnorm(20), ncol = 2))
+  expect_error(dbscan:::mst_dist_cpp(unclass(d), 11), "does not match")
+})
+
+test_that("dist_subset works", {
+  set.seed(1)
+  d <- dist(matrix(rnorm(60), ncol = 2))
+  idx <- c(2L, 5L, 11L, 30L)
+  expect_equal(as.vector(dbscan:::dist_subset(d, idx)),
+               as.vector(as.dist(as.matrix(d)[idx, idx])))
+})

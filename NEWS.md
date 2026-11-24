@@ -11,6 +11,15 @@
     `minPts`, which now only controls the smoothing of the density estimate.
     The default reproduces the previous results.
 
+## Bug fixes
+* Fixed integer overflow when indexing long `dist` objects (more than 46,340
+  objects) reported by nicoleannarogowski. 
+  `hdbscan()` and `mst_dist()` on a `dist` object, `dbcv()`, and
+  `GLOSH()` could silently return wrong results or crash with a segmentation
+  fault because the position in the lower-triangle distance vector was computed
+  in 32-bit integers. `mst_dist()` now also checks that the length of the `dist`
+  object matches its size.
+
 
 # dbscan 1.3.0 (2026-11-15)
 

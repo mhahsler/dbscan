@@ -125,6 +125,10 @@ mrd <- function(dm, cd) {
     .Call(`_dbscan_mrd`, dm, cd)
 }
 
+lt_pos_cpp <- function(n, i, j, one_based) {
+    .Call(`_dbscan_lt_pos_cpp`, n, i, j, one_based)
+}
+
 mst_dist_cpp <- function(x_dist, n) {
     .Call(`_dbscan_mst_dist_cpp`, x_dist, n)
 }

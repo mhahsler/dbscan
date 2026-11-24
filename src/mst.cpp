@@ -31,15 +31,33 @@
 // }
 
 
+// Position in a dist object (lower triangle vector) of the pair (i, j) with n objects.
+// Used to test the LT_POS0/LT_POS1 macros for long dist objects.
+// [[Rcpp::export]]
+NumericVector lt_pos_cpp(const double n, const IntegerVector i, const IntegerVector j,
+                         const bool one_based) {
+  if (i.length() != j.length()) stop("i and j need to have the same length.");
+  const R_xlen_t nn = (R_xlen_t) n;
+  NumericVector res(i.length());
+  for (R_xlen_t k = 0; k < i.length(); ++k)
+    res[k] = (double) (one_based ? LT_POS1(nn, i[k], j[k]) : LT_POS0(nn, i[k], j[k]));
+  return res;
+}
+
 // Prim's Algorithm
 // this implementation for dense dist objects avoids the use of a min-heap.
 // [[Rcpp::export]]
 Rcpp::NumericMatrix mst_dist_cpp(const NumericVector x_dist, const R_xlen_t n) {
+  if (n < 1)
+    stop("x needs to contain at least 1 object.");
+  if (x_dist.length() != n * (n - 1) / 2)
+    stop("the length of the dist object does not match n.");
+
   Rcpp::NumericMatrix mst = NumericMatrix(n - 1, 3);
   colnames(mst) = CharacterVector::create("from", "to", "weight");
 
   // vector to store the parent of vertex
-  std::vector<int> parent(n);
+  std::vector<R_xlen_t> parent(n);
   std::vector<double> weight(n, INFINITY);
   std::vector<bool> visited(n, false);
 
@@ -47,9 +65,9 @@ Rcpp::NumericMatrix mst_dist_cpp(const NumericVector x_dist, const R_xlen_t n) {
   parent[0] = -1;
   weight[0] = 0;
 
-  int next_node = 0;
+  R_xlen_t next_node = 0;
   double next_weight;
-  int node;
+  R_xlen_t node;
 
   while (next_node >= 0) {
     node = next_node;
@@ -63,7 +81,7 @@ Rcpp::NumericMatrix mst_dist_cpp(const NumericVector x_dist, const R_xlen_t n) {
       mst(node-1, 2) = weight[node];
     }
 
-    for (int i = 1; i < n; i++) { // 0 is always the first node
+    for (R_xlen_t i = 1; i < n; i++) { // 0 is always the first node
       if (visited[i] || node == i) continue;
 
       double the_weight = x_dist[LT_POS0(n, node, i)];
@@ -114,16 +132,16 @@ Rcpp::NumericMatrix mst_mrd(const NumericMatrix x, const NumericVector coredist)
   Rcpp::NumericMatrix mst = NumericMatrix(n - 1, 3);
   colnames(mst) = CharacterVector::create("from", "to", "weight");
 
-  std::vector<int> parent(n);
+  std::vector<R_xlen_t> parent(n);
   std::vector<double> weight(n, INFINITY);
   std::vector<bool> visited(n, false);
 
   parent[0] = -1;
   weight[0] = 0;
 
-  int next_node = 0;
+  R_xlen_t next_node = 0;
   double next_weight;
-  int node;
+  R_xlen_t node;
 
   while (next_node >= 0) {
     node = next_node;
@@ -140,7 +158,7 @@ Rcpp::NumericMatrix mst_mrd(const NumericMatrix x, const NumericVector coredist)
     const double *pn = &pts[node * d];
     const double cn = coredist[node];
 
-    for (int i = 1; i < n; i++) { // 0 is always the first node
+    for (R_xlen_t i = 1; i < n; i++) { // 0 is always the first node
       if (visited[i] || node == i) continue;
 
       // Euclidean distance (same accumulation order as stats::dist)

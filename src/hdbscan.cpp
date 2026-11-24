@@ -22,7 +22,8 @@ using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
 
 // Macros
-#define INDEX_TF(N,to,from) (N)*(to) - (to)*(to+1)/2 + (from) - (to) - (1)
+// all arguments are cast to R_xlen_t to avoid int overflow for long vectors
+#define INDEX_TF(N,to,from) (((R_xlen_t)(N))*((R_xlen_t)(to)) - ((R_xlen_t)(to))*(((R_xlen_t)(to))+1)/2 + ((R_xlen_t)(from)) - ((R_xlen_t)(to)) - 1)
 
 // Given a dist vector of "should-link" (1), "should-not-link" (-1), and "don't care" (0)
 // constraints in the form of integers, convert constraints to a more compact adjacency list
@@ -33,7 +34,7 @@ List distToAdjacency(IntegerVector constraints, const int N){
   for (int i = 0; i < N; ++i){
     for (int j = 0; j < N; ++j){
       if (i == j) continue;
-      int index = i > j ? INDEX_TF(N, j, i) : INDEX_TF(N, i, j);
+      R_xlen_t index = i > j ? INDEX_TF(N, j, i) : INDEX_TF(N, i, j);
       int crule = constraints.at(index);
       if (crule != 0){
         if (key_map.count(i+1) != 1){ key_map[i+1] = std::vector<int>(); } // add 1 for base 1

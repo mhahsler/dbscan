@@ -7,7 +7,7 @@ test_that("shrinkRule gives exact results for all bd-tree shrinking rules", {
   ref_lof <- lof(x, min_pts, search = "linear")
   ref_density <- pointdensity(x, eps, search = "linear")
   ref_db <- dbscan(x, eps, min_pts, borderPoints = FALSE, search = "linear")
-  ref_optics <- optics(x, eps, min_pts, search = "linear")
+  ref_optics <- optics(x, eps = Inf, minPts = min_pts, search = "linear")
 
   for (sr in c("none", "simple", "centroid", "suggest")) {
     expect_equal(lof(x, min_pts, search = "bdtree", shrinkRule = sr), ref_lof,
@@ -19,7 +19,7 @@ test_that("shrinkRule gives exact results for all bd-tree shrinking rules", {
       shrinkRule = sr)
     expect_identical(db$cluster, ref_db$cluster)
 
-    o <- optics(x, eps, min_pts, search = "bdtree", shrinkRule = sr)
+    o <- optics(x, eps = Inf, minPts = min_pts, search = "bdtree", shrinkRule = sr)
     expect_equal(o$order, ref_optics$order)
     expect_equal(o$reachdist, ref_optics$reachdist, tolerance = 1e-12)
 

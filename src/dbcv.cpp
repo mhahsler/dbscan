@@ -63,18 +63,18 @@ NumericVector dist_subset_arma(const NumericVector& dist, IntegerVector idx){
 // object to subset 'dist', and a (1-based!) integer vector 'idx' of the points to keep in the subset
 // [[Rcpp::export]]
 NumericVector dist_subset(const NumericVector& dist, IntegerVector idx){
-  const int n = dist.attr("Size");
-  const int cl_n = idx.length();
+  const R_xlen_t n = as<int>(dist.attr("Size"));
+  const R_xlen_t cl_n = idx.length();
   NumericVector new_dist = Rcpp::no_init((cl_n * (cl_n - 1))/2);
-  int ii = 0;
+  R_xlen_t ii = 0;
   for (IntegerVector::iterator i = idx.begin(); i != idx.end(); ++i){
     for (IntegerVector::iterator j = i; j != idx.end(); ++j){
       if (*i == *j) { continue; }
-      const int ij_idx = LT_POS1(n, *i, *j);
+      const R_xlen_t ij_idx = LT_POS1(n, *i, *j);
       new_dist[ii++] = dist[ij_idx];
     }
   }
-  new_dist.attr("Size") = cl_n;
+  new_dist.attr("Size") = (int) cl_n;
   new_dist.attr("class") = "dist";
   return(new_dist);
 }

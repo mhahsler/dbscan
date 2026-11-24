@@ -432,6 +432,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// lt_pos_cpp
+NumericVector lt_pos_cpp(const double n, const IntegerVector i, const IntegerVector j, const bool one_based);
+RcppExport SEXP _dbscan_lt_pos_cpp(SEXP nSEXP, SEXP iSEXP, SEXP jSEXP, SEXP one_basedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector >::type i(iSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector >::type j(jSEXP);
+    Rcpp::traits::input_parameter< const bool >::type one_based(one_basedSEXP);
+    rcpp_result_gen = Rcpp::wrap(lt_pos_cpp(n, i, j, one_based));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mst_dist_cpp
 Rcpp::NumericMatrix mst_dist_cpp(const NumericVector x_dist, const R_xlen_t n);
 RcppExport SEXP _dbscan_mst_dist_cpp(SEXP x_distSEXP, SEXP nSEXP) {
@@ -556,6 +570,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_dbscan_kNN_int", (DL_FUNC) &_dbscan_kNN_int, 7},
     {"_dbscan_lof_kNN", (DL_FUNC) &_dbscan_lof_kNN, 7},
     {"_dbscan_mrd", (DL_FUNC) &_dbscan_mrd, 2},
+    {"_dbscan_lt_pos_cpp", (DL_FUNC) &_dbscan_lt_pos_cpp, 4},
     {"_dbscan_mst_dist_cpp", (DL_FUNC) &_dbscan_mst_dist_cpp, 2},
     {"_dbscan_mst_mrd", (DL_FUNC) &_dbscan_mst_mrd, 2},
     {"_dbscan_hclustMergeOrder", (DL_FUNC) &_dbscan_hclustMergeOrder, 2},

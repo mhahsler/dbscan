@@ -123,6 +123,26 @@
 #' need to be merged, while still being able to extract clusters
 #' of variable densities at higher levels.
 #'
+#' ## Condensed tree plot
+#'
+#' `plot()` draws the condensed tree: the simplified cluster hierarchy as a
+#' dendrogram where each cluster is drawn as a shaded bar.
+#'
+#' * **Width** shows the number of points that are still in the cluster at that
+#'   height. A bar is widest where the cluster is born and gets narrower as
+#'   points leave the cluster as noise or split off into child clusters.
+#'   The widths can be rescaled with `scale`.
+#' * **Color** also shows the size of a cluster. It is a single color per
+#'   cluster that represents the number of points in the cluster when it is
+#'   born, picked from the `gradient` (first color for small clusters, last
+#'   color for large ones). Unlike the width, it does not change along the bar.
+#'   A color bar at the right side of the plot (`colorbar = TRUE`) maps the
+#'   colors to the number of points.
+#' * The **y-axis** shows the distance `eps` (mutual reachability distance) at
+#'   which clusters split or lose points, or with `yscale = "lambda"`, its
+#'   inverse \eqn{\lambda = 1/\epsilon}. Larger \eqn{\lambda} values mean
+#'   higher density.
+#'
 #' ## Cluster membership prediction for new points
 #'
 #' * `predict()` assigns each new data point to the same cluster as the nearest point
@@ -161,11 +181,13 @@
 #' explicitly computed (see Campello et al, 2013).
 #' @param verbose report progress.
 #' @param ...  additional arguments are passed on.
-#' @param scale integer; used to scale condensed tree based on the graphics
-#' device. Lower scale results in wider colored trees lines.
-#' The default `'suggest'` sets scale to the number of clusters.
-#' @param gradient character vector; the colors to build the condensed tree
-#' coloring with.
+#' @param scale numeric; factor used to scale the width of the bars in the
+#'    condensed tree, which show the number of points in each cluster. The bar
+#'    widths are multiplied by `scale` (and divided by the number of clusters),
+#'    so larger values draw wider bars. The default is 1.
+#' @param gradient character vector; the colors used to build a color ramp for
+#'    the cluster bars in the condensed tree. The first color is used for small
+#'    clusters and the last color for large clusters.
 #' @param show_flat logical; whether to draw boxes indicating the most stable
 #' clusters.
 #' @param coredist numeric vector with precomputed core distances (optional).
@@ -408,22 +430,32 @@ print.hdbscan <- function(x, ...) {
 
 #' @rdname hdbscan
 #' @param leaflab a string specifying how leaves are labeled (see [stats::plot.dendrogram()]).
-#' @param ylab the label for the y axis.
+#' @param ylab the label for the y axis. The default is the value of `yscale`.
+#' @param yscale character; what the y axis of the condensed tree shows:
+#'    `"eps"` (the default) shows the distance at which clusters split or lose
+#'    points and `"lambda"` shows its inverse, \eqn{\lambda = 1/\epsilon}.
+#' @param colorbar logical; show a color bar (legend) that maps the colors of
+#'    the `gradient` to the number of points in a cluster?
 #' @param main Title of the plot.
 #' @export
 plot.hdbscan <-
   function(x,
-           scale = "suggest",
+           scale = 1,
            gradient = c("yellow", "red"),
            show_flat = FALSE,
            main = "HDBSCAN*",
-           ylab = "eps value",
+           ylab = NULL,
            leaflab = "none",
+           yscale = "eps",
+           colorbar = TRUE,
            ...) {
     ## Logic checks
-    if (!(scale == "suggest" ||
-          scale > 0)) {
-      stop("scale parameter must be greater than 0.")
+    if (scale == "suggest") {
+      scale <- 1
+    }
+
+    if (!(.validate_nonnegative_scalar(scale) && scale > 0)) {
+      stop("scale parameter must be numeric scaler greater than 0.")
     }
 
     ## Main information needed
@@ -442,7 +474,28 @@ plot.hdbscan <-
         leaves_only = TRUE
       ))
 
+    #  y scale: eps or lambda
+    yscale <- match.arg(yscale, choices = c("eps", "lambda"))
+    ylab <- ylab %||% yscale
+
+    h <- numeric()
+    invisible(dendrapply(dend, function(node) {
+      h <<- c(h, attr(node, "height"))   # leaves without a height add nothing
+      node
+    }))
+
     scale <- ifelse(scale == "suggest", nclusters, nclusters / scale)
+
+
+    if (yscale == "eps") {
+      y_scale_eps <- pretty(c(0, max(h)))
+      y_scale <- y_scale_eps
+    } else {
+      h <- h[h > 0]
+      h <- 1 / h
+      y_scale <- pretty(c(0, max(h)))
+      y_scale_eps <- 1 / y_scale
+    }
 
     ## Color variables
     col_breaks <- seq(0, length(x$cluster) + nclusters, by = nclusters)
@@ -551,6 +604,18 @@ plot.hdbscan <-
       }
     }
 
+    ## Split the plotting window: condensed tree on the left, color bar on the
+    ## right. Note: layout() replaces any existing mfrow/layout setting.
+    if (colorbar) {
+      mar <- par("mar")
+      on.exit({
+        graphics::layout(1)
+        par(mar = mar)
+      }, add = TRUE)
+      graphics::layout(matrix(c(1, 2), nrow = 1), widths = c(5, 1))
+      par(mar = c(mar[1], mar[2], mar[3], 1))
+    }
+
     ## Run the recursive plotting. This calls stats::plot.dendrogram()
     plot(
       dend,
@@ -558,14 +623,47 @@ plot.hdbscan <-
       main = main,
       ylab = ylab,
       leaflab = leaflab,
+      yaxt = "n",
       ...
     )
+
+    graphics::axis(2, at = y_scale_eps, labels = y_scale, xpd = NA)
+
     eps_dfs(dend,
             index = 1,
             parent_height = 0,
             scale = scale)
+
+    if (colorbar) {
+      par(mar = c(mar[1], 1, mar[3], 4))
+      .plot_colorbar(col_breaks, gcolors, max = npoints, label = "points")
+    }
+
     return(invisible(x))
   }
+
+# Draw a vertical color bar in the current plot panel (used by plot.hdbscan()
+# in the second panel of a layout). The colors are binned: the bin that starts
+# at breaks[i] has color colors[i]. Only bins below `max` are shown, and the
+# last bin is cut off at `max`.
+.plot_colorbar <- function(breaks, colors, max, label = "") {
+  bins <- which(breaks < max)
+  edges <- c(breaks[bins], max)
+
+  graphics::image(
+    x = c(0, 1),
+    y = edges,
+    z = matrix(seq_along(bins), nrow = 1),
+    col = colors[bins],
+    breaks = seq(0, length(bins)) + 0.5,
+    axes = FALSE,
+    xlab = "",
+    ylab = ""
+  )
+  graphics::axis(4, las = 1)
+  graphics::box()
+  graphics::mtext(label, side = 4, line = 2.5)
+}
 
 #' @rdname hdbscan
 #' @export
@@ -591,9 +689,7 @@ mrdist <- function(x, minPts, coredist = NULL) {
                    upper = FALSE)
   }
 
-  if (is.null(coredist)) {
-    coredist <- coredist(x, minPts)
-  }
+  coredist <- coredist %||% coredist(x, minPts)
 
   # mr_dist <- as.vector(pmax(as.dist(outer(coredist, coredist, pmax)), x_dist))
   # much faster in C++

@@ -8,8 +8,13 @@
 * __HDBSCAN__
   - `hdbscan()` gained the parameter `min_cluster_size` (default: `minPts`) to
     decouple the minimum cluster size used for stability calculation from
-    `minPts`, which now only controls the smoothing of the density estimate.
-    The default reproduces the previous results.
+  - `plot()` for `hdbscan` objects gained the parameter `yscale` to show the
+    y-axis of the condensed tree as `"eps"` (default) or as
+    `"lambda"` (1/eps).
+  - `plot()` for `hdbscan` objects now shows a color bar that maps the colors
+    of the condensed tree to the number of points in a cluster.
+  - The `scale` parameter of `plot()` for `hdbscan` objects now defaults to 1
+    (numeric). The value `"suggest"` is deprecated and is treated as 1.
 
 ## Bug fixes
 * Fixed integer overflow when indexing long `dist` objects (more than 46,340

@@ -25,7 +25,7 @@ hdbscan(
 \method{plot}{hdbscan}(
   x,
   scale = 1,
-  gradient = c("yellow", "red"),
+  gradient = grDevices::hcl.colors(100, palette = "viridis"),
   show_flat = FALSE,
   main = "HDBSCAN*",
   ylab = NULL,
@@ -73,9 +73,14 @@ condensed tree, which show the number of points in each cluster. The bar
 widths are multiplied by \code{scale} (and divided by the number of clusters),
 so larger values draw wider bars. The default is 1.}
 
-\item{gradient}{character vector; the colors used to build a color ramp for
-the cluster bars in the condensed tree. The first color is used for small
-clusters and the last color for large clusters.}
+\item{gradient}{the color palette for the cluster bars in the condensed
+tree. The default is the viridis palette. It can be a character
+vector with at least two colors, the name of a palette available in
+\code{\link[grDevices:hcl.colors]{grDevices::hcl.colors()}} (e.g., \code{"plasma"}), or a function that takes the number
+of colors and returns a vector of colors (e.g., a palette created with
+\code{\link[grDevices:colorRampPalette]{grDevices::colorRampPalette()}}). The colors are interpolated to
+a continuous ramp. The first color represents 0 points and the last color
+represents all points in the data set.}
 
 \item{show_flat}{logical; whether to draw boxes indicating the most stable
 clusters.}
@@ -244,12 +249,13 @@ dendrogram where each cluster is drawn as a shaded bar.
 height. A bar is widest where the cluster is born and gets narrower as
 points leave the cluster as noise or split off into child clusters.
 The widths can be rescaled with \code{scale}.
-\item \strong{Color} also shows the size of a cluster. It is a single color per
-cluster that represents the number of points in the cluster when it is
-born, picked from the \code{gradient} (first color for small clusters, last
-color for large ones). Unlike the width, it does not change along the bar.
-A color bar at the right side of the plot (\code{colorbar = TRUE}) maps the
-colors to the number of points.
+\item \strong{Color} shows the same number as the width: the number of points in the
+cluster at that height. The colors are picked continuously from the
+\code{gradient} (first color for 0 points, last color for all points in the
+data set), so the color of a bar
+changes along the bar as points leave the cluster. A color bar at the
+right side of the plot (\code{colorbar = TRUE}) maps the colors to the number
+of points.
 \item The \strong{y-axis} shows the distance \code{eps} (mutual reachability distance) at
 which clusters split or lose points, or with \code{yscale = "lambda"}, its
 inverse \eqn{\lambda = 1/\epsilon}. Larger \eqn{\lambda} values mean

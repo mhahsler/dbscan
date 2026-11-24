@@ -132,12 +132,13 @@
 #'   height. A bar is widest where the cluster is born and gets narrower as
 #'   points leave the cluster as noise or split off into child clusters.
 #'   The widths can be rescaled with `scale`.
-#' * **Color** also shows the size of a cluster. It is a single color per
-#'   cluster that represents the number of points in the cluster when it is
-#'   born, picked from the `gradient` (first color for small clusters, last
-#'   color for large ones). Unlike the width, it does not change along the bar.
-#'   A color bar at the right side of the plot (`colorbar = TRUE`) maps the
-#'   colors to the number of points.
+#' * **Color** shows the same number as the width: the number of points in the
+#'   cluster at that height. The colors are picked continuously from the
+#'   `gradient` (first color for 0 points, last color for all points in the
+#'   data set), so the color of a bar
+#'   changes along the bar as points leave the cluster. A color bar at the
+#'   right side of the plot (`colorbar = TRUE`) maps the colors to the number
+#'   of points.
 #' * The **y-axis** shows the distance `eps` (mutual reachability distance) at
 #'   which clusters split or lose points, or with `yscale = "lambda"`, its
 #'   inverse \eqn{\lambda = 1/\epsilon}. Larger \eqn{\lambda} values mean
@@ -185,9 +186,14 @@
 #'    condensed tree, which show the number of points in each cluster. The bar
 #'    widths are multiplied by `scale` (and divided by the number of clusters),
 #'    so larger values draw wider bars. The default is 1.
-#' @param gradient character vector; the colors used to build a color ramp for
-#'    the cluster bars in the condensed tree. The first color is used for small
-#'    clusters and the last color for large clusters.
+#' @param gradient the color palette for the cluster bars in the condensed
+#'    tree. The default is the viridis palette. It can be a character
+#'    vector with at least two colors, the name of a palette available in
+#'    [grDevices::hcl.colors()] (e.g., `"plasma"`), or a function that takes the number
+#'    of colors and returns a vector of colors (e.g., a palette created with
+#'    [grDevices::colorRampPalette()]). The colors are interpolated to
+#'    a continuous ramp. The first color represents 0 points and the last color
+#'    represents all points in the data set.
 #' @param show_flat logical; whether to draw boxes indicating the most stable
 #' clusters.
 #' @param coredist numeric vector with precomputed core distances (optional).
@@ -441,7 +447,7 @@ print.hdbscan <- function(x, ...) {
 plot.hdbscan <-
   function(x,
            scale = 1,
-           gradient = c("yellow", "red"),
+           gradient = grDevices::hcl.colors(100, palette = "viridis"),
            show_flat = FALSE,
            main = "HDBSCAN*",
            ylab = NULL,
@@ -497,9 +503,13 @@ plot.hdbscan <-
       y_scale_eps <- 1 / y_scale
     }
 
-    ## Color variables
-    col_breaks <- seq(0, length(x$cluster) + nclusters, by = nclusters)
-    gcolors <- grDevices::colorRampPalette(gradient)(length(col_breaks))
+    ## Color function: continuous mapping of the number of points (0 to
+    ## npoints) to the colors in gradient
+    color_ramp <- grDevices::colorRamp(.as_gradient(gradient))
+    points_to_color <- function(n) {
+      grDevices::rgb(color_ramp(pmin(pmax(n / npoints, 0), 1)),
+                     maxColorValue = 255)
+    }
 
     ## Depth-first search to recursively plot rectangles
     eps_dfs <- function(dend, index, parent_height, scale) {
@@ -526,25 +536,26 @@ plot.hdbscan <-
       xleft <- coord[[1]] - normalize(widths) / scale
       xright <- coord[[1]] + normalize(widths) / scale
 
-      ## Top is always parent height, bottom is when the points died
-      ## Minor adjustment made if at the root equivalent to plot.dendrogram(edge.root=T)
-      if (cl_key == "0") {
-        ytop <-
-          rep(hd_info[[cl_key]]$eps_birth + 0.0625 * hd_info[[cl_key]]$eps_birth,
-              length(widths))
-        ybottom <- rep(hd_info[[cl_key]]$eps_death, length(widths))
-      } else {
-        ytop <- rep(parent_height, length(widths))
-        ybottom <-
-          c(
-            sort(hd_info[[cl_key]]$eps, decreasing = TRUE),
-            rep(hd_info[[cl_key]]$eps_death, hd_info[[cl_key]]$n_children)
-          )
-      }
+      ## Segments are horizontal slabs: each one starts where the points left
+      ## the cluster and ends where the segment above starts, so they do not
+      ## overlap. The top is the parent height. Minor adjustment made if at the
+      ## root equivalent to plot.dendrogram(edge.root=T)
+      ybottom <-
+        c(
+          sort(hd_info[[cl_key]]$eps, decreasing = TRUE),
+          rep(hd_info[[cl_key]]$eps_death, hd_info[[cl_key]]$n_children)
+        )
+      top <- if (cl_key == "0")
+        hd_info[[cl_key]]$eps_birth + 0.0625 * hd_info[[cl_key]]$eps_birth
+      else
+        parent_height
+      ytop <- if (length(ybottom) > 0L)
+        c(top, ybottom[-length(ybottom)])
+      else
+        numeric(0)
 
       ## Draw the rectangles
-      rect_color <-
-        gcolors[.bincode(length(widths), breaks = col_breaks)]
+      rect_color <- points_to_color(widths)
       graphics::rect(
         xleft = xleft,
         xright = xright,
@@ -636,26 +647,43 @@ plot.hdbscan <-
 
     if (colorbar) {
       par(mar = c(mar[1], 1, mar[3], 4))
-      .plot_colorbar(col_breaks, gcolors, max = npoints, label = "points")
+      .plot_colorbar(points_to_color, max = npoints, label = "points")
     }
 
     return(invisible(x))
   }
 
+# Convert the gradient parameter of plot.hdbscan() into a vector of colors.
+# It can be a vector of colors, the name of an hcl.colors() palette, or a
+# function that takes the number of colors.
+.as_gradient <- function(gradient) {
+  if (is.function(gradient)) {
+    gradient <- gradient(100L)
+  } else if (is.character(gradient) &&
+             length(gradient) == 1L &&
+             tolower(gradient) %in% tolower(grDevices::hcl.pals())) {
+    gradient <- grDevices::hcl.colors(100L, palette = gradient)
+  }
+
+  if (!is.character(gradient) || length(gradient) < 2L || anyNA(gradient))
+    stop(
+      "gradient needs to be a vector with at least two colors, the name of ",
+      "an hcl.colors() palette, or a function that returns colors."
+    )
+  gradient
+}
+
 # Draw a vertical color bar in the current plot panel (used by plot.hdbscan()
-# in the second panel of a layout). The colors are binned: the bin that starts
-# at breaks[i] has color colors[i]. Only bins below `max` are shown, and the
-# last bin is cut off at `max`.
-.plot_colorbar <- function(breaks, colors, max, label = "") {
-  bins <- which(breaks < max)
-  edges <- c(breaks[bins], max)
+# in the second panel of a layout). `color_fun` maps values between 0 and `max`
+# to colors.
+.plot_colorbar <- function(color_fun, max, label = "", n = 100L) {
+  values <- seq(0, max, length.out = n)
 
   graphics::image(
     x = c(0, 1),
-    y = edges,
-    z = matrix(seq_along(bins), nrow = 1),
-    col = colors[bins],
-    breaks = seq(0, length(bins)) + 0.5,
+    y = values,
+    z = matrix(values, nrow = 1),
+    col = color_fun(values),
     axes = FALSE,
     xlab = "",
     ylab = ""

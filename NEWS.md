@@ -13,6 +13,7 @@
     `"lambda"` (1/eps).
   - `plot()` for `hdbscan` objects now shows a color bar that maps the colors
     of the condensed tree to the number of points in a cluster.
+    The default for `gradient` is now the viridis palette.
   - The `scale` parameter of `plot()` for `hdbscan` objects now defaults to 1
     (numeric). The value `"suggest"` is deprecated and is treated as 1.
 

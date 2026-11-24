@@ -1,0 +1,13 @@
+This directory contains the ANN distribution v1.1 (05/03/05) obtained from https://www.cs.umd.edu/~mount/ANN/
+with minor R-specific modifications:
+
+Error handler (ANN.cpp)
+  - annError() prints with R's Rprintf instead of cerr. ANN.cpp also includes <R.h>.
+  - The std::exit(1) call is commented out. ANN's fatal errors now print a message and no longer terminate the process, which R packages shouldn't do. 
+
+Includes (ANN.cpp)
+  - Added cstdlib and std::" and the file includes <cstdlib>. This is a compatibility fix for newer compilers.
+
+Note: The querrying trees in the ANN library is not thread safe! Do not call it with OpenMP or RcppParallel. 
+
+The original ANN readme is in ReadMe.txt 

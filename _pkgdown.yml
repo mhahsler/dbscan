@@ -58,6 +58,7 @@ reference:
   contents:
   - moons
   - clusterable_data
+  - epsilon_data
   - DS3
   - DBCV_datasets
 

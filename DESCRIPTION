@@ -70,6 +70,7 @@ Collate:
     'dbcv.R'
     'dbscan.R'
     'dendrogram.R'
+    'epsilon_data.R'
     'extractFOSC.R'
     'frNN.R'
     'hdbscan.R'

@@ -3,6 +3,9 @@
 ## New features
 * Added the dataset `clusterable_data` (2309 2-d points), the example data from the
   HDBSCAN documentation on soft clustering.
+* Added the dataset `epsilon_data` (118 2-d points with clusters of various
+  densities) from Malzer and Baum (2020). It replaces the data that was typed
+  into the HDBSCAN(e) example of `hdbscan()`.
 
 ## Changes
 * __HDBSCAN__

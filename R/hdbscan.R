@@ -88,12 +88,15 @@
 #' children's combined stability is larger than the parent's, so
 #' long-lived, high-mass clusters are favored.
 #'
-#' Because one `minPts` value sets both the density smoothing and the minimum
-#' cluster size in HDBSCAN, using a different minimum cluster size
-#' requires an explicit call to [extractFOSC()] with the new `minPts`,
+#' The original HDBSCAN algorithm uses one `minPts` value sets both the density
+#' smoothing and the minimum
+#' cluster size.
+#' The user can specify a different cluster size via `min_cluster_size`
+#' or call [extractFOSC()] with the new `minPts`,
 #' e.g., `extractFOSC(res, minPts = 20)`. This keeps the
-#' density estimates using the original `minPts`and the hierarchy of `res`,
-#' but recomputed stability and cluster extraction using the new `minPts` value.
+#' density estimates using the original `minPts` and the hierarchy of `res`,
+#' but recomputed stability and cluster extraction using the new `minPts` value
+#' for the minimum cluster size.
 #'
 #'
 #' ## HDBSCAN* and DBSCAN*
@@ -142,9 +145,12 @@
 #'
 #' @param x a data matrix (Euclidean distances are used) or a [dist] object
 #' calculated with an arbitrary distance metric.
-#' @param minPts integer; Main parameter to control density estimate smoothing
-#'   and the minimum clusters size. See details. For `mrdist()` (and
+#' @param minPts integer; Main parameter to control density estimate smoothing.
+#'   For `mrdist()` (and
 #'   [mst_mrdist()]) it can be omitted if `coredist` is specified.
+#' @param min_cluster_size integer; The minimum clusters size used for stability
+#'   calculation. HDBSCAN* uses `min_cluster_size=minPts`, but
+#'   it can be decoupled for better results. See Details Section.
 #' @param cluster_selection_epsilon double; a distance threshold below which
 #'  no clusters should be selected (see Malzer & Baum 2020). The threshold is
 #'  specified in mutual reachability distance (see `mrdist()`). The default of
@@ -275,6 +281,7 @@
 #' @export
 hdbscan <- function(x,
                     minPts,
+                    min_cluster_size = minPts,
                     cluster_selection_epsilon = 0.0,
                     gen_hdbscan_tree = FALSE,
                     gen_simplified_tree = FALSE,
@@ -311,7 +318,7 @@ hdbscan <- function(x,
 
   # this is the same as extractFOCS(hc, minPts=minPts, cluster_selection_epsilon = cluster_selection_epsilon)
   # but it also computes GLOSH scores.
-  res <- computeStability(hc, minPts, compute_glosh = TRUE)
+  res <- computeStability(hc, min_cluster_size, compute_glosh = TRUE)
   res <- extractUnsupervised(res, cluster_selection_epsilon = cluster_selection_epsilon)
 
   cl <- attr(res, "cluster")

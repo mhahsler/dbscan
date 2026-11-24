@@ -4,6 +4,13 @@
 * Added the dataset `clusterable_data` (2309 2-d points), the example data from the
   HDBSCAN documentation on soft clustering.
 
+## Changes
+* __HDBSCAN__
+  - `hdbscan()` gained the parameter `min_cluster_size` (default: `minPts`) to
+    decouple the minimum cluster size used for stability calculation from
+    `minPts`, which now only controls the smoothing of the density estimate.
+    The default reproduces the previous results.
+
 
 # dbscan 1.3.0 (2026-11-15)
 

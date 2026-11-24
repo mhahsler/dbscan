@@ -13,6 +13,7 @@
 hdbscan(
   x,
   minPts,
+  min_cluster_size = minPts,
   cluster_selection_epsilon = 0,
   gen_hdbscan_tree = FALSE,
   gen_simplified_tree = FALSE,
@@ -42,9 +43,13 @@ mrdist(x, minPts, coredist = NULL)
 \item{x}{a data matrix (Euclidean distances are used) or a \link{dist} object
 calculated with an arbitrary distance metric.}
 
-\item{minPts}{integer; Main parameter to control density estimate smoothing
-and the minimum clusters size. See details. For \code{mrdist()} (and
+\item{minPts}{integer; Main parameter to control density estimate smoothing.
+For \code{mrdist()} (and
 \code{\link[=mst_mrdist]{mst_mrdist()}}) it can be omitted if \code{coredist} is specified.}
+
+\item{min_cluster_size}{integer; The minimum clusters size used for stability
+calculation. HDBSCAN* uses \code{min_cluster_size=minPts}, but
+it can be decoupled for better results. See Details Section.}
 
 \item{cluster_selection_epsilon}{double; a distance threshold below which
 no clusters should be selected (see Malzer & Baum 2020). The threshold is
@@ -183,12 +188,15 @@ In the cluster tree, a child cluster replaces its parent only if the
 children's combined stability is larger than the parent's, so
 long-lived, high-mass clusters are favored.
 
-Because one \code{minPts} value sets both the density smoothing and the minimum
-cluster size in HDBSCAN, using a different minimum cluster size
-requires an explicit call to \code{\link[=extractFOSC]{extractFOSC()}} with the new \code{minPts},
+The original HDBSCAN algorithm uses one \code{minPts} value sets both the density
+smoothing and the minimum
+cluster size.
+The user can specify a different cluster size via \code{min_cluster_size}
+or call \code{\link[=extractFOSC]{extractFOSC()}} with the new \code{minPts},
 e.g., \code{extractFOSC(res, minPts = 20)}. This keeps the
-density estimates using the original \code{minPts}and the hierarchy of \code{res},
-but recomputed stability and cluster extraction using the new \code{minPts} value.
+density estimates using the original \code{minPts} and the hierarchy of \code{res},
+but recomputed stability and cluster extraction using the new \code{minPts} value
+for the minimum cluster size.
 }
 
 \subsection{HDBSCAN* and DBSCAN*}{

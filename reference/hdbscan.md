@@ -9,6 +9,7 @@ related algorithms.
 hdbscan(
   x,
   minPts,
+  min_cluster_size = minPts,
   cluster_selection_epsilon = 0,
   gen_hdbscan_tree = FALSE,
   gen_simplified_tree = FALSE,
@@ -48,10 +49,16 @@ predict(object, newdata, data, ...)
 
 - minPts:
 
-  integer; Main parameter to control density estimate smoothing and the
-  minimum clusters size. See details. For `mrdist()` (and
+  integer; Main parameter to control density estimate smoothing. For
+  `mrdist()` (and
   [`mst_mrdist()`](https://michael.hahsler.net/dbscan/reference/mst_dist.md))
   it can be omitted if `coredist` is specified.
+
+- min_cluster_size:
+
+  integer; The minimum clusters size used for stability calculation.
+  HDBSCAN\* uses `min_cluster_size=minPts`, but it can be decoupled for
+  better results. See Details Section.
 
 - cluster_selection_epsilon:
 
@@ -250,14 +257,19 @@ Euclidean distances.
 The MST is pruned using stability and clusters are extracted in the
 unsupervised version implemented in
 [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md).
-Because one `minPts` value sets both the density smoothing and the
-minimum cluster size in HDBSCAN, using a different minimum cluster size
-requires an explicit call to
+Stability is the excess-of-mass measure defined for HDBSCAN\*. In the
+cluster tree, a child cluster replaces its parent only if the children's
+combined stability is larger than the parent's, so long-lived, high-mass
+clusters are favored.
+
+The original HDBSCAN algorithm uses one `minPts` value sets both the
+density smoothing and the minimum cluster size. The user can specify a
+different cluster size via `min_cluster_size` or call
 [`extractFOSC()`](https://michael.hahsler.net/dbscan/reference/extractFOSC.md)
 with the new `minPts`, e.g., `extractFOSC(res, minPts = 20)`. This keeps
-the density estimates using the original `minPts`and the hierarchy of
+the density estimates using the original `minPts` and the hierarchy of
 `res`, but recomputed stability and cluster extraction using the new
-`minPts` value.
+`minPts` value for the minimum cluster size.
 
 ### HDBSCAN\* and DBSCAN\*
 

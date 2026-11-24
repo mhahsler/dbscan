@@ -61,6 +61,7 @@ algorithms.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">hdbscan</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">minPts</span>,</span>
+<span>  min_cluster_size <span class="op">=</span> <span class="va">minPts</span>,</span>
 <span>  cluster_selection_epsilon <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  gen_hdbscan_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  gen_simplified_tree <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -100,9 +101,15 @@ calculated with an arbitrary distance metric.</p></dd>
 
 
 <dt id="arg-minpts">minPts<a class="anchor" aria-label="anchor" href="#arg-minpts"></a></dt>
-<dd><p>integer; Main parameter to control density estimate smoothing
-and the minimum clusters size. See details. For <code>mrdist()</code> (and
+<dd><p>integer; Main parameter to control density estimate smoothing.
+For <code>mrdist()</code> (and
 <code><a href="mst_dist.html">mst_mrdist()</a></code>) it can be omitted if <code>coredist</code> is specified.</p></dd>
+
+
+<dt id="arg-min-cluster-size">min_cluster_size<a class="anchor" aria-label="anchor" href="#arg-min-cluster-size"></a></dt>
+<dd><p>integer; The minimum clusters size used for stability
+calculation. HDBSCAN* uses <code>min_cluster_size=minPts</code>, but
+it can be decoupled for better results. See Details Section.</p></dd>
 
 
 <dt id="arg-cluster-selection-epsilon">cluster_selection_epsilon<a class="anchor" aria-label="anchor" href="#arg-cluster-selection-epsilon"></a></dt>
@@ -280,12 +287,19 @@ only works with Euclidean distances.</p>
 
 <p>The MST is pruned using stability and clusters are extracted
 in the unsupervised version implemented in <code><a href="extractFOSC.html">extractFOSC()</a></code>.
-Because one <code>minPts</code> value sets both the density smoothing and the minimum
-cluster size in HDBSCAN, using a different minimum cluster size
-requires an explicit call to <code><a href="extractFOSC.html">extractFOSC()</a></code> with the new <code>minPts</code>,
+Stability is the excess-of-mass measure defined for HDBSCAN*.
+In the cluster tree, a child cluster replaces its parent only if the
+children's combined stability is larger than the parent's, so
+long-lived, high-mass clusters are favored.</p>
+<p>The original HDBSCAN algorithm uses one <code>minPts</code> value sets both the density
+smoothing and the minimum
+cluster size.
+The user can specify a different cluster size via <code>min_cluster_size</code>
+or call <code><a href="extractFOSC.html">extractFOSC()</a></code> with the new <code>minPts</code>,
 e.g., <code>extractFOSC(res, minPts = 20)</code>. This keeps the
-density estimates using the original <code>minPts</code>and the hierarchy of <code>res</code>,
-but recomputed stability and cluster extraction using the new <code>minPts</code> value.</p>
+density estimates using the original <code>minPts</code> and the hierarchy of <code>res</code>,
+but recomputed stability and cluster extraction using the new <code>minPts</code> value
+for the minimum cluster size.</p>
 </div>
 
 <div class="section">

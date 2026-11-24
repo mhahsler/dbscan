@@ -134,6 +134,8 @@ Example and benchmark data sets for density-based clustering.
 
 - [`moons`](https://michael.hahsler.net/dbscan/reference/moons.md) :
   Moons Data
+- [`clusterable_data`](https://michael.hahsler.net/dbscan/reference/clusterable_data.md)
+  : Clusterable Data (HDBSCAN Soft Clustering Example)
 - [`DS3`](https://michael.hahsler.net/dbscan/reference/DS3.md) : DS3:
   Spatial data with arbitrary shapes
 - [`DBCV_datasets`](https://michael.hahsler.net/dbscan/reference/DBCV_datasets.md)

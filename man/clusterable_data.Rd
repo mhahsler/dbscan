@@ -23,11 +23,12 @@ HDBSCAN documentation to explain soft clustering.
 }
 \examples{
 data(clusterable_data)
-plot(clusterable_data, pch = 20, col = rgb(0, 0, 0, 0.25))
+plot(clusterable_data)
 
 cl <- hdbscan(clusterable_data, minPts = 15)
 cl
-plot(clusterable_data, col = cl$cluster + 1L, pch = 20)
+
+clplot(clusterable_data, cl)
 }
 \references{
 McInnes, Leland, John Healy, and Steve Astels (2017).

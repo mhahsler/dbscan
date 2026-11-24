@@ -1,5 +1,9 @@
 # dbscan 1.3.1 (unreleased)
 
+## New features
+* Added the dataset `clusterable_data` (2309 2-d points), the example data from the
+  HDBSCAN documentation on soft clustering.
+
 
 # dbscan 1.3.0 (2026-11-15)
 

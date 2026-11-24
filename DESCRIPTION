@@ -65,6 +65,7 @@ Collate:
     'NN.R'
     'RcppExports.R'
     'broom-dbscan-tidiers.R'
+    'clusterable_data.R'
     'comps.R'
     'dbcv.R'
     'dbscan.R'

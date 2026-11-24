@@ -57,6 +57,7 @@ reference:
   desc: Example and benchmark data sets for density-based clustering.
   contents:
   - moons
+  - clusterable_data
   - DS3
   - DBCV_datasets
 
